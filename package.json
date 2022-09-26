@@ -2,12 +2,12 @@
   "name": "rechess",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --config .config/vite.config.ts",
     "build": "run-p type-check build-only",
-    "preview": "vite preview --port 4173",
-    "build-only": "vite build",
-    "type-check": "vue-tsc --noEmit",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "preview": "vite preview --port 4173 --config .config/vite.config.ts",
+    "build-only": "vite build --config .config/vite.config.ts",
+    "type-check": "vue-tsc --noEmit --project .config/tsconfig.json",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --config .config/.eslintrc.cjs"
   },
   "dependencies": {
     "bulma": "^0.9.4",
