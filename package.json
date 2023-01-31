@@ -1,20 +1,24 @@
 {
   "name": "rechess",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "dev": "vite --config .config/vite.config.ts",
-    "build": "run-p type-check build-only",
-    "deploy": "run-p type-check build-only deploy-only",
+    "build": "run-p build-wasm type-check build-only",
+    "deploy": "run-p build deploy-only",
     "preview": "vite preview --port 4173 --config .config/vite.config.ts",
-    "build-only": "vite build --config .config/vite.config.ts",
+    "build-wasm": "make --directory protochess-engine/protochess-engine-wasm",
+    "build-only": "vite build -d --config .config/vite.config.ts",
     "type-check": "vue-tsc --noEmit --project .config/tsconfig.json",
     "deploy-only": "firebase deploy --project rechess-web",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --config .config/.eslintrc.cjs"
   },
   "dependencies": {
     "bulma": "^0.9.4",
+    "comlink": "^4.3.1",
     "pinia": "^2.0.21",
-    "vue": "^3.2.38"
+    "vue": "^3.2.38",
+    "vue-router": "^4.1.6",
+    "wasm-feature-detect": "^1.4.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",

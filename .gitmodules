@@ -1,0 +1,3 @@
+[submodule "protochess-engine"]
+	path = protochess-engine
+	url = https://github.com/p-rivero/protochess-engine
