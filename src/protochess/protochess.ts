@@ -1,56 +1,14 @@
 
 import * as Comlink from 'comlink'
-
-// PUBLIC INTERFACES
-
-export interface MakeMoveResult {
-  result:
-    'Ok' |
-    'IllegalMove' |
-    'Checkmate' |
-    'LeaderCaptured' |
-    'PieceInWinSquare' |
-    'CheckLimit' |
-    'Stalemate' |
-    'Repetition',
-  winner?: 'White' | 'Black',
-}
-export interface MakeMoveResultWithDepth extends MakeMoveResult {
-  depth: number,
-}
-
-export interface MoveInfo {
-  // x, y coordinates between 0 and 15
-  // (0, 0 is the bottom left corner)
-  from: [number, number],
-  to: [number, number],
-  promotion?: number,
-}
-export interface MoveInfoWithEval extends MoveInfo {
-  evaluation: number,
-}
-export interface MoveInfoWithEvalDepth extends MoveInfoWithEval {
-  depth: number,
-}
-
-export interface Protochess {
-  toString(): Promise<string>,
-  playBestMove(): Promise<MakeMoveResult>,
-  playBestMoveTimeout(time: number): Promise<MakeMoveResultWithDepth>,
-  makeMove(move: MoveInfo): Promise<MakeMoveResult>,
-  makeMoveStr(move: string): Promise<MakeMoveResult>,
-  getBestMove(depth: number): Promise<MoveInfoWithEval>,
-  getBestMoveTimeout(time: number): Promise<MoveInfoWithEvalDepth>,
-  isInCheck(): Promise<boolean>,
-  // TODO: Add state interface
-  setState(state: string): Promise<void>,
-  loadFen(fen: string): Promise<void>,
-  movesFrom(x: number, y: number): Promise<MoveInfo[]>,
-  getMaxThreads(): Promise<number>,
-  setNumThreads(threads: number): Promise<void>,
-}
-
-
+import {
+  Protochess,
+  MakeMoveResult,
+  MakeMoveResultWithDepth,
+  MoveInfo,
+  MoveInfoWithEval,
+  MoveInfoWithEvalDepth,
+  IWasmModule
+} from "./interfaces"
 
 // Call this at the start of the app to initialize the wasm module
 let protochess: Protochess | null = null
@@ -66,13 +24,12 @@ export function getProtochess(): Protochess {
 }
 
 
-// CODE TO INITIALIZE THE WASM MODULE
 
 async function init(): Promise<Protochess> {
   // Create a separate thread from wasm-worker.js and get a proxy to its handler
-  const WasmModule: Comlink.Remote<Worker> = Comlink.wrap(new Worker(new URL('./wasm-worker.js', import.meta.url), { type: 'module' }))
+  const WasmModule = Comlink.wrap(new Worker(new URL('./wasm-worker.js', import.meta.url), { type: 'module' }))
   // wasm is an object that lives in the worker thread, but appears to be local
-  const wasm = await new WasmModule()
+  const wasm: IWasmModule = await new WasmModule()
   await wasm.init()
   
   if (await wasm.supportsThreads) {
@@ -92,10 +49,10 @@ async function init(): Promise<Protochess> {
       return adaptMakeMoveResultWithDepth(await wasm.wasmObject.play_best_move_timeout(time))
     },
     async makeMove(move: MoveInfo): Promise<MakeMoveResult> {
-      return adaptMakeMoveResult(await wasm.wasmObject.make_move(move.from[0], move.from[1], move.to[0], move.to[1], move.promotion))
+      return adaptMakeMoveResult(await wasm.wasmObject.make_move(move))
     },
-    async makeMoveStr(move: string): Promise<MakeMoveResult> {
-      return adaptMakeMoveResult(await wasm.wasmObject.make_move_str(move))
+    async makeMoveStr(move_str: string): Promise<MakeMoveResult> {
+      return adaptMakeMoveResult(await wasm.wasmObject.make_move_str(move_str))
     },
     async getBestMove(depth: number): Promise<MoveInfoWithEval> {
       return adaptMoveInfoWithEval(await wasm.wasmObject.get_best_move(depth))
