@@ -69,12 +69,13 @@ export function getProtochess(): Protochess {
 // CODE TO INITIALIZE THE WASM MODULE
 
 async function init(): Promise<Protochess> {
-  // Create a separate thread from wasm-worker.ts and get a proxy to its handler
-  const comlink_remote: Comlink.Remote<{wasm: {wasmObject: any, supportsThreads: boolean}}> =
-    Comlink.wrap(new Worker(new URL('./wasm-worker.js', import.meta.url), { type: 'module' }))
-  const wasm = await comlink_remote.wasm
+  // Create a separate thread from wasm-worker.js and get a proxy to its handler
+  const WasmModule: Comlink.Remote<Worker> = Comlink.wrap(new Worker(new URL('./wasm-worker.js', import.meta.url), { type: 'module' }))
+  // wasm is an object that lives in the worker thread, but appears to be local
+  const wasm = await new WasmModule()
+  await wasm.init()
   
-  if (wasm.supportsThreads) {
+  if (await wasm.supportsThreads) {
     console.info('WebAssembly supports threads, using multi-threaded version')
   } else {
     console.warn('WebAssembly does not support threads, using single-threaded version')
