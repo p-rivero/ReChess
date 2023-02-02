@@ -6,7 +6,7 @@
     "build": "run-s build-wasm type-check build-only",
     "deploy": "run-s build deploy-only",
     "preview": "vite preview --port 4173 --config .config/vite.config.ts",
-    "build-wasm": "make --directory protochess-engine/protochess-engine-wasm",
+    "build-wasm": "make all use-pathname --directory protochess-engine/protochess-engine-wasm",
     "build-only": "vite build --config .config/vite.config.ts",
     "type-check": "vue-tsc --noEmit",
     "deploy-only": "firebase deploy --project rechess-web",
