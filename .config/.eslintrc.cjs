@@ -10,5 +10,7 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: 'latest'
-  }
+  },
+  // Ignore the protochess-engine directory
+  ignorePatterns: ['protochess-engine'],
 }

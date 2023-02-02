@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteParams, RouteRecordRaw } from 'vue-router'
-import Home from './pages/Home.vue'
-import Play from './pages/Play.vue'
+import Home from './pages/HomePage.vue'
+import Play from './pages/PlayPage.vue'
 
 // https://github.com/mutoe/vue3-realworld-example-app/blob/master/src/router.ts
 

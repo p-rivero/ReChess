@@ -1,13 +1,14 @@
 
 import * as Comlink from 'comlink'
-import {
+import type {
   Protochess,
   MakeMoveResult,
   MakeMoveResultWithDepth,
   MoveInfo,
   MoveInfoWithEval,
   MoveInfoWithEvalDepth,
-  IWasmModule
+  IWasmModule,
+  GameState,
 } from "./interfaces"
 
 // Call this at the start of the app to initialize the wasm module
@@ -28,8 +29,10 @@ export function getProtochess(): Protochess {
 async function init(): Promise<Protochess> {
   // Create a separate thread from wasm-worker.js and get a proxy to its handler
   const WasmModule = Comlink.wrap(new Worker(new URL('./wasm-worker.js', import.meta.url), { type: 'module' }))
-  // wasm is an object that lives in the worker thread, but appears to be local
+  // WasmModule is a proxy to a class, so it's constructable even though tsc disagrees
+  // @ts-ignore
   const wasm: IWasmModule = await new WasmModule()
+  // wasm is an object that lives in the worker thread, but appears to be local
   await wasm.init()
   
   if (await wasm.supportsThreads) {
@@ -63,8 +66,11 @@ async function init(): Promise<Protochess> {
     async isInCheck(): Promise<boolean> {
       return wasm.wasmObject.to_move_in_check()
     },
-    async setState(state: string): Promise<void> {
+    async setState(state: GameState): Promise<void> {
       return wasm.wasmObject.set_state(state)
+    },
+    async getState(): Promise<GameState> {
+      return wasm.wasmObject.get_state()
     },
     async loadFen(fen: string): Promise<void> {
       return wasm.wasmObject.load_fen(fen)
