@@ -13,11 +13,12 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --config .config/.eslintrc.cjs"
   },
   "dependencies": {
-    "protochess-singlethread": "protochess-engine/protochess-engine-wasm/pkg",
-    "protochess-multithread": "protochess-engine/protochess-engine-wasm/pkg-parallel",
     "bulma": "^0.9.4",
     "comlink": "^4.3.1",
     "pinia": "^2.0.21",
+    "protochess-multithread": "protochess-engine/protochess-engine-wasm/pkg-parallel",
+    "protochess-singlethread": "protochess-engine/protochess-engine-wasm/pkg",
+    "sass": "^1.58.0",
     "vue": "^3.2.38",
     "vue-router": "^4.1.6",
     "wasm-feature-detect": "^1.4.0"

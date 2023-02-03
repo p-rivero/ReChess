@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   width="45"
+   height="45"
+   id="svg18"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs22" />
+  <g
+     style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     transform="matrix(1.3890385,0,0,1.3890385,-8.2124947,-9.429036)"
+     id="g16">
+    <path
+       d="m 10.125,38.025002 h 27 v -3 h -27 z"
+       style="stroke-linecap:butt"
+       id="path2" />
+    <path
+       d="m 13.800003,35.025002 v -4 h 21 v 4 z"
+       style="stroke-linecap:butt"
+       id="path4" />
+    <path
+       d="M 12.800003,13.025002 V 8.0250015 h 4 v 2.0000005 h 5 V 8.0250015 h 5 v 2.0000005 h 5 V 8.0250015 h 4 v 5.0000005"
+       style="stroke-linecap:butt"
+       id="path6" />
+    <path
+       d="m 35.800003,13.025002 -3,3 c -0.71693,7.215754 -16.936402,6.571163 -17,0 l -3,-3"
+       id="path8" />
+    <path
+       d="m 32.800003,16.025002 v 12.5 h -17 v -12.5"
+       style="stroke-linecap:butt;stroke-linejoin:miter"
+       id="path10" />
+    <path
+       d="m 32.800003,28.525002 1.5,2.5 h -20 l 1.5,-2.5"
+       id="path12" />
+    <path
+       d="m 12.800003,13.025002 h 23"
+       style="display:inline;fill:none;stroke:#000000;stroke-linejoin:miter"
+       id="path14" />
+    <g
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       transform="translate(0.85714002,1.1964315)"
+       id="g10">
+      <path
+         d="m 24,18 c 0.38,2.91 -5.55,7.37 -8,9 -3,2 -2.82,4.34 -5,4 -1.042,-0.94 1.41,-3.04 0,-3 -1,0 0.19,1.23 -1,2 -1,0 -4.003,1 -4,-4 0,-2 6,-12 6,-12 0,0 0.240002,-0.55 1.057147,-1.785714"
+         style="fill:#ffffff;stroke:#000000"
+         id="path4-3" />
+      <path
+         d="m 9.5,25.5 a 0.5,0.5 0 1 1 -1,0 0.5,0.5 0 1 1 1,0 z"
+         style="fill:#000000;stroke:#000000"
+         id="path6-6" />
+      <path
+         d="m 15,15.5 a 0.5,1.5 0 1 1 -1,0 0.5,1.5 0 1 1 1,0 z"
+         style="fill:#000000;stroke:#000000"
+         id="path8-7"
+         transform="matrix(0.866,0.5,-0.5,0.866,9.693,-5.173)" />
+    </g>
+  </g>
+</svg>

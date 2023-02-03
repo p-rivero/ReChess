@@ -1,0 +1,28 @@
+@import 'bulma/bulma.sass';
+
+// Dark theme variant
+[data-theme="dark"] {
+    body {
+        background-color: $dark;
+        color: $light;
+    }
+    
+    body .subtitle,
+    body .title {
+        color: $light;
+    }
+}
+
+
+// Light theme variant
+[data-theme="light"] {
+    body {
+        background-color: $light;
+        color: $dark;
+    }
+    
+    body .subtitle,
+    body .title {
+        color: $dark;
+    }
+}

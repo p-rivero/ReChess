@@ -17,9 +17,10 @@ export async function initializeProtochess() {
   protochess = await init()
 }
 // Use this to get a reference to the protochess object
-export function getProtochess(): Protochess {
-  if (protochess === null) {
-    throw new Error('Protochess not initialized, make sure to call initializeProtochess() first')
+export async function getProtochess(): Promise<Protochess> {
+  // Wait for the wasm module to be initialized
+  while (protochess === null) {
+    await new Promise(resolve => setTimeout(resolve, 10))
   }
   return protochess
 }

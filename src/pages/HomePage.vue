@@ -2,9 +2,15 @@
   <div>
     <p>Home page</p>
     <button @click="$router.push('/play')" class="button is-link">Go to /play</button>
+    <button @click="toggleTheme" class="button">Toggle theme</button>
   </div>
 </template>
 
 <script setup lang="ts">
-  // TODO
+  function toggleTheme() {
+    const oldTheme = document.documentElement.getAttribute('data-theme')
+    const newTheme = oldTheme === 'dark' ? 'light' : 'dark'
+    document.documentElement.setAttribute('data-theme', newTheme)
+    localStorage.setItem('theme', newTheme)
+  }
 </script>
