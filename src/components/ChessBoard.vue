@@ -9,7 +9,7 @@
   import { chessboardSvg } from './boardBackgroudSvg'
   import { Chessground } from 'chessgroundx'
   import type { Config } from 'chessgroundx/config';
-  import { ref, onMounted } from "vue";
+  import { ref, onMounted } from 'vue';
   
   const props = defineProps<{
     width: number
@@ -46,7 +46,9 @@
   })
   
   // Board appearance
-  const backgroundSvg = chessboardSvg(props.width, props.height)
+  const LIGHT_COLOR = '#f0d9b5';
+  const DARK_COLOR = '#b58863';
+  const backgroundSvg = chessboardSvg(props.width, props.height, LIGHT_COLOR, DARK_COLOR)
   const boardBackground = 'url("data:image/svg+xml;utf8,' + backgroundSvg + '")'
   const widthPercent = 100 / props.width + '%'
   const heightPercent = 100 / props.height + '%'
@@ -54,7 +56,13 @@
   const sizePerSquare = props.size / Math.max(props.width, props.height)
   const componentHeight = props.height * sizePerSquare + 'px'
   const componentWidth = props.width * sizePerSquare + 'px'
-  const fontSize = sizePerSquare * 0.2 + 'px'
+  
+  const bottomLeftTextColor = props.height % 2 === 0 ? LIGHT_COLOR : DARK_COLOR
+  const bottomLeftTextOpposite = props.height % 2 === 0 ? DARK_COLOR : LIGHT_COLOR
+  const topRightTextColor = props.width % 2 === 0 ? LIGHT_COLOR : DARK_COLOR
+  const topRightTextOpposite = props.width % 2 === 0 ? DARK_COLOR : LIGHT_COLOR
+  const bottomRightTextColor = (props.height + props.width) % 2 === 0 ? DARK_COLOR : LIGHT_COLOR
+  const bottomRightTextOpposite = (props.height + props.width) % 2 === 0 ? LIGHT_COLOR : DARK_COLOR
 </script>
 
 <style lang="css">
@@ -174,41 +182,64 @@
     z-index: 9;
   }
   .cg-wrap coords {
+    --coord-light: #f0d9b5;
+    --coord-dark: #946f51;
     position: absolute;
     display: flex;
     pointer-events: none;
-    opacity: 0.8;
-    font-size: v-bind(fontSize);
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 12px;
   }
   .cg-wrap coords.side {
-    right: -15px;
+    right: 2px;
     top: 0;
     flex-flow: column-reverse;
+    text-align: right;
     height: 100%;
-    width: 12px;
-    font-weight: 600;
   }
   .cg-wrap coords.side.black {
     flex-flow: column;
   }
   .cg-wrap coords.bottom {
-    bottom: -16px;
-    left: 0;
+    bottom: 0;
+    left: 2px;
+    text-align: left;
     flex-flow: row;
     width: 100%;
-    height: 16px;
-    text-transform: uppercase;
-    text-align: center;
-    font-weight: 600;
   }
   .cg-wrap coords.bottom.black {
     flex-flow: row-reverse;
   }
+  
   .cg-wrap coords coord {
     flex: 1 1 auto;
   }
-  .cg-wrap coords.side coord {
-    transform: translateY(39%);
+  
+  .cg-wrap coords.side coord:nth-child(2n+1) {
+    color: v-bind(bottomRightTextColor)
+  }
+  .cg-wrap coords.side coord:nth-child(2n) {
+    color: v-bind(bottomRightTextOpposite)
+  }
+  .cg-wrap coords.side.black coord:nth-child(2n+1) {
+    color: v-bind(topRightTextColor)
+  }
+  .cg-wrap coords.side.black coord:nth-child(2n) {
+    color: v-bind(topRightTextOpposite)
+  }
+  
+  .cg-wrap coords.bottom coord:nth-child(2n+1) {
+    color: v-bind(bottomLeftTextColor)
+  }
+  .cg-wrap coords.bottom coord:nth-child(2n) {
+    color: v-bind(bottomLeftTextOpposite)
+  }
+  .cg-wrap coords.bottom.black coord:nth-child(2n+1) {
+    color: v-bind(bottomRightTextColor)
+  }
+  .cg-wrap coords.bottom.black coord:nth-child(2n) {
+    color: v-bind(bottomRightTextOpposite)
   }
   
   
