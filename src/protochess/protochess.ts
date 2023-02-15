@@ -44,46 +44,46 @@ async function init(): Promise<Protochess> {
   
   return {
     async toString(): Promise<string> {
-      return wasm.wasmObject.to_string()
+      return wasm.wasmObject.toString()
     },
     async playBestMove(): Promise<MakeMoveResult> {
-      return adaptMakeMoveResult(await wasm.wasmObject.play_best_move())
+      return adaptMakeMoveResult(await wasm.wasmObject.playBestMove())
     },
     async playBestMoveTimeout(time: number): Promise<MakeMoveResultWithDepth> {
-      return adaptMakeMoveResultWithDepth(await wasm.wasmObject.play_best_move_timeout(time))
+      return adaptMakeMoveResultWithDepth(await wasm.wasmObject.playBestMoveTimeout(time))
     },
     async makeMove(move: MoveInfo): Promise<MakeMoveResult> {
-      return adaptMakeMoveResult(await wasm.wasmObject.make_move(move))
+      return adaptMakeMoveResult(await wasm.wasmObject.makeMove(move))
     },
-    async makeMoveStr(move_str: string): Promise<MakeMoveResult> {
-      return adaptMakeMoveResult(await wasm.wasmObject.make_move_str(move_str))
+    async makeMoveStr(moveStr: string): Promise<MakeMoveResult> {
+      return adaptMakeMoveResult(await wasm.wasmObject.makeMoveStr(moveStr))
     },
     async getBestMove(depth: number): Promise<MoveInfoWithEval> {
-      return adaptMoveInfoWithEval(await wasm.wasmObject.get_best_move(depth))
+      return adaptMoveInfoWithEval(await wasm.wasmObject.getBestMove(depth))
     },
     async getBestMoveTimeout(time: number): Promise<MoveInfoWithEvalDepth> {
-      return adaptMoveInfoWithEvalDepth(await wasm.wasmObject.get_best_move_timeout(time))
+      return adaptMoveInfoWithEvalDepth(await wasm.wasmObject.getBestMoveTimeout(time))
     },
     async isInCheck(): Promise<boolean> {
-      return wasm.wasmObject.to_move_in_check()
+      return wasm.wasmObject.toMoveInCheck()
     },
     async setState(state: GameState): Promise<void> {
-      return wasm.wasmObject.set_state(state)
+      return wasm.wasmObject.setState(state)
     },
     async getState(): Promise<GameState> {
-      return wasm.wasmObject.get_state()
+      return wasm.wasmObject.getState()
     },
     async loadFen(fen: string): Promise<void> {
-      return wasm.wasmObject.load_fen(fen)
+      return wasm.wasmObject.loadFen(fen)
     },
     async movesFrom(x: number, y: number): Promise<MoveInfo[]> {
-      return wasm.wasmObject.moves_from(x, y)
+      return wasm.wasmObject.movesFrom(x, y)
     },
     async getMaxThreads(): Promise<number> {
-      return wasm.wasmObject.get_max_threads()
+      return wasm.wasmObject.getMaxThreads()
     },
     async setNumThreads(threads: number): Promise<void> {
-      return wasm.wasmObject.set_num_threads(threads)
+      return wasm.wasmObject.setNumThreads(threads)
     },
   }
 }
@@ -94,9 +94,9 @@ async function init(): Promise<Protochess> {
 function adaptMakeMoveResult(makeMoveRes: any): MakeMoveResult {
   const result = makeMoveRes.result
   let winner: 'White' | 'Black' | undefined
-  if (makeMoveRes.winner_player === 0) {
+  if (makeMoveRes.winnerPlayer === 0) {
     winner = 'White'
-  } else if (makeMoveRes.winner_player === 1) {
+  } else if (makeMoveRes.winnerPlayer === 1) {
     winner = 'Black'
   } else {
     winner = undefined
@@ -105,19 +105,19 @@ function adaptMakeMoveResult(makeMoveRes: any): MakeMoveResult {
 }
 
 function adaptMakeMoveResultWithDepth(makeMoveRes: any): MakeMoveResultWithDepth {
-  const makeMoveResult = adaptMakeMoveResult(makeMoveRes.make_move_result)
+  const makeMoveResult = adaptMakeMoveResult(makeMoveRes.makeIoveIesult)
   const depth: number = makeMoveRes.depth
   return { ...makeMoveResult, depth }
 }
 
 function adaptMoveInfoWithEval(moveInfoEval: any): MoveInfoWithEval {
-  const moveInfo: MoveInfo = moveInfoEval.move_info
+  const moveInfo: MoveInfo = moveInfoEval.moveInfo
   const evaluation: number = moveInfoEval.evaluation
   return { ...moveInfo, evaluation }
 }
 
 function adaptMoveInfoWithEvalDepth(moveInfoEval: any): MoveInfoWithEvalDepth {
-  const moveInfo: MoveInfo = moveInfoEval.move_info
+  const moveInfo: MoveInfo = moveInfoEval.moveInfo
   const evaluation: number = moveInfoEval.evaluation
   const depth: number = moveInfoEval.depth
   return { ...moveInfo, evaluation, depth }
