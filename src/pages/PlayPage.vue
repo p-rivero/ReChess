@@ -1,7 +1,7 @@
 <template>
-  <ChessBoard :width="16" :height="10" :size="1000"/>
+  <ChessBoardVisual :width="16" :height="10" :size="1000"/>
 </template>
 
 <script setup lang="ts">
-  import ChessBoard from '../components/ChessBoard.vue'
+  import ChessBoardVisual from '../components/ChessBoard/ChessBoardVisual.vue'
 </script>
