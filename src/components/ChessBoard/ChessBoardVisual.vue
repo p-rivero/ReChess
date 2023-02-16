@@ -1,48 +1,42 @@
 
+<!--
+  This component is a low level interface with the chessgroundx UI.
+  It does not know anything about the game state or game engine, and is only responsible for rendering the board.
+  It's recommended to use the ChessBoard component instead of this one.
+-->
+
 <template>
   <div class="chessboard">
     <div ref="board" class="cg-board-wrap"></div>
   </div>
 </template>
 
+
 <script setup lang="ts">
   import { chessboardSvg } from './boardBackgroudSvg'
   import { Chessground } from 'chessgroundx'
+  import type * as cg from 'chessgroundx/types';
+  import type { Api } from 'chessgroundx/api';
   import type { Config } from 'chessgroundx/config';
   import { ref, onMounted } from 'vue';
   
   const props = defineProps<{
     width: number
     height: number
+    boardConfig: Config
     size: number
+    viewOnly: boolean
+    whitePov: boolean
   }>()
-  
-  const boardConfig: Config = {
-    orientation: 'white',
-    turnColor: 'white',
-    autoCastle: false,
-    viewOnly: false,
-    disableContextMenu: true,
-    blockTouchScroll: true,
-    addPieceZIndex: true,
-    dimensions: {
-      width: props.width,
-      height: props.height,
-    },
-    premovable: {
-      enabled: false,
-    },
-    drawable: {
-      defaultSnapToValidMove: false,
-    },
-  }
 
-  const board = ref<HTMLElement | null>(null)
+  // When mounted, create the chessground board and store the reference to the API handle
+  const board = ref<HTMLElement>()
+  let chessgroundApi: Api | undefined = undefined
   onMounted(() => {
-    if (board.value === null) {
-      throw new Error('reference to board is null')
+    if (board.value === undefined) {
+      throw new Error('Reference to board is undefined')
     }
-    Chessground(board.value, boardConfig)
+    chessgroundApi = Chessground(board.value, props.boardConfig)
   })
   
   // Board appearance
@@ -63,7 +57,17 @@
   const topRightTextOpposite = props.width % 2 === 0 ? DARK_COLOR : LIGHT_COLOR
   const bottomRightTextColor = (props.height + props.width) % 2 === 0 ? DARK_COLOR : LIGHT_COLOR
   const bottomRightTextOpposite = (props.height + props.width) % 2 === 0 ? LIGHT_COLOR : DARK_COLOR
+  
+  // Expose a subset of the chessground API to the parent component
+  defineExpose({
+    setConfig: (config: Config) => chessgroundApi?.set(config),
+    toggleOrientation: () => chessgroundApi?.toggleOrientation(),
+    movePiece: (from: cg.Key, to: cg.Key) => chessgroundApi?.move(from, to),
+    setPieces: (diff: cg.PiecesDiff) => chessgroundApi?.setPieces(diff),
+  })
+  
 </script>
+
 
 <style lang="css">
   
