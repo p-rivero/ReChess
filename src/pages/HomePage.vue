@@ -1,7 +1,7 @@
 <template>
   <div>
     <p>Home page</p>
-    <button @click="$router.push('/play')" class="button is-link">Go to /play</button>
+    <button @click="$router.push('/play')" class="button is-primary">Go to /play</button>
     <button @click="toggleTheme" class="button">Toggle theme</button>
   </div>
 </template>
