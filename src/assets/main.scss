@@ -6,9 +6,14 @@
         background-color: $dark;
         color: $light;
     }
+    nav {
+        @extend .is-dark;
+    }
     
-    body .subtitle,
-    body .title {
+    .subtitle,
+    .title,
+    .card-header-title
+    {
         color: $light;
     }
 }

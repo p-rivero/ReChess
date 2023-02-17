@@ -72,8 +72,6 @@
 <style lang="css">
   
   .chessboard {
-    width: 100%;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -251,6 +249,7 @@
  
   .chessboard .cg-wrap {
     background-image: v-bind(boardBackground);
+    background-repeat: no-repeat;
   }
   
   .chessboard piece.p-piece.white {
