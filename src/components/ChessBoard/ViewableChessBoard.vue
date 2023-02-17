@@ -1,7 +1,7 @@
 <!--
-  This component is a higher level adapter of the ChessBoardVisual component.
+  This component is a higher level wrapper around the ChessgroundAdapter component.
   It's capable of rendering a GameState, but it doesn't know anything about the game engine or the rules of chess.
-  You can use this component directly for view-only boards. For interactive boards, use the [TODO] component instead.
+  You can use this component directly for view-only boards. For interactive boards, use the PlayableChessBoard component instead.
   Note that the initial size of the board is 0x0, so you must call setState() for the board to be visible.
 -->
 
@@ -24,7 +24,7 @@
   import type { GameState } from '@/protochess/interfaces';
   import * as cg from 'chessgroundx/types';
   import type { Config } from 'chessgroundx/config';
-  import ChessBoardVisual from './ChessBoardVisual.vue';
+  import ChessBoardVisual from './internal/ChessgroundAdapter.vue';
   import { ref } from 'vue'
 
   const props = defineProps<{
@@ -79,12 +79,12 @@
     },
     
     // Move a piece from one position to another, and optionally promote it
-    makeMove: (from: [number, number], to: [number, number], promotion?: {color: cg.Color, char: cg.Alphabet}) => {
+    makeMove: (from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', char: string}) => {
       let fromKey = positionToKey(from)
       let toKey = positionToKey(to)
       board.value?.movePiece(fromKey, toKey)
       if (promotion !== undefined) {
-        const role: cg.Role = `${promotion.char}-piece`
+        const role = `${promotion.char}-piece` as cg.Role
         const piecesDiff: Map<cg.Key, cg.Piece> = new Map()
         piecesDiff.set(toKey, {color: promotion.color, role, promoted: true})
         board.value?.setPieces(piecesDiff)
@@ -97,11 +97,11 @@
     },
     
     // Set a callback that will be called when the user makes a move (not when makeMove() is called)
-    onMoveCallback: (callback: (from: cg.Key, to: cg.Key, capturedPiece?: cg.Piece) => void) => {
+    onMoveCallback: (callback: (from: [number, number], to: [number, number]) => void) => {
       const newConfig: Config = {
         movable: {
           events: {
-            after: (from, to, metadata) => callback(from, to, metadata.captured)
+            after: (from, to, _) => callback(keyToPosition(from), keyToPosition(to))
           }
         }
       }
@@ -115,6 +115,16 @@
       throw new Error('Invalid position')
     }
     return `${cg.files[position[0]]}${cg.ranks[position[1]]}`
+  }
+  function keyToPosition(key: cg.Key): [number, number] {
+    let keyLetter = key[0] as cg.File
+    let keyNumber = key[1] as cg.Rank
+    const file = cg.files.indexOf(keyLetter)
+    const rank = cg.ranks.indexOf(keyNumber)
+    if (file < 0 || file >= currentWidth || rank < 0 || rank >= currentHeight) {
+      throw new Error('Invalid key')
+    }
+    return [file, rank]
   }
 
 </script>

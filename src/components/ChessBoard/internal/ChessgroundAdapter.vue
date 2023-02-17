@@ -2,7 +2,7 @@
 <!--
   This component is a low level interface with the chessgroundx UI.
   It does not know anything about the game state or game engine, and is only responsible for rendering the board.
-  It's recommended to use the ChessBoard component instead of this one.
+  It's recommended to use the ViewableChessBoard component instead of this one.
 -->
 
 <template>
@@ -253,40 +253,40 @@
   }
   
   .chessboard piece.p-piece.white {
-    background-image: url('./images/pieces/merida/wP.svg');
+    background-image: url('./merida/wP.svg');
   }
   .chessboard piece.b-piece.white {
-    background-image: url('./images/pieces/merida/wB.svg');
+    background-image: url('./merida/wB.svg');
   }
   .chessboard piece.n-piece.white {
-    background-image: url('./images/pieces/merida/wN.svg');
+    background-image: url('./merida/wN.svg');
   }
   .chessboard piece.r-piece.white {
-    background-image: url('./images/pieces/merida/wR.svg');
+    background-image: url('./merida/wR.svg');
   }
   .chessboard piece.q-piece.white {
-    background-image: url('./images/pieces/merida/wQ.svg');
+    background-image: url('./merida/wQ.svg');
   }
   .chessboard piece.k-piece.white {
-    background-image: url('./images/pieces/merida/wK.svg');
+    background-image: url('./merida/wK.svg');
   }
   .chessboard piece.p-piece.black {
-    background-image: url('./images/pieces/merida/bP.svg');
+    background-image: url('./merida/bP.svg');
   }
   .chessboard piece.b-piece.black {
-    background-image: url('./images/pieces/merida/bB.svg');
+    background-image: url('./merida/bB.svg');
   }
   .chessboard piece.n-piece.black {
-    background-image: url('./images/pieces/merida/bN.svg');
+    background-image: url('./merida/bN.svg');
   }
   .chessboard piece.r-piece.black {
-    background-image: url('./images/pieces/merida/bR.svg');
+    background-image: url('./merida/bR.svg');
   }
   .chessboard piece.q-piece.black {
-    background-image: url('./images/pieces/merida/bQ.svg');
+    background-image: url('./merida/bQ.svg');
   }
   .chessboard piece.k-piece.black {
-    background-image: url('./images/pieces/merida/bK.svg');
+    background-image: url('./merida/bK.svg');
   }
   
 </style>

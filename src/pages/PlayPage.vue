@@ -1,5 +1,5 @@
 <template>
-  <Board ref="board" :size="1000" :white-pov=true :view-only=false />
+  <Board ref="board" :size=1000 :user-controls-white=true :user-controls-black=true />
 </template>
 
 <script setup lang="ts">
@@ -15,17 +15,14 @@
 
 <script lang="ts">
 import {ref, onMounted} from 'vue'
-import Board from '@/components/ChessBoard/ChessBoard.vue'
+import Board from '@/components/ChessBoard/PlayableChessBoard.vue'
 
 async function initState(board: InstanceType<typeof Board>) {
   const protochess = await getProtochess()
   const state = await protochess.getState()
   board.setState(state)
-  board.onMoveCallback((from, to, capturedPiece) => {
+  board.onMoveCallback((from, to) => {
     console.log(`Move from ${from} to ${to}`)
-    if (capturedPiece !== undefined) {
-      console.log(`Captured ${capturedPiece.color} ${capturedPiece.role}`)
-    }
   })
   
   // Wait 2 seconds and then make a move
