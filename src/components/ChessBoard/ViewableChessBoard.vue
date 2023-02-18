@@ -12,7 +12,7 @@
     :size=$props.size
     :white-pov=whitePov
     :view-only=$props.viewOnly
-    :board-config=currentBoardConfig
+    :initial-config=currentBoardConfig
     
     :key="boardUpdateKey"
     ref="board"
@@ -38,6 +38,7 @@
   let currentHeight = 0
   let currentBoardConfig: Config = {
     orientation: props.whitePov ? 'white' : 'black',
+    fen: 'aaA_🚀AÁÀÑ🦀,',
     turnColor: 'white',
     autoCastle: false,
     viewOnly: props.viewOnly,
@@ -62,29 +63,29 @@
   defineExpose({
     // Set the state of the board
     setState: (state: GameState) => {
-      if (state.validSquares.length == 0) {
-        throw new Error('There must be at least one valid square in the board')
+      if (state.boardWidth < 2 || state.boardHeight < 2) {
+        throw new Error('Minimum board size is 2x2')
       }
-      const newWidth = Math.max(...state.validSquares.map(([x, _]) => x)) + 1
-      const newHeight = Math.max(...state.validSquares.map(([_, y]) => y)) + 1
       // If the size changed, re-render the board by incrementing the key counter
-      if (newWidth != currentWidth || newHeight != currentHeight) {
-        currentWidth = newWidth
-        currentHeight = newHeight
-        currentBoardConfig.dimensions = { width: newWidth, height: newHeight }
+      if (state.boardWidth != currentWidth || state.boardHeight != currentHeight) {
+        currentWidth = state.boardWidth
+        currentHeight = state.boardHeight
+        currentBoardConfig.dimensions = { width: state.boardWidth, height: state.boardHeight }
         boardUpdateKey.value += 1
       }
-      // TODO: Convert the state to a chessgroundx Config
+      // Convert the state to a chessgroundx Config
+      currentBoardConfig.turnColor = state.playerToMove == 0 ? 'white' : 'black'
+      currentBoardConfig.fen = state.guiFen
       board.value?.setConfig(currentBoardConfig)
     },
     
     // Move a piece from one position to another, and optionally promote it
-    makeMove: (from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', char: string}) => {
-      let fromKey = positionToKey(from)
-      let toKey = positionToKey(to)
+    makeMove: (from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', id: string}) => {
+      const fromKey = positionToKey(from)
+      const toKey = positionToKey(to)
       board.value?.movePiece(fromKey, toKey)
       if (promotion !== undefined) {
-        const role = `${promotion.char}-piece` as cg.Role
+        const role = idToRole(promotion.id)
         const piecesDiff: Map<cg.Key, cg.Piece> = new Map()
         piecesDiff.set(toKey, {color: promotion.color, role, promoted: true})
         board.value?.setPieces(piecesDiff)
@@ -108,6 +109,12 @@
       currentBoardConfig = { ...currentBoardConfig, ...newConfig }
       board.value?.setConfig(currentBoardConfig)
     },
+    
+    // Cause an explosion at the given positions
+    explode: (positions: [number, number][]) => {
+      const keys = positions.map(positionToKey)
+      board.value?.explode(keys)
+    },
   })
   
   function positionToKey(position: [number, number]): cg.Key {
@@ -117,14 +124,17 @@
     return `${cg.files[position[0]]}${cg.ranks[position[1]]}`
   }
   function keyToPosition(key: cg.Key): [number, number] {
-    let keyLetter = key[0] as cg.File
-    let keyNumber = key[1] as cg.Rank
+    const keyLetter = key[0] as cg.File
+    const keyNumber = key[1] as cg.Rank
     const file = cg.files.indexOf(keyLetter)
     const rank = cg.ranks.indexOf(keyNumber)
     if (file < 0 || file >= currentWidth || rank < 0 || rank >= currentHeight) {
       throw new Error('Invalid key')
     }
     return [file, rank]
+  }
+  function idToRole(id: string): cg.Role {
+    return `${id}-piece` as cg.Role
   }
 
 </script>

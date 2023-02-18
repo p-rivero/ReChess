@@ -36,7 +36,7 @@
     },
     
     // Move a piece from one position to another, and optionally promote it
-    makeMove: (from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', char: string}) => {
+    makeMove: (from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', id: string}) => {
       board.value?.makeMove(from, to, promotion)
     },
     
@@ -48,6 +48,11 @@
     // Set a callback that will be called when the user makes a move (not when makeMove() is called)
     onMoveCallback: (callback: (from: [number, number], to: [number, number]) => void) => {
       board.value?.onMoveCallback(callback)
+    },
+    
+    // Cause an explosion at the given positions
+    explode: (positions: [number, number][]) => {
+      board.value?.explode(positions)
     },
   })
   

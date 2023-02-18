@@ -46,8 +46,8 @@ async function init(): Promise<Protochess> {
     async toString(): Promise<string> {
       return wasm.wasmObject.toString()
     },
-    async playBestMove(): Promise<MakeMoveResult> {
-      return adaptMakeMoveResult(await wasm.wasmObject.playBestMove())
+    async playBestMove(depth: number): Promise<MakeMoveResult> {
+      return adaptMakeMoveResult(await wasm.wasmObject.playBestMove(depth))
     },
     async playBestMoveTimeout(time: number): Promise<MakeMoveResultWithDepth> {
       return adaptMakeMoveResultWithDepth(await wasm.wasmObject.playBestMoveTimeout(time))

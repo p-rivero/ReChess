@@ -3,7 +3,7 @@
 
 export interface Protochess {
   toString(): Promise<string>,
-  playBestMove(): Promise<MakeMoveResult>,
+  playBestMove(depth: number): Promise<MakeMoveResult>,
   playBestMoveTimeout(time: number): Promise<MakeMoveResultWithDepth>,
   makeMove(move: MoveInfo): Promise<MakeMoveResult>,
   makeMoveStr(move: string): Promise<MakeMoveResult>,
@@ -38,9 +38,10 @@ export interface MakeMoveResultWithDepth extends MakeMoveResult {
 export interface MoveInfo {
   // x, y coordinates between 0 and 15
   // (0, 0 is the bottom left corner)
+  // promotion is a piece id (string of 1 character)
   from: [number, number],
   to: [number, number],
-  promotion?: number,
+  promotion?: string,
 }
 export interface MoveInfoWithEval extends MoveInfo {
   evaluation: number,
@@ -51,17 +52,19 @@ export interface MoveInfoWithEvalDepth extends MoveInfoWithEval {
 
 export interface GameState {
   pieceTypes: PieceDefinition[],
-  validSquares: [number, number][],
+  boardWidth: number,
+  boardHeight: number,
+  invalidSquares: [number, number][],
   pieces: PiecePlacement[],
   playerToMove: 0 | 1,
   epSquareAndVictim?: [[number, number], [number, number]],
   timesInCheck?: [number, number],
   globalRules: GlobalRules,
+  guiFen: string,
 }
 
 export interface PieceDefinition {
-  id: number,
-  charRep: string,
+  id: string,
   availableFor: (0 | 1)[],
   isLeader: boolean,
   castleFiles?: [number, number],
@@ -70,7 +73,7 @@ export interface PieceDefinition {
   explosionDeltas: [number, number][],
   immuneToExplosion: boolean,
   promotionSquares: [number, number][],
-  promoVals: number[],
+  promoVals: string[],
   doubleJumpSquares: [number, number][],
   attackSlidingDeltas: [number, number][][],
   attackJumpDeltas: [number, number][],
@@ -97,7 +100,7 @@ export interface PieceDefinition {
 
 export interface PiecePlacement {
   owner: 0 | 1,
-  pieceId: number,
+  pieceId: string,
   x: number,
   y: number,
   canCastle?: boolean,
@@ -121,7 +124,7 @@ export interface IWasmModule {
   supportsThreads: boolean,
   wasmObject: {
     toString(): Promise<any>,
-    playBestMove(): Promise<any>,
+    playBestMove(depth: number): Promise<any>,
     playBestMoveTimeout(time: number): Promise<any>,
     makeMove(move: MoveInfo): Promise<any>,
     makeMoveStr(moveStr: string): Promise<any>,

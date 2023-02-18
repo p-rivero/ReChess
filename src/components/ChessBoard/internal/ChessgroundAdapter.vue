@@ -23,7 +23,7 @@
   const props = defineProps<{
     width: number
     height: number
-    boardConfig: Config
+    initialConfig: Config
     size: number
     viewOnly: boolean
     whitePov: boolean
@@ -36,7 +36,7 @@
     if (board.value === undefined) {
       throw new Error('Reference to board is undefined')
     }
-    chessgroundApi = Chessground(board.value, props.boardConfig)
+    chessgroundApi = Chessground(board.value, props.initialConfig)
   })
   
   // Board appearance
@@ -64,6 +64,7 @@
     toggleOrientation: () => chessgroundApi?.toggleOrientation(),
     movePiece: (from: cg.Key, to: cg.Key) => chessgroundApi?.move(from, to),
     setPieces: (diff: cg.PiecesDiff) => chessgroundApi?.setPieces(diff),
+    explode: (keys: cg.Key[]) => chessgroundApi?.explode(keys),
   })
   
 </script>
@@ -250,6 +251,15 @@
   .chessboard .cg-wrap {
     background-image: v-bind(boardBackground);
     background-repeat: no-repeat;
+  }
+  .chessboard piece._-piece {
+    background-image: url('@/assets/board/wall.svg');
+  }
+  .chessboard square.exploding1 {
+    background-image: url('@/assets/board/explosion1.svg');
+  }
+  .chessboard square.exploding2 {
+    background-image: url('@/assets/board/explosion2.svg');
   }
   
   .chessboard piece.p-piece.white {
