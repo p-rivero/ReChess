@@ -11,9 +11,11 @@ export interface Protochess {
   getBestMoveTimeout(time: number): Promise<MoveInfoWithEvalDepth>,
   isInCheck(): Promise<boolean>,
   setState(state: GameState): Promise<void>,
-  getState(): Promise<GameState>,
+  getState(): Promise<GameStateGui>,
   loadFen(fen: string): Promise<void>,
   movesFrom(x: number, y: number): Promise<MoveInfo[]>,
+  legalMoves(): Promise<MoveList[]>,
+  possiblePromotions(fromX: number, fromY: number, toX: number, toY: number): Promise<string[]>,
   getMaxThreads(): Promise<number>,
   setNumThreads(threads: number): Promise<void>,
 }
@@ -49,6 +51,11 @@ export interface MoveInfoWithEval extends MoveInfo {
 export interface MoveInfoWithEvalDepth extends MoveInfoWithEval {
   depth: number,
 }
+export interface MoveList {
+  x: number,
+  y: number,
+  moves: MoveInfo[],
+}
 
 export interface GameState {
   pieceTypes: PieceDefinition[],
@@ -60,7 +67,10 @@ export interface GameState {
   epSquareAndVictim?: [[number, number], [number, number]],
   timesInCheck?: [number, number],
   globalRules: GlobalRules,
-  guiFen: string,
+}
+export interface GameStateGui extends GameState {
+  fen: string,
+  inCheck: boolean,
 }
 
 export interface PieceDefinition {
@@ -135,6 +145,8 @@ export interface IWasmModule {
     getState(): Promise<any>,
     loadFen(fen: string): Promise<any>,
     movesFrom(x: number, y: number): Promise<any>,
+    legalMoves(): Promise<any>,
+    possiblePromotions(fromX: number, fromY: number, toX: number, toY: number): Promise<any>,
     getMaxThreads(): Promise<any>,
     setNumThreads(threads: number): Promise<any>,
   }

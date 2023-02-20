@@ -21,7 +21,7 @@
 
 
 <script setup lang="ts">
-  import type { GameState } from '@/protochess/interfaces';
+  import type { GameStateGui, MoveList } from '@/protochess/interfaces';
   import * as cg from 'chessgroundx/types';
   import type { Config } from 'chessgroundx/config';
   import ChessBoardVisual from './internal/ChessgroundAdapter.vue';
@@ -38,8 +38,6 @@
   let currentHeight = 0
   let currentBoardConfig: Config = {
     orientation: props.whitePov ? 'white' : 'black',
-    fen: 'aaA_🚀AÁÀÑ🦀,',
-    turnColor: 'white',
     autoCastle: false,
     viewOnly: props.viewOnly,
     disableContextMenu: true,
@@ -62,21 +60,41 @@
   
   defineExpose({
     // Set the state of the board
-    setState: (state: GameState) => {
+    setState: (state: GameStateGui) => {
       if (state.boardWidth < 2 || state.boardHeight < 2) {
         throw new Error('Minimum board size is 2x2')
       }
       // If the size changed, re-render the board by incrementing the key counter
+      let newConfig: Config = {}
       if (state.boardWidth != currentWidth || state.boardHeight != currentHeight) {
         currentWidth = state.boardWidth
         currentHeight = state.boardHeight
-        currentBoardConfig.dimensions = { width: state.boardWidth, height: state.boardHeight }
+        newConfig.dimensions = { width: state.boardWidth, height: state.boardHeight }
         boardUpdateKey.value += 1
       }
       // Convert the state to a chessgroundx Config
-      currentBoardConfig.turnColor = state.playerToMove == 0 ? 'white' : 'black'
-      currentBoardConfig.fen = state.guiFen
-      board.value?.setConfig(currentBoardConfig)
+      newConfig.turnColor = state.playerToMove == 0 ? 'white' : 'black'
+      newConfig.fen = state.fen
+      newConfig.check = state.inCheck
+      incrementalUpdateConfig(newConfig)
+    },
+    
+    // Define which sides are movable by the user
+    setMovable: (white: boolean, black: boolean, moves: MoveList[]) => {
+      let dests = new Map<cg.Orig, cg.Key[]>()
+      for (const mv of moves) {
+        const fromKey = positionToKey([mv.x, mv.y])
+        const toKeys = mv.moves.map(m => positionToKey(m.to))
+        dests.set(fromKey, toKeys)
+      }
+      const newConfig: Config = {
+        movable: {
+          color: white && black ? 'both' : white ? 'white' : black ? 'black' : 'none' as cg.Color,
+          free: false,
+          dests,
+        }
+      }
+      incrementalUpdateConfig(newConfig)
     },
     
     // Move a piece from one position to another, and optionally promote it
@@ -106,8 +124,7 @@
           }
         }
       }
-      currentBoardConfig = { ...currentBoardConfig, ...newConfig }
-      board.value?.setConfig(currentBoardConfig)
+      incrementalUpdateConfig(newConfig)
     },
     
     // Cause an explosion at the given positions
@@ -135,6 +152,29 @@
   }
   function idToRole(id: string): cg.Role {
     return `${id}-piece` as cg.Role
+  }
+  
+  
+  function incrementalUpdateConfig(newConfig: Config) {
+    deepMerge(currentBoardConfig, newConfig)
+    board.value?.setConfig(currentBoardConfig)
+  }
+  function deepMerge(base: any, extend: any): void {
+    for (const key in extend) {
+      // TODO: Call directly
+      if (Object.prototype.hasOwnProperty.call(extend, key)) {
+        if (Object.prototype.hasOwnProperty.call(base, key) && isPlainObject(base[key]) && isPlainObject(extend[key]))
+          deepMerge(base[key], extend[key]);
+        else base[key] = extend[key];
+      }
+    }
+  }
+  // TODO: Remove
+  function isPlainObject(o: any) {
+    if (typeof o !== 'object' || o === null)
+      return false;
+    const proto = Object.getPrototypeOf(o);
+    return proto === Object.prototype || proto === null;
   }
 
 </script>

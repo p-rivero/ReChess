@@ -9,6 +9,8 @@ import type {
   MoveInfoWithEvalDepth,
   IWasmModule,
   GameState,
+  GameStateGui,
+  MoveList,
 } from "./interfaces"
 
 // Call this at the start of the app to initialize the wasm module
@@ -70,14 +72,20 @@ async function init(): Promise<Protochess> {
     async setState(state: GameState): Promise<void> {
       return wasm.wasmObject.setState(state)
     },
-    async getState(): Promise<GameState> {
-      return wasm.wasmObject.getState()
+    async getState(): Promise<GameStateGui> {
+      return adaptGameStateGui(await wasm.wasmObject.getState())
     },
     async loadFen(fen: string): Promise<void> {
       return wasm.wasmObject.loadFen(fen)
     },
     async movesFrom(x: number, y: number): Promise<MoveInfo[]> {
       return wasm.wasmObject.movesFrom(x, y)
+    },
+    async legalMoves(): Promise<MoveList[]> {
+      return wasm.wasmObject.legalMoves()
+    },
+    async possiblePromotions(fromX: number, fromY: number, toX: number, toY: number): Promise<string[]> {
+      return wasm.wasmObject.possiblePromotions(fromX, fromY, toX, toY)
     },
     async getMaxThreads(): Promise<number> {
       return wasm.wasmObject.getMaxThreads()
@@ -121,4 +129,11 @@ function adaptMoveInfoWithEvalDepth(moveInfoEval: any): MoveInfoWithEvalDepth {
   const evaluation: number = moveInfoEval.evaluation
   const depth: number = moveInfoEval.depth
   return { ...moveInfo, evaluation, depth }
+}
+
+function adaptGameStateGui(gameStateGui: any): GameStateGui {
+  const gameState: GameState = gameStateGui.state
+  const fen: string = gameStateGui.fen
+  const inCheck: boolean = gameStateGui.inCheck
+  return { ...gameState, fen, inCheck }
 }
