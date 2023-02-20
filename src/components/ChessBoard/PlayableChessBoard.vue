@@ -9,25 +9,29 @@
   <ViewableChessBoard 
     :size=props.size
     :white-pov=whitePov
-    :view-only=viewOnly
+    :view-only=false
     
     ref="board"
   />
 </template>
 
 <script setup lang="ts">
-  import type { GameState } from '@/protochess/interfaces';
+  import type { GameState, MoveInfo, MakeMoveResult } from '@/protochess/interfaces';
   import { getProtochess } from '@/protochess/protochess';
   import { ref, onMounted } from 'vue';
   import ViewableChessBoard from './ViewableChessBoard.vue'
   
+  interface CustomMoveCallback {
+    (playerToMove: 'white'|'black'): Promise<MoveInfo>
+  }
+  
   const props = defineProps<{
     size: number
-    userControlsWhite: boolean
-    userControlsBlack: boolean
+    white: 'human' | 'engine' | CustomMoveCallback
+    black: 'human' | 'engine' | CustomMoveCallback
   }>()
-  const whitePov = props.userControlsWhite || !props.userControlsBlack
-  const viewOnly = !props.userControlsWhite && !props.userControlsBlack
+  // If both or no players are humans, default to white
+  const whitePov = props.white == 'human' || props.black != 'human'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
     
@@ -41,14 +45,14 @@
     loadFen: async (fen: string) => {
       const protochess = await getProtochess()
       await protochess.loadFen(fen)
-      await updateBoardState()
+      await synchronizeBoardState()
     },
     
     // Set the state of the board
     setState: async (state: GameState) => {
       const protochess = await getProtochess()
       await protochess.setState(state)
-      await updateBoardState()
+      await synchronizeBoardState()
     },
     
     // Move a piece from one position to another, and optionally promote it
@@ -76,26 +80,51 @@
   })
   
   
+  // Called when the user makes a move on the board
   async function userMovedCallback(from: [number, number], to: [number, number]) {
     const protochess = await getProtochess()
     const possiblePromotions = await protochess.possiblePromotions(from[0], from[1], to[0], to[1])
     // TODO: Allow the user to choose the promotion piece
     const promotion = possiblePromotions.length > 0 ? possiblePromotions[0] : undefined
-    const result = await protochess.makeMove({ from, to, promotion })
-    // TODO: Handle result
-    console.log(result)
-    await updateBoardState()
+    await synchronizeBoardState({ from, to, promotion })
+  }
+  
+  // Called in order to make the computer play its move
+  async function makeEngineMove() {
+    const protochess = await getProtochess()
+    // TODO: Allow the user to choose the search timeout
+    const bestMove = await protochess.getBestMove(6)
+    await synchronizeBoardState(bestMove)
   }
   
   // Synchonize the board state with the protochess engine
-  async function updateBoardState() {
+  // If playMoveBefore is specified, it will be played before synchronizing the state
+  async function synchronizeBoardState(playMoveBefore?: MoveInfo) {
     const protochess = await getProtochess()
+    if (playMoveBefore) {
+      const result = await protochess.makeMove(playMoveBefore)
+      board.value?.makeMove(playMoveBefore.from, playMoveBefore.to)
+      handleResult(result)
+    }
     const state = await protochess.getState()
     const moves = await protochess.legalMoves()
-    const moveWhite = props.userControlsWhite && state.playerToMove == 0
-    const moveBlack = props.userControlsBlack && state.playerToMove == 1
+    const moveWhite = props.white == 'human' && state.playerToMove == 0
+    const moveBlack = props.black == 'human' && state.playerToMove == 1
     board.value?.setState(state)
     board.value?.setMovable(moveWhite, moveBlack, moves)
+    
+    const nextPlayer = state.playerToMove == 0 ? props.white : props.black
+    if (nextPlayer == 'engine') {
+      makeEngineMove()
+    } else if (typeof nextPlayer == 'function') {
+      const move = await nextPlayer(state.playerToMove == 0 ? 'white' : 'black')
+      synchronizeBoardState(move)
+    }
+  }
+  
+  async function handleResult(result: MakeMoveResult) {
+    // TODO
+    console.log(result)
   }
   
 </script>
