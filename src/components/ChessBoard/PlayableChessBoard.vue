@@ -93,7 +93,7 @@
   async function makeEngineMove() {
     const protochess = await getProtochess()
     // TODO: Allow the user to choose the search timeout
-    const bestMove = await protochess.getBestMove(6)
+    const bestMove = await protochess.getBestMoveTimeout(1)
     await synchronizeBoardState(bestMove)
   }
   

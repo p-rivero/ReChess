@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from '@/App.vue'
 import { router } from '@/router'
-import { getProtochess, initializeProtochess } from '@/protochess/protochess'
+import { getProtochess, initializeProtochess, protochessSupportsThreads } from '@/protochess/protochess'
 
 import '@/assets/main.scss'
 
@@ -19,4 +19,8 @@ app.use(router)
 app.mount('#app')
 
 // Temporary code until threads work as expected
-getProtochess().then(protochess => { protochess.setNumThreads(1) })
+protochessSupportsThreads().then(supportsThreads => {
+  if (supportsThreads) {
+    getProtochess().then(protochess => { protochess.setNumThreads(4) })
+  }
+})

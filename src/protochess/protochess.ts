@@ -15,6 +15,7 @@ import type {
 
 // Call this at the start of the app to initialize the wasm module
 let protochess: Protochess | null = null
+let supportsThreads: boolean | undefined = undefined
 export async function initializeProtochess() {
   protochess = await init()
 }
@@ -25,6 +26,13 @@ export async function getProtochess(): Promise<Protochess> {
     await new Promise(resolve => setTimeout(resolve, 10))
   }
   return protochess
+}
+export async function protochessSupportsThreads(): Promise<boolean> {
+  // Wait for the wasm module to be initialized
+  while (supportsThreads === undefined) {
+    await new Promise(resolve => setTimeout(resolve, 10))
+  }
+  return supportsThreads
 }
 
 
@@ -38,7 +46,8 @@ async function init(): Promise<Protochess> {
   // wasm is an object that lives in the worker thread, but appears to be local
   await wasm.init()
   
-  if (await wasm.supportsThreads) {
+  supportsThreads = wasm.supportsThreads
+  if (supportsThreads) {
     console.info('WebAssembly supports threads, using multi-threaded version')
   } else {
     console.warn('WebAssembly does not support threads, using single-threaded version')
