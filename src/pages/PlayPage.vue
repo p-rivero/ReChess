@@ -1,9 +1,9 @@
 <template>
-  <Board ref='board' :size=1000 :user-controls-white=true :user-controls-black=true />
+  <PlayableChessBoard ref='board' :size=1000 :user-controls-white=true :user-controls-black=true />
 </template>
 
 <script setup lang="ts">
-  const board = ref<InstanceType<typeof Board>>()
+  const board = ref<InstanceType<typeof PlayableChessBoard>>()
   onMounted(() => {
     if (board.value === undefined) {
       throw new Error('Reference to board is undefined')
@@ -14,9 +14,9 @@
 
 <script lang="ts">
 import {ref, onMounted} from 'vue'
-import Board from '@/components/ChessBoard/PlayableChessBoard.vue'
+import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
 
-async function initState(board: InstanceType<typeof Board>) {
+async function initState(board: InstanceType<typeof PlayableChessBoard>) {
   board.loadFen('rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPPPP///PPPPPPPPP/PPPPPPPP/PPPPPKPP w kq - 0 1')
   board.onMoveCallback(async (from, to) => {
     console.log(`Move from ${from} to ${to}`)

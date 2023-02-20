@@ -6,7 +6,7 @@
 -->
 
 <template>
-  <ChessBoardVisual
+  <ChessgroundAdapter
     :width=currentWidth
     :height=currentHeight
     :size=$props.size
@@ -24,7 +24,7 @@
   import type { GameStateGui, MoveList } from '@/protochess/interfaces';
   import * as cg from 'chessgroundx/types';
   import type { Config } from 'chessgroundx/config';
-  import ChessBoardVisual from './internal/ChessgroundAdapter.vue';
+  import ChessgroundAdapter from './internal/ChessgroundAdapter.vue';
   import { ref } from 'vue'
 
   const props = defineProps<{
@@ -56,7 +56,7 @@
   
   // Ref to the board, and a key that is incremented every time the board is re-rendered
   const boardUpdateKey = ref(0);
-  const board = ref<InstanceType<typeof ChessBoardVisual>>()
+  const board = ref<InstanceType<typeof ChessgroundAdapter>>()
   
   defineExpose({
     // Set the state of the board

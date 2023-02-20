@@ -1,5 +1,5 @@
 <template>
-  <Navbar />
+  <NavbarComponent />
   <div class="page-container">
     <div class="page-content">
       <RouterView />
@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-  import Navbar from '@/components/Navbar.vue';
+  import NavbarComponent from '@/components/NavbarComponent.vue';
 </script>
 
 
