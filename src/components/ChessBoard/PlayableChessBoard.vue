@@ -94,6 +94,7 @@
     const protochess = await getProtochess()
     // TODO: Allow the user to choose the search timeout
     const bestMove = await protochess.getBestMoveTimeout(1)
+    console.log('Eval (from engine POV):', bestMove.evaluation, 'Depth:', bestMove.depth)
     await synchronizeBoardState(bestMove)
   }
   
@@ -123,7 +124,8 @@
   }
   
   async function handleResult(result: MakeMoveResult) {
-    // TODO
+    // Show effect for exploded squares
+    board.value?.explode(result.exploded)
     console.log(result)
   }
   

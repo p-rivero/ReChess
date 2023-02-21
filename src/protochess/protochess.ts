@@ -58,16 +58,16 @@ async function init(): Promise<Protochess> {
       return wasm.wasmObject.toString()
     },
     async playBestMove(depth: number): Promise<MakeMoveResult> {
-      return adaptMakeMoveResult(await wasm.wasmObject.playBestMove(depth))
+      return wasm.wasmObject.playBestMove(depth)
     },
     async playBestMoveTimeout(time: number): Promise<MakeMoveResultWithDepth> {
       return adaptMakeMoveResultWithDepth(await wasm.wasmObject.playBestMoveTimeout(time))
     },
     async makeMove(move: MoveInfo): Promise<MakeMoveResult> {
-      return adaptMakeMoveResult(await wasm.wasmObject.makeMove(move))
+      return wasm.wasmObject.makeMove(move)
     },
     async makeMoveStr(moveStr: string): Promise<MakeMoveResult> {
-      return adaptMakeMoveResult(await wasm.wasmObject.makeMoveStr(moveStr))
+      return wasm.wasmObject.makeMoveStr(moveStr)
     },
     async getBestMove(depth: number): Promise<MoveInfoWithEval> {
       return adaptMoveInfoWithEval(await wasm.wasmObject.getBestMove(depth))
@@ -108,36 +108,34 @@ async function init(): Promise<Protochess> {
 
 // ADAPTERS
 
-function adaptMakeMoveResult(makeMoveRes: any): MakeMoveResult {
-  const result = makeMoveRes.result
-  let winner: 'White' | 'Black' | undefined
-  if (makeMoveRes.winnerPlayer === 0) {
-    winner = 'White'
-  } else if (makeMoveRes.winnerPlayer === 1) {
-    winner = 'Black'
-  } else {
-    winner = undefined
-  }
-  return { result, winner }
-}
-
 function adaptMakeMoveResultWithDepth(makeMoveRes: any): MakeMoveResultWithDepth {
-  const makeMoveResult = adaptMakeMoveResult(makeMoveRes.makeIoveIesult)
+  const makeMoveResult: MakeMoveResult = makeMoveRes.makeMoveResult
   const depth: number = makeMoveRes.depth
   return { ...makeMoveResult, depth }
 }
 
 function adaptMoveInfoWithEval(moveInfoEval: any): MoveInfoWithEval {
+  // Engine constants
+  const MATE_VALUE = 1_000_000
+  const MAX_DEPTH = 256 // Actually 127, but this is a safe upper bound
+  
   const moveInfo: MoveInfo = moveInfoEval.moveInfo
-  const evaluation: number = moveInfoEval.evaluation
+  const evalNumeric: number = moveInfoEval.evaluation
+  // Depth in ply of a possible mate
+  const mateDepth = MATE_VALUE - Math.abs(evalNumeric)
+  const multiplier = evalNumeric < 0 ? -1 : 1
+  // Possible mate in n moves (negative if engine is losing)
+  const mate = multiplier * Math.floor(mateDepth/2)
+  // If this is mate (mateDepth < MAX_DEPTH), return a string like "MATE 5"
+  const evaluation: number | `MATE ${number}` = mateDepth < MAX_DEPTH ? `MATE ${mate}` : evalNumeric
+  
   return { ...moveInfo, evaluation }
 }
 
 function adaptMoveInfoWithEvalDepth(moveInfoEval: any): MoveInfoWithEvalDepth {
-  const moveInfo: MoveInfo = moveInfoEval.moveInfo
-  const evaluation: number = moveInfoEval.evaluation
+  const moveEval: MoveInfoWithEval = adaptMoveInfoWithEval(moveInfoEval)
   const depth: number = moveInfoEval.depth
-  return { ...moveInfo, evaluation, depth }
+  return { ...moveEval, depth }
 }
 
 function adaptGameStateGui(gameStateGui: any): GameStateGui {

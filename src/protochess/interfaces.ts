@@ -22,7 +22,7 @@ export interface Protochess {
 
 
 export interface MakeMoveResult {
-  result:
+  flag:
     'Ok' |
     'IllegalMove' |
     'Checkmate' |
@@ -31,7 +31,8 @@ export interface MakeMoveResult {
     'CheckLimit' |
     'Stalemate' |
     'Repetition',
-  winner?: 'White' | 'Black',
+  winner: 'White' | 'Black' | 'None',
+  exploded: [number, number][],
 }
 export interface MakeMoveResultWithDepth extends MakeMoveResult {
   depth: number,
@@ -46,7 +47,7 @@ export interface MoveInfo {
   promotion?: string,
 }
 export interface MoveInfoWithEval extends MoveInfo {
-  evaluation: number,
+  evaluation: number | `MATE ${number}`,
 }
 export interface MoveInfoWithEvalDepth extends MoveInfoWithEval {
   depth: number,
