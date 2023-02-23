@@ -2,7 +2,7 @@
   <nav class="navbar is-fixed-top has-shadow">
     <div class="navbar-brand">
       <a class="navbar-item" href="/">
-        <img src="@/assets/logo.svg" alt="ReChess: Chess reinvented by you">
+        <img src="@/assets/img/logo.svg" alt="ReChess: Chess reinvented by you">
       </a>
       <!-- <div class="navbar-item"> -->
         <div class="navbar-burger" data-target="navbarMenu" @click="navBarBurgerClick">

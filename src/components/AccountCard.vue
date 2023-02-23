@@ -1,7 +1,7 @@
 <template>
   <a class="card-header" @click="onAccountClick">
     <span class="card-header-icon">
-      <img class="account-icon" src="@/assets/account.png" />
+      <img class="account-icon" src="@/assets/img/account.png" />
     </span>
     <p class="card-header-title">
       My user name

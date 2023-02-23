@@ -75,8 +75,7 @@ export interface GameStateGui extends GameState {
 }
 
 export interface PieceDefinition {
-  id: string,
-  availableFor: (0 | 1)[],
+  ids: [string|undefined, string|undefined],
   isLeader: boolean,
   castleFiles?: [number, number],
   isCastleRook: boolean,
@@ -84,7 +83,7 @@ export interface PieceDefinition {
   explosionDeltas: [number, number][],
   immuneToExplosion: boolean,
   promotionSquares: [number, number][],
-  promoVals: string[],
+  promoVals: [string[], string[]],
   doubleJumpSquares: [number, number][],
   attackSlidingDeltas: [number, number][][],
   attackJumpDeltas: [number, number][],
@@ -110,7 +109,6 @@ export interface PieceDefinition {
 }
 
 export interface PiecePlacement {
-  owner: 0 | 1,
   pieceId: string,
   x: number,
   y: number,
