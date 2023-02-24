@@ -4,6 +4,8 @@
 $family-serif: "Rubik", serif;
 $family-primary: $family-serif;
 
+$navbar-height: 4rem;
+
 $dark-brown: hsl(27, 50%, 50%);
 $dark-green: hsl(137, 50%, 50%);
 $light-green: hsl(137, 50%, 80%);
@@ -20,6 +22,17 @@ $link: $dark-green;
     }
     nav {
         @extend .is-dark;
+    }
+    .navbar-menu {
+        background-color: $dark;
+        color: $light;
+    }
+    .navbar-item {
+        color: $light;
+    }
+    .navbar-item:hover {
+        background-color: $dark;
+        color: $link;
     }
     
     .subtitle,
@@ -41,6 +54,9 @@ $link: $dark-green;
     body {
         background-color: $light;
         color: $dark;
+    }
+    .navbar-menu {
+        @extend .is-light;
     }
     
     body .subtitle,

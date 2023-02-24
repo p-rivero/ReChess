@@ -1,19 +1,20 @@
 <template>
   <nav class="navbar is-fixed-top has-shadow">
     <div class="navbar-brand">
-      <a class="navbar-item" href="/">
-        <img src="@/assets/img/logo.svg" alt="ReChess: Chess reinvented by you">
-      </a>
-      <!-- <div class="navbar-item"> -->
-        <div class="navbar-burger" data-target="navbarMenu" @click="navBarBurgerClick">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      <!-- </div> -->
+      
+      <div class="navbar-burger" data-target="navbarMenu" @click="navBarBurgerClick">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
       <div class="navbar-end">
-        <div class="navbar-item">
-          <AccountCard class="only-when-small" />
+        <div class="navbar-item only-when-small">
+          <ToggleThemeButton />
+        </div>
+      </div>
+      <div class="navbar-end">
+        <div class="navbar-item only-when-small">
+          <AccountCard />
         </div>
       </div>
     </div>
@@ -21,12 +22,18 @@
     <div id="navbarMenu" class="navbar-menu">
       <div class="navbar-start">
         <a class="navbar-item" href="/">
+          <img src="@/assets/img/logo.svg" alt="ReChess: Chess reinvented by you">
+        </a>
+        <a class="navbar-item" href="/">
           Home
         </a>
       </div>
       <div class="navbar-end">
-        <div class="navbar-item">
-          <AccountCard class="only-when-big" />
+        <div class="navbar-item only-when-big">
+          <ToggleThemeButton />
+        </div>
+        <div class="navbar-item only-when-big">
+          <AccountCard />
         </div>
       </div>
     </div>
@@ -34,7 +41,8 @@
 </template>
 
 <script setup lang="ts">
-  import AccountCard from '@/components/AccountCard.vue'
+  import AccountCard from '@/components/Navbar/AccountCard.vue'
+  import ToggleThemeButton from '@/components/Navbar/ToggleThemeButton.vue';
   
   function navBarBurgerClick() {
     const navbarBurger = document.querySelector('.navbar-burger')
@@ -45,18 +53,20 @@
 </script>
 
 <style lang="scss" scoped>
-  .navbar-brand {
-    padding-left: 1rem;
-  }
   .navbar.has-shadow {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
   .navbar-burger {
     height: 4rem;
     width: 4rem;
+    margin-left: 0;
+    margin-right: auto;
   }
   .navbar-item img {
     max-height: 2rem;
+  }
+  .navbar-item {
+    height: 4rem;
   }
   
   .only-when-small {

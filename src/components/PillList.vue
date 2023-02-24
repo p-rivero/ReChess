@@ -186,7 +186,7 @@ function focusPillInput() {
       .pill {
         height: 2rem;
         margin: 0.25rem;
-        border-radius: 1rem;
+        border-radius: 50%;
         padding: 0;
         padding-right: 0;
         cursor: pointer;
@@ -216,7 +216,7 @@ function focusPillInput() {
           width: 2rem;
           height: 2rem;
           font-size: 1.5rem;
-          border-radius: 1rem;
+          border-radius: 50%;
           // Hover effect
           &:hover {
             background-color: rgba(0, 0, 0, 0.2);
