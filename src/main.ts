@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { plugin as VueInputAutowidth } from 'vue-input-autowidth'
 import App from '@/App.vue'
 import { router } from '@/router'
 import { getProtochess, initializeProtochess, protochessSupportsThreads } from '@/protochess/protochess'
@@ -15,6 +16,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(VueInputAutowidth)
 
 app.mount('#app')
 

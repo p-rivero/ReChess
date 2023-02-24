@@ -22,6 +22,7 @@
     "protochess-singlethread": "protochess-engine/protochess-engine-wasm/pkg",
     "sass": "^1.58.0",
     "vue": "^3.2.38",
+    "vue-input-autowidth": "^2.2.0",
     "vue-router": "^4.1.6",
     "wasm-feature-detect": "^1.4.0"
   },
