@@ -20,14 +20,18 @@
   import type { Config } from 'chessgroundx/config';
   import { ref, onMounted } from 'vue';
   
+  // Map from piece id to the URL of the image to use
+  export type PlayerPieceImages = [string, string][]
+  export type PieceImages = {white: PlayerPieceImages, black: PlayerPieceImages}
+  
   const props = defineProps<{
     width: number
     height: number
     initialConfig: Config
     size: number
     whitePov: boolean
-    // Map from piece id to image URL
-    // pieceImages: Record<string, string>
+    // For each player, a mapping from piece id to the URL of the image to use
+    pieceImages: PieceImages
   }>()
 
   // When mounted, create the chessground board and store the reference to the API handle
@@ -36,6 +40,10 @@
   onMounted(() => {
     if (board.value === undefined) {
       throw new Error('Reference to board is undefined')
+    }
+    props.initialConfig.mapping = {
+      whitePieces: props.pieceImages.white.map(([id, _]) => id),
+      blackPieces: props.pieceImages.black.map(([id, _]) => id),
     }
     chessgroundApi = Chessground(board.value, props.initialConfig)
   })
@@ -67,6 +75,16 @@
     setPieces: (diff: cg.PiecesDiff) => chessgroundApi?.setPieces(diff),
     explode: (keys: cg.Key[]) => chessgroundApi?.explode(keys),
   })
+  
+  
+  function pieceUrl(piece: cg.Alphabet, color: cg.Color): string {
+    // a->0, b->1, c->2, ...
+    const pieceIndex = piece.charCodeAt(0) - 'a'.charCodeAt(0)
+    const images = color === 'white' ? props.pieceImages.white : props.pieceImages.black
+    if (images.length <= pieceIndex) return 'none'
+    const [_id, pieceUrl] = images[pieceIndex]
+    return `url("${pieceUrl}")`
+  }
   
 </script>
 
@@ -263,41 +281,59 @@
     background-image: url('@/assets/board/explosion2.svg');
   }
   
-  .chessboard piece.p-piece.white {
-    background-image: url('./merida/wP.svg');
-  }
-  .chessboard piece.b-piece.white {
-    background-image: url('./merida/wB.svg');
-  }
-  .chessboard piece.n-piece.white {
-    background-image: url('./merida/wN.svg');
-  }
-  .chessboard piece.r-piece.white {
-    background-image: url('./merida/wR.svg');
-  }
-  .chessboard piece.q-piece.white {
-    background-image: url('./merida/wQ.svg');
-  }
-  .chessboard piece.k-piece.white {
-    background-image: url('./merida/wK.svg');
-  }
-  .chessboard piece.p-piece.black {
-    background-image: url('./merida/bP.svg');
-  }
-  .chessboard piece.b-piece.black {
-    background-image: url('./merida/bB.svg');
-  }
-  .chessboard piece.n-piece.black {
-    background-image: url('./merida/bN.svg');
-  }
-  .chessboard piece.r-piece.black {
-    background-image: url('./merida/bR.svg');
-  }
-  .chessboard piece.q-piece.black {
-    background-image: url('./merida/bQ.svg');
-  }
-  .chessboard piece.k-piece.black {
-    background-image: url('./merida/bK.svg');
-  }
+  /* Hack for defining custom images with a dynamic name. */
+  /* For now, there is a limit of 26 pieces for each player. We could add more by making the mapping more complex */
+  .chessboard piece.a-piece.white { background-image: v-bind(pieceUrl('a', 'white')); }
+  .chessboard piece.b-piece.white { background-image: v-bind(pieceUrl('b', 'white')); }
+  .chessboard piece.c-piece.white { background-image: v-bind(pieceUrl('c', 'white')); }
+  .chessboard piece.d-piece.white { background-image: v-bind(pieceUrl('d', 'white')); }
+  .chessboard piece.e-piece.white { background-image: v-bind(pieceUrl('e', 'white')); }
+  .chessboard piece.f-piece.white { background-image: v-bind(pieceUrl('f', 'white')); }
+  .chessboard piece.g-piece.white { background-image: v-bind(pieceUrl('g', 'white')); }
+  .chessboard piece.h-piece.white { background-image: v-bind(pieceUrl('h', 'white')); }
+  .chessboard piece.i-piece.white { background-image: v-bind(pieceUrl('i', 'white')); }
+  .chessboard piece.j-piece.white { background-image: v-bind(pieceUrl('j', 'white')); }
+  .chessboard piece.k-piece.white { background-image: v-bind(pieceUrl('k', 'white')); }
+  .chessboard piece.l-piece.white { background-image: v-bind(pieceUrl('l', 'white')); }
+  .chessboard piece.m-piece.white { background-image: v-bind(pieceUrl('m', 'white')); }
+  .chessboard piece.n-piece.white { background-image: v-bind(pieceUrl('n', 'white')); }
+  .chessboard piece.o-piece.white { background-image: v-bind(pieceUrl('o', 'white')); }
+  .chessboard piece.p-piece.white { background-image: v-bind(pieceUrl('p', 'white')); }
+  .chessboard piece.q-piece.white { background-image: v-bind(pieceUrl('q', 'white')); }
+  .chessboard piece.r-piece.white { background-image: v-bind(pieceUrl('r', 'white')); }
+  .chessboard piece.s-piece.white { background-image: v-bind(pieceUrl('s', 'white')); }
+  .chessboard piece.t-piece.white { background-image: v-bind(pieceUrl('t', 'white')); }
+  .chessboard piece.u-piece.white { background-image: v-bind(pieceUrl('u', 'white')); }
+  .chessboard piece.v-piece.white { background-image: v-bind(pieceUrl('v', 'white')); }
+  .chessboard piece.w-piece.white { background-image: v-bind(pieceUrl('w', 'white')); }
+  .chessboard piece.x-piece.white { background-image: v-bind(pieceUrl('x', 'white')); }
+  .chessboard piece.y-piece.white { background-image: v-bind(pieceUrl('y', 'white')); }
+  .chessboard piece.z-piece.white { background-image: v-bind(pieceUrl('z', 'white')); }
+  .chessboard piece.a-piece.black { background-image: v-bind(pieceUrl('a', 'black')); }
+  .chessboard piece.b-piece.black { background-image: v-bind(pieceUrl('b', 'black')); }
+  .chessboard piece.c-piece.black { background-image: v-bind(pieceUrl('c', 'black')); }
+  .chessboard piece.d-piece.black { background-image: v-bind(pieceUrl('d', 'black')); }
+  .chessboard piece.e-piece.black { background-image: v-bind(pieceUrl('e', 'black')); }
+  .chessboard piece.f-piece.black { background-image: v-bind(pieceUrl('f', 'black')); }
+  .chessboard piece.g-piece.black { background-image: v-bind(pieceUrl('g', 'black')); }
+  .chessboard piece.h-piece.black { background-image: v-bind(pieceUrl('h', 'black')); }
+  .chessboard piece.i-piece.black { background-image: v-bind(pieceUrl('i', 'black')); }
+  .chessboard piece.j-piece.black { background-image: v-bind(pieceUrl('j', 'black')); }
+  .chessboard piece.k-piece.black { background-image: v-bind(pieceUrl('k', 'black')); }
+  .chessboard piece.l-piece.black { background-image: v-bind(pieceUrl('l', 'black')); }
+  .chessboard piece.m-piece.black { background-image: v-bind(pieceUrl('m', 'black')); }
+  .chessboard piece.n-piece.black { background-image: v-bind(pieceUrl('n', 'black')); }
+  .chessboard piece.o-piece.black { background-image: v-bind(pieceUrl('o', 'black')); }
+  .chessboard piece.p-piece.black { background-image: v-bind(pieceUrl('p', 'black')); }
+  .chessboard piece.q-piece.black { background-image: v-bind(pieceUrl('q', 'black')); }
+  .chessboard piece.r-piece.black { background-image: v-bind(pieceUrl('r', 'black')); }
+  .chessboard piece.s-piece.black { background-image: v-bind(pieceUrl('s', 'black')); }
+  .chessboard piece.t-piece.black { background-image: v-bind(pieceUrl('t', 'black')); }
+  .chessboard piece.u-piece.black { background-image: v-bind(pieceUrl('u', 'black')); }
+  .chessboard piece.v-piece.black { background-image: v-bind(pieceUrl('v', 'black')); }
+  .chessboard piece.w-piece.black { background-image: v-bind(pieceUrl('w', 'black')); }
+  .chessboard piece.x-piece.black { background-image: v-bind(pieceUrl('x', 'black')); }
+  .chessboard piece.y-piece.black { background-image: v-bind(pieceUrl('y', 'black')); }
+  .chessboard piece.z-piece.black { background-image: v-bind(pieceUrl('z', 'black')); }
   
 </style>

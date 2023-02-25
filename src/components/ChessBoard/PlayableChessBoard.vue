@@ -10,6 +10,7 @@
     :size=props.size
     :white-pov=whitePov
     :view-only=false
+    :show-coordinates=true
     
     ref="board"
   />

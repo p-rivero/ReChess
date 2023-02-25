@@ -12,6 +12,7 @@
     :size=$props.size
     :white-pov=whitePov
     :initial-config=currentBoardConfig
+    :piece-images="pieceImages"
     
     :key="boardUpdateKey"
     ref="board"
@@ -23,7 +24,7 @@
   import type { GameStateGui, MoveList } from '@/protochess/interfaces';
   import * as cg from 'chessgroundx/types';
   import type { Config } from 'chessgroundx/config';
-  import ChessgroundAdapter from './internal/ChessgroundAdapter.vue';
+  import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue';
   import { ref } from 'vue'
 
   const props = defineProps<{
@@ -53,6 +54,10 @@
     drawable: {
       defaultSnapToValidMove: false,
     },
+  }
+  let pieceImages: PieceImages = {
+    white: [['K', '/src/assets/merida/wK.svg'], ['Q', '/src/assets/merida/wQ.svg'], ['R', '/src/assets/merida/wR.svg'], ['B', '/src/assets/merida/wB.svg'], ['N', '/src/assets/merida/wN.svg'], ['P', '/src/assets/merida/wP.svg']],
+    black: [['k', '/src/assets/merida/bK.svg'], ['q', '/src/assets/merida/bQ.svg'], ['r', '/src/assets/merida/bR.svg'], ['b', '/src/assets/merida/bB.svg'], ['n', '/src/assets/merida/bN.svg'], ['p', '/src/assets/merida/bP.svg']],
   }
   
   // Ref to the board, and a key that is incremented every time the board is re-rendered

@@ -6,6 +6,7 @@
     :white-pov=true
     :view-only=true
     :initial-config=boardConfig
+    :piece-images="{white: [['P', '/src/assets/merida/bK.svg']], black: []}"
     
     ref="board"
   />
@@ -25,7 +26,7 @@
     viewOnly: true,
     disableContextMenu: true,
     blockTouchScroll: true,
-    coordinates: true,
+    coordinates: false,
     dimensions: {
       width: 15, 
       height: 15,
