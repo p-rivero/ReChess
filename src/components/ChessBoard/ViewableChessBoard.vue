@@ -39,6 +39,7 @@
   let currentHeight = 0
   let currentBoardConfig: Config = {
     orientation: props.whitePov ? 'white' : 'black',
+    fen: ' ',
     autoCastle: false,
     viewOnly: props.viewOnly,
     disableContextMenu: true,
@@ -56,8 +57,8 @@
     },
   }
   let pieceImages: PieceImages = {
-    white: [['K', '/src/assets/merida/wK.svg'], ['Q', '/src/assets/merida/wQ.svg'], ['R', '/src/assets/merida/wR.svg'], ['B', '/src/assets/merida/wB.svg'], ['N', '/src/assets/merida/wN.svg'], ['P', '/src/assets/merida/wP.svg']],
-    black: [['k', '/src/assets/merida/bK.svg'], ['q', '/src/assets/merida/bQ.svg'], ['r', '/src/assets/merida/bR.svg'], ['b', '/src/assets/merida/bB.svg'], ['n', '/src/assets/merida/bN.svg'], ['p', '/src/assets/merida/bP.svg']],
+    white: [['K', ''], ['Q', ''], ['R', ''], ['B', ''], ['N', ''], ['P', '']],
+    black: [['k', ''], ['q', ''], ['r', ''], ['b', ''], ['n', ''], ['p', '']],
   }
   
   // Ref to the board, and a key that is incremented every time the board is re-rendered
@@ -76,6 +77,12 @@
         currentWidth = state.boardWidth
         currentHeight = state.boardHeight
         newConfig.dimensions = { width: state.boardWidth, height: state.boardHeight }
+        boardUpdateKey.value += 1
+      }
+      // If the piece images changed, re-render the board
+      const newPieceImages = extractImages(state)
+      if (JSON.stringify(newPieceImages) != JSON.stringify(pieceImages)) {
+        pieceImages = newPieceImages
         boardUpdateKey.value += 1
       }
       // Convert the state to a chessgroundx Config
@@ -158,6 +165,31 @@
   }
   function idToRole(id: string): cg.Role {
     return `${id}-piece` as cg.Role
+  }
+  
+  function extractImages(state: GameStateGui): PieceImages {
+    const images: PieceImages = {
+      white: [],
+      black: [],
+    }
+    for (const pieceDef of state.pieceTypes) {
+      if (pieceDef.ids[0]) {
+        const id = pieceDef.ids[0]
+        const image = pieceDef.imageUrls[0]
+        if (!image) throw new Error(`Missing image for piece ${id}`)
+        images.white.push([id, image])
+      }
+      if (pieceDef.ids[1]) {
+        const id = pieceDef.ids[1]
+        const image = pieceDef.imageUrls[1]
+        if (!image) throw new Error(`Missing image for piece ${id}`)
+        images.black.push([id, image])
+      }
+    }
+    // Sort by id to ensure the order is consistent
+    images.white.sort((a, b) => a[0].localeCompare(b[0]))
+    images.black.sort((a, b) => a[0].localeCompare(b[0]))
+    return images
   }
   
   

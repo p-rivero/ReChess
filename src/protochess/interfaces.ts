@@ -106,6 +106,8 @@ export interface PieceDefinition {
   translateSoutheast: boolean,
   translateSouthwest: boolean,
   winSquares: [number, number][],
+  displayName: string,
+  imageUrls: [string|undefined, string|undefined],
 }
 
 export interface PiecePlacement {
