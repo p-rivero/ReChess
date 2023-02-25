@@ -31,6 +31,7 @@
     size: number
     whitePov: boolean
     viewOnly: boolean
+    showCoordinates: boolean
   }>()
   
   // Initial board configuration
@@ -42,6 +43,7 @@
     viewOnly: props.viewOnly,
     disableContextMenu: true,
     blockTouchScroll: true,
+    coordinates: props.showCoordinates,
     dimensions: {
       width: currentWidth, 
       height: currentHeight,

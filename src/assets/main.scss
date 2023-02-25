@@ -16,36 +16,41 @@ $link: $dark-green;
 
 // Dark theme variant
 [data-theme="dark"] {
-    body {
+    body,
+    .navbar-item:hover,
+    .input,
+    .textarea,
+    .navbar-menu {
         background-color: $dark;
         color: $light;
+        
     }
     nav {
         @extend .is-dark;
     }
-    .navbar-menu {
-        background-color: $dark;
-        color: $light;
-    }
-    .navbar-item {
-        color: $light;
-    }
-    .navbar-item:hover {
-        background-color: $dark;
-        color: $link;
-    }
     
     .subtitle,
     .title,
+    .navbar-item,
+    .label,
     .card-header-title
     {
         color: $light;
     }
     
     // Color for link hover
-    a:hover {
+    a:hover,
+    .radio:hover,
+    .checkbox:hover
+    {
         color: $light-green;
     }
+    
+    ::placeholder {
+        color: $grey;
+        opacity: 1;
+    }
+      
 }
 
 

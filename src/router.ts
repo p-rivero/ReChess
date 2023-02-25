@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteParams, RouteRecordRaw } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
 import PlayPage from '@/pages/PlayPage.vue'
+import CreateVariantPage from './pages/CreateVariantPage.vue'
 
 // https://github.com/mutoe/vue3-realworld-example-app/blob/master/src/router.ts
 
@@ -19,6 +20,11 @@ export const routes: RouteRecordRaw[] = [
     name: 'play',
     path: '/play',
     component: PlayPage,
+  },
+  {
+    name: 'create-variant',
+    path: '/create',
+    component: CreateVariantPage,
   },
 ]
 export const router = createRouter({
