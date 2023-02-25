@@ -27,7 +27,7 @@
       </div>
       
       <br>
-      <button class="button is-primary bottom-button">Done</button>      
+      <button class="button is-primary bottom-button">Done</button>
     </div>
     
     
@@ -44,7 +44,7 @@
               White
             </label>
             <div class="piece-image" :class="{ invisible: !whiteEnabled }"></div>
-            <button class="button edit-button" :class="{ invisible: !whiteEnabled }"></button>
+            <EditButton :class="{ invisible: !whiteEnabled }" />
             <input class="input width-3rem" :class="{ invisible: !whiteEnabled }" type="text" placeholder="A">
           </div>
         </div>
@@ -56,7 +56,7 @@
               Black
             </label>
             <div class="piece-image" :class="{ invisible: !blackEnabled }"></div>
-            <button class="button edit-button" :class="{ invisible: !blackEnabled }"></button>
+            <EditButton :class="{ invisible: !blackEnabled }" />
             <input class="input width-3rem" :class="{ invisible: !blackEnabled }" type="text" placeholder="a">
           </div>
         </div>
@@ -137,6 +137,7 @@
 
 <script setup lang="ts">
   import PieceViewer from '@/components/ChessBoard/PieceViewer.vue';
+  import EditButton from '@/components/EditButton.vue';
   import MovementSlideRow from '@/components/MovementSlideRow.vue';
   import PillList from '@/components/PillList.vue'
   import { getProtochess } from '@/protochess/protochess';
@@ -209,16 +210,6 @@
     height: 4rem;
     flex-shrink: 0;
     background-image: url("@/assets/img/pieces/knook.svg");
-    background-size: contain;
-  }
-  .edit-button {
-    margin-left: 0rem;
-    margin-right: 1rem;
-    width: 2rem;
-    height: 2rem;
-    background-color: transparent;
-    border: none;
-    background-image: url("@/assets/img/edit/edit-light.svg");
     background-size: contain;
   }
   
