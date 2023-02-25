@@ -8,7 +8,7 @@
     <div class="column is-narrow left-column">
       
       <div class="board-container">
-        <ViewableChessBoard ref="board" :size="500" :white-pov="true" :view-only="false" :show-coordinates="false"/>
+        <ViewableChessBoard ref="board" :size="500" :white-pov="true" :view-only="false" :show-coordinates="true"/>
       </div>
       
       <div class="horizontal-field">
@@ -144,7 +144,7 @@
       <br>
       <button class="button">
         <span class="icon">
-          <svg-icon type="mdi" path="mdi-plus"/>
+          <!-- <svg-icon type="mdi" path="mdi-plus"/> -->
         </span>
         <span>Add piece</span>
       </button>
@@ -158,7 +158,6 @@
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import { getProtochess } from '@/protochess/protochess';
   import { ref, onMounted } from 'vue'
-  import SvgIcon from '@jamescoyle/vue-icon'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   
@@ -188,10 +187,6 @@
   .field-label {
     flex-basis: auto;
     flex-grow: 0;
-    align-items: center;
-    display: flex;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
     margin-right: 1rem;
   }
   .field-label-both {
@@ -206,6 +201,7 @@
   .horizontal-field {
     display: flex;
     margin-bottom: 1rem;
+    align-items: center;
   }
   
   .board-container {

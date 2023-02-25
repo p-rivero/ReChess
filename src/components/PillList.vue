@@ -4,44 +4,42 @@
   Properties:
   - editable: True if the pills can be edited and removed, and if the user can add new pills.
   - validator: A function that validates the text of a pill. The function returns true if the text is valid.
-  - width: The number of pills that can be displayed on a single line before wrapping to the next line.
+  - startingPills: An array of strings to start with.
 -->
 
 <template>
-  <div class="pill-list">
-    <div class="pill-row" v-for="(row, rowIndex) in rows" :key="rowIndex">
-      <span
-        v-bind:class="{
-          'pill': true,
-          'tag': true,
-          'is-primary': !pill.error,
-          'is-danger': pill.error,
-          'non-editable': !editable,
-        }"
-        v-for="(pill, pillIndex) in row"
-        :key="pillIndex"
-        @click="onPillClick(pill)"
-      >
-        <div class="pill-text" v-if="!pill.editing">
-          {{ pill.text }}
-        </div>
-        <input
-          v-else
-          class="pill-input"
-          type="text"
-          v-autowidth
-          ref="pillInput"
-          :value="pill.text"
-          @input="onPillInput(pill, $event)"
-          @blur="finishEdit(pill,pillIndex)"
-          @keydown.enter="finishEdit(pill,pillIndex, 123)"
-          @keydown.esc="cancelEdit(pill)"
-        />
-        <button class="pill-delete-button delete" v-if="editable" @click="removePill(pill)"></button>
-      </span>
-      <div class="pill tag is-primary" v-if="editable && rowIndex === rows.length - 1" @click="onAddPillClick()">
-        <div class="add-button">+</div>
+  <div class="pill-row field is-grouped is-grouped-multiline">
+    <span
+      v-bind:class="{
+        'pill': true,
+        'tag': true,
+        'is-primary': !pill.error,
+        'is-danger': pill.error,
+        'non-editable': !editable,
+      }"
+      v-for="(pill, pillIndex) in pills"
+      :key="pillIndex"
+      @click="onPillClick(pill)"
+    >
+      <div class="pill-text" v-if="!pill.editing">
+        {{ pill.text }}
       </div>
+      <input
+        v-else
+        class="pill-input"
+        type="text"
+        v-autowidth
+        ref="pillInput"
+        :value="pill.text"
+        @input="onPillInput(pill, $event)"
+        @blur="finishEdit(pill)"
+        @keydown.enter="finishEdit(pill)"
+        @keydown.esc="cancelEdit(pill)"
+      />
+      <button class="pill-delete-button delete" v-if="editable" @click="removePill(pill)"></button>
+    </span>
+    <div class="pill tag is-primary" v-if="editable" @click="onAddPillClick()">
+      <div class="add-button">+</div>
     </div>
   </div>
 </template>
@@ -76,30 +74,12 @@ import { ref, computed } from "vue"
 const props = defineProps<{
   editable: boolean
   validator: (text: string) => boolean
-  width: number
   startingPills?: string[]
 }>()
 
 
 const pills = ref<Pill[]>(stringsToPills(props.startingPills ?? []))
 const pillInput = ref<HTMLInputElement[]>()
-const rows = computed(() => {
-  const rows: Pill[][] = []
-  let row: Pill[] = []
-  for (const pill of pills.value) {
-    // Start a new row if the current row is full
-    if (row.length === props.width) {
-      rows.push(row)
-      row = []
-    }
-    row.push(pill)
-  }
-  // Add the last row if not empty, make sure there is at least one row
-  if (row.length > 0 || rows.length === 0) {
-    rows.push(row)
-  }
-  return rows
-})
 
 function onPillClick(pill: Pill) {
   if (!props.editable) return
@@ -114,8 +94,7 @@ function onPillInput(pill: Pill, event: Event) {
   pill.text = input.value
 }
 
-function finishEdit(pill: Pill, pillIndex: number, row?: number) {
-  console.log("finish", row, pillIndex, pill)
+function finishEdit(pill: Pill) {
   // If the pill is empty, don't call the validator and remove it
   if (pill.text === '') {
     removePill(pill)
@@ -180,53 +159,51 @@ function focusPillInput() {
 
 
 <style scoped lang="scss">
-  .pill-list {
-    .pill-row {
-      display: flex;
-      .pill {
+  .pill-row {
+    display: flex;
+    .pill {
+      height: 2rem;
+      margin: 0.25rem;
+      border-radius: 1rem;
+      padding: 0;
+      padding-right: 0;
+      cursor: pointer;
+      .pill-text {
+        margin-left: 0.5rem;
+        padding: 0 0.2rem;
+        font-size: 1rem;
+        pointer-events: none;
+      }
+      
+      .pill-input {
+        margin-left: 0.5rem;
+        padding: 0 0.2rem;
+        font-size: 1rem;
+        color: white;
+        background-color: transparent;
+        border: none;
+        outline: none;
+      }
+      .pill-delete-button {
+        margin-right: 0.5rem;
+      }
+      .add-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
         height: 2rem;
-        margin: 0.25rem;
+        font-size: 1.5rem;
         border-radius: 50%;
-        padding: 0;
-        padding-right: 0;
-        cursor: pointer;
-        .pill-text {
-          margin-left: 0.5rem;
-          padding: 0 0.2rem;
-          font-size: 1rem;
-          pointer-events: none;
-        }
-        
-        .pill-input {
-          margin-left: 0.5rem;
-          padding: 0 0.2rem;
-          font-size: 1rem;
-          color: white;
-          background-color: transparent;
-          border: none;
-          outline: none;
-        }
-        .pill-delete-button {
-          margin-right: 0.5rem;
-        }
-        .add-button {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 2rem;
-          height: 2rem;
-          font-size: 1.5rem;
-          border-radius: 50%;
-          // Hover effect
-          &:hover {
-            background-color: rgba(0, 0, 0, 0.2);
-          }
+        // Hover effect
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.2);
         }
       }
-      .non-editable {
-        padding-right: 0.5rem;
-        cursor: default;
-      }
+    }
+    .non-editable {
+      padding-right: 0.5rem;
+      cursor: default;
     }
   }
 </style>
