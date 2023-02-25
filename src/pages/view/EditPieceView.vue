@@ -8,7 +8,7 @@
     <div class="column is-narrow left-column">
       
       <div class="board-container">
-        <ViewableChessBoard ref="board" :size="500" :white-pov="true" :view-only="false" :show-coordinates="false"/>
+        <PieceViewer ref="board" :size="500" :white-pov="true" :view-only="false" :show-coordinates="false"/>
       </div>
       
       <div class="field">
@@ -40,24 +40,24 @@
         <div class="column">
           <div class="horizontal-field">
             <label class="checkbox piece-color-checkbox" style="margin-right: 1rem">
-              <input type="checkbox">
+              <input type="checkbox" v-model="whiteEnabled">
               White
             </label>
-            <div class="piece-image"></div>
-            <button class="button edit-button">Edit</button>
-            <input class="input width-3rem" type="text" placeholder="A">
+            <div class="piece-image" :class="{ invisible: !whiteEnabled }"></div>
+            <button class="button edit-button" :class="{ invisible: !whiteEnabled }"></button>
+            <input class="input width-3rem" :class="{ invisible: !whiteEnabled }" type="text" placeholder="A">
           </div>
         </div>
         
         <div class="column">
           <div class="horizontal-field">
             <label class="checkbox" style="margin-right: 1rem">
-              <input type="checkbox">
+              <input type="checkbox" v-model="blackEnabled">
               Black
             </label>
-            <div class="piece-image"></div>
-            <button class="button edit-button">Edit</button>
-            <input class="input width-3rem" type="text" placeholder="a">
+            <div class="piece-image" :class="{ invisible: !blackEnabled }"></div>
+            <button class="button edit-button" :class="{ invisible: !blackEnabled }"></button>
+            <input class="input width-3rem" :class="{ invisible: !blackEnabled }" type="text" placeholder="a">
           </div>
         </div>
       </div>
@@ -106,12 +106,12 @@
       <br>
       
       <label class="label">Movement:</label>
-      <MovementSlideRow style="margin-bottom: 1rem;"/>
+      <div style="margin-bottom: 1rem;"> <MovementSlideRow/> </div>
       <label>Double jump when standing on:</label>
       <PillList :editable="true" :validator="() => true" :width="10" style="margin-bottom: 1.5rem;"/>
         
       <label class="label">Capture:</label>
-      <MovementSlideRow style="margin-bottom: 1.5rem;"/>
+      <div style="margin-bottom: 1.5rem;"> <MovementSlideRow/> </div>
       
       <label class="label">Promotion:</label>
       <label>Promote when landing on:</label>
@@ -119,12 +119,12 @@
       <br>
         
       <div class="columns">
-        <div class="column">
+        <div class="column" :class="{ invisible: !whiteEnabled }">
           <label>(White) Promote to:</label>
           <PillList :editable="true" :validator="() => true" :width="10"/>
         </div>
         
-        <div class="column">
+        <div class="column" :class="{ invisible: !blackEnabled }">
           <label>(Black) Promote to:</label>
           <PillList :editable="true" :validator="() => true" :width="10"/>
         </div>
@@ -136,21 +136,16 @@
 
 
 <script setup lang="ts">
-  import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
+  import PieceViewer from '@/components/ChessBoard/PieceViewer.vue';
   import MovementSlideRow from '@/components/MovementSlideRow.vue';
   import PillList from '@/components/PillList.vue'
   import { getProtochess } from '@/protochess/protochess';
   import { ref, onMounted } from 'vue'
   
-  const board = ref<InstanceType<typeof ViewableChessBoard>>()
+  const board = ref<InstanceType<typeof PieceViewer>>()
   
-  onMounted(async () => {
-    if (board.value === undefined) {
-      throw new Error('Reference to board is undefined')
-    }
-    const protochess = await getProtochess()
-    board.value.setState(await protochess.getState())
-  })
+  const whiteEnabled = ref(true)
+  const blackEnabled = ref(true)
 </script>
 
 
@@ -217,8 +212,17 @@
     background-size: contain;
   }
   .edit-button {
-    margin-left: 0.5rem;
+    margin-left: 0rem;
     margin-right: 1rem;
-    // TODO: Use icon instead of text
+    width: 2rem;
+    height: 2rem;
+    background-color: transparent;
+    border: none;
+    background-image: url("@/assets/img/edit/edit-light.svg");
+    background-size: contain;
+  }
+  
+  .invisible {
+    visibility: hidden;
   }
 </style>

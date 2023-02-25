@@ -11,7 +11,6 @@
     :height=currentHeight
     :size=$props.size
     :white-pov=whitePov
-    :view-only=$props.viewOnly
     :initial-config=currentBoardConfig
     
     :key="boardUpdateKey"

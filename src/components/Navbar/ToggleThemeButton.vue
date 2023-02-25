@@ -1,8 +1,7 @@
 <template>
   <button
-    v-bind:class="{
-      'button': true,
-      'toggle-theme-button': true,
+    class="button toggle-theme-button"
+    :class="{
       'dark-theme': themeStore.currentTheme === 'dark',
     }"
     :key="themeStore.currentTheme"

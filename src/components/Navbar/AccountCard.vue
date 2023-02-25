@@ -1,8 +1,7 @@
 <template>
   <a v-if="false" class="card-header" @click="onAccountClick">
     <span class="card-header-icon">
-      <div v-bind:class="{
-        'account-icon': true,
+      <div class="account-icon" :class="{
         'dark-account-icon': themeStore.currentTheme === 'dark',
       }"></div>
     </span>

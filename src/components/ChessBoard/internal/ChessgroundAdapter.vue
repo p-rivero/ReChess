@@ -25,8 +25,9 @@
     height: number
     initialConfig: Config
     size: number
-    viewOnly: boolean
     whitePov: boolean
+    // Map from piece id to image URL
+    // pieceImages: Record<string, string>
   }>()
 
   // When mounted, create the chessground board and store the reference to the API handle

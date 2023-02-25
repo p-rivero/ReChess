@@ -10,9 +10,8 @@
 <template>
   <div class="pill-row field is-grouped is-grouped-multiline">
     <span
-      v-bind:class="{
-        'pill': true,
-        'tag': true,
+      class="pill tag"
+      :class="{
         'is-primary': !pill.error,
         'is-danger': pill.error,
         'non-editable': !editable,
