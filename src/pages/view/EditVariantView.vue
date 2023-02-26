@@ -34,47 +34,7 @@
       
       <div class="field">
         <label class="label">Place piece:</label>
-        <div class="field is-grouped is-grouped-multiline">
-          <div class="control">
-            <button class="button">K</button>
-          </div>
-          <div class="control">
-            <button class="button">Q</button>
-          </div>
-          <div class="control">
-            <button class="button">R</button>
-          </div>
-          <div class="control">
-            <button class="button">B</button>
-          </div>
-          <div class="control">
-            <button class="button">N</button>
-          </div>
-          <div class="control">
-            <button class="button">P</button>
-          </div>
-          <div class="control">
-            <button class="button">k</button>
-          </div>
-          <div class="control">
-            <button class="button">q</button>
-          </div>
-          <div class="control">
-            <button class="button">r</button>
-          </div>
-          <div class="control">
-            <button class="button">b</button>
-          </div>
-          <div class="control">
-            <button class="button">n</button>
-          </div>
-          <div class="control">
-            <button class="button">p</button>
-          </div>
-          <div class="control">
-            <button class="button">REMOVE</button>
-          </div>
-        </div>
+        <PiecePlacementButtons :state="variantDraftStore.variantDraft" />
       </div>
       
       <br>
@@ -153,6 +113,7 @@
   import { ref, onMounted } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { getProtochess } from '@/protochess/protochess'
+  import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const variantDraftStore = useVariantDraftStore()
