@@ -2,16 +2,21 @@
   "name": "rechess",
   "version": "1.0.0",
   "scripts": {
-    "dev": "run-s build-wasm dev-only",
-    "build": "run-s build-wasm type-check build-only",
-    "deploy": "run-s build deploy-only",
+    "dev": "run-s pre-compile dev-only",
+    "build": "run-s pre-compile type-check build-only",
     "preview": "vite preview --port 4173 --config .config/vite.config.ts",
+    "deploy": "run-s build deploy-only",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --config .config/.eslintrc.cjs",
+    
+    
+    "pre-compile": "run-p build-wasm generate-type-guard",
+    "generate-type-guard": "ts-auto-guard ./src/protochess/interfaces.ts && sed -i 's/import {/import type {/g' ./src/protochess/interfaces.guard.ts",
     "build-wasm": "make all use-pathname --directory protochess-engine/protochess-engine-wasm",
-    "build-only": "vite build --config .config/vite.config.ts",
     "type-check": "vue-tsc --noEmit",
+    
+    "build-only": "vite build --config .config/vite.config.ts",
     "dev-only": "vite --config .config/vite.config.ts",
-    "deploy-only": "firebase deploy --project rechess-web",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --config .config/.eslintrc.cjs"
+    "deploy-only": "firebase deploy --project rechess-web"
   },
   "dependencies": {
     "bulma": "^0.9.4",
@@ -35,6 +40,7 @@
     "eslint": "^8.22.0",
     "eslint-plugin-vue": "^9.3.0",
     "npm-run-all": "^4.1.5",
+    "ts-auto-guard": "^4.1.2",
     "typescript": "~4.7.4",
     "vite": "^3.0.9",
     "vue-tsc": "^0.40.7"

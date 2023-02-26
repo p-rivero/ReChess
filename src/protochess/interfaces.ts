@@ -58,6 +58,7 @@ export interface MoveList {
   moves: MoveInfo[],
 }
 
+/** @see {isGameState} ts-auto-guard:type-guard */
 export interface GameState {
   pieceTypes: PieceDefinition[],
   boardWidth: number,
@@ -69,11 +70,13 @@ export interface GameState {
   timesInCheck?: [number, number],
   globalRules: GlobalRules,
 }
+/** @see {isGameStateGui} ts-auto-guard:type-guard */
 export interface GameStateGui extends GameState {
   fen: string,
   inCheck: boolean,
 }
 
+/** @see {isPieceDefinition} ts-auto-guard:type-guard */
 export interface PieceDefinition {
   ids: [string|undefined, string|undefined],
   isLeader: boolean,
