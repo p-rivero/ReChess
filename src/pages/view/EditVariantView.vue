@@ -8,14 +8,17 @@
     <div class="column is-narrow left-column">
       
       <div class="board-container">
-        <ViewableChessBoard ref="board" :size="500" :white-pov="true" :view-only="false" :show-coordinates="true"/>
+        <ViewableChessBoard ref="board" :size="500" :white-pov="true" :view-only="false" :show-coordinates="true"
+          :key="stateKey" :after-mount="updateBoard"/>
       </div>
       
       <div class="horizontal-field">
         <div class="field-label"><label>Board size:</label></div>
-        <input class="input width-5rem" type="number" placeholder="8" min="1" max="16">
+        <input class="input width-5rem" type="number" placeholder="8" min="2" max="16"
+          @input="sizeChanged($event?.target, 'height')">
         <div class="field-label-both"><label>x</label></div>
-        <input class="input width-5rem" type="number" placeholder="8" min="1" max="16">
+        <input class="input width-5rem" type="number" placeholder="8" min="2" max="16"
+          @input="sizeChanged($event?.target, 'width')">
       </div>
       
       <div class="horizontal-field">
@@ -34,7 +37,7 @@
       
       <div class="field">
         <label class="label">Place piece:</label>
-        <PiecePlacementButtons :state="variantDraftStore.variantDraft" />
+        <PiecePlacementButtons :state="variantDraftStore.variantDraft" :key="stateKey"/>
       </div>
       
       <br>
@@ -100,7 +103,11 @@
       </div>
       <br>
       <label class="label">Pieces:</label>
-      <PiecesSummary :editable="true" :state="variantDraftStore.variantDraft" />
+      <PiecesSummary 
+        :editable="true"
+        :state="variantDraftStore.variantDraft"
+        :on-edit-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
+        :on-delete-click="pieceIndex => { /* TODO: Ask for confirmation */ variantDraftStore.deletePiece(pieceIndex) }" />
       
     </div>
   </div>
@@ -110,7 +117,7 @@
 <script setup lang="ts">
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import PiecesSummary from '@/components/EditVariant/PiecesSummary.vue'
-  import { ref, onMounted } from 'vue'
+  import { ref, computed } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { getProtochess } from '@/protochess/protochess'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
@@ -118,7 +125,9 @@
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const variantDraftStore = useVariantDraftStore()
   
-  onMounted(async () => {
+  const stateKey = computed(() => JSON.stringify(variantDraftStore.variantDraft))
+  
+  async function updateBoard() {
     if (board.value === undefined) {
       throw new Error('Reference to board is undefined')
     }
@@ -126,7 +135,23 @@
     const protochess = await getProtochess()
     await protochess.setState(variantDraftStore.variantDraft)
     board.value.setState(await protochess.getState())
-  })
+  }
+  
+  function sizeChanged(target: EventTarget|null, dim: 'height'|'width') {
+    if (target === null) {
+      throw new Error('Target is null')
+    }
+    const text = (target as HTMLInputElement).value
+    let size = parseInt(text)
+    if (isNaN(size)) size = 8
+    if (size < 2) return
+    if (size > 16) return
+    if (dim === 'height') {
+      variantDraftStore.setHeight(size)
+    } else {
+      variantDraftStore.setWidth(size)
+    }
+  }
 </script>
 
 
@@ -165,8 +190,9 @@
   
   .board-container {
     display: flex;
-    justify-content: left;
+    justify-content: center;
     margin-bottom: 1rem;
+    height: 500px;
   }
   
   .bottom-button {

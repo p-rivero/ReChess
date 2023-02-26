@@ -22,8 +22,28 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
       return null
     return variantDraft.value.pieceTypes[index]
   }
+  
+  function deletePiece(index: number) {
+    if (index < 0 || index >= variantDraft.value.pieceTypes.length)
+      return
+    variantDraft.value.pieceTypes.splice(index, 1)
+    saveToLocalStorage()
+  }
+  
+  function setHeight(height: number) {
+    variantDraft.value.boardHeight = height
+    saveToLocalStorage()
+  }
+  function setWidth(width: number) {
+    variantDraft.value.boardWidth = width
+    saveToLocalStorage()
+  }
+  
+  function saveToLocalStorage() {
+    localStorage.setItem('variantDraft', JSON.stringify(variantDraft.value))
+  }
 
-  return { variantDraft, getPiece }
+  return { variantDraft, getPiece, deletePiece, setHeight, setWidth }
 })
 
 const DEFAULT_DRAFT: GameState = {

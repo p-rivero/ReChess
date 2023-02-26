@@ -29,7 +29,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     name: 'edit-piece',
-    path: '/edit/pieces/:pieceId',
+    path: '/edit/pieces/:pieceIndex',
     component: EditPiecePage,
   },
 ]

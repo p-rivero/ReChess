@@ -13,6 +13,7 @@
     :white-pov=whitePov
     :initial-config=currentBoardConfig
     :piece-images="pieceImages"
+    :after-mount="$props.afterMount"
     
     :key="boardUpdateKey"
     ref="board"
@@ -32,6 +33,7 @@
     whitePov: boolean
     viewOnly: boolean
     showCoordinates: boolean
+    afterMount?: () => void
   }>()
   
   // Initial board configuration
@@ -56,10 +58,7 @@
       defaultSnapToValidMove: false,
     },
   }
-  let pieceImages: PieceImages = {
-    white: [['K', ''], ['Q', ''], ['R', ''], ['B', ''], ['N', ''], ['P', '']],
-    black: [['k', ''], ['q', ''], ['r', ''], ['b', ''], ['n', ''], ['p', '']],
-  }
+  let pieceImages: PieceImages = { white: [], black: [] }
   
   // Ref to the board, and a key that is incremented every time the board is re-rendered
   const boardUpdateKey = ref(0);

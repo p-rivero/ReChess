@@ -32,6 +32,7 @@
     whitePov: boolean
     // For each player, a mapping from piece id to the URL of the image to use
     pieceImages: PieceImages
+    afterMount?: () => void
   }>()
 
   // When mounted, create the chessground board and store the reference to the API handle
@@ -47,6 +48,7 @@
       blackPieces: props.pieceImages.black.map(([id, _]) => id),
     }
     chessgroundApi = Chessground(board.value, mappedConfig)
+    if (props.afterMount) props.afterMount()
   })
   
   // Board appearance

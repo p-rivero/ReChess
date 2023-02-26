@@ -1,7 +1,7 @@
 <template>
   <div v-for="(piece, pieceIndex) in props.state.pieceTypes" class="piece-container" :key="pieceIndex">
     <div v-if="editable">
-      <button class="button edit-button" @click="$router.push({ name: 'edit-piece', params: { pieceId: pieceIndex } })">
+      <button class="button edit-button" @click="onEditClick(pieceIndex)">
         <span>Edit</span>
       </button>
       <button class="button delete-button" @click="onDeleteClick(pieceIndex)">
@@ -15,7 +15,7 @@
       <img v-if="piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="piece-image">
       <div v-else alt="piece image" class="piece-image-not-found" :class="{'is-light': theme.currentTheme === 'light'}"></div>
       
-      <strong class="piece-name">{{ piece.displayName }}</strong>
+      <p class="piece-name">{{ piece.displayName }}</p>
       
       <img v-if="piece.isLeader" class="star-icon" src="@/assets/img/star.svg" alt="star">
       <strong v-if="piece.isLeader" class="has-text-primary piece-name">Leader</strong>
@@ -38,11 +38,9 @@
   const props = defineProps<{
     editable: boolean
     state: GameState
+    onEditClick: (pieceIndex: number) => void
+    onDeleteClick: (pieceIndex: number) => void
   }>()
-  
-  async function onDeleteClick(pieceIndex: number) {
-    // TODO
-  }
   
 </script>
 
