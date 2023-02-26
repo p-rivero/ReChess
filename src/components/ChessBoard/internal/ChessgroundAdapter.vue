@@ -41,11 +41,12 @@
     if (board.value === undefined) {
       throw new Error('Reference to board is undefined')
     }
-    props.initialConfig.mapping = {
+    let mappedConfig = props.initialConfig
+    mappedConfig.mapping = {
       whitePieces: props.pieceImages.white.map(([id, _]) => id),
       blackPieces: props.pieceImages.black.map(([id, _]) => id),
     }
-    chessgroundApi = Chessground(board.value, props.initialConfig)
+    chessgroundApi = Chessground(board.value, mappedConfig)
   })
   
   // Board appearance

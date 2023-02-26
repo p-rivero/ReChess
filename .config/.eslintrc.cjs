@@ -11,11 +11,11 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest'
   },
-  // Ignore the protochess-engine directory
-  ignorePatterns: ['protochess-engine'],
+  // Ignore the submodule directories
+  ignorePatterns: ['protochess-engine', 'chessgroundx'],
   rules: {
     // Use '_' as a prefix for unused variables
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
   }
 }

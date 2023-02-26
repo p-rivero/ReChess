@@ -9,5 +9,5 @@
 </template>
 
 <script setup lang="ts">
-  import CreateVariantView from './view/EditVariantView.vue';
+  import CreateVariantView from './view/EditVariantView.vue'
 </script>

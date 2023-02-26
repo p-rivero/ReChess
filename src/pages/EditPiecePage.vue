@@ -9,5 +9,5 @@
 </template>
 
 <script setup lang="ts">
-  import EditPieceView from './view/EditPieceView.vue';
+  import EditPieceView from './view/EditPieceView.vue'
 </script>

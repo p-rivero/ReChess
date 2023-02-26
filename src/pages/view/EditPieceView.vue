@@ -8,7 +8,7 @@
     <div class="column is-narrow left-column">
       
       <div class="board-container">
-        <PieceViewer ref="board" :size="500" :white-pov="true" :view-only="false" :show-coordinates="false"/>
+        <PieceViewer :size="500" :white-pov="true" :view-only="false" :show-coordinates="false"/>
       </div>
       
       <div class="field">
@@ -140,10 +140,7 @@
   import EditButton from '@/components/EditButton.vue';
   import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue';
   import PillList from '@/components/PillList.vue'
-  import { getProtochess } from '@/protochess/protochess';
-  import { ref, onMounted } from 'vue'
-  
-  const board = ref<InstanceType<typeof PieceViewer>>()
+  import { ref } from 'vue'
   
   const whiteEnabled = ref(true)
   const blackEnabled = ref(true)
