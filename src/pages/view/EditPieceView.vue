@@ -140,6 +140,7 @@
   import EditButton from '@/components/EditButton.vue'
   import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue'
   import PillList from '@/components/PillList.vue'
+  import type { PieceDefinition } from '@/protochess/interfaces'
   import { router } from '@/router'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { paramToInt } from '@/utils/param-to-int'
@@ -150,12 +151,14 @@
   const blackEnabled = ref(true)
   
   const route = useRoute()
-  const variantDraftStore = useVariantDraftStore()
+  const draftStore = useVariantDraftStore()
   const pieceIndex = paramToInt(route.params.pieceIndex) || -1
-  const piece = variantDraftStore.getPiece(pieceIndex)
-  if (piece === null) {
+  let piece: PieceDefinition|null = null
+  if (pieceIndex < 0 || pieceIndex >= draftStore.state.pieceTypes.length) {
     // Incorrect piece index, redirect to edit-variant
     router.push({ name: 'edit-variant' })
+  } else {
+    piece = draftStore.state.pieceTypes[pieceIndex]
   }
 </script>
 
