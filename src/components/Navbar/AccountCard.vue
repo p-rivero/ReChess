@@ -1,5 +1,5 @@
 <template>
-  <a v-if="false" class="card-header" @click="onAccountClick">
+  <a v-if="true" class="card-header" @click="onAccountClick">
     <span class="card-header-icon">
       <div class="account-icon" :class="{
         'dark-account-icon': themeStore.currentTheme === 'dark',
@@ -30,9 +30,6 @@
 
 
 <style lang="scss" scoped>
-  .card-header {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  }
   .account-icon {
     border-radius: 50%;
     width: 2rem;

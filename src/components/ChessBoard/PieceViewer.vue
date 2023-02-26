@@ -16,25 +16,16 @@
 <script setup lang="ts">
   import type { Config } from 'chessgroundx/config'
   import ChessgroundAdapter from './internal/ChessgroundAdapter.vue'
-  import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useRoute } from 'vue-router'
-  import { paramToInt } from '@/utils/param-to-int'
+  import type { PieceDefinition } from '@/protochess/interfaces'
   
   const route = useRoute()
-  defineProps<{
+  const params = defineProps<{
     size: number
+    piece: PieceDefinition|null
   }>()
   
-  const variantDraftStore = useVariantDraftStore()
-  const index = paramToInt(route.params.pieceIndex) || -1
-  const piece = variantDraftStore.getPiece(index)
-  if (!piece) {
-    throw new Error('This piece does not exist')
-  }
-  const image = piece.imageUrls[0] || piece.imageUrls[1]
-  if (!image) {
-    throw new Error('Piece has no image')
-  }
+  const image = params.piece?.imageUrls[0] || params.piece?.imageUrls[1] || ''
   
   const boardConfig: Config = {
     fen: '7P/////// w - - 0 1',

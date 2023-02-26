@@ -20,19 +20,26 @@ $link: $dark-green;
     .navbar-item:hover,
     .input,
     .textarea,
+    .box,
     .navbar-menu {
         background-color: $dark;
         color: $light;
-        
     }
     nav {
         @extend .is-dark;
+    }
+    
+    .card-header,
+    .box
+    {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
     
     .subtitle,
     .title,
     .navbar-item,
     .label,
+    strong,
     .card-header-title
     {
         color: $light;

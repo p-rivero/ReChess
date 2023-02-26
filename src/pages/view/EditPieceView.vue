@@ -8,7 +8,7 @@
     <div class="column is-narrow left-column">
       
       <div class="board-container">
-        <PieceViewer :size="500" :white-pov="true" :view-only="false" :show-coordinates="false"/>
+        <PieceViewer :size="500" :white-pov="true" :view-only="false" :show-coordinates="false" :piece="piece"/>
       </div>
       
       <div class="field">
@@ -136,14 +136,27 @@
 
 
 <script setup lang="ts">
-  import PieceViewer from '@/components/ChessBoard/PieceViewer.vue';
-  import EditButton from '@/components/EditButton.vue';
-  import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue';
+  import PieceViewer from '@/components/ChessBoard/PieceViewer.vue'
+  import EditButton from '@/components/EditButton.vue'
+  import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue'
   import PillList from '@/components/PillList.vue'
+  import { router } from '@/router'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { paramToInt } from '@/utils/param-to-int'
   import { ref } from 'vue'
+  import { useRoute } from 'vue-router'
   
   const whiteEnabled = ref(true)
   const blackEnabled = ref(true)
+  
+  const route = useRoute()
+  const variantDraftStore = useVariantDraftStore()
+  const pieceIndex = paramToInt(route.params.pieceIndex) || -1
+  const piece = variantDraftStore.getPiece(pieceIndex)
+  if (piece === null) {
+    // Incorrect piece index, redirect to edit-variant
+    router.push({ name: 'edit-variant' })
+  }
 </script>
 
 

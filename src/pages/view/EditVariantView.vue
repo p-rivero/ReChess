@@ -140,14 +140,7 @@
       </div>
       <br>
       <label class="label">Pieces:</label>
-      todo
-      <br>
-      <button class="button">
-        <span class="icon">
-          <!-- <svg-icon type="mdi" path="mdi-plus"/> -->
-        </span>
-        <span>Add piece</span>
-      </button>
+      <PiecesSummary :editable="true" :state="variantDraftStore.variantDraft" />
       
     </div>
   </div>
@@ -156,16 +149,21 @@
 
 <script setup lang="ts">
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
-  import { getProtochess } from '@/protochess/protochess';
+  import PiecesSummary from '@/components/EditVariant/PiecesSummary.vue'
   import { ref, onMounted } from 'vue'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { getProtochess } from '@/protochess/protochess'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
+  const variantDraftStore = useVariantDraftStore()
   
   onMounted(async () => {
     if (board.value === undefined) {
       throw new Error('Reference to board is undefined')
     }
+    // TODO: Remove this and instead put the fen and inCheck (optional) in the GameState
     const protochess = await getProtochess()
+    await protochess.setState(variantDraftStore.variantDraft)
     board.value.setState(await protochess.getState())
   })
 </script>

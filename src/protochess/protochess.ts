@@ -79,7 +79,9 @@ async function init(): Promise<Protochess> {
       return wasm.wasmObject.toMoveInCheck()
     },
     async setState(state: GameState): Promise<void> {
-      return wasm.wasmObject.setState(state)
+      // Clone the state object manually to avoid errors when passing it to wasm
+      const stateClone = JSON.parse(JSON.stringify(state))
+      return wasm.wasmObject.setState(stateClone)
     },
     async getState(): Promise<GameStateGui> {
       return adaptGameStateGui(await wasm.wasmObject.getState())
