@@ -138,7 +138,7 @@
 <script setup lang="ts">
   import PieceViewer from '@/components/ChessBoard/PieceViewer.vue';
   import EditButton from '@/components/EditButton.vue';
-  import MovementSlideRow from '@/components/MovementSlideRow.vue';
+  import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue';
   import PillList from '@/components/PillList.vue'
   import { getProtochess } from '@/protochess/protochess';
   import { ref, onMounted } from 'vue'
