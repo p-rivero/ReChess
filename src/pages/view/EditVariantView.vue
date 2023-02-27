@@ -14,11 +14,13 @@
       
       <div class="horizontal-field">
         <div class="field-label"><label>Board size:</label></div>
-        <input class="input width-5rem" type="number" placeholder="8" min="2" max="16" ref="heightInput"
-          @input="inputChanged($event?.target, 8, 2, 16, 'height')">
+        <SmartNumberInput class="width-5rem" :min="2" :max="16" :default="8"
+          :start-value="draftStore.state.boardHeight"
+          :on-changed="height => { draftStore.state.boardHeight = height; draftStore.save() }"/>
         <div class="field-label-both"><label>x</label></div>
-        <input class="input width-5rem" type="number" placeholder="8" min="2" max="16" ref="widthInput"
-          @input="inputChanged($event?.target, 8, 2, 16, 'width')">
+        <SmartNumberInput class="width-5rem" :min="2" :max="16" :default="8"
+          :start-value="draftStore.state.boardWidth"
+          :on-changed="width => { draftStore.state.boardWidth = width; draftStore.save() }"/>
       </div>
       
       <div class="horizontal-field">
@@ -63,21 +65,21 @@
       <label class="label">Rules:</label>
       <div class="columns is-mobile">
         <div class="column is-narrow left-column">
-          <CheckboxWithCallback text="Capturing is forced" class="rules-field"
+          <SmartCheckbox text="Capturing is forced" class="rules-field"
             :start-value="draftStore.state.globalRules.capturingIsForced"
             :on-changed="value => { draftStore.state.globalRules.capturingIsForced = value; draftStore.save() }"/>
           <br>
-          <CheckboxWithCallback text="Check is forbidden" class="rules-field"
+          <SmartCheckbox text="Check is forbidden" class="rules-field"
             :start-value="draftStore.state.globalRules.checkIsForbidden"
             :on-changed="value => { draftStore.state.globalRules.checkIsForbidden = value; draftStore.save() }"/>
         </div>
         
         <div class="column">
-          <CheckboxWithCallback text="Stalemated player loses" class="rules-field"
+          <SmartCheckbox text="Stalemated player loses" class="rules-field"
             :start-value="draftStore.state.globalRules.stalematedPlayerLoses"
             :on-changed="value => { draftStore.state.globalRules.stalematedPlayerLoses = value; draftStore.save() }"/>
           <br>
-          <CheckboxWithCallback text="Invert ALL win conditions" class="rules-field"
+          <SmartCheckbox text="Invert ALL win conditions" class="rules-field"
             :start-value="draftStore.state.globalRules.invertWinConditions"
             :on-changed="value => { draftStore.state.globalRules.invertWinConditions = value; draftStore.save() }"/>
         </div>
@@ -86,15 +88,17 @@
         <div class="field-label">
           <label>Repetitions for draw:</label>
         </div>
-        <input class="input width-5rem" type="number" placeholder="3" min="0" max="200" ref="repetitionsForDrawInput"
-          @input="inputChanged($event?.target, 3, 0, 200, 'repeatDraw')">
+        <SmartNumberInput class="width-5rem" :min="0" :max="200" :default="3"
+          :start-value="draftStore.state.globalRules.repetitionsDraw"
+          :on-changed="value => { draftStore.state.globalRules.repetitionsDraw = value; draftStore.save() }"/>
       </div>
       <div class="horizontal-field">
         <div class="field-label">
           <label>Lose when put in check</label>
         </div>
-        <input class="input width-5rem" type="number" placeholder="-" min="0" max="200" ref="loseWhenPutInCheckTimesInput"
-          @input="inputChanged($event?.target, 3, 0, 200, 'checksToLose')">
+        <SmartNumberInput class="width-5rem" :min="0" :max="200" :default="0" placeholder="-"
+          :start-value="draftStore.state.globalRules.checksToLose"
+          :on-changed="value => { draftStore.state.globalRules.checksToLose = value; draftStore.save() }"/>
         
         <div class="field-label-right">
           <label>times</label>
@@ -116,7 +120,8 @@
 <script setup lang="ts">
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import PiecesSummary from '@/components/EditVariant/PiecesSummary.vue'
-  import CheckboxWithCallback from '@/components/BasicWrappers/SmartCheckbox.vue'
+  import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'
+  import SmartNumberInput from '@/components/BasicWrappers/SmartNumberInput.vue'
   import { ref, computed, onMounted } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { getProtochess } from '@/protochess/protochess'
@@ -124,53 +129,15 @@
   
   const draftStore = useVariantDraftStore()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
-  const heightInput = ref<HTMLInputElement>()
-  const widthInput = ref<HTMLInputElement>()
   const playerToMoveSelect = ref<HTMLSelectElement>()
-  const variantNameInput = ref<HTMLInputElement>()
-  const descriptionInput = ref<HTMLTextAreaElement>()
-  const repetitionsForDrawInput = ref<HTMLInputElement>()
-  const loseWhenPutInCheckTimesInput = ref<HTMLInputElement>()
   
   const stateKey = computed(() => JSON.stringify(draftStore.state))
   
   onMounted(() => {
-    if (board.value === undefined) {
-      throw new Error('Reference to board is undefined')
-    }
-    if (heightInput.value === undefined) {
-      throw new Error('Reference to heightInput is undefined')
-    }
-    if (widthInput.value === undefined) {
-      throw new Error('Reference to widthInput is undefined')
-    }
     if (playerToMoveSelect.value === undefined) {
       throw new Error('Reference to playerToMoveSelect is undefined')
     }
-    if (variantNameInput.value === undefined) {
-      throw new Error('Reference to variantNameInput is undefined')
-    }
-    if (descriptionInput.value === undefined) {
-      throw new Error('Reference to descriptionInput is undefined')
-    }
-    if (repetitionsForDrawInput.value === undefined) {
-      throw new Error('Reference to repetitionsForDrawInput is undefined')
-    }
-    if (loseWhenPutInCheckTimesInput.value === undefined) {
-      throw new Error('Reference to loseWhenPutInCheckTimesInput is undefined')
-    }
-    heightInput.value.value = draftStore.state.boardHeight.toString()
-    widthInput.value.value = draftStore.state.boardWidth.toString()
     playerToMoveSelect.value.value = draftStore.state.playerToMove === 0 ? 'White' : 'Black'
-    // variantNameInput.value.value = variantDraftStore.state.name
-    // descriptionInput.value.value = variantDraftStore.state.description
-    repetitionsForDrawInput.value.value = draftStore.state.globalRules.repetitionsDraw.toString()
-    const checksToLose = draftStore.state.globalRules.checksToLose
-    if (checksToLose === 0) {
-      loseWhenPutInCheckTimesInput.value.value = ''
-    } else {
-      loseWhenPutInCheckTimesInput.value.value = checksToLose.toString()
-    }
   })
   
   async function updateBoard() {
@@ -186,25 +153,6 @@
   function deletePiece(pieceIndex: number) {
     // TODO: Ask for confirmation
     draftStore.state.pieces.splice(pieceIndex, 1)
-    draftStore.save()
-  }
-  
-  function inputChanged(target: EventTarget|null, defaultVal: number, minVal: number, maxVal: number, field: 'height'|'width'|'repeatDraw'|'checksToLose') {
-    if (target === null) throw new Error('Target is undefined')
-    const text = (target as HTMLInputElement).value
-    let size = parseInt(text)
-    if (isNaN(size)) size = defaultVal
-    if (size < minVal) size = minVal
-    if (size > maxVal) size = maxVal
-    if (field === 'height') {
-      draftStore.state.boardHeight = size
-    } else if (field === 'width') {
-      draftStore.state.boardWidth = size
-    } else if (field === 'repeatDraw') {
-      draftStore.state.globalRules.repetitionsDraw = size
-    } else if (field === 'checksToLose') {
-      draftStore.state.globalRules.checksToLose = size
-    }
     draftStore.save()
   }
   

@@ -63,7 +63,7 @@
       </div>
       
       <label class="label">Behavior:</label>
-      <CheckboxWithCallback text="Leader" class="rules-field"
+      <SmartCheckbox text="Leader" class="rules-field"
         :startValue="piece?.isLeader"
         :onChanged="value => { piece!.isLeader = value; draftStore.save() }"/>
       
@@ -90,12 +90,12 @@
       
       <div class="columns">
         <div class="column ">
-          <CheckboxWithCallback text="Explode when capturing" class="rules-field"
+          <SmartCheckbox text="Explode when capturing" class="rules-field"
             :startValue="piece?.explodes"
             :onChanged="value => { piece!.explodes = value; draftStore.save() }"/>
         </div>
         <div class="column">
-          <CheckboxWithCallback text="Immune to other explosions" class="rules-field"
+          <SmartCheckbox text="Immune to other explosions" class="rules-field"
             :startValue="piece?.immuneToExplosion"
             :onChanged="value => { piece!.immuneToExplosion = value; draftStore.save() }"/>
         </div>
@@ -144,7 +144,7 @@
   import PieceViewer from '@/components/ChessBoard/PieceViewer.vue'
   import EditButton from '@/components/EditButton.vue'
   import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue'
-  import CheckboxWithCallback from '@/components/BasicWrappers/SmartCheckbox.vue'
+  import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'
   import CharPillList from '@/components/EditVariant/CharPillList.vue'
   import CoordPillList from '@/components/EditVariant/CoordPillList.vue'
   import type { PieceDefinition } from '@/protochess/interfaces'
