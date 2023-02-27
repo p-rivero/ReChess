@@ -117,7 +117,6 @@
       handleResult(result)
     }
     const state = await protochess.getState()
-    console.log(state)
     const moves = await protochess.legalMoves()
     const moveWhite = props.white == 'human' && state.playerToMove == 0
     const moveBlack = props.black == 'human' && state.playerToMove == 1
@@ -136,7 +135,7 @@
   async function handleResult(result: MakeMoveResult) {
     // Show effect for exploded squares
     board.value?.explode(result.exploded)
-    console.log(result)
+    console.log('Make move result:', result)
   }
   
 </script>

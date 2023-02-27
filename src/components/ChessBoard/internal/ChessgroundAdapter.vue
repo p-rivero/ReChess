@@ -11,6 +11,7 @@
   </div>
 </template>
 
+<!-- TODO: Make pieceImages and width/height updatable without redrawing entire component -->
 
 <script setup lang="ts">
   import { chessboardSvg } from './boardBackgroudSvg'

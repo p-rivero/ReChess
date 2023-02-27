@@ -87,10 +87,12 @@
       // Convert the state to a chessgroundx Config
       newConfig.turnColor = state.playerToMove == 0 ? 'white' : 'black'
       newConfig.check = state.inCheck
-      newConfig.fen = state.fen
-      // Wait for the board to possibly re-render, then configure it
+      newConfig.kingRoles = getLeaderIds(state)
+      incrementalUpdateConfig(newConfig)
+      // Wait for the board to possibly re-render, then add the pieces
       await new Promise(resolve => setTimeout(() => {
-        incrementalUpdateConfig(newConfig)
+        const piecesConfig = {fen: state.fen}
+        incrementalUpdateConfig(piecesConfig)
         resolve(null)
       }))
     },
@@ -193,6 +195,18 @@
     images.white.sort((a, b) => a[0].localeCompare(b[0]))
     images.black.sort((a, b) => a[0].localeCompare(b[0]))
     return images
+  }
+  
+  function getLeaderIds(state: GameStateGui): string[] {
+    const roles: string[] = []
+    for (const pieceDef of state.pieceTypes) {
+      if (pieceDef.isLeader) {
+        if (pieceDef.ids[0]) roles.push(pieceDef.ids[0])
+        if (pieceDef.ids[1]) roles.push(pieceDef.ids[1])
+      }
+    }
+    console.log('Leader roles', roles)
+    return roles
   }
   
   

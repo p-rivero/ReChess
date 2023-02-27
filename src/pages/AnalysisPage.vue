@@ -8,6 +8,7 @@
   import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { getProtochess } from '@/protochess/protochess'
+  import { pairToCoords } from '@/utils/chess-coords'
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const draftStore = useVariantDraftStore()
@@ -18,12 +19,17 @@
     if (board.value === undefined) {
       throw new Error('Reference to board is undefined')
     }
-    board.value.setState(draftStore.state)
-    const protochess = await getProtochess()
-    board.value.onMoveCallback(async () => {
-      const mv = await protochess.getBestMoveTimeout(2);
-      evaluation.value = `${mv.evaluation}, best move: ${mv.from} -> ${mv.to} (search depth: ${mv.depth}))`
-    })
+    await board.value.setState(draftStore.state)
+    board.value.onMoveCallback(updateEvaluation)
+    await updateEvaluation()
   })
+  
+  async function updateEvaluation() {
+    const protochess = await getProtochess()
+    const mv = await protochess.getBestMoveTimeout(1)
+    const player = await protochess.playerToMove()
+    const adjustedEval = player === 'white' ? mv.evaluation : -mv.evaluation
+    evaluation.value = `${adjustedEval}, best move: ${pairToCoords(mv.from)}->${pairToCoords(mv.to)} (search depth: ${mv.depth})`
+  }
 </script>
 

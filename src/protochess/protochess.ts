@@ -57,6 +57,10 @@ async function init(): Promise<Protochess> {
     async toString(): Promise<string> {
       return wasm.wasmObject.toString()
     },
+    async playerToMove(): Promise<'white' | 'black'> {
+      const player: 0|1 = await wasm.wasmObject.playerToMove()
+      return player === 0 ? 'white' : 'black'
+    },
     async playBestMove(depth: number): Promise<MakeMoveResult> {
       return wasm.wasmObject.playBestMove(depth)
     },
