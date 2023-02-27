@@ -63,27 +63,23 @@
       <label class="label">Rules:</label>
       <div class="columns is-mobile">
         <div class="column is-narrow left-column">
-          <label class="checkbox rules-field">
-            <input type="checkbox" ref="captureForcedCheckbox" @change="checkboxChanged($event?.target, 'capturingIsForced')">
-            Capturing is forced
-          </label>
+          <CheckboxWithCallback text="Capturing is forced" class="rules-field"
+            :start-value="draftStore.state.globalRules.capturingIsForced"
+            :on-changed="value => { draftStore.state.globalRules.capturingIsForced = value; draftStore.save() }"/>
           <br>
-          <label class="checkbox rules-field">
-            <input type="checkbox" ref="checkForbiddenCheckbox" @change="checkboxChanged($event?.target, 'checkIsForbidden')">
-            Check is forbidden
-          </label>
+          <CheckboxWithCallback text="Check is forbidden" class="rules-field"
+            :start-value="draftStore.state.globalRules.checkIsForbidden"
+            :on-changed="value => { draftStore.state.globalRules.checkIsForbidden = value; draftStore.save() }"/>
         </div>
         
         <div class="column">
-          <label class="checkbox rules-field">
-            <input type="checkbox" ref="stalematedLosesCheckbox" @change="checkboxChanged($event?.target, 'stalematedPlayerLoses')">
-            Stalemated player loses
-          </label>
+          <CheckboxWithCallback text="Stalemated player loses" class="rules-field"
+            :start-value="draftStore.state.globalRules.stalematedPlayerLoses"
+            :on-changed="value => { draftStore.state.globalRules.stalematedPlayerLoses = value; draftStore.save() }"/>
           <br>
-          <label class="checkbox rules-field">
-            <input type="checkbox" ref="invertWinConditionsCheckbox" @change="checkboxChanged($event?.target, 'invertWinConditions')">
-            Invert ALL win conditions
-          </label>
+          <CheckboxWithCallback text="Invert ALL win conditions" class="rules-field"
+            :start-value="draftStore.state.globalRules.invertWinConditions"
+            :on-changed="value => { draftStore.state.globalRules.invertWinConditions = value; draftStore.save() }"/>
         </div>
       </div>
       <div class="horizontal-field">
@@ -120,6 +116,7 @@
 <script setup lang="ts">
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import PiecesSummary from '@/components/EditVariant/PiecesSummary.vue'
+  import CheckboxWithCallback from '@/components/CheckboxWithCallback.vue'
   import { ref, computed, onMounted } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { getProtochess } from '@/protochess/protochess'
@@ -132,10 +129,6 @@
   const playerToMoveSelect = ref<HTMLSelectElement>()
   const variantNameInput = ref<HTMLInputElement>()
   const descriptionInput = ref<HTMLTextAreaElement>()
-  const captureForcedCheckbox = ref<HTMLInputElement>()
-  const checkForbiddenCheckbox = ref<HTMLInputElement>()
-  const stalematedLosesCheckbox = ref<HTMLInputElement>()
-  const invertWinConditionsCheckbox = ref<HTMLInputElement>()
   const repetitionsForDrawInput = ref<HTMLInputElement>()
   const loseWhenPutInCheckTimesInput = ref<HTMLInputElement>()
   
@@ -160,18 +153,6 @@
     if (descriptionInput.value === undefined) {
       throw new Error('Reference to descriptionInput is undefined')
     }
-    if (captureForcedCheckbox.value === undefined) {
-      throw new Error('Reference to captureForcedCheckbox is undefined')
-    }
-    if (checkForbiddenCheckbox.value === undefined) {
-      throw new Error('Reference to checkForbiddenCheckbox is undefined')
-    }
-    if (stalematedLosesCheckbox.value === undefined) {
-      throw new Error('Reference to stalematedLosesCheckbox is undefined')
-    }
-    if (invertWinConditionsCheckbox.value === undefined) {
-      throw new Error('Reference to invertWinConditionsCheckbox is undefined')
-    }
     if (repetitionsForDrawInput.value === undefined) {
       throw new Error('Reference to repetitionsForDrawInput is undefined')
     }
@@ -183,10 +164,6 @@
     playerToMoveSelect.value.value = draftStore.state.playerToMove === 0 ? 'White' : 'Black'
     // variantNameInput.value.value = variantDraftStore.state.name
     // descriptionInput.value.value = variantDraftStore.state.description
-    captureForcedCheckbox.value.checked = draftStore.state.globalRules.capturingIsForced
-    checkForbiddenCheckbox.value.checked = draftStore.state.globalRules.checkIsForbidden
-    stalematedLosesCheckbox.value.checked = draftStore.state.globalRules.stalematedPlayerLoses
-    invertWinConditionsCheckbox.value.checked = draftStore.state.globalRules.invertWinConditions
     repetitionsForDrawInput.value.value = draftStore.state.globalRules.repetitionsDraw.toString()
     const checksToLose = draftStore.state.globalRules.checksToLose
     if (checksToLose === 0) {
@@ -236,16 +213,6 @@
     const text = (target as HTMLSelectElement).value
     if (text === 'White') draftStore.state.playerToMove = 0
     else draftStore.state.playerToMove = 1
-    draftStore.save()
-  }
-  
-  function checkboxChanged(target: EventTarget|null, field: 'capturingIsForced'|'checkIsForbidden'|'stalematedPlayerLoses'|'invertWinConditions') {
-    if (target === null) throw new Error('Target is undefined')
-    const checked = (target as HTMLInputElement).checked
-    if (field === 'capturingIsForced') draftStore.state.globalRules.capturingIsForced = checked
-    else if (field === 'checkIsForbidden') draftStore.state.globalRules.checkIsForbidden = checked
-    else if (field === 'stalematedPlayerLoses') draftStore.state.globalRules.stalematedPlayerLoses = checked
-    else if (field === 'invertWinConditions') draftStore.state.globalRules.invertWinConditions = checked
     draftStore.save()
   }
 </script>
