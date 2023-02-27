@@ -40,7 +40,6 @@
       </div>
       
       <br>
-      <br>
       <button class="button bottom-button" @click="$router.push({name: 'analysis'})">Analysis board</button>
       <button class="button bottom-button" @click="$router.push({name: 'play'})"> Play against engine</button>
       <br>

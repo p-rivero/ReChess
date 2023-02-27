@@ -1,12 +1,8 @@
 <template>
   <div v-for="(piece, pieceIndex) in props.state.pieceTypes" class="piece-container" :key="pieceIndex">
     <div v-if="editable">
-      <button class="button edit-button" @click="onEditClick(pieceIndex)">
-        <span>Edit</span>
-      </button>
-      <button class="button delete-button" @click="onDeleteClick(pieceIndex)">
-        <span>Delete</span>
-      </button>
+      <EditButton @click="onEditClick(pieceIndex)" />
+      <DeleteButton class="margin-right-1rem" @click="onDeleteClick(pieceIndex)" />
     </div>
     <div class="box">
       <img v-if="piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="piece-image">
@@ -15,10 +11,10 @@
       <img v-if="piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="piece-image">
       <div v-else alt="piece image" class="piece-image-not-found" :class="{'is-light': theme.currentTheme === 'light'}"></div>
       
-      <p class="piece-name">{{ piece.displayName }}</p>
+      <p class="margin-right-1rem">{{ piece.displayName }}</p>
       
       <img v-if="piece.isLeader" class="star-icon" src="@/assets/img/star.svg" alt="star">
-      <strong v-if="piece.isLeader" class="has-text-primary piece-name">Leader</strong>
+      <strong v-if="piece.isLeader" class="has-text-primary margin-right-1rem">Leader</strong>
     </div>
   </div>
   <br>
@@ -31,8 +27,10 @@
 </template>
 
 <script setup lang="ts">
+  import EditButton from '@/components/EditButton.vue'
+  import DeleteButton from '../DeleteButton.vue'
   import type { GameState } from '@/protochess/interfaces'
-  import { useThemeStore } from '@/stores/theme';
+  import { useThemeStore } from '@/stores/theme'
   
   const theme = useThemeStore();
   const props = defineProps<{
@@ -51,12 +49,6 @@
     display: flex;
     align-items: center;
   }
-  .edit-button {
-    margin-right: 0.5rem;
-  }
-  .delete-button {
-    margin-right: 0.5rem;
-  }
   
   .piece-image {
     width: 3rem;
@@ -74,7 +66,7 @@
     background-image: url("@/assets/img/cross/cross-light.svg");
   }
   
-  .piece-name {
+  .margin-right-1rem {
     margin-right: 1rem;
   }
   .star-icon {
