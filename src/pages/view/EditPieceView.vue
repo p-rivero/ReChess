@@ -27,7 +27,7 @@
       </div>
       
       <br>
-      <button class="button is-primary bottom-button">Done</button>
+      <button class="button is-primary bottom-button" @click="$router.push('/edit')">Done</button>
     </div>
     
     
@@ -63,10 +63,9 @@
       </div>
       
       <label class="label">Behavior:</label>
-      <label class="checkbox rules-field">
-        <input type="checkbox">
-        Leader
-      </label>
+      <CheckboxWithCallback text="Leader" class="rules-field"
+        :startValue="piece?.isLeader"
+        :onChanged="value => { piece!.isLeader = value; draftStore.save() }"/>
       
       <div class="horizontal-field">
         <div class="field-label">
@@ -91,16 +90,14 @@
       
       <div class="columns">
         <div class="column ">
-          <label class="checkbox rules-field">
-            <input type="checkbox">
-            Explode when capturing
-          </label>
+          <CheckboxWithCallback text="Explode when capturing" class="rules-field"
+            :startValue="piece?.explodes"
+            :onChanged="value => { piece!.explodes = value; draftStore.save() }"/>
         </div>
         <div class="column">
-          <label class="checkbox rules-field">
-            <input type="checkbox">
-            Immune to other explosions
-          </label>
+          <CheckboxWithCallback text="Immune to other explosions" class="rules-field"
+            :startValue="piece?.immuneToExplosion"
+            :onChanged="value => { piece!.immuneToExplosion = value; draftStore.save() }"/>
         </div>
       </div>
       <br>
@@ -147,7 +144,7 @@
   import PieceViewer from '@/components/ChessBoard/PieceViewer.vue'
   import EditButton from '@/components/EditButton.vue'
   import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue'
-  import PillList from '@/components/PillList.vue'
+  import CheckboxWithCallback from '@/components/BasicWrappers/SmartCheckbox.vue'
   import CharPillList from '@/components/EditVariant/CharPillList.vue'
   import CoordPillList from '@/components/EditVariant/CoordPillList.vue'
   import type { PieceDefinition } from '@/protochess/interfaces'

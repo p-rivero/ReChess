@@ -13,7 +13,7 @@
   
   const props = defineProps<{
     text: string
-    startValue: boolean
+    startValue?: boolean
     onChanged?: (value: boolean) => void
   }>()
   

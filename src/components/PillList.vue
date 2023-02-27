@@ -123,7 +123,6 @@ function finishEdit(pill: Pill) {
 }
 
 function cancelEdit(pill: Pill) {
-  console.log("cancel", pill)
   pill.text = pill.originalText
   pill.error = false
   pill.editing = false
@@ -134,6 +133,7 @@ function removePill(pill: Pill) {
   // Pill may already have been removed (e.g. pressing enter can also trigger blur)
   if (index === -1) return
   pills.value.splice(index, 1)
+  callbackOnChanged()
 }
 
 function onAddPillClick() {

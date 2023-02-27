@@ -116,7 +116,7 @@
 <script setup lang="ts">
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import PiecesSummary from '@/components/EditVariant/PiecesSummary.vue'
-  import CheckboxWithCallback from '@/components/CheckboxWithCallback.vue'
+  import CheckboxWithCallback from '@/components/BasicWrappers/SmartCheckbox.vue'
   import { ref, computed, onMounted } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { getProtochess } from '@/protochess/protochess'

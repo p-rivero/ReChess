@@ -12,7 +12,6 @@ export function coordsToPair(coords: string): [number, number] {
   if (!isCoords(coords)) throw new Error(`Invalid coords: ${coords}`)
   const letter = coords[0]
   const number = coords.slice(1)
-  console.log(letter, number)
   const x = letter.charCodeAt(0) - 'a'.charCodeAt(0)
   const y = Number(number) - 1
   return [x, y]
