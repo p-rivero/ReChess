@@ -74,6 +74,7 @@ const props = defineProps<{
   editable: boolean
   validator: (text: string) => boolean
   startingPills?: string[]
+  onChanged?: (pills: string[]) => void
 }>()
 
 
@@ -97,12 +98,14 @@ function finishEdit(pill: Pill) {
   // If the pill is empty, don't call the validator and remove it
   if (pill.text === '') {
     removePill(pill)
+    callbackOnChanged()
     return
   }
   if (props.validator(pill.text)) {
     pill.originalText = pill.text
     pill.error = false
     pill.editing = false
+    callbackOnChanged()
   } else {
     if (!pill.error) {
       // First attempt: show error, re-focus input
@@ -152,6 +155,10 @@ function focusPillInput() {
     if (pillInput.value.length === 0) return
     pillInput.value[pillInput.value.length-1].focus()
   })
+}
+
+function callbackOnChanged() {
+  props.onChanged?.(pills.value.map((pill) => pill.text))
 }
 
 </script>

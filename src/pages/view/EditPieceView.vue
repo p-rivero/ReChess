@@ -8,7 +8,7 @@
     <div class="column is-narrow left-column">
       
       <div class="board-container">
-        <PieceViewer :size="500" :white-pov="true" :view-only="false" :show-coordinates="false" :piece="piece"/>
+        <PieceViewer :size="500" :piece="piece"/>
       </div>
       
       <div class="field">
@@ -106,27 +106,35 @@
       <br>
       
       <label class="label">Movement:</label>
-      <div style="margin-bottom: 1rem;"> <MovementSlideRow/> </div>
+      <div style="margin-bottom: 1rem;"> <MovementSlideRow :piece-index="pieceIndex" :type="'move'"/> </div>
       <label>Double jump when standing on:</label>
-      <PillList :editable="true" :validator="() => true" :width="10" style="margin-bottom: 1.5rem;"/>
+      <CoordPillList :editable="true" style="margin-bottom: 1.5rem;"
+        :starting-coords="piece?.doubleJumpSquares"
+        :on-changed="coords => {piece!.doubleJumpSquares = coords; draftStore.save()}"/>
         
       <label class="label">Capture:</label>
-      <div style="margin-bottom: 1.5rem;"> <MovementSlideRow/> </div>
+      <div style="margin-bottom: 1.5rem;"> <MovementSlideRow :piece-index="pieceIndex" :type="'capture'"/> </div>
       
       <label class="label">Promotion:</label>
       <label>Promote when landing on:</label>
-      <PillList :editable="true" :validator="() => true" :width="10"/>
+      <CoordPillList :editable="true"
+        :starting-coords="piece?.promotionSquares"
+        :on-changed="coords => {piece!.promotionSquares = coords; draftStore.save()}"/>
       <br>
         
       <div class="columns">
         <div class="column" :class="{ invisible: !whiteEnabled }">
           <label>(White) Promote to:</label>
-          <PillList :editable="true" :validator="() => true" :width="10"/>
+          <CharPillList :editable="true"
+            :starting-pills="piece?.promoVals[0]"
+            :on-changed="promos => {piece!.promoVals[0] = promos; draftStore.save()}"/>
         </div>
         
         <div class="column" :class="{ invisible: !blackEnabled }">
           <label>(Black) Promote to:</label>
-          <PillList :editable="true" :validator="() => true" :width="10"/>
+          <CharPillList :editable="true"
+            :starting-pills="piece?.promoVals[1]"
+            :on-changed="promos => {piece!.promoVals[1] = promos; draftStore.save()}"/>
         </div>
       </div>
       
@@ -140,6 +148,8 @@
   import EditButton from '@/components/EditButton.vue'
   import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue'
   import PillList from '@/components/PillList.vue'
+  import CharPillList from '@/components/EditVariant/CharPillList.vue'
+  import CoordPillList from '@/components/EditVariant/CoordPillList.vue'
   import type { PieceDefinition } from '@/protochess/interfaces'
   import { router } from '@/router'
   import { useVariantDraftStore } from '@/stores/variant-draft'
@@ -152,9 +162,9 @@
   
   const route = useRoute()
   const draftStore = useVariantDraftStore()
-  const pieceIndex = paramToInt(route.params.pieceIndex) || -1
+  const pieceIndex = paramToInt(route.params.pieceIndex)
   let piece: PieceDefinition|null = null
-  if (pieceIndex < 0 || pieceIndex >= draftStore.state.pieceTypes.length) {
+  if (Number.isNaN(pieceIndex) || pieceIndex < 0 || pieceIndex >= draftStore.state.pieceTypes.length) {
     // Incorrect piece index, redirect to edit-variant
     router.push({ name: 'edit-variant' })
   } else {
@@ -199,7 +209,7 @@
   
   .board-container {
     display: flex;
-    justify-content: left;
+    justify-content: center;
     margin-bottom: 1rem;
   }
   

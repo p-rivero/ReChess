@@ -16,10 +16,8 @@
 <script setup lang="ts">
   import type { Config } from 'chessgroundx/config'
   import ChessgroundAdapter from './internal/ChessgroundAdapter.vue'
-  import { useRoute } from 'vue-router'
   import type { PieceDefinition } from '@/protochess/interfaces'
   
-  const route = useRoute()
   const params = defineProps<{
     size: number
     piece: PieceDefinition|null

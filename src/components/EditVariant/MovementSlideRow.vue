@@ -15,7 +15,7 @@
           'button-down-left': index === 6,
           'button-down-right': index === 7,
           'is-primary': selected
-        }" @click="selectedDirections[index] = !selectedDirections[index]"></button>
+        }" @click="arrowClicked(index)"></button>
       </div>
     </div>
   </div>
@@ -23,9 +23,73 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { computed } from 'vue'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
   
-  const selectedDirections = ref<boolean[]>([false, false, false, false, false, false, false, false])
+  const draftStore = useVariantDraftStore()
+  
+  const selectedDirections = computed(() => {
+    const ref = draftStore.state.pieceTypes[props.pieceIndex]
+    if (props.type === 'move') {
+      return [
+        ref.translateWest,
+        ref.translateEast,
+        ref.translateNorth,
+        ref.translateSouth,
+        ref.translateNorthwest,
+        ref.translateNortheast,
+        ref.translateSouthwest,
+        ref.translateSoutheast,
+      ]
+    } else if (props.type === 'capture') {
+      return [
+        ref.attackWest,
+        ref.attackEast,
+        ref.attackNorth,
+        ref.attackSouth,
+        ref.attackNorthwest,
+        ref.attackNortheast,
+        ref.attackSouthwest,
+        ref.attackSoutheast,
+      ]
+    }
+  })
+  
+  const props = defineProps<{
+    pieceIndex: number
+    type: 'move' | 'capture'
+  }>()
+  
+  function arrowClicked(buttonIndex: number) {
+    const ref = draftStore.state.pieceTypes[props.pieceIndex]
+    if (props.type === 'move') {
+      switch (buttonIndex) {
+        case 0: ref.translateWest = !ref.translateWest; break
+        case 1: ref.translateEast = !ref.translateEast; break
+        case 2: ref.translateNorth = !ref.translateNorth; break
+        case 3: ref.translateSouth = !ref.translateSouth; break
+        case 4: ref.translateNorthwest = !ref.translateNorthwest; break
+        case 5: ref.translateNortheast = !ref.translateNortheast; break
+        case 6: ref.translateSouthwest = !ref.translateSouthwest; break
+        case 7: ref.translateSoutheast = !ref.translateSoutheast; break
+        default: throw new Error('Invalid button index')
+      }
+    } else if (props.type === 'capture') {
+      switch (buttonIndex) {
+        case 0: ref.attackWest = !ref.attackWest; break
+        case 1: ref.attackEast = !ref.attackEast; break
+        case 2: ref.attackNorth = !ref.attackNorth; break
+        case 3: ref.attackSouth = !ref.attackSouth; break
+        case 4: ref.attackNorthwest = !ref.attackNorthwest; break
+        case 5: ref.attackNortheast = !ref.attackNortheast; break
+        case 6: ref.attackSouthwest = !ref.attackSouthwest; break
+        case 7: ref.attackSoutheast = !ref.attackSoutheast; break
+        default: throw new Error('Invalid button index')
+      }
+    }
+    draftStore.save()
+  }
+  
 </script>
   
 
