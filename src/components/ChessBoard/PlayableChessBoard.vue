@@ -120,7 +120,7 @@
     const moves = await protochess.legalMoves()
     const moveWhite = props.white == 'human' && state.playerToMove == 0
     const moveBlack = props.black == 'human' && state.playerToMove == 1
-    board.value?.setState(state)
+    await board.value?.setState(state)
     board.value?.setMovable(moveWhite, moveBlack, moves)
     
     const nextPlayer = state.playerToMove == 0 ? props.white : props.black

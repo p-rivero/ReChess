@@ -271,6 +271,8 @@
     height: 4rem;
     flex-shrink: 0;
     background-size: contain;
+    background-color: #f0d9b5;
+    border-radius: 0.25rem;
   }
   
   .invisible {

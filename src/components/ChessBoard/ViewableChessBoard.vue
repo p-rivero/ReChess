@@ -66,11 +66,10 @@
   
   defineExpose({
     // Set the state of the board
-    setState: (state: GameStateGui) => {
+    setState: async (state: GameStateGui) => {
       if (state.boardWidth < 2 || state.boardHeight < 2) {
         throw new Error('Minimum board size is 2x2')
       }
-      // If the size changed, re-render the board by incrementing the key counter
       let newConfig: Config = {}
       if (state.boardWidth != currentWidth || state.boardHeight != currentHeight) {
         currentWidth = state.boardWidth
@@ -86,9 +85,13 @@
       }
       // Convert the state to a chessgroundx Config
       newConfig.turnColor = state.playerToMove == 0 ? 'white' : 'black'
-      newConfig.fen = state.fen
       newConfig.check = state.inCheck
-      incrementalUpdateConfig(newConfig)
+      newConfig.fen = state.fen
+      // Wait for the board to possibly re-render, then configure it
+      await new Promise(resolve => setTimeout(() => {
+        incrementalUpdateConfig(newConfig)
+        resolve(null)
+      }))
     },
     
     // Define which sides are movable by the user

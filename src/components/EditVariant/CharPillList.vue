@@ -10,7 +10,6 @@
 
 <script setup lang="ts">
   import PillList from "@/components/PillList.vue"
-  import { defineProps } from "vue"
 
   defineProps<{
     editable: boolean

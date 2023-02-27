@@ -111,6 +111,12 @@
         :on-edit-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
         :on-delete-click="pieceIndex => deletePiece(pieceIndex)" />
       
+      <!-- TODO: Invalid squares -->
+      
+      <label class="label" style="margin-top: 2rem;">TEMPORARY FOR DEMO:</label>
+      <SmartTextInput placeholder="(Temp) FEN string" class="rules-field" :key="stateKey"
+        :start-text="placementsToFen(draftStore.state)"
+        :on-changed="text => { draftStore.state.pieces = fenToPlacements(text); }"/>
     </div>
   </div>
 </template>
@@ -127,6 +133,8 @@
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { getProtochess } from '@/protochess/protochess'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
+  import { placementsToFen, fenToPlacements } from '@/utils/fen-to-placements'
+  import type { GameStateGui } from '@/protochess/interfaces'
   
   const draftStore = useVariantDraftStore()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()  
@@ -137,9 +145,9 @@
       throw new Error('Reference to board is undefined')
     }
     // TODO: Remove this and instead put the fen and inCheck (optional) in the GameState
-    const protochess = await getProtochess()
-    await protochess.setState(draftStore.state)
-    board.value.setState(await protochess.getState())
+    let state = JSON.parse(JSON.stringify(draftStore.state))
+    state.fen = placementsToFen(draftStore.state)
+    await board.value.setState(state)
   }
   
   function deletePiece(pieceIndex: number) {
