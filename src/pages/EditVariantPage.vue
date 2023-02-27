@@ -41,8 +41,8 @@
       
       <br>
       <br>
-      <button class="button bottom-button">Analysis board</button>
-      <button class="button bottom-button" @click="$router.push('/play')"> Play against engine</button>
+      <button class="button bottom-button" @click="$router.push({name: 'analysis'})">Analysis board</button>
+      <button class="button bottom-button" @click="$router.push({name: 'play'})"> Play against engine</button>
       <br>
       <button class="button is-primary bottom-button">Publish</button>
       <br>

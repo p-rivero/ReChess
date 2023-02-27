@@ -28,7 +28,7 @@
       </div>
       
       <br>
-      <button class="button is-primary bottom-button" @click="$router.push('/edit')">Done</button>
+      <button class="button is-primary bottom-button" @click="$router.push({name: 'edit-variant'})">Done</button>
     </div>
     
     
