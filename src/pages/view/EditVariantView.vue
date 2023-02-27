@@ -28,12 +28,9 @@
           <label>First player to move:</label>
         </div>
         <div class="field-body">
-          <div class="select">
-            <select ref="playerToMoveSelect" @change="playerToMoveChanged($event?.target)">
-              <option>White</option>
-              <option>Black</option>
-            </select>
-          </div>
+          <SmartDropdown :items="['White', 'Black']"
+            :start-item="draftStore.state.playerToMove === 0 ? 'White' : 'Black'"
+            :on-changed="item => { draftStore.state.playerToMove = item === 'White' ? 0 : 1; draftStore.save() }"/>
         </div>
       </div>
       
@@ -122,23 +119,15 @@
   import PiecesSummary from '@/components/EditVariant/PiecesSummary.vue'
   import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'
   import SmartNumberInput from '@/components/BasicWrappers/SmartNumberInput.vue'
-  import { ref, computed, onMounted } from 'vue'
+  import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
+  import { ref, computed } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { getProtochess } from '@/protochess/protochess'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
   
   const draftStore = useVariantDraftStore()
-  const board = ref<InstanceType<typeof ViewableChessBoard>>()
-  const playerToMoveSelect = ref<HTMLSelectElement>()
-  
+  const board = ref<InstanceType<typeof ViewableChessBoard>>()  
   const stateKey = computed(() => JSON.stringify(draftStore.state))
-  
-  onMounted(() => {
-    if (playerToMoveSelect.value === undefined) {
-      throw new Error('Reference to playerToMoveSelect is undefined')
-    }
-    playerToMoveSelect.value.value = draftStore.state.playerToMove === 0 ? 'White' : 'Black'
-  })
   
   async function updateBoard() {
     if (board.value === undefined) {
@@ -153,14 +142,6 @@
   function deletePiece(pieceIndex: number) {
     // TODO: Ask for confirmation
     draftStore.state.pieces.splice(pieceIndex, 1)
-    draftStore.save()
-  }
-  
-  function playerToMoveChanged(target: EventTarget|null) {
-    if (target === null) throw new Error('Target is undefined')
-    const text = (target as HTMLSelectElement).value
-    if (text === 'White') draftStore.state.playerToMove = 0
-    else draftStore.state.playerToMove = 1
     draftStore.save()
   }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <input class="input" type="number" ref="numberInput"
     :placeholder="placeholder" :min="props.min" :max="props.max"
-    @input="inputChanged($event?.target)">
+    @input="inputChanged($event.target)">
 </template>
 
 <script setup lang="ts">
