@@ -9,7 +9,7 @@
     <div class="column is-narrow left-column">
       
       <div class="board-container">
-        <PieceViewer :size="500" :piece="piece"/>
+        <PieceViewer :size="500" :piece="piece" :key="JSON.stringify(piece)"/>
       </div>
       
       <div class="field">
@@ -42,20 +42,26 @@
         <div class="column">
           <div class="horizontal-field">
             <SmartCheckbox text="White" style="margin-right: 1rem" :start-value="!!(piece?.ids[0])"
-              :on-changed="enabled => { piece!.ids[0] = enabled ? 'A' : null; draftStore.save() }"/>
-            <div class="piece-image" :class="{ invisible: whiteInvisible }"></div>
+              :on-changed="enabled => { piece!.ids[0] = enabled ? pieceIdWhite : null; draftStore.save() }"/>
+            <img class="piece-image" alt="White piece" :class="{ invisible: whiteInvisible }"
+              :src="piece?.imageUrls[0] ?? ''" />
             <EditButton :class="{ invisible: whiteInvisible }" />
-            <input class="input width-3rem" :class="{ invisible: whiteInvisible }" type="text" placeholder="A">
+            <SmartTextInput class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
+              :start-text="pieceIdWhite ?? undefined"
+              :on-changed="text => { pieceIdWhite = text; piece!.ids[0] = text; draftStore.save() }"/>
           </div>
         </div>
         
         <div class="column">
           <div class="horizontal-field">
             <SmartCheckbox text="Black" style="margin-right: 1rem" :start-value="!!(piece?.ids[1])"
-              :on-changed="enabled => { piece!.ids[1] = enabled ? 'a' : null; draftStore.save() }"/>
-            <div class="piece-image" :class="{ invisible: blackInvisible }"></div>
+              :on-changed="enabled => { piece!.ids[1] = enabled ? pieceIdBlack : null; draftStore.save() }"/>
+            <img class="piece-image" alt="Black piece" :class="{ invisible: blackInvisible }"
+              :src="piece?.imageUrls[1] ?? ''" />
             <EditButton :class="{ invisible: blackInvisible }" />
-            <input class="input width-3rem" :class="{ invisible: blackInvisible }" type="text" placeholder="a">
+            <SmartTextInput class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
+              :start-text="pieceIdBlack ?? undefined"
+              :on-changed="text => { pieceIdBlack = text; piece!.ids[1] = text; draftStore.save() }"/>
           </div>
         </div>
       </div>
@@ -76,11 +82,15 @@
           <div class="field-label-both">
             <label>Queenside file</label>
           </div>
-          <input class="input width-3rem" type="text" placeholder="c">
+          <SmartTextInput class="width-3rem" placeholder="c"
+            :start-text="numberToLetter(piece?.castleFiles?.[0])"
+            :on-changed="text => { castleFileQueenside = letterToNumber(text); piece!.castleFiles![0] = castleFileQueenside; draftStore.save() }"/>
           <div class="field-label-both">
             <label>Kingside file</label>
           </div>
-          <input class="input width-3rem" type="text" placeholder="g">
+          <SmartTextInput class="width-3rem" placeholder="g"
+            :start-text="numberToLetter(piece?.castleFiles?.[1])"
+            :on-changed="text => { castleFileKingside = letterToNumber(text); piece!.castleFiles![1] = castleFileKingside; draftStore.save() }"/>
         </div>
       </div>
       
@@ -131,6 +141,15 @@
         </div>
       </div>
       
+      
+      <label class="label">TEMPORARY FOR DEMO:</label>
+      <SmartTextInput placeholder="(Temp) URL for white piece image" class="rules-field"
+        :start-text="piece?.imageUrls[0] ?? undefined"
+        :on-changed="text => { piece!.imageUrls[0] = text; draftStore.save() }"/>
+      <SmartTextInput placeholder="(Temp) URL for black piece image" class="rules-field"
+        :start-text="piece?.imageUrls[1] ?? undefined"
+        :on-changed="text => { piece!.imageUrls[1] = text; draftStore.save() }"/>
+      
     </div>
   </div>
 </template>
@@ -148,11 +167,9 @@
   import type { PieceDefinition } from '@/protochess/interfaces'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { paramToInt } from '@/utils/param-to-int'
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  
-  const whiteInvisible = computed(() => !(piece?.ids[0]))
-  const blackInvisible = computed(() => !(piece?.ids[1]))
+  import { numberToLetter, letterToNumber } from '@/utils/chess-coords'
   
   const router = useRouter(); 
   const route = useRoute()
@@ -166,13 +183,22 @@
     piece = draftStore.state.pieceTypes[pieceIndex]
   }
   
+  // Hide a piece if it's current id is null or undefined
+  const whiteInvisible = computed(() => !(piece?.ids[0]))
+  const blackInvisible = computed(() => !(piece?.ids[1]))
+  // Reference to the current value of the piece id text inputs, initialize to the current id
+  const pieceIdWhite = ref(piece?.ids[0])
+  const pieceIdBlack = ref(piece?.ids[1])
+  // Reference to the current (number) value of the castling file text inputs
+  const castleFileQueenside = ref(piece?.castleFiles?.[0] || 2)
+  const castleFileKingside = ref(piece?.castleFiles?.[1] || 6)
+  
   function castlingDropdownChanged(item: string) {
     if (item === 'No') {
       piece!.castleFiles = undefined
       piece!.isCastleRook = false
     } else if (item === 'As king') {
-      // TODO: Get the actual files from the user
-      piece!.castleFiles = [2, 6]
+      piece!.castleFiles = [castleFileQueenside.value, castleFileKingside.value]
       piece!.isCastleRook = false
     } else if (item === 'As rook') {
       piece!.castleFiles = undefined
@@ -244,7 +270,6 @@
     width: 4rem;
     height: 4rem;
     flex-shrink: 0;
-    background-image: url("@/assets/img/pieces/knook.svg");
     background-size: contain;
   }
   

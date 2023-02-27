@@ -24,7 +24,8 @@
   
   function inputChanged(input: EventTarget | null) {
     if (!input) throw new Error('Number input event target is null')
-    const text = (input as HTMLInputElement).value
+    let text = (input as HTMLInputElement).value
+    if (text === '') text = props.placeholder ?? ''
     props.onChanged?.(text)
   }
 </script>

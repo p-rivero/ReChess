@@ -23,3 +23,13 @@ export function isCoords(coords: string): coords is `${LetterCoord}${NumberCoord
   const number = Number(numberStr)
   return letter >= 'a' && letter <= 'p' && number >= 1 && number <= 16
 }
+
+export function numberToLetter(number: number|undefined): LetterCoord|undefined {
+  if (number === undefined) return undefined
+  if (number < 0 || number > 15) return undefined
+  return String.fromCharCode('a'.charCodeAt(0) + number) as LetterCoord
+}
+
+export function letterToNumber(letter: string): number {
+  return letter.charCodeAt(0) - 'a'.charCodeAt(0)
+}

@@ -53,7 +53,9 @@
     
     
     <div class="column">
-      <input class="input is-large" type="text" placeholder="Variant name" ref="variantNameInput">
+      <SmartTextInput class="is-large" placeholder="Variant name"
+        :start-text="draftStore.state.variantDisplayName"
+        :on-changed="name => { draftStore.state.variantDisplayName = name; draftStore.save() }"/>
       <br>
       <br>
       <textarea class="textarea" placeholder="Describe the rules of the variant and how fun it is to play!" ref="descriptionInput"></textarea>
@@ -119,6 +121,7 @@
   import PiecesSummary from '@/components/EditVariant/PiecesSummary.vue'
   import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'
   import SmartNumberInput from '@/components/BasicWrappers/SmartNumberInput.vue'
+  import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
   import { ref, computed } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'

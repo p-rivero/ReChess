@@ -69,6 +69,7 @@ export interface GameState {
   epSquareAndVictim?: [[number, number], [number, number]],
   timesInCheck?: [number, number],
   globalRules: GlobalRules,
+  variantDisplayName?: string,
 }
 /** @see {isGameStateGui} ts-auto-guard:type-guard */
 export interface GameStateGui extends GameState {
