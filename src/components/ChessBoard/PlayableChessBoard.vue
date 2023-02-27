@@ -117,6 +117,7 @@
       handleResult(result)
     }
     const state = await protochess.getState()
+    console.log(state)
     const moves = await protochess.legalMoves()
     const moveWhite = props.white == 'human' && state.playerToMove == 0
     const moveBlack = props.black == 'human' && state.playerToMove == 1
