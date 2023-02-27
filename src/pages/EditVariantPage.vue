@@ -42,7 +42,7 @@
       <br>
       <br>
       <button class="button bottom-button">Analysis board</button>
-      <button class="button bottom-button">Play against engine</button>
+      <button class="button bottom-button" @click="$router.push('/play')"> Play against engine</button>
       <br>
       <button class="button is-primary bottom-button">Publish</button>
       <br>
@@ -109,14 +109,15 @@
         :editable="true"
         :state="draftStore.state"
         :on-edit-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
-        :on-delete-click="pieceIndex => deletePiece(pieceIndex)" />
+        :on-delete-click="pieceIndex => deletePiece(pieceIndex)"
+        :on-new-click="createNewPiece" />
       
       <!-- TODO: Invalid squares -->
       
       <label class="label" style="margin-top: 2rem;">TEMPORARY FOR DEMO:</label>
       <SmartTextInput placeholder="(Temp) FEN string" class="rules-field" :key="stateKey"
         :start-text="placementsToFen(draftStore.state)"
-        :on-changed="text => { draftStore.state.pieces = fenToPlacements(text); }"/>
+        :on-changed="text => { draftStore.state.pieces = fenToPlacements(text); draftStore.save() }"/>
     </div>
   </div>
 </template>
@@ -131,12 +132,12 @@
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
   import { ref, computed } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
-  import { getProtochess } from '@/protochess/protochess'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
   import { placementsToFen, fenToPlacements } from '@/utils/fen-to-placements'
-  import type { GameStateGui } from '@/protochess/interfaces'
+  import { useRouter } from 'vue-router'
   
   const draftStore = useVariantDraftStore()
+  const router = useRouter()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()  
   const stateKey = computed(() => JSON.stringify(draftStore.state))
   
@@ -152,8 +153,47 @@
   
   function deletePiece(pieceIndex: number) {
     // TODO: Ask for confirmation
-    draftStore.state.pieces.splice(pieceIndex, 1)
+    draftStore.state.pieceTypes.splice(pieceIndex, 1)
     draftStore.save()
+  }
+  function createNewPiece() {
+    draftStore.state.pieceTypes.push({
+      ids: ['', ''],
+      isLeader: false,
+      castleFiles: undefined,
+      isCastleRook: false,
+      explodes: false,
+      explosionDeltas: [],
+      immuneToExplosion: false,
+      promotionSquares: [],
+      promoVals: [[], []],
+      doubleJumpSquares: [],
+      attackSlidingDeltas: [],
+      attackJumpDeltas: [],
+      attackNorth: false,
+      attackSouth: false,
+      attackEast: false,
+      attackWest: false,
+      attackNortheast: false,
+      attackNorthwest: false,
+      attackSoutheast: false,
+      attackSouthwest: false,
+      translateJumpDeltas: [],
+      translateSlidingDeltas: [],
+      translateNorth: false,
+      translateSouth: false,
+      translateEast: false,
+      translateWest: false,
+      translateNortheast: false,
+      translateNorthwest: false,
+      translateSoutheast: false,
+      translateSouthwest: false,
+      winSquares: [],
+      displayName: '',
+      imageUrls: [undefined, undefined],
+    })
+    draftStore.save()
+    router.push({ name: 'edit-piece', params: { pieceIndex: draftStore.state.pieceTypes.length - 1 } })
   }
 </script>
 

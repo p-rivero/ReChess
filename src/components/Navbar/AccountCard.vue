@@ -1,5 +1,5 @@
 <template>
-  <a v-if="true" class="card-header" @click="onAccountClick">
+  <a v-if="false" class="card-header" @click="onAccountClick">
     <span class="card-header-icon">
       <div class="account-icon" :class="{
         'dark-account-icon': themeStore.currentTheme === 'dark',

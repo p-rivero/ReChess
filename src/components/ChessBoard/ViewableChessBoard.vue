@@ -46,6 +46,7 @@
     viewOnly: props.viewOnly,
     disableContextMenu: true,
     blockTouchScroll: true,
+    // TODO: Coordinates are not working
     coordinates: props.showCoordinates,
     dimensions: {
       width: currentWidth, 

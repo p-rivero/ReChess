@@ -3,6 +3,7 @@ import type { GameState, PiecePlacement } from '@/protochess/interfaces'
 export function fenToPlacements(fen: string): PiecePlacement[] {
   const placements: PiecePlacement[] = []
   const rows = fen.split('/')
+  const height = rows.length
   // Allow 2-digit numbers for skipping multiple squares
   for (let y = 0; y < rows.length; y++) {
     let x = 0
@@ -16,7 +17,7 @@ export function fenToPlacements(fen: string): PiecePlacement[] {
         placements.push({
           pieceId: char,
           x,
-          y,
+          y: height - 1 - y,
         })
         x++
       }
@@ -27,7 +28,7 @@ export function fenToPlacements(fen: string): PiecePlacement[] {
 
 export function placementsToFen(state: GameState): string {
   const rows: string[] = []
-  for (let y = 0; y < state.boardHeight; y++) {
+  for (let y = state.boardHeight - 1; y >= 0; y--) {
     let row = ''
     let empty = 0
     for (let x = 0; x < state.boardWidth; x++) {

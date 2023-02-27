@@ -22,7 +22,7 @@
     </div>
   </div>
   <br>
-  <button class="button">
+  <button class="button" @click="onNewClick">
     <span class="icon">
       <div class="add-icon" alt="star"></div>
     </span>
@@ -40,6 +40,7 @@
     state: GameState
     onEditClick: (pieceIndex: number) => void
     onDeleteClick: (pieceIndex: number) => void
+    onNewClick: () => void
   }>()
   
 </script>

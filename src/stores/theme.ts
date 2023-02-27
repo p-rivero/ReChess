@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 export const useThemeStore = defineStore('theme', () => {
   
   // Initialize the theme from the current document theme
-  const currentTheme = ref(document.documentElement.getAttribute('data-theme') || 'dark')
+  const currentTheme = ref(document.documentElement.getAttribute('data-theme') || 'light')
   
   function toggle() {
     const newTheme = currentTheme.value === 'dark' ? 'light' : 'dark'

@@ -41,10 +41,11 @@
       <div class="columns">
         <div class="column">
           <div class="horizontal-field">
-            <SmartCheckbox text="White" style="margin-right: 1rem" :start-value="!!(piece?.ids[0])"
-              :on-changed="enabled => { piece!.ids[0] = enabled ? pieceIdWhite : null; draftStore.save() }"/>
-            <img class="piece-image" alt="White piece" :class="{ invisible: whiteInvisible }"
+            <SmartCheckbox text="White" style="margin-right: 1rem" :start-value="!whiteInvisible"
+              :on-changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
+            <img v-if="piece?.imageUrls[0]" class="piece-image" alt="White piece" :class="{ invisible: whiteInvisible }"
               :src="piece?.imageUrls[0] ?? ''" />
+            <div v-else class="piece-image-not-found" :class="{ invisible: whiteInvisible }"></div>
             <EditButton :class="{ invisible: whiteInvisible }" />
             <SmartTextInput class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
@@ -54,10 +55,11 @@
         
         <div class="column">
           <div class="horizontal-field">
-            <SmartCheckbox text="Black" style="margin-right: 1rem" :start-value="!!(piece?.ids[1])"
-              :on-changed="enabled => { piece!.ids[1] = enabled ? pieceIdBlack : null; draftStore.save() }"/>
-            <img class="piece-image" alt="Black piece" :class="{ invisible: blackInvisible }"
+            <SmartCheckbox text="Black" style="margin-right: 1rem" :start-value="!blackInvisible"
+              :on-changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
+            <img v-if="piece?.imageUrls[1]" class="piece-image" alt="Black piece" :class="{ invisible: blackInvisible }"
               :src="piece?.imageUrls[1] ?? ''" />
+            <div v-else class="piece-image-not-found" :class="{ invisible: blackInvisible }"></div>
             <EditButton :class="{ invisible: blackInvisible }" />
             <SmartTextInput class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
@@ -184,8 +186,8 @@
   }
   
   // Hide a piece if it's current id is null or undefined
-  const whiteInvisible = computed(() => !(piece?.ids[0]))
-  const blackInvisible = computed(() => !(piece?.ids[1]))
+  const whiteInvisible = computed(() => piece?.ids[0] == null || piece?.ids[0] === undefined)
+  const blackInvisible = computed(() => piece?.ids[1] == null || piece?.ids[1] === undefined)
   // Reference to the current value of the piece id text inputs, initialize to the current id
   const pieceIdWhite = ref(piece?.ids[0])
   const pieceIdBlack = ref(piece?.ids[1])
@@ -206,6 +208,15 @@
     } else {
       throw new Error('Invalid castling dropdown item')
     }
+    draftStore.save()
+  }
+  
+  function enabledCheckboxChanged(enabled: boolean, color: 'white'|'black') {
+    const textBoxVal = color === 'white' ? pieceIdWhite.value : pieceIdBlack.value
+    const enabledId = textBoxVal ?? ''
+    const id = enabled ? enabledId : null
+    if (color === 'white') piece!.ids[0] = id
+    else piece!.ids[1] = id
     draftStore.save()
   }
 </script>
@@ -273,6 +284,10 @@
     background-size: contain;
     background-color: #f0d9b5;
     border-radius: 0.25rem;
+  }
+  .piece-image-not-found {
+    @extend .piece-image;
+    background-image: url("@/assets/img/cross/cross-light.svg");
   }
   
   .invisible {

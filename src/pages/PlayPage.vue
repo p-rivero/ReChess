@@ -3,17 +3,18 @@
 </template>
 
 <script setup lang="ts">
+  import {ref, onMounted} from 'vue'
+  import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
+  
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
+  const draftStore = useVariantDraftStore()
+  
   onMounted(() => {
     if (board.value === undefined) {
       throw new Error('Reference to board is undefined')
     }
-    board.value.loadFen('rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPPPP///PPPPPPPPP/PPPPPPPP/PPPPPKPP w kq - 0 1')
+    board.value.setState(draftStore.state)
   })
 </script>
 
-<script lang="ts">
-import {ref, onMounted} from 'vue'
-import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
-
-</script>
