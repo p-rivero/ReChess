@@ -34,31 +34,28 @@
     
     
     <div class="column">
-      <input class="input is-large" type="text" placeholder="Piece name">
+      <SmartTextInput class="is-large" placeholder="Piece name" :start-text="piece?.displayName"
+        :on-changed="name => { piece!.displayName = name; draftStore.save() }"/>
       <br>
       <br>
       <div class="columns">
         <div class="column">
           <div class="horizontal-field">
-            <label class="checkbox piece-color-checkbox" style="margin-right: 1rem">
-              <input type="checkbox" v-model="whiteEnabled">
-              White
-            </label>
-            <div class="piece-image" :class="{ invisible: !whiteEnabled }"></div>
-            <EditButton :class="{ invisible: !whiteEnabled }" />
-            <input class="input width-3rem" :class="{ invisible: !whiteEnabled }" type="text" placeholder="A">
+            <SmartCheckbox text="White" style="margin-right: 1rem" :start-value="!!(piece?.ids[0])"
+              :on-changed="enabled => { piece!.ids[0] = enabled ? 'A' : null; draftStore.save() }"/>
+            <div class="piece-image" :class="{ invisible: whiteInvisible }"></div>
+            <EditButton :class="{ invisible: whiteInvisible }" />
+            <input class="input width-3rem" :class="{ invisible: whiteInvisible }" type="text" placeholder="A">
           </div>
         </div>
         
         <div class="column">
           <div class="horizontal-field">
-            <label class="checkbox" style="margin-right: 1rem">
-              <input type="checkbox" v-model="blackEnabled">
-              Black
-            </label>
-            <div class="piece-image" :class="{ invisible: !blackEnabled }"></div>
-            <EditButton :class="{ invisible: !blackEnabled }" />
-            <input class="input width-3rem" :class="{ invisible: !blackEnabled }" type="text" placeholder="a">
+            <SmartCheckbox text="Black" style="margin-right: 1rem" :start-value="!!(piece?.ids[1])"
+              :on-changed="enabled => { piece!.ids[1] = enabled ? 'a' : null; draftStore.save() }"/>
+            <div class="piece-image" :class="{ invisible: blackInvisible }"></div>
+            <EditButton :class="{ invisible: blackInvisible }" />
+            <input class="input width-3rem" :class="{ invisible: blackInvisible }" type="text" placeholder="a">
           </div>
         </div>
       </div>
@@ -72,21 +69,19 @@
         <div class="field-label">
           <label>Castling</label>
         </div>
-        <div class="select">
-          <select>
-            <option>No</option>
-            <option>As king</option>
-            <option>As rook</option>
-          </select>
+        <SmartDropdown :items="['No', 'As king', 'As rook']"
+          :startItem="piece?.isCastleRook ? 'As rook' : piece?.castleFiles ? 'As king' : 'No'"
+          :onChanged="item =>castlingDropdownChanged(item)"/>
+        <div :class="{ invisible: !(piece?.castleFiles) }" style="display: flex; flex-direction: row; align-items: center;">
+          <div class="field-label-both">
+            <label>Queenside file</label>
+          </div>
+          <input class="input width-3rem" type="text" placeholder="c">
+          <div class="field-label-both">
+            <label>Kingside file</label>
+          </div>
+          <input class="input width-3rem" type="text" placeholder="g">
         </div>
-        <div class="field-label-both">
-          <label>Queenside file</label>
-        </div>
-        <input class="input width-3rem" type="text" placeholder="c">
-        <div class="field-label-both">
-          <label>Kingside file</label>
-        </div>
-        <input class="input width-3rem" type="text" placeholder="g">
       </div>
       
       <div class="columns">
@@ -121,14 +116,14 @@
       <br>
         
       <div class="columns">
-        <div class="column" :class="{ invisible: !whiteEnabled }">
+        <div class="column" :class="{ invisible: whiteInvisible }">
           <label>(White) Promote to:</label>
           <CharPillList :editable="true"
             :starting-pills="piece?.promoVals[0]"
             :on-changed="promos => {piece!.promoVals[0] = promos; draftStore.save()}"/>
         </div>
         
-        <div class="column" :class="{ invisible: !blackEnabled }">
+        <div class="column" :class="{ invisible: blackInvisible }">
           <label>(Black) Promote to:</label>
           <CharPillList :editable="true"
             :starting-pills="piece?.promoVals[1]"
@@ -146,18 +141,20 @@
   import EditButton from '@/components/EditButton.vue'
   import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue'
   import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'
+  import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
+  import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import CharPillList from '@/components/EditVariant/CharPillList.vue'
   import CoordPillList from '@/components/EditVariant/CoordPillList.vue'
   import type { PieceDefinition } from '@/protochess/interfaces'
-  import { router } from '@/router'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { paramToInt } from '@/utils/param-to-int'
-  import { ref } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { computed } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   
-  const whiteEnabled = ref(true)
-  const blackEnabled = ref(true)
+  const whiteInvisible = computed(() => !(piece?.ids[0]))
+  const blackInvisible = computed(() => !(piece?.ids[1]))
   
+  const router = useRouter(); 
   const route = useRoute()
   const draftStore = useVariantDraftStore()
   const pieceIndex = paramToInt(route.params.pieceIndex)
@@ -167,6 +164,23 @@
     router.push({ name: 'edit-variant' })
   } else {
     piece = draftStore.state.pieceTypes[pieceIndex]
+  }
+  
+  function castlingDropdownChanged(item: string) {
+    if (item === 'No') {
+      piece!.castleFiles = undefined
+      piece!.isCastleRook = false
+    } else if (item === 'As king') {
+      // TODO: Get the actual files from the user
+      piece!.castleFiles = [2, 6]
+      piece!.isCastleRook = false
+    } else if (item === 'As rook') {
+      piece!.castleFiles = undefined
+      piece!.isCastleRook = true
+    } else {
+      throw new Error('Invalid castling dropdown item')
+    }
+    draftStore.save()
   }
 </script>
 

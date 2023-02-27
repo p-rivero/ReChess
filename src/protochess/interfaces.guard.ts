@@ -77,8 +77,10 @@ export function isPieceDefinition(obj: unknown): obj is PieceDefinition {
             typeof typedObj === "function") &&
         Array.isArray(typedObj["ids"]) &&
         (typeof typedObj["ids"][0] === "undefined" ||
+            typedObj["ids"][0] === null ||
             typeof typedObj["ids"][0] === "string") &&
         (typeof typedObj["ids"][1] === "undefined" ||
+            typedObj["ids"][1] === null ||
             typeof typedObj["ids"][1] === "string") &&
         typeof typedObj["isLeader"] === "boolean" &&
         (typeof typedObj["castleFiles"] === "undefined" ||
@@ -170,8 +172,10 @@ export function isPieceDefinition(obj: unknown): obj is PieceDefinition {
         typeof typedObj["displayName"] === "string" &&
         Array.isArray(typedObj["imageUrls"]) &&
         (typeof typedObj["imageUrls"][0] === "undefined" ||
+            typedObj["imageUrls"][0] === null ||
             typeof typedObj["imageUrls"][0] === "string") &&
         (typeof typedObj["imageUrls"][1] === "undefined" ||
+            typedObj["imageUrls"][1] === null ||
             typeof typedObj["imageUrls"][1] === "string")
     )
 }

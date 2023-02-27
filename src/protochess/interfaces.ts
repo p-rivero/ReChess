@@ -78,7 +78,7 @@ export interface GameStateGui extends GameState {
 
 /** @see {isPieceDefinition} ts-auto-guard:type-guard */
 export interface PieceDefinition {
-  ids: [string|undefined, string|undefined],
+  ids: [string|undefined|null, string|undefined|null],
   isLeader: boolean,
   castleFiles?: [number, number],
   isCastleRook: boolean,
@@ -110,7 +110,7 @@ export interface PieceDefinition {
   translateSouthwest: boolean,
   winSquares: [number, number][],
   displayName: string,
-  imageUrls: [string|undefined, string|undefined],
+  imageUrls: [string|undefined|null, string|undefined|null],
 }
 
 export interface PiecePlacement {

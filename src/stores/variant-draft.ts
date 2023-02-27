@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-import type { GameState, PieceDefinition } from '@/protochess/interfaces'
+import type { GameState } from '@/protochess/interfaces'
 import { isGameState } from '@/protochess/interfaces.guard'
 
 export const useVariantDraftStore = defineStore('variant-draft', () => {

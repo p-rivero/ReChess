@@ -52,6 +52,8 @@
         ref.attackSouthwest,
         ref.attackSoutheast,
       ]
+    } else {
+      throw new Error('Invalid type')
     }
   })
   
