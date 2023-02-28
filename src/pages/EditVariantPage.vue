@@ -185,6 +185,8 @@
     draftStore.save()
   }
   function createNewPiece() {
+    // Limit to 26 pieces for now, since IDs are internally encoded as a single lowercase letter
+    if (draftStore.state.pieceTypes.length >= 26) return
     draftStore.state.pieceTypes.push({
       ids: ['', ''],
       isLeader: false,

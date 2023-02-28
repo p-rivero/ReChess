@@ -1,7 +1,9 @@
 <template>
   <input class="input" type="number" ref="numberInput"
     :placeholder="placeholder" :min="props.min" :max="props.max"
-    @input="inputChanged($event.target)">
+    @input="inputChanged($event.target)"
+    @blur="onBlur($event.target)"
+  >
 </template>
 
 <script setup lang="ts">
@@ -32,10 +34,22 @@
   function inputChanged(input: EventTarget | null) {
     if (!input) throw new Error('Number input event target is null')
     const valueStr = (input as HTMLInputElement).value
-    let value = parseInt(valueStr)
+    const value = parseInt(valueStr)
+    props.onChanged?.(normalizeValue(value))
+  }
+  
+  function onBlur(input: EventTarget | null) {
+    if (!input) throw new Error('Number input event target is null')
+    const inputElement = input as HTMLInputElement
+    const valueStr = inputElement.value
+    const value = parseInt(valueStr)
+    inputElement.value = normalizeValue(value).toString()
+  }
+  
+  function normalizeValue(value: number) {
     if (isNaN(value)) value = props.default
     if (props.min !== undefined && value < props.min) value = props.min
     if (props.max !== undefined && value > props.max) value = props.max
-    props.onChanged?.(value)
+    return value
   }
 </script>
