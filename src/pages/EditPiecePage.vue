@@ -41,12 +41,12 @@
       <div class="columns">
         <div class="column">
           <div class="horizontal-field">
-            <SmartCheckbox text="White" style="margin-right: 1rem" :start-value="!whiteInvisible"
+            <SmartCheckbox text="White" class="margin-right-1rem" :start-value="!whiteInvisible"
               :on-changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
             <img v-if="piece?.imageUrls[0]" class="piece-image" alt="White piece" :class="{ invisible: whiteInvisible }"
               :src="piece?.imageUrls[0] ?? ''" />
-            <div v-else class="piece-image-not-found" :class="{ invisible: whiteInvisible }"></div>
-            <EditButton :class="{ invisible: whiteInvisible }" />
+            <div v-else class="piece-image icon-cross-light" :class="{ invisible: whiteInvisible }"></div>
+            <button class="icon-edit transparent-button margin-right-1rem" :class="{ invisible: whiteInvisible }" ></button>
             <SmartTextInput class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
               :on-changed="text => { pieceIdWhite = text; piece!.ids[0] = text; draftStore.save() }"/>
@@ -55,12 +55,12 @@
         
         <div class="column">
           <div class="horizontal-field">
-            <SmartCheckbox text="Black" style="margin-right: 1rem" :start-value="!blackInvisible"
+            <SmartCheckbox text="Black" class="margin-right-1rem" :start-value="!blackInvisible"
               :on-changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
             <img v-if="piece?.imageUrls[1]" class="piece-image" alt="Black piece" :class="{ invisible: blackInvisible }"
               :src="piece?.imageUrls[1] ?? ''" />
-            <div v-else class="piece-image-not-found" :class="{ invisible: blackInvisible }"></div>
-            <EditButton :class="{ invisible: blackInvisible }" />
+            <div v-else class="piece-image icon-cross-light" :class="{ invisible: blackInvisible }"></div>
+            <button class="icon-edit transparent-button margin-right-1rem" :class="{ invisible: blackInvisible }" ></button>
             <SmartTextInput class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :on-changed="text => { pieceIdBlack = text; piece!.ids[1] = text; draftStore.save() }"/>
@@ -159,7 +159,6 @@
 
 <script setup lang="ts">
   import PieceViewer from '@/components/ChessBoard/PieceViewer.vue'
-  import EditButton from '@/components/EditButton.vue'
   import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue'
   import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
@@ -268,6 +267,18 @@
     margin-right: 0.5rem;
   }
   
+  .transparent-button {
+    width: 2rem;
+    height: 2rem;
+    background-color: transparent;
+    border: none;
+    background-size: contain;
+  }
+  
+  .margin-right-1rem {
+    margin-right: 1rem;
+  }
+  
   .rules-field:not(:last-child) {
     margin-bottom: 1rem;
     flex-basis: content;
@@ -284,10 +295,6 @@
     background-size: contain;
     background-color: #f0d9b5;
     border-radius: 0.25rem;
-  }
-  .piece-image-not-found {
-    @extend .piece-image;
-    background-image: url("@/assets/img/cross/cross-light.svg");
   }
   
   .invisible {

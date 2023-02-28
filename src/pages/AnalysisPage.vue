@@ -28,8 +28,19 @@
     const protochess = await getProtochess()
     const mv = await protochess.getBestMoveTimeout(1)
     const player = await protochess.playerToMove()
-    const adjustedEval = player === 'white' ? mv.evaluation : -mv.evaluation
-    evaluation.value = `${adjustedEval}, best move: ${pairToCoords(mv.from)}->${pairToCoords(mv.to)} (search depth: ${mv.depth})`
+    let evalString: string
+    if (typeof mv.evaluation === 'string' && mv.evaluation.startsWith('#')) {
+      const mateIn = parseInt(mv.evaluation.slice(1))
+      const adjustedMate = player === 'white' ? mateIn : -mateIn
+      evalString = `#${adjustedMate}`
+    } else if (typeof mv.evaluation === 'number') {
+      const evalPawns = mv.evaluation / 100
+      const adjustedEval = player === 'white' ? evalPawns : -evalPawns
+      evalString = `${adjustedEval}`
+    } else {
+      throw new Error('Unexpected evaluation format: ' + mv.evaluation)
+    }
+    evaluation.value = `${evalString}, best move: ${pairToCoords(mv.from)}->${pairToCoords(mv.to)} (search depth: ${mv.depth})`
   }
 </script>
 

@@ -57,22 +57,68 @@ $link: $dark-green;
         color: $grey;
         opacity: 1;
     }
-      
+
 }
 
 
 // Light theme variant
 [data-theme="light"] {
+    $transitionDuration: 1000ms;
     body {
         background-color: $light;
         color: $dark;
+        transition: background-color $transitionDuration, color $transitionDuration;
+        -webkit-transition: background-color $transitionDuration, color $transitionDuration;
+        -ms-transition: background-color $transitionDuration, color $transitionDuration;
     }
     .navbar-menu {
         @extend .is-light;
+        transition: background-color $transitionDuration, color $transitionDuration;
+        -webkit-transition: background-color $transitionDuration, color $transitionDuration;
+        -ms-transition: background-color $transitionDuration, color $transitionDuration;
+    }
+    nav {
+        transition: background-color $transitionDuration, color $transitionDuration;
+        -webkit-transition: background-color $transitionDuration, color $transitionDuration;
+        -ms-transition: background-color $transitionDuration, color $transitionDuration;
     }
     
     body .subtitle,
     body .title {
         color: $dark;
+        transition: color $transitionDuration;
     }
+    
+    .subtitle,
+    .title,
+    .navbar-item,
+    .label,
+    strong,
+    .card-header-title
+    {
+        transition: color $transitionDuration;
+    }
+    
+    a:hover,
+    .radio:hover,
+    .checkbox:hover
+    {
+        transition: color $transitionDuration;
+    }
+    
+    ::placeholder {
+        transition: color $transitionDuration;
+    }
+}
+
+// Icons with unconditional color
+@import 'icon/icon-light.scss';
+@import 'icon/icon-dark.scss';
+
+// Icons depending on theme
+[data-theme="dark"] {
+    @import 'icon/icon-dark-theme.scss';
+}
+[data-theme="light"] {
+    @import 'icon/icon-light-theme.scss';
 }

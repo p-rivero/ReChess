@@ -1,9 +1,7 @@
 <template>
-  <a v-if="false" class="card-header" @click="onAccountClick">
+  <a v-if="true" class="card-header" @click="onAccountClick">
     <span class="card-header-icon">
-      <div class="account-icon" :class="{
-        'dark-account-icon': themeStore.currentTheme === 'dark',
-      }"></div>
+      <div class="account-icon icon-account"></div>
     </span>
     <p class="card-header-title">
       My user name
@@ -16,8 +14,6 @@
 
 
 <script setup lang="ts">
-  import { useThemeStore } from '@/stores/theme';
-  const themeStore = useThemeStore();
   
   async function onAccountClick() {
     console.log('Account clicked')
@@ -34,10 +30,6 @@
     border-radius: 50%;
     width: 2rem;
     height: 2rem;
-    background-image: url("@/assets/img/account/account-light.svg");
-  }
-  .dark-account-icon {
-    background-image: url("@/assets/img/account/account-dark.svg");
   }
 
   .card-header-icon {
@@ -49,5 +41,6 @@
     white-space: nowrap;
     overflow: hidden;
     max-width: 400px;
+    font-weight: 400;
   }
 </style>

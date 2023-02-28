@@ -48,7 +48,7 @@ export interface MoveInfo {
   promotion?: string,
 }
 export interface MoveInfoWithEval extends MoveInfo {
-  evaluation: number | `MATE ${number}`,
+  evaluation: number | `#${number}`,
 }
 export interface MoveInfoWithEvalDepth extends MoveInfoWithEval {
   depth: number,

@@ -1,9 +1,6 @@
 <template>
   <button
-    class="button toggle-theme-button"
-    :class="{
-      'dark-theme': themeStore.currentTheme === 'dark',
-    }"
+    class="button toggle-theme-button icon-theme"
     :key="themeStore.currentTheme"
     @click="themeStore.toggle"
   >
@@ -22,9 +19,5 @@
     width: 2rem;
     border: none;
     background-color: transparent;
-    background-image: url("@/assets/img/themes/moon.svg");
-  }
-  .dark-theme {
-    background-image: url("@/assets/img/themes/sun.svg");
   }
 </style>

@@ -40,10 +40,39 @@
       </div>
       
       <br>
-      <button class="button bottom-button" @click="$router.push({name: 'analysis'})">Analysis board</button>
-      <button class="button bottom-button" @click="$router.push({name: 'play'})"> Play against engine</button>
+      <button class="button bottom-button" @click="$router.push({name: 'analysis'})">
+        <span class="icon">
+          <div class="icon icon-analysis-light"></div>
+        </span>
+        <span>Analysis board</span>
+      </button>
+      <button class="button bottom-button" @click="$router.push({name: 'play'})">
+        <span class="icon">
+          <div class="icon icon-cpu-light"></div>
+        </span>
+        <span>Play against engine</span>
+      </button>
       <br>
-      <button class="button is-primary bottom-button">Publish</button>
+      <button class="button is-primary bottom-button">
+        <span class="icon">
+          <div class="icon icon-rocket-dark"></div>
+        </span>
+        <span>Publish variant</span>
+      </button>
+      <br>
+      <br>
+      <button class="button bottom-button" @click="$router.push({name: 'analysis'})">
+        <span class="icon">
+          <div class="icon icon-download-light"></div>
+        </span>
+        <span>Back up</span>
+      </button>
+      <button class="button bottom-button" @click="$router.push({name: 'play'})">
+        <span class="icon">
+          <div class="icon icon-upload-light"></div>
+        </span>
+        <span>Upload</span>
+      </button>
       <br>
       * Your draft is saved automatically, you can close this page and come back later to continue editing.
       

@@ -9,8 +9,12 @@
     </div>
     <div class="control">
       <button
-        class="button piece-button delete-button"
-        :class="{'is-primary': selectedIndex === 'delete'}"
+        class="button piece-button"
+        :class="{
+          'is-primary': selectedIndex === 'delete',
+          'icon-cross-light': selectedIndex !== 'delete',
+          'icon-cross-dark': selectedIndex === 'delete',
+        }"
         @click="onDeleteClick()">
       </button>
     </div>
@@ -72,11 +76,4 @@
     padding: 0.2rem;
     background-size: contain;
   }
-  .delete-button {
-    background-image: url("@/assets/img/cross/cross-light.svg");
-  }
-  .delete-button.is-primary {
-    background-image: url("@/assets/img/cross/cross-dark.svg");
-  }
-  
 </style>

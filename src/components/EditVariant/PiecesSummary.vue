@@ -1,15 +1,15 @@
 <template>
   <div v-for="(piece, pieceIndex) in props.state.pieceTypes" class="piece-container" :key="pieceIndex">
     <div v-if="editable">
-      <EditButton @click="onEditClick(pieceIndex)" />
-      <DeleteButton class="margin-right-1rem" @click="onDeleteClick(pieceIndex)" />
+      <button class="button icon-edit transparent-button margin-right-1rem" @click="onEditClick(pieceIndex)"></button>
+      <button class="button icon-trash transparent-button margin-right-1rem" @click="onDeleteClick(pieceIndex)"></button>
     </div>
     <div class="box">
       <img v-if="piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="piece-image">
-      <div v-else alt="piece image" class="piece-image-not-found" :class="{'is-light': theme.currentTheme === 'light'}"></div>
+      <div v-else alt="piece image" class="piece-image icon-cross"></div>
       
       <img v-if="piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="piece-image">
-      <div v-else alt="piece image" class="piece-image-not-found" :class="{'is-light': theme.currentTheme === 'light'}"></div>
+      <div v-else alt="piece image" class="piece-image icon-cross"></div>
       
       <p class="margin-right-1rem">{{ piece.displayName }}</p>
       
@@ -20,19 +20,15 @@
   <br>
   <button class="button" @click="onNewClick">
     <span class="icon">
-      <div class="add-icon" alt="star"></div>
+      <div class="icon-add-light icon" alt="star"></div>
     </span>
     <span>Add piece</span>
   </button>
 </template>
 
 <script setup lang="ts">
-  import EditButton from '@/components/EditButton.vue'
-  import DeleteButton from '../DeleteButton.vue'
   import type { GameState } from '@/protochess/interfaces'
-  import { useThemeStore } from '@/stores/theme'
   
-  const theme = useThemeStore();
   const props = defineProps<{
     editable: boolean
     state: GameState
@@ -57,13 +53,13 @@
     display: inline-block;
     margin-right: 1rem;
   }
-  .piece-image-not-found {
-    @extend .piece-image;
-    background-image: url("@/assets/img/cross/cross-dark.svg");
-  }
-  .piece-image-not-found.is-light {
-    @extend .piece-image;
-    background-image: url("@/assets/img/cross/cross-light.svg");
+  
+  .transparent-button {
+    width: 2rem;
+    height: 2rem;
+    background-color: transparent;
+    border: none;
+    background-size: contain;
   }
   
   .margin-right-1rem {
@@ -74,12 +70,6 @@
     height: 1.5rem;
     margin-bottom: 0.3rem;
     margin-right: 0.2rem;
-  }
-  .add-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-    margin-bottom: 0.1rem;
-    background-image: url("@/assets/img/plus/plus-light.svg");
   }
   
   
