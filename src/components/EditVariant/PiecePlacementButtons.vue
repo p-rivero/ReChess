@@ -8,14 +8,12 @@
         @click="onPieceClick(index)"/>
     </div>
     <div class="control">
-      <button
-        class="button piece-button"
+      <button class="button piece-button" :class="{'is-primary': selectedIndex === 'delete'}" @click="onDeleteClick()">
+        <span class="icon-cross"
         :class="{
-          'is-primary': selectedIndex === 'delete',
-          'icon-cross-light': selectedIndex !== 'delete',
-          'icon-cross-dark': selectedIndex === 'delete',
-        }"
-        @click="onDeleteClick()">
+          'color-black': selectedIndex !== 'delete',
+          'color-white': selectedIndex === 'delete',
+        }"></span>
       </button>
     </div>
   </div>

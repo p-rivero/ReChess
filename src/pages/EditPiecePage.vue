@@ -28,7 +28,12 @@
       </div>
       
       <br>
-      <button class="button is-primary bottom-button" @click="$router.push({name: 'edit-variant'})">Done</button>
+      <button class="button is-primary bottom-button" @click="$router.push({name: 'edit-variant'})">
+        <span class="icon">
+          <div class="icon icon-check color-white"></div>
+        </span>
+        <span>Done</span>
+      </button>
     </div>
     
     
@@ -45,8 +50,10 @@
               :on-changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
             <img v-if="piece?.imageUrls[0]" class="piece-image" alt="White piece" :class="{ invisible: whiteInvisible }"
               :src="piece?.imageUrls[0] ?? ''" />
-            <div v-else class="piece-image icon-cross-light" :class="{ invisible: whiteInvisible }"></div>
-            <button class="icon-edit transparent-button margin-right-1rem" :class="{ invisible: whiteInvisible }" ></button>
+              <div v-else class="piece-image" :class="{ invisible: whiteInvisible }">
+                <div class="icon-cross color-black"></div>
+              </div>
+            <button class="icon-edit color-theme transparent-button margin-right-1rem" :class="{ invisible: whiteInvisible }" ></button>
             <SmartTextInput class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
               :on-changed="text => { pieceIdWhite = text; piece!.ids[0] = text; draftStore.save() }"/>
@@ -59,8 +66,10 @@
               :on-changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
             <img v-if="piece?.imageUrls[1]" class="piece-image" alt="Black piece" :class="{ invisible: blackInvisible }"
               :src="piece?.imageUrls[1] ?? ''" />
-            <div v-else class="piece-image icon-cross-light" :class="{ invisible: blackInvisible }"></div>
-            <button class="icon-edit transparent-button margin-right-1rem" :class="{ invisible: blackInvisible }" ></button>
+            <div v-else class="piece-image" :class="{ invisible: blackInvisible }">
+              <div class="icon-cross color-black"></div>
+            </div>
+            <button class="icon-edit color-theme transparent-button margin-right-1rem" :class="{ invisible: blackInvisible }" ></button>
             <SmartTextInput class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :on-changed="text => { pieceIdBlack = text; piece!.ids[1] = text; draftStore.save() }"/>
@@ -292,7 +301,6 @@
     width: 4rem;
     height: 4rem;
     flex-shrink: 0;
-    background-size: contain;
     background-color: #f0d9b5;
     border-radius: 0.25rem;
   }

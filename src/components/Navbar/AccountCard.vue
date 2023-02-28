@@ -1,7 +1,7 @@
 <template>
   <a v-if="true" class="card-header" @click="onAccountClick">
     <span class="card-header-icon">
-      <div class="account-icon icon-account"></div>
+      <div class="account-icon icon-account color-theme"></div>
     </span>
     <p class="card-header-title">
       My user name

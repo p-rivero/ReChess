@@ -1,15 +1,15 @@
 <template>
   <div v-for="(piece, pieceIndex) in props.state.pieceTypes" class="piece-container" :key="pieceIndex">
     <div v-if="editable">
-      <button class="button icon-edit transparent-button margin-right-1rem" @click="onEditClick(pieceIndex)"></button>
-      <button class="button icon-trash transparent-button margin-right-1rem" @click="onDeleteClick(pieceIndex)"></button>
+      <button class="button icon-edit color-theme transparent-button margin-right-1rem" @click="onEditClick(pieceIndex)"></button>
+      <button class="button icon-trash color-theme transparent-button margin-right-1rem" @click="onDeleteClick(pieceIndex)"></button>
     </div>
     <div class="box">
       <img v-if="piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="piece-image">
-      <div v-else alt="piece image" class="piece-image icon-cross"></div>
+      <div v-else alt="piece image" class="piece-image icon-cross color-theme"></div>
       
       <img v-if="piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="piece-image">
-      <div v-else alt="piece image" class="piece-image icon-cross"></div>
+      <div v-else alt="piece image" class="piece-image icon-cross color-theme"></div>
       
       <p class="margin-right-1rem">{{ piece.displayName }}</p>
       
@@ -20,7 +20,7 @@
   <br>
   <button class="button" @click="onNewClick">
     <span class="icon">
-      <div class="icon-add-light icon" alt="star"></div>
+      <div class="icon-add color-black icon" alt="star"></div>
     </span>
     <span>Add piece</span>
   </button>

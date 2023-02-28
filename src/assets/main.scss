@@ -111,14 +111,25 @@ $link: $dark-green;
     }
 }
 
+@import './img/icons/icons.scss';
 // Icons with unconditional color
-@import 'icon/icon-light.scss';
-@import 'icon/icon-dark.scss';
-
+.color-white {
+    background-color: $light;
+}
+.color-black {
+    background-color: $dark;
+}
+.color-primary {
+    background-color: $primary;
+}
 // Icons depending on theme
 [data-theme="dark"] {
-    @import 'icon/icon-dark-theme.scss';
+    .color-theme {
+        @extend .color-white;
+    }
 }
 [data-theme="light"] {
-    @import 'icon/icon-light-theme.scss';
+    .color-theme {
+        @extend .color-black;
+    }
 }

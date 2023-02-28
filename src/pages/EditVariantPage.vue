@@ -42,20 +42,20 @@
       <br>
       <button class="button bottom-button" @click="$router.push({name: 'analysis'})">
         <span class="icon">
-          <div class="icon icon-analysis-light"></div>
+          <div class="icon icon-analysis color-black"></div>
         </span>
         <span>Analysis board</span>
       </button>
       <button class="button bottom-button" @click="$router.push({name: 'play'})">
         <span class="icon">
-          <div class="icon icon-cpu-light"></div>
+          <div class="icon icon-cpu color-black"></div>
         </span>
         <span>Play against engine</span>
       </button>
       <br>
       <button class="button is-primary bottom-button">
         <span class="icon">
-          <div class="icon icon-rocket-dark"></div>
+          <div class="icon icon-rocket color-white"></div>
         </span>
         <span>Publish variant</span>
       </button>
@@ -63,13 +63,13 @@
       <br>
       <button class="button bottom-button" @click="$router.push({name: 'analysis'})">
         <span class="icon">
-          <div class="icon icon-download-light"></div>
+          <div class="icon icon-download color-black"></div>
         </span>
         <span>Back up</span>
       </button>
       <button class="button bottom-button" @click="$router.push({name: 'play'})">
         <span class="icon">
-          <div class="icon icon-upload-light"></div>
+          <div class="icon icon-upload color-black"></div>
         </span>
         <span>Upload</span>
       </button>
