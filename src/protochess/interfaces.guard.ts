@@ -58,7 +58,9 @@ export function isGameState(obj: unknown): obj is GameState {
         typeof typedObj["globalRules"]["repetitionsDraw"] === "number" &&
         typeof typedObj["globalRules"]["checksToLose"] === "number" &&
         (typeof typedObj["variantDisplayName"] === "undefined" ||
-            typeof typedObj["variantDisplayName"] === "string")
+            typeof typedObj["variantDisplayName"] === "string") &&
+        (typeof typedObj["variantDescription"] === "undefined" ||
+            typeof typedObj["variantDescription"] === "string")
     )
 }
 

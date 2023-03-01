@@ -1,8 +1,10 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import sanitizeFilename from 'sanitize-filename'
 
 import type { GameState } from '@/protochess/interfaces'
 import { isGameState } from '@/protochess/interfaces.guard'
+import { exportFile, importFile } from '@/utils/file-io'
 
 export const useVariantDraftStore = defineStore('variant-draft', () => {
   
@@ -10,7 +12,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   const variantDraftJSON = localStorage.getItem('variantDraft')
   let variantDraftObj = variantDraftJSON ? JSON.parse(variantDraftJSON) : null
   // Check if the draft fits the GameState type. If it doesn't, set the draft to the default value.
-  if (!isGameState(variantDraftObj)) {
+  if (!isValidGameState(variantDraftObj)) {
     variantDraftObj = DEFAULT_DRAFT
   }
   const variantDraftTyped = variantDraftObj as GameState
@@ -20,83 +22,61 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   function save() {
     localStorage.setItem('variantDraft', JSON.stringify(state.value))
   }
+  
+  function backupFile() {
+    const file = new Blob([JSON.stringify(state.value)], { type: 'application/json' })
+    let fileName = `Unnamed variant.json`
+    if (state.value.variantDisplayName) {
+      const sanitizedName = sanitizeFilename(state.value.variantDisplayName)
+      if (sanitizedName.length > 0 && sanitizedName !== 'Variant name') {
+        fileName = `${sanitizedName}.json`
+      }
+    }
+    exportFile(file, fileName)
+  }
+  
+  async function uploadFile(): Promise<boolean> {
+    const fileBlob = await importFile()
+    const fileText = await fileBlob.text()
+    try {
+      const fileObj = JSON.parse(fileText)
+      if (isValidGameState(fileObj)) {
+        state.value = fileObj
+        save()
+        return true
+      }
+    } catch (e) {
+      // Do nothing and return false
+    }
+    return false
+  }
+  
+  
+  function isValidGameState(state: any): boolean {
+    if (!isGameState(state)) return false
+    if (state.pieceTypes.length > 26) return false
+    if (state.boardWidth < 1 || state.boardWidth > 16) return false
+    if (state.boardHeight < 1 || state.boardHeight > 16) return false
+    if (state.invalidSquares.some((square: any) => square.x < 0 || square.x >= state.boardWidth || square.y < 0 || square.y >= state.boardHeight)) return false
+    if (state.pieces.some((piece: any) => piece.x < 0 || piece.x >= state.boardWidth || piece.y < 0 || piece.y >= state.boardHeight)) return false
+    if (state.epSquareAndVictim &&
+      (  state.epSquareAndVictim[0][0] < 0
+      || state.epSquareAndVictim[0][0] >= state.boardWidth
+      || state.epSquareAndVictim[0][1] < 0
+      || state.epSquareAndVictim[0][1] >= state.boardHeight
+      || state.epSquareAndVictim[1][0] < 0
+      || state.epSquareAndVictim[1][0] >= state.boardWidth
+      || state.epSquareAndVictim[1][1] < 0
+      || state.epSquareAndVictim[1][1] >= state.boardHeight)) return false
+    if (state?.timesInCheck?.some((times: any) => times < 0 || times > 200)) return false
+    return true
+  }
 
-  return { state, save }
+  return { state, save, backupFile, uploadFile }
 })
 
 const DEFAULT_DRAFT: GameState = {
-  pieceTypes: [
-    {
-      ids: ['A', 'a'],
-      isLeader: true,
-      castleFiles: [0, 7],
-      isCastleRook: false,
-      explodes: false,
-      explosionDeltas: [],
-      immuneToExplosion: false,
-      promotionSquares: [],
-      promoVals: [[], []],
-      doubleJumpSquares: [],
-      attackSlidingDeltas: [],
-      attackJumpDeltas: [],
-      attackNorth: false,
-      attackSouth: false,
-      attackEast: false,
-      attackWest: false,
-      attackNortheast: false,
-      attackNorthwest: false,
-      attackSoutheast: false,
-      attackSouthwest: false,
-      translateJumpDeltas: [],
-      translateSlidingDeltas: [],
-      translateNorth: false,
-      translateSouth: false,
-      translateEast: false,
-      translateWest: false,
-      translateNortheast: false,
-      translateNorthwest: false,
-      translateSoutheast: false,
-      translateSouthwest: false,
-      winSquares: [],
-      displayName: 'Leader',
-      imageUrls: ['https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg', 'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg'],
-    },
-    {
-      ids: ['B', 'b'],
-      isLeader: false,
-      castleFiles: [0, 7],
-      isCastleRook: false,
-      explodes: false,
-      explosionDeltas: [],
-      immuneToExplosion: false,
-      promotionSquares: [],
-      promoVals: [[], []],
-      doubleJumpSquares: [],
-      attackSlidingDeltas: [],
-      attackJumpDeltas: [],
-      attackNorth: false,
-      attackSouth: false,
-      attackEast: false,
-      attackWest: false,
-      attackNortheast: false,
-      attackNorthwest: false,
-      attackSoutheast: false,
-      attackSouthwest: false,
-      translateJumpDeltas: [],
-      translateSlidingDeltas: [],
-      translateNorth: false,
-      translateSouth: false,
-      translateEast: false,
-      translateWest: false,
-      translateNortheast: false,
-      translateNorthwest: false,
-      translateSoutheast: false,
-      translateSouthwest: false,
-      winSquares: [],
-      displayName: 'Another Piece',
-      imageUrls: ['https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg', 'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg'],
-    }
-  ],
+  pieceTypes: [],
   boardWidth: 8,
   boardHeight: 8,
   invalidSquares: [],

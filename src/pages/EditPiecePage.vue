@@ -39,7 +39,7 @@
     
     
     <div class="column">
-      <SmartTextInput class="is-large" placeholder="Piece name" :start-text="piece?.displayName"
+      <SmartTextInput :multiline="false" class="is-large" placeholder="Piece name" :start-text="piece?.displayName"
         :on-changed="name => { piece!.displayName = name; draftStore.save() }"/>
       <br>
       <br>
@@ -54,7 +54,7 @@
                 <div class="icon-cross color-black"></div>
               </div>
             <button class="icon-edit color-theme transparent-button margin-right-1rem" :class="{ invisible: whiteInvisible }" ></button>
-            <SmartTextInput class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
+            <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
               :on-changed="text => { pieceIdWhite = text; piece!.ids[0] = text; draftStore.save() }"/>
           </div>
@@ -70,7 +70,7 @@
               <div class="icon-cross color-black"></div>
             </div>
             <button class="icon-edit color-theme transparent-button margin-right-1rem" :class="{ invisible: blackInvisible }" ></button>
-            <SmartTextInput class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
+            <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :on-changed="text => { pieceIdBlack = text; piece!.ids[1] = text; draftStore.save() }"/>
           </div>
@@ -93,13 +93,13 @@
           <div class="field-label-both">
             <label>Queenside file</label>
           </div>
-          <SmartTextInput class="width-3rem" placeholder="c"
+          <SmartTextInput :multiline="false" class="width-3rem" placeholder="c"
             :start-text="numberToLetter(piece?.castleFiles?.[0])"
             :on-changed="text => { castleFileQueenside = letterToNumber(text); piece!.castleFiles![0] = castleFileQueenside; draftStore.save() }"/>
           <div class="field-label-both">
             <label>Kingside file</label>
           </div>
-          <SmartTextInput class="width-3rem" placeholder="g"
+          <SmartTextInput :multiline="false" class="width-3rem" placeholder="g"
             :start-text="numberToLetter(piece?.castleFiles?.[1])"
             :on-changed="text => { castleFileKingside = letterToNumber(text); piece!.castleFiles![1] = castleFileKingside; draftStore.save() }"/>
         </div>
@@ -154,10 +154,10 @@
       
       
       <label class="label">TEMPORARY FOR DEMO:</label>
-      <SmartTextInput placeholder="(Temp) URL for white piece image" class="rules-field"
+      <SmartTextInput :multiline="false" placeholder="(Temp) URL for white piece image" class="rules-field"
         :start-text="piece?.imageUrls[0] ?? undefined"
         :on-changed="text => { piece!.imageUrls[0] = text; draftStore.save() }"/>
-      <SmartTextInput placeholder="(Temp) URL for black piece image" class="rules-field"
+      <SmartTextInput :multiline="false" placeholder="(Temp) URL for black piece image" class="rules-field"
         :start-text="piece?.imageUrls[1] ?? undefined"
         :on-changed="text => { piece!.imageUrls[1] = text; draftStore.save() }"/>
       

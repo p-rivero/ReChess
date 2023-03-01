@@ -1,6 +1,6 @@
 <template>
   <button
-    class="button toggle-theme-button icon-night color-night"
+    class="button toggle-theme-button icon-theme color-theme"
     :key="themeStore.currentTheme"
     @click="themeStore.toggle"
   >

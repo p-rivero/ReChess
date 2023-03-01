@@ -39,21 +39,21 @@
         <PiecePlacementButtons :state="draftStore.state" :key="stateKey"/>
       </div>
       
-      <br>
-      <button class="button bottom-button" @click="$router.push({name: 'analysis'})">
+      <SmartErrorMessage v-show="hasError" class="error-message" :handler="errorMsgHandler" />
+      <button class="button bottom-button" @click="$router.push({name: 'analysis'})" :disabled="hasError">
         <span class="icon">
           <div class="icon icon-analysis color-black"></div>
         </span>
         <span>Analysis board</span>
       </button>
-      <button class="button bottom-button" @click="$router.push({name: 'play'})">
+      <button class="button bottom-button" @click="$router.push({name: 'play'})" :disabled="hasError">
         <span class="icon">
           <div class="icon icon-cpu color-black"></div>
         </span>
         <span>Play against engine</span>
       </button>
       <br>
-      <button class="button is-primary bottom-button">
+      <button class="button is-primary bottom-button" :disabled="hasError">
         <span class="icon">
           <div class="icon icon-rocket color-white"></div>
         </span>
@@ -61,32 +61,38 @@
       </button>
       <br>
       <br>
-      <button class="button bottom-button" @click="$router.push({name: 'analysis'})">
+      <button class="button bottom-button" @click="draftStore.backupFile">
         <span class="icon">
           <div class="icon icon-download color-black"></div>
         </span>
         <span>Back up</span>
       </button>
-      <button class="button bottom-button" @click="$router.push({name: 'play'})">
+      <button class="button bottom-button" @click="uploadFile">
         <span class="icon">
           <div class="icon icon-upload color-black"></div>
         </span>
         <span>Upload</span>
       </button>
       <br>
-      * Your draft is saved automatically, you can close this page and come back later to continue editing.
+      <p>* Your draft is saved automatically, you can close this page and come back later to continue editing.</p>
       
     </div>
     
     
     
     <div class="column">
-      <SmartTextInput class="is-large" placeholder="Variant name"
+      <SmartTextInput :multiline="false" class="is-large" placeholder="Variant name"
         :start-text="draftStore.state.variantDisplayName"
-        :on-changed="name => { draftStore.state.variantDisplayName = name; draftStore.save() }"/>
+        :on-changed="name => { draftStore.state.variantDisplayName = name; draftStore.save() }"
+        :validator="(text) => {if (text.length > 50) return 'Variant name must be at most 50 characters long'}"
+        :error-handler="errorMsgHandler"/>
       <br>
       <br>
-      <textarea class="textarea" placeholder="Describe the rules of the variant and how fun it is to play!" ref="descriptionInput"></textarea>
+      <SmartTextInput :multiline="true" placeholder="Describe the rules of the variant and how fun it is to play!"
+        :start-text="draftStore.state.variantDescription"
+        :on-changed="text => { draftStore.state.variantDescription = text; draftStore.save() }"
+        :validator="(text) => {if (text.length > 500) return 'Variant description must be at most 500 characters long'}"
+        :error-handler="errorMsgHandler"/>
       <br>
       
       <label class="label">Rules:</label>
@@ -143,7 +149,7 @@
       <!-- TODO: Invalid squares -->
       
       <label class="label" style="margin-top: 2rem;">TEMPORARY FOR DEMO:</label>
-      <SmartTextInput placeholder="(Temp) FEN string" class="rules-field" :key="stateKey"
+      <SmartTextInput :multiline="false" placeholder="(Temp) FEN string" class="rules-field" :key="stateKey"
         :start-text="placementsToFen(draftStore.state)"
         :on-changed="text => { draftStore.state.pieces = fenToPlacements(text); draftStore.save() }"/>
     </div>
@@ -158,16 +164,21 @@
   import SmartNumberInput from '@/components/BasicWrappers/SmartNumberInput.vue'
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
+  import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import { ref, computed } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
   import { placementsToFen, fenToPlacements } from '@/utils/fen-to-placements'
+  import { ErrorMessageHandler } from '@/utils/ErrorMessageHandler'
   import { useRouter } from 'vue-router'
   
   const draftStore = useVariantDraftStore()
   const router = useRouter()
-  const board = ref<InstanceType<typeof ViewableChessBoard>>()  
+  const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const stateKey = computed(() => JSON.stringify(draftStore.state))
+  
+  const hasError = ref(false)
+  const errorMsgHandler = new ErrorMessageHandler(hasError)
   
   async function updateBoard() {
     if (board.value === undefined) {
@@ -225,6 +236,13 @@
     draftStore.save()
     router.push({ name: 'edit-piece', params: { pieceIndex: draftStore.state.pieceTypes.length - 1 } })
   }
+  
+  async function uploadFile() {
+    const success = await draftStore.uploadFile()
+    // Refresh the page if the upload was successful
+    if (success) router.go(0)
+    else alert('Could not import file, make sure the format is correct')
+  }
 </script>
 
 
@@ -239,6 +257,11 @@
   .left-column {
     max-width: 500px;
     margin-right: 2rem;
+  }
+  
+  .error-message {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
   }
   
   .field-label {

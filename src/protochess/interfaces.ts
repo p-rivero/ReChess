@@ -71,6 +71,7 @@ export interface GameState {
   timesInCheck?: [number, number],
   globalRules: GlobalRules,
   variantDisplayName?: string,
+  variantDescription?: string,
 }
 /** @see {isGameStateGui} ts-auto-guard:type-guard */
 export interface GameStateGui extends GameState {

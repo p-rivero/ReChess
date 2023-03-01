@@ -7,14 +7,11 @@
     "preview": "vite preview --port 4173 --config .config/vite.config.ts",
     "deploy": "run-s build deploy-only",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --config .config/.eslintrc.cjs",
-    
-    
     "pre-compile": "run-p build-wasm generate-type-guard generate-icons",
     "generate-type-guard": "ts-auto-guard ./src/protochess/interfaces.ts && sed -i 's/import {/import type {/g' ./src/protochess/interfaces.guard.ts",
     "generate-icons": "chmod +x ./src/assets/img/icons/generate-icons.sh && ./src/assets/img/icons/generate-icons.sh",
     "build-wasm": "make all use-pathname --directory protochess-engine/protochess-engine-wasm",
     "type-check": "vue-tsc --noEmit",
-    
     "build-only": "vite build --config .config/vite.config.ts",
     "dev-only": "vite --config .config/vite.config.ts",
     "deploy-only": "firebase deploy --project rechess-web"
@@ -26,6 +23,7 @@
     "pinia": "^2.0.21",
     "protochess-multithread": "./protochess-engine/protochess-engine-wasm/pkg-parallel",
     "protochess-singlethread": "./protochess-engine/protochess-engine-wasm/pkg",
+    "sanitize-filename": "^1.6.3",
     "sass": "^1.58.0",
     "vue": "^3.2.38",
     "vue-input-autowidth": "^2.2.0",
