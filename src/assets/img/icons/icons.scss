@@ -100,6 +100,17 @@
 }
 
 
+/* star.svg */
+.icon-star {
+    -webkit-mask-image: url("@/assets/img/icons/star.svg");
+    mask-image: url("@/assets/img/icons/star.svg");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+}
+
+
 /* theme.svg */
 .icon-theme {
     -webkit-mask-image: url("@/assets/img/icons/theme.svg");

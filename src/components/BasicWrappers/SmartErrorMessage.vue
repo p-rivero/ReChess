@@ -13,7 +13,6 @@
     handler: ErrorMessageHandler
   }>()
   
-  console.log('registering text')
-  props.handler.registerText({show: (error: string) => {console.log("aaa: " + error); errorMessage.value = error}})
+  props.handler.registerText({show: (error: string) => { errorMessage.value = error }})
   
 </script>

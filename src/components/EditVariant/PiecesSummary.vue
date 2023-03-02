@@ -5,22 +5,22 @@
       <button class="button icon-trash color-theme transparent-button margin-right-1rem" @click="onDeleteClick(pieceIndex)"></button>
     </div>
     <div class="box">
-      <img v-if="piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="piece-image">
-      <div v-else alt="piece image" class="piece-image icon-cross color-theme"></div>
+      <img v-if="piece.ids[0] != null && piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="piece-image">
+      <div v-else alt="piece image" class="piece-image icon-cross" :class="{'color-theme': piece.ids[0] != null}"></div>
       
-      <img v-if="piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="piece-image">
-      <div v-else alt="piece image" class="piece-image icon-cross color-theme"></div>
+      <img v-if="piece.ids[1] != null && piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="piece-image">
+      <div v-else alt="piece image" class="piece-image icon-cross" :class="{'color-theme': piece.ids[1] != null}"></div>
       
       <p class="margin-right-1rem">{{ piece.displayName }}</p>
       
-      <img v-if="piece.isLeader" class="star-icon" src="@/assets/img/star.svg" alt="star">
+      <div v-if="piece.isLeader" class="star-icon-container icon-star color-primary"></div>
       <strong v-if="piece.isLeader" class="has-text-primary margin-right-1rem">Leader</strong>
     </div>
   </div>
   <br>
   <button class="button" @click="onNewClick">
     <span class="icon">
-      <div class="icon-add color-black icon" alt="star"></div>
+      <div class="icon-add color-black icon"></div>
     </span>
     <span>Add piece</span>
   </button>
@@ -65,7 +65,7 @@
   .margin-right-1rem {
     margin-right: 1rem;
   }
-  .star-icon {
+  .star-icon-container {
     width: 1.5rem;
     height: 1.5rem;
     margin-bottom: 0.3rem;

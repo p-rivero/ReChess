@@ -47,7 +47,6 @@
   function inputChanged() {
     if (!textInput.value) throw new Error('Number input is null')
     let text = textInput.value.value
-    if (text === '') text = props.placeholder ?? ''
     
     if (validate(text)) {
       props.onChanged?.(text)
@@ -59,10 +58,12 @@
       // Run the validator, if the validator returns an error message, show it
       const errorMessage = props.validator(text)
       if (errorMessage) {
+        // If there is some error, show it (even if it was already showing, since the error message may have changed)
         isError.value = true
         props.errorHandler?.show(errorMessage, props.errorPriority ?? 0)
         return false
-      } else {
+      } else if (isError.value) {
+        // If there is no error and the error message was showing, hide it
         isError.value = false
         props.errorHandler?.clear()
       }

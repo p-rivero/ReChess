@@ -137,14 +137,14 @@
       <br>
         
       <div class="columns">
-        <div class="column" :class="{ invisible: whiteInvisible }">
+        <div v-if="!whiteInvisible" class="column">
           <label>(White) Promote to:</label>
           <CharPillList :editable="true"
             :starting-pills="piece?.promoVals[0]"
             :on-changed="promos => {piece!.promoVals[0] = promos; draftStore.save()}"/>
         </div>
         
-        <div class="column" :class="{ invisible: blackInvisible }">
+        <div v-if="!blackInvisible" class="column">
           <label>(Black) Promote to:</label>
           <CharPillList :editable="true"
             :starting-pills="piece?.promoVals[1]"

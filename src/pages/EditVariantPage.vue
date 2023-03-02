@@ -84,7 +84,11 @@
       <SmartTextInput :multiline="false" class="is-large" placeholder="Variant name"
         :start-text="draftStore.state.variantDisplayName"
         :on-changed="name => { draftStore.state.variantDisplayName = name; draftStore.save() }"
-        :validator="(text) => {if (text.length > 50) return 'Variant name must be at most 50 characters long'}"
+        :validator="(text) => {
+          if (text.length > 50) return 'Variant name must be at most 50 characters long'
+          if (text.length === 0) return 'Please enter the name of your variant'
+          if (text.length < 3) return 'Variant name must be at least 3 characters long'
+        }"
         :error-handler="errorMsgHandler"/>
       <br>
       <br>
@@ -154,6 +158,7 @@
         :on-changed="text => { draftStore.state.pieces = fenToPlacements(text); draftStore.save() }"/>
     </div>
   </div>
+  <GameStateCheck :state="draftStore.state" :error-msg-handler="errorMsgHandler" :key="stateKey" />
 </template>
 
 
@@ -165,6 +170,7 @@
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
+  import GameStateCheck from '@/components/GameStateCheck.vue'
   import { ref, computed } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'

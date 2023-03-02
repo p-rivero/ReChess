@@ -32,7 +32,7 @@ export class ErrorMessageHandler {
 
   // Show an error message
   show(message: string, priority: number) {
-    if (this.currentPriority >= priority) return
+    if (this.currentPriority > priority) return
     this.hasErrorRef.value = true
     this.currentPriority = priority
     this.messageText.forEach((messageText) => {
