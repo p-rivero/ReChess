@@ -174,9 +174,9 @@
   import PopupOverlay from '@/components/PopupOverlay.vue'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
   import { checkState } from '@/components/EditVariant/check-state'
-  import { ref, computed, watch, watchEffect } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
-  import { placementsToFen, fenToPlacements } from '@/utils/fen-to-placements'
+  import { placementsToFen } from '@/utils/fen-to-placements'
   import { ErrorMessageHandler } from '@/utils/ErrorMessageHandler'
   import { useRouter } from 'vue-router'
   
@@ -191,15 +191,16 @@
   const selectedPieceId = ref<string|'delete'|'none'>('none')
   
   // When state changes, update the board and run a state check
-  watch(draftStore.state, () => {
+  watch(draftStore.state, () => updateBoardAndError(), { deep: true })
+  onMounted(() => updateBoardAndError())
+  function updateBoardAndError() {
     checkState(draftStore.state, errorMsgHandler)
     // Clone state and add GUI fields
     let state = JSON.parse(JSON.stringify(draftStore.state))
     state.fen = placementsToFen(draftStore.state)
     state.inCheck = false
-    // Wait for board to be mounted (the first time this runs, it's not mounted yet)
-    setTimeout(() => board.value?.setState(state))
-  }, { immediate: true, deep: true})
+    board.value?.setState(state)
+  }
   
   function deletePiece(pieceIndex: number) {
     // TODO: Ask for confirmation

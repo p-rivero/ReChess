@@ -1,6 +1,8 @@
 type LetterCoord = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p'
 type NumberCoord = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16
 
+import * as cg from 'chessgroundx/types'
+
 export function pairToCoords(pair: [number, number]): `${LetterCoord}${NumberCoord}` {
   const [x, y] = pair
   const letter = String.fromCharCode('a'.charCodeAt(0) + x) as LetterCoord
@@ -32,4 +34,19 @@ export function numberToLetter(number: number|undefined): LetterCoord|undefined 
 
 export function letterToNumber(letter: string): number {
   return letter.charCodeAt(0) - 'a'.charCodeAt(0)
+}
+
+
+// Interface with chessgroundx
+
+export function keyToPosition(key: cg.Key): [number, number] {
+  const keyLetter = key[0] as cg.File
+  const keyNumber = key[1] as cg.Rank
+  const file = cg.files.indexOf(keyLetter)
+  const rank = cg.ranks.indexOf(keyNumber)
+  return [file, rank]
+}
+
+export function positionToKey(position: [number, number]): cg.Key {
+  return `${cg.files[position[0]]}${cg.ranks[position[1]]}`
 }

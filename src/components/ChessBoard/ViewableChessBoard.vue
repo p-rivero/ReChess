@@ -23,7 +23,8 @@
 
 <script setup lang="ts">
   import type { GameStateGui, MoveList } from '@/protochess/interfaces';
-  import * as cg from 'chessgroundx/types';
+  import type * as cg from 'chessgroundx/types';
+  import { positionToKey, keyToPosition } from '@/utils/chess-coords';
   import type { Config } from 'chessgroundx/config';
   import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue';
   import { ref } from 'vue'
@@ -154,22 +155,6 @@
     },
   })
   
-  function positionToKey(position: [number, number]): cg.Key {
-    if (position[0] < 0 || position[0] >= currentWidth || position[1] < 0 || position[1] >= currentHeight) {
-      throw new Error('Invalid position')
-    }
-    return `${cg.files[position[0]]}${cg.ranks[position[1]]}`
-  }
-  function keyToPosition(key: cg.Key): [number, number] {
-    const keyLetter = key[0] as cg.File
-    const keyNumber = key[1] as cg.Rank
-    const file = cg.files.indexOf(keyLetter)
-    const rank = cg.ranks.indexOf(keyNumber)
-    if (file < 0 || file >= currentWidth || rank < 0 || rank >= currentHeight) {
-      throw new Error('Invalid key')
-    }
-    return [file, rank]
-  }
   function idToRole(id: string): cg.Role {
     return `${id}-piece` as cg.Role
   }

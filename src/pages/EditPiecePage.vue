@@ -9,20 +9,15 @@
     <div class="column is-narrow left-column">
       
       <div class="board-container">
-        <PieceViewer :size="500" :piece="piece" :key="JSON.stringify(piece)"/>
+        <PieceViewer v-if="piece" :size="500" :piece="piece" style="z-index: 11;"
+          @clicked="editDelta"/>
       </div>
       
       <div class="field">
-        <label class="label">Add or remove:</label>
+        <label class="label">Zoom:</label>
         <div class="field is-grouped is-grouped-multiline">
           <div class="control">
-            <button class="button">Move jump</button>
-          </div>
-          <div class="control">
-            <button class="button">Capture jump</button>
-          </div>
-          <div class="control">
-            <button class="button">Explosion</button>
+            <button class="button">todo</button>
           </div>
         </div>
       </div>
@@ -131,31 +126,24 @@
         </div>
       </div>
       
-      <div class="columns">
-        <div class="column ">
-          <SmartCheckbox text="Explode when capturing" class="rules-field"
-            :startValue="piece?.explodes"
-            @changed="value => { piece!.explodes = value; draftStore.save() }"/>
-        </div>
-        <div class="column">
-          <SmartCheckbox text="Immune to other explosions" class="rules-field"
-            :startValue="piece?.immuneToExplosion"
-            @changed="value => { piece!.immuneToExplosion = value; draftStore.save() }"/>
-        </div>
-      </div>
       <br>
-      
       <label class="label">Movement:</label>
-      <div style="margin-bottom: 1rem;"> <MovementSlideRow :piece-index="pieceIndex" :type="'move'"/> </div>
+      <AddRemoveButtons text="Jumps:" :z-index="11" type="move"
+        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta" />
+      <div style="margin-bottom: 1rem;"> <MovementSlideRow :piece-index="pieceIndex" type="move"/> </div>
       <label>Double jump when standing on:</label>
       <CoordPillList :editable="true" style="margin-bottom: 1.5rem;" :allow-repeat="false"
         :starting-coords="piece?.doubleJumpSquares"
         @changed="coords => {piece!.doubleJumpSquares = coords; draftStore.save()}"/>
         
+      <br>
       <label class="label">Capture:</label>
-      <div style="margin-bottom: 1.5rem;"> <MovementSlideRow :piece-index="pieceIndex" :type="'capture'"/> </div>
+      <AddRemoveButtons text="Jumps:" :z-index="11" type="capture"
+        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta" />
+      <div style="margin-bottom: 1.5rem;"> <MovementSlideRow :piece-index="pieceIndex" type="capture"/> </div>
       
-      <label class="label">Promotion:</label>
+      <br>
+      <label class="label">Promote:</label>
       <label>Promote when landing on:</label>
       <CoordPillList :editable="true" :allow-repeat="false"
         :starting-coords="piece?.promotionSquares"
@@ -178,8 +166,26 @@
         </div>
       </div>
       
+      <br>
+      <label class="label">Explode:</label>
+      <div class="columns">
+        <div class="column ">
+          <SmartCheckbox text="Explode when capturing" class="rules-field"
+            :startValue="piece?.explodes"
+            @changed="value => { piece!.explodes = value; draftStore.save() }"/>
+        </div>
+        <div class="column">
+          <SmartCheckbox text="Immune to other explosions" class="rules-field"
+            :startValue="piece?.immuneToExplosion"
+            @changed="value => { piece!.immuneToExplosion = value; draftStore.save() }"/>
+        </div>
+      </div>
+      <AddRemoveButtons text="Explosion squares:" :z-index="11" type="explosion"
+        v-show="piece?.explodes"
+        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta" />
       
-      <label class="label">TEMPORARY FOR DEMO:</label>
+      <br>
+      <label class="label">TEMPORARY FOR MVP:</label>
       <SmartTextInput :multiline="false" placeholder="(Temp) URL for white piece image" class="rules-field"
         :start-text="piece?.imageUrls[0] ?? undefined"
         @changed="text => { piece!.imageUrls[0] = text; draftStore.save() }"/>
@@ -189,6 +195,7 @@
       
     </div>
   </div>
+  <PopupOverlay v-if="selectedDelta[0] !== 'none'" :z-index="10" @click="selectedDelta[0] = 'none'" />
 </template>
 
 
@@ -201,6 +208,8 @@
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import CharPillList from '@/components/EditVariant/CharPillList.vue'
   import CoordPillList from '@/components/EditVariant/CoordPillList.vue'
+  import AddRemoveButtons from '@/components/EditVariant/AddRemoveButtons.vue'
+  import PopupOverlay from '@/components/PopupOverlay.vue'
   import type { PieceDefinition } from '@/protochess/interfaces'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { paramToInt } from '@/utils/param-to-int'
@@ -223,6 +232,9 @@
   
   const hasError = ref(false)
   const errorMsgHandler = new ErrorMessageHandler(hasError)
+  
+  // Current selected paint mode. True if adding, false if removing
+  const selectedDelta = ref<['none'|'move'|'capture'|'explosion', boolean]>(['none', false])
   
   // Hide a piece if it's current id is null or undefined
   const whiteInvisible = computed(() => piece?.ids[0] == null || piece?.ids[0] === undefined)
@@ -266,6 +278,26 @@
     draftStore.save()
     // Remove any error message if the piece id was invalid
     setTimeout(() => errorMsgHandler.clear())
+  }
+  
+  function editDelta(delta: [number, number]) {
+    if (!piece) return
+    if (selectedDelta.value[0] === 'none') return
+    const adding = selectedDelta.value[1]
+    
+    if (selectedDelta.value[0] === 'move') {
+      piece.translateJumpDeltas = piece.translateJumpDeltas.filter(d => d[0] !== delta[0] || d[1] !== delta[1])
+      if (adding) piece.translateJumpDeltas.push(delta)
+    } else if (selectedDelta.value[0] === 'capture') {
+      piece.attackJumpDeltas = piece.attackJumpDeltas.filter(d => d[0] !== delta[0] || d[1] !== delta[1])
+      if (adding) piece.attackJumpDeltas.push(delta)
+    } else if (selectedDelta.value[0] === 'explosion') {
+      piece.explosionDeltas = piece.explosionDeltas.filter(d => d[0] !== delta[0] || d[1] !== delta[1])
+      if (adding) piece.explosionDeltas.push(delta)
+    } else {
+      throw new Error('Invalid selectedDelta')
+    }
+    draftStore.save()
   }
 </script>
 

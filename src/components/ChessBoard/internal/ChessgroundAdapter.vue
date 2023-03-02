@@ -18,10 +18,11 @@
 <script setup lang="ts">
   import { chessboardSvg } from './boardBackgroudSvg'
   import { Chessground } from 'chessgroundx'
-  import type * as cg from 'chessgroundx/types';
-  import type { Api } from 'chessgroundx/api';
-  import type { Config } from 'chessgroundx/config';
-  import { ref, onMounted } from 'vue';
+  import type * as cg from 'chessgroundx/types'
+  import type { Api } from 'chessgroundx/api'
+  import type { Config } from 'chessgroundx/config'
+  import type { DrawShape } from 'chessgroundx/draw'
+  import { ref, onMounted } from 'vue'
   
   // Map from piece id to the URL of the image to use
   export type PlayerPieceImages = [string, string][]
@@ -76,6 +77,7 @@
     movePiece: (from: cg.Key, to: cg.Key) => chessgroundApi?.move(from, to),
     setPieces: (diff: cg.PiecesDiff) => chessgroundApi?.setPieces(diff),
     explode: (keys: cg.Key[]) => chessgroundApi?.explode(keys),
+    setShapes: (shapes: DrawShape[]) => chessgroundApi?.setShapes(shapes),
   })
   
   
@@ -103,11 +105,12 @@
   function onDrag(e: MouseEvent) {
     if (isDragging && canDragAgain) {
       canDragAgain = false
+      console.log('dragging')
       onClick(e)
       setTimeout(() => canDragAgain = true, 10)
     }
   }
-  function endDrag(e: Event) {
+  function endDrag() {
     isDragging = false
   }
   

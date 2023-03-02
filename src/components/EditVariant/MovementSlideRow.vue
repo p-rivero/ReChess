@@ -28,8 +28,16 @@
   
   const draftStore = useVariantDraftStore()
   
+  const props = defineProps<{
+    pieceIndex: number
+    type: 'move' | 'capture'
+  }>()
+  
   const selectedDirections = computed(() => {
     const ref = draftStore.state.pieceTypes[props.pieceIndex]
+    // Make sure that the piece exists
+    if (!ref) return []
+    
     if (props.type === 'move') {
       return [
         ref.translateWest,
@@ -56,11 +64,6 @@
       throw new Error('Invalid type')
     }
   })
-  
-  const props = defineProps<{
-    pieceIndex: number
-    type: 'move' | 'capture'
-  }>()
   
   function arrowClicked(buttonIndex: number) {
     const ref = draftStore.state.pieceTypes[props.pieceIndex]
