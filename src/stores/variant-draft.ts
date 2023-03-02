@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import sanitizeFilename from 'sanitize-filename'
 
-import type { GameState } from '@/protochess/interfaces'
+import type { GameState, PieceDefinition, PiecePlacement } from '@/protochess/interfaces'
 import { isGameState } from '@/protochess/interfaces.guard'
 import { exportFile, importFile } from '@/utils/file-io'
 
@@ -22,6 +22,22 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   function save() {
     localStorage.setItem('variantDraft', JSON.stringify(state.value))
   }
+  
+  function addPiece() {
+    state.value.pieceTypes.push(DEFAULT_PIECE)
+    save()
+  }
+  function setWidth(width: number) {
+    state.value.boardWidth = width
+    state.value.pieces = state.value.pieces.filter((piece: PiecePlacement) => piece.x < width)
+    save()
+  }
+  function setHeight(height: number) {
+    state.value.boardHeight = height
+    state.value.pieces = state.value.pieces.filter((piece: PiecePlacement) => piece.y < height)
+    save()
+  }
+  
   
   function backupFile() {
     const file = new Blob([JSON.stringify(state.value)], { type: 'application/json' })
@@ -72,7 +88,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     return true
   }
 
-  return { state, save, backupFile, uploadFile }
+  return { state, save, addPiece, setWidth, setHeight, backupFile, uploadFile }
 })
 
 const DEFAULT_DRAFT: GameState = {
@@ -90,4 +106,40 @@ const DEFAULT_DRAFT: GameState = {
     repetitionsDraw: 3,
     checksToLose: 0,
   },
+}
+
+const DEFAULT_PIECE: PieceDefinition = {
+  ids: ['', ''],
+  isLeader: false,
+  castleFiles: undefined,
+  isCastleRook: false,
+  explodes: false,
+  explosionDeltas: [],
+  immuneToExplosion: false,
+  promotionSquares: [],
+  promoVals: [[], []],
+  doubleJumpSquares: [],
+  attackSlidingDeltas: [],
+  attackJumpDeltas: [],
+  attackNorth: false,
+  attackSouth: false,
+  attackEast: false,
+  attackWest: false,
+  attackNortheast: false,
+  attackNorthwest: false,
+  attackSoutheast: false,
+  attackSouthwest: false,
+  translateJumpDeltas: [],
+  translateSlidingDeltas: [],
+  translateNorth: false,
+  translateSouth: false,
+  translateEast: false,
+  translateWest: false,
+  translateNortheast: false,
+  translateNorthwest: false,
+  translateSoutheast: false,
+  translateSouthwest: false,
+  winSquares: [],
+  displayName: '',
+  imageUrls: [undefined, undefined],
 }

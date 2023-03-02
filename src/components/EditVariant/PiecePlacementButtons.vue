@@ -1,6 +1,6 @@
 <template>
   <div class="field is-grouped is-grouped-multiline">
-    <div v-for="(piece, index) in pieceList" :key="index" class="control">
+    <div v-for="(piece, index) in pieceList" :key="index" class="control" :style="{zIndex}">
       <img
         class="button piece-button"
         :src="piece.url"
@@ -8,8 +8,8 @@
         @click="onPieceClick(index)"/>
     </div>
     <div class="control">
-      <button class="button piece-button" :class="{'is-primary': selectedIndex === 'delete'}" @click="onDeleteClick()">
-        <span class="icon-cross"
+      <button class="button piece-button" :class="{'is-primary': selectedIndex === 'delete'}" :style="{zIndex}" @click="onDeleteClick()">
+        <span class="icon-trash"
         :class="{
           'color-black': selectedIndex !== 'delete',
           'color-white': selectedIndex === 'delete',
@@ -27,6 +27,12 @@
     
   const props = defineProps<{
     state: GameState
+    zIndex: number
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'piece-selected', piece: number|'delete'): void
+    (event: 'piece-deselected'): void
   }>()
   
   // Extract the id and url from the piece definition
@@ -53,15 +59,19 @@
   function onPieceClick(index: number) {
     if (selectedIndex.value === index) {
       selectedIndex.value = 'none'
+      emit('piece-deselected')
     } else {
       selectedIndex.value = index
+      emit('piece-selected', index)
     }
   }
   function onDeleteClick() {
     if (selectedIndex.value === 'delete') {
       selectedIndex.value = 'none'
+      emit('piece-deselected')
     } else {
       selectedIndex.value = 'delete'
+      emit('piece-selected', 'delete')
     }
   }
     

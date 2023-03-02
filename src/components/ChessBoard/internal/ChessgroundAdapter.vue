@@ -7,7 +7,7 @@
 
 <template>
   <div class="chessboard">
-    <div ref="board" class="cg-board-wrap"></div>
+    <div ref="board" class="cg-board-wrap" @click="e => onClick(e)"></div>
   </div>
 </template>
 
@@ -31,12 +31,11 @@
     initialConfig: Config
     size: number
     whitePov: boolean
-    // For each player, a mapping from piece id to the URL of the image to use
     pieceImages: PieceImages
   }>()
   
   const emit = defineEmits<{
-    (event: 'mounted'): void
+    (event: 'clicked', position: cg.Key): void
   }>()
 
   // When mounted, create the chessground board and store the reference to the API handle
@@ -46,13 +45,7 @@
     if (board.value === undefined) {
       throw new Error('Reference to board is undefined')
     }
-    let mappedConfig = props.initialConfig
-    mappedConfig.mapping = {
-      whitePieces: props.pieceImages.white.map(([id, _]) => id),
-      blackPieces: props.pieceImages.black.map(([id, _]) => id),
-    }
-    chessgroundApi = Chessground(board.value, mappedConfig)
-    emit('mounted')
+    chessgroundApi = Chessground(board.value, props.initialConfig)
   })
   
   // Board appearance
@@ -91,6 +84,13 @@
     if (images.length <= pieceIndex) return 'none'
     const [_id, pieceUrl] = images[pieceIndex]
     return `url("${pieceUrl}")`
+  }
+  
+  function onClick(e: MouseEvent) {
+    if (chessgroundApi === undefined) throw new Error('Chessground API is not initialized')
+    const coords: cg.NumberPair = [e.clientX, e.clientY]
+    let key = chessgroundApi.getKeyAtDomPos(coords)
+    if (key) emit('clicked', key)
   }
   
 </script>

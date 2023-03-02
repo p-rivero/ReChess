@@ -8,19 +8,20 @@
     <div class="column is-narrow left-column">
       
       <div class="board-container">
-        <ViewableChessBoard ref="board" :size="500" :white-pov="true" :view-only="false" :show-coordinates="true"
-          :key="stateKey" @mounted="updateBoard"/>
+        <ViewableChessBoard ref="board" style="z-index: 20"
+          :size="500" :white-pov="true" :view-only="true" :show-coordinates="true"
+          @clicked="coords => placePiece(coords)"/>
       </div>
       
       <div class="horizontal-field">
         <div class="field-label"><label>Board size:</label></div>
         <SmartNumberInput class="width-5rem" :min="2" :max="16" :default="8"
           :start-value="draftStore.state.boardHeight"
-          @changed="height => { draftStore.state.boardHeight = height; draftStore.save() }"/>
+          @changed="draftStore.setHeight"/>
         <div class="field-label-both"><label>x</label></div>
         <SmartNumberInput class="width-5rem" :min="2" :max="16" :default="8"
           :start-value="draftStore.state.boardWidth"
-          @changed="width => { draftStore.state.boardWidth = width; draftStore.save() }"/>
+          @changed="draftStore.setWidth"/>
       </div>
       
       <div class="horizontal-field">
@@ -36,7 +37,9 @@
       
       <div class="field">
         <label class="label">Place piece:</label>
-        <PiecePlacementButtons :state="draftStore.state" :key="stateKey"/>
+        <PiecePlacementButtons :z-index="11" :state="draftStore.state" :key="JSON.stringify(draftStore.state.pieceTypes)"
+          @piece-selected="index => selectedPieceIndex = index"
+          @piece-deselected="selectedPieceIndex = 'none'"/>
       </div>
       
       <SmartErrorMessage v-show="hasError" class="error-message" :handler="errorMsgHandler" />
@@ -153,12 +156,13 @@
       <!-- TODO: Invalid squares -->
       
       <label class="label" style="margin-top: 2rem;">TEMPORARY FOR DEMO:</label>
-      <SmartTextInput :multiline="false" placeholder="(Temp) FEN string" class="rules-field" :key="stateKey"
+      <SmartTextInput :multiline="false" placeholder="(Temp) FEN string" class="rules-field" :key="JSON.stringify(draftStore.state.pieces)"
         :start-text="placementsToFen(draftStore.state)"
         @changed="text => { draftStore.state.pieces = fenToPlacements(text); draftStore.save() }"/>
     </div>
   </div>
-  <GameStateCheck :state="draftStore.state" :error-msg-handler="errorMsgHandler" :key="stateKey" />
+  
+  <PopupOverlay v-if="selectedPieceIndex !== 'none'" :z-index="10" />
 </template>
 
 
@@ -170,10 +174,11 @@
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
-  import GameStateCheck from '@/components/GameStateCheck.vue'
-  import { ref, computed } from 'vue'
-  import { useVariantDraftStore } from '@/stores/variant-draft'
+  import PopupOverlay from '@/components/PopupOverlay.vue'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
+  import { checkState } from '@/components/EditVariant/check-state'
+  import { ref, computed, watch, watchEffect } from 'vue'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
   import { placementsToFen, fenToPlacements } from '@/utils/fen-to-placements'
   import { ErrorMessageHandler } from '@/utils/ErrorMessageHandler'
   import { useRouter } from 'vue-router'
@@ -181,20 +186,22 @@
   const draftStore = useVariantDraftStore()
   const router = useRouter()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
-  const stateKey = computed(() => JSON.stringify(draftStore.state))
   
   const hasError = ref(true)
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
-  async function updateBoard() {
-    if (board.value === undefined) {
-      throw new Error('Reference to board is undefined')
-    }
-    // TODO: Remove this and instead put the fen and inCheck (optional) in the GameState
+  const selectedPieceIndex = ref<number|'delete'|'none'>('none')
+  
+  // When state changes, update the board and run a state check
+  watch(draftStore.state, () => {
+    checkState(draftStore.state, errorMsgHandler)
+    // Clone state and add GUI fields
     let state = JSON.parse(JSON.stringify(draftStore.state))
     state.fen = placementsToFen(draftStore.state)
-    await board.value.setState(state)
-  }
+    state.inCheck = false
+    // Wait for board to be mounted (the first time this runs, it's not mounted yet)
+    setTimeout(() => board.value?.setState(state))
+  }, { immediate: true, deep: true})
   
   function deletePiece(pieceIndex: number) {
     // TODO: Ask for confirmation
@@ -204,43 +211,23 @@
   function createNewPiece() {
     // Limit to 26 pieces for now, since IDs are internally encoded as a single lowercase letter
     if (draftStore.state.pieceTypes.length >= 26) return
-    draftStore.state.pieceTypes.push({
-      ids: ['', ''],
-      isLeader: false,
-      castleFiles: undefined,
-      isCastleRook: false,
-      explodes: false,
-      explosionDeltas: [],
-      immuneToExplosion: false,
-      promotionSquares: [],
-      promoVals: [[], []],
-      doubleJumpSquares: [],
-      attackSlidingDeltas: [],
-      attackJumpDeltas: [],
-      attackNorth: false,
-      attackSouth: false,
-      attackEast: false,
-      attackWest: false,
-      attackNortheast: false,
-      attackNorthwest: false,
-      attackSoutheast: false,
-      attackSouthwest: false,
-      translateJumpDeltas: [],
-      translateSlidingDeltas: [],
-      translateNorth: false,
-      translateSouth: false,
-      translateEast: false,
-      translateWest: false,
-      translateNortheast: false,
-      translateNorthwest: false,
-      translateSoutheast: false,
-      translateSouthwest: false,
-      winSquares: [],
-      displayName: '',
-      imageUrls: [undefined, undefined],
-    })
-    draftStore.save()
+    draftStore.addPiece()
     router.push({ name: 'edit-piece', params: { pieceIndex: draftStore.state.pieceTypes.length - 1 } })
+  }
+  
+  function placePiece(coords: [number, number]) {
+    if (selectedPieceIndex.value === 'none') return
+    // Remove old placement
+    draftStore.state.pieces = draftStore.state.pieces.filter(piece => piece.x !== coords[0] || piece.y !== coords[1])
+    if (selectedPieceIndex.value !== 'delete') {
+      // Get id of selected piece
+      const id = 'd'
+      draftStore.state.pieces.push({
+        x: coords[0],
+        y: coords[1],
+        pieceId: id,
+      })
+    }
   }
   
   async function uploadFile() {
@@ -309,5 +296,11 @@
   
   .width-5rem {
     width: 5rem;
+  }
+</style>
+
+<style>
+  cg-board {
+    cursor: v-bind("selectedPieceIndex === 'none' ? 'default' : 'pointer'");
   }
 </style>

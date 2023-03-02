@@ -1,0 +1,31 @@
+<!-- 
+  When this component is shown, it covers the entire screen with a semi-transparent black overlay at a given z-index.
+  The user cannot interact with anything behind that z-index.
+ -->
+ 
+<template>
+  <div class="overlay" @click="emit('click')"></div>
+</template>
+
+<script setup lang="ts">
+  
+  defineProps<{
+    zIndex: number
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'click'): void
+  }>()
+</script>
+
+<style scoped lang="scss">
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: v-bind('zIndex')
+  }
+</style>

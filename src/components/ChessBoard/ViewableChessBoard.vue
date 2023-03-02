@@ -7,13 +7,13 @@
 
 <template>
   <ChessgroundAdapter
-    :width=currentWidth
-    :height=currentHeight
-    :size=$props.size
-    :white-pov=whitePov
-    :initial-config=currentBoardConfig
+    :width="currentWidth"
+    :height="currentHeight"
+    :size="props.size"
+    :white-pov="whitePov"
+    :initial-config="currentBoardConfig"
     :piece-images="pieceImages"
-    @mounted="emit('mounted')"
+    @clicked="key => emit('clicked', keyToPosition(key))"
     
     :key="boardUpdateKey"
     ref="board"
@@ -36,7 +36,7 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'mounted'): void
+    (event: 'clicked', position: [number, number]): void
   }>()
   
   // Initial board configuration
@@ -70,7 +70,7 @@
   
   defineExpose({
     // Set the state of the board
-    setState: async (state: GameStateGui) => {
+    setState: (state: GameStateGui) => {
       if (state.boardWidth < 2 || state.boardHeight < 2) {
         throw new Error('Minimum board size is 2x2')
       }
@@ -85,19 +85,18 @@
       const newPieceImages = extractImages(state)
       if (JSON.stringify(newPieceImages) != JSON.stringify(pieceImages)) {
         pieceImages = newPieceImages
+        newConfig.mapping = {
+          whitePieces: pieceImages.white.map(([id, _]) => id),
+          blackPieces: pieceImages.black.map(([id, _]) => id),
+        }
         boardUpdateKey.value += 1
       }
       // Convert the state to a chessgroundx Config
       newConfig.turnColor = state.playerToMove == 0 ? 'white' : 'black'
       newConfig.check = state.inCheck
+      newConfig.fen = state.fen
       newConfig.kingRoles = getLeaderIds(state)
       incrementalUpdateConfig(newConfig)
-      // Wait for the board to possibly re-render, then add the pieces
-      await new Promise(resolve => setTimeout(() => {
-        const piecesConfig = {fen: state.fen}
-        incrementalUpdateConfig(piecesConfig)
-        resolve(null)
-      }))
     },
     
     // Define which sides are movable by the user
