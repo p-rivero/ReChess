@@ -75,6 +75,7 @@ const props = defineProps<{
   validator: (text: string) => boolean
   startingPills?: string[]
   onChanged?: (pills: string[]) => void
+  allowRepeat: boolean
 }>()
 
 
@@ -101,7 +102,8 @@ function finishEdit(pill: Pill) {
     callbackOnChanged()
     return
   }
-  if (props.validator(pill.text)) {
+  const repeatError = !props.allowRepeat && pills.value.some((p) => p.text === pill.text && p !== pill)
+  if (!repeatError && props.validator(pill.text)) {
     pill.originalText = pill.text
     pill.error = false
     pill.editing = false

@@ -5,6 +5,7 @@
 <template>
   <PillList :editable="$props.editable" :validator="validator"
             :starting-pills="startingPills"
+            :allow-repeat="$props.allowRepeat"
             :on-changed="onChanged"/>
 </template>
 
@@ -16,6 +17,7 @@
     editable: boolean
     startingCoords?: [number, number][]
     onChanged?: (coords: [number, number][]) => void
+    allowRepeat: boolean
   }>()
   
   const startingPills = props.startingCoords?.map((coord) => pairToCoords(coord))

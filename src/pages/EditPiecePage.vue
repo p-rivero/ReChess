@@ -28,6 +28,7 @@
       </div>
       
       <br>
+      <SmartErrorMessage v-show="hasError" class="error-message" :handler="errorMsgHandler" />
       <button class="button is-primary bottom-button" @click="$router.push({name: 'edit-variant'})">
         <span class="icon">
           <div class="icon icon-check color-white"></div>
@@ -40,6 +41,13 @@
     
     <div class="column">
       <SmartTextInput :multiline="false" class="is-large" placeholder="Piece name" :start-text="piece?.displayName"
+        :error-handler="errorMsgHandler"
+        :error-priority="2"
+        :validator="text => {
+          if (text.length === 0) return 'Please enter the name of this piece'
+          if (text.length > 40) return 'Piece name must be at most 40 characters long'
+          if (text.length < 3) return 'Piece name must be at least 3 characters long'
+        }"
         :on-changed="name => { piece!.displayName = name; draftStore.save() }"/>
       <br>
       <br>
@@ -50,12 +58,20 @@
               :on-changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
             <img v-if="piece?.imageUrls[0]" class="piece-image" alt="White piece" :class="{ invisible: whiteInvisible }"
               :src="piece?.imageUrls[0] ?? ''" />
-              <div v-else class="piece-image" :class="{ invisible: whiteInvisible }">
-                <div class="icon-cross color-black"></div>
-              </div>
+            <div v-else class="piece-image" :class="{ invisible: whiteInvisible }">
+              <div class="icon-cross color-black"></div>
+            </div>
             <button class="icon-edit color-theme transparent-button margin-right-1rem" :class="{ invisible: whiteInvisible }" ></button>
             <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
+              :error-handler="errorMsgHandler"
+              :error-priority="1"
+              :validator="text => {
+                if (whiteInvisible && blackInvisible) return 'This piece should be available to at least 1 player'
+                if (whiteInvisible) return
+                if (text.length === 0) return 'Missing piece symbol for White player'
+                if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
+              }"
               :on-changed="text => { pieceIdWhite = text; piece!.ids[0] = text; draftStore.save() }"/>
           </div>
         </div>
@@ -72,6 +88,12 @@
             <button class="icon-edit color-theme transparent-button margin-right-1rem" :class="{ invisible: blackInvisible }" ></button>
             <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
+              :error-handler="errorMsgHandler"
+              :validator="text => {
+                if (blackInvisible) return
+                if (text.length === 0) return 'Missing piece symbol for Black player'
+                if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
+              }"
               :on-changed="text => { pieceIdBlack = text; piece!.ids[1] = text; draftStore.save() }"/>
           </div>
         </div>
@@ -89,18 +111,22 @@
         <SmartDropdown :items="['No', 'As king', 'As rook']"
           :startItem="piece?.isCastleRook ? 'As rook' : piece?.castleFiles ? 'As king' : 'No'"
           :onChanged="item =>castlingDropdownChanged(item)"/>
-        <div :class="{ invisible: !(piece?.castleFiles) }" style="display: flex; flex-direction: row; align-items: center;">
+        <div v-show="piece?.castleFiles" style="display: flex; flex-direction: row; align-items: center;">
           <div class="field-label-both">
             <label>Queenside file</label>
           </div>
           <SmartTextInput :multiline="false" class="width-3rem" placeholder="c"
             :start-text="numberToLetter(piece?.castleFiles?.[0])"
+            :error-handler="errorMsgHandler"
+            :validator="text => validateCastlingFile(text, 'Queenside')"
             :on-changed="text => { castleFileQueenside = letterToNumber(text); piece!.castleFiles![0] = castleFileQueenside; draftStore.save() }"/>
           <div class="field-label-both">
             <label>Kingside file</label>
           </div>
           <SmartTextInput :multiline="false" class="width-3rem" placeholder="g"
             :start-text="numberToLetter(piece?.castleFiles?.[1])"
+            :error-handler="errorMsgHandler"
+            :validator="text => validateCastlingFile(text, 'Kingside')"
             :on-changed="text => { castleFileKingside = letterToNumber(text); piece!.castleFiles![1] = castleFileKingside; draftStore.save() }"/>
         </div>
       </div>
@@ -122,7 +148,7 @@
       <label class="label">Movement:</label>
       <div style="margin-bottom: 1rem;"> <MovementSlideRow :piece-index="pieceIndex" :type="'move'"/> </div>
       <label>Double jump when standing on:</label>
-      <CoordPillList :editable="true" style="margin-bottom: 1.5rem;"
+      <CoordPillList :editable="true" style="margin-bottom: 1.5rem;" :allow-repeat="false"
         :starting-coords="piece?.doubleJumpSquares"
         :on-changed="coords => {piece!.doubleJumpSquares = coords; draftStore.save()}"/>
         
@@ -131,7 +157,7 @@
       
       <label class="label">Promotion:</label>
       <label>Promote when landing on:</label>
-      <CoordPillList :editable="true"
+      <CoordPillList :editable="true" :allow-repeat="false"
         :starting-coords="piece?.promotionSquares"
         :on-changed="coords => {piece!.promotionSquares = coords; draftStore.save()}"/>
       <br>
@@ -139,14 +165,14 @@
       <div class="columns">
         <div v-if="!whiteInvisible" class="column">
           <label>(White) Promote to:</label>
-          <CharPillList :editable="true"
+          <CharPillList :editable="true" :allow-repeat="false"
             :starting-pills="piece?.promoVals[0]"
             :on-changed="promos => {piece!.promoVals[0] = promos; draftStore.save()}"/>
         </div>
         
         <div v-if="!blackInvisible" class="column">
           <label>(Black) Promote to:</label>
-          <CharPillList :editable="true"
+          <CharPillList :editable="true" :allow-repeat="false"
             :starting-pills="piece?.promoVals[1]"
             :on-changed="promos => {piece!.promoVals[1] = promos; draftStore.save()}"/>
         </div>
@@ -172,6 +198,7 @@
   import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
+  import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import CharPillList from '@/components/EditVariant/CharPillList.vue'
   import CoordPillList from '@/components/EditVariant/CoordPillList.vue'
   import type { PieceDefinition } from '@/protochess/interfaces'
@@ -180,6 +207,7 @@
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { numberToLetter, letterToNumber } from '@/utils/chess-coords'
+  import { ErrorMessageHandler } from '@/utils/ErrorMessageHandler'
   
   const router = useRouter(); 
   const route = useRoute()
@@ -192,6 +220,9 @@
   } else {
     piece = draftStore.state.pieceTypes[pieceIndex]
   }
+  
+  const hasError = ref(false)
+  const errorMsgHandler = new ErrorMessageHandler(hasError)
   
   // Hide a piece if it's current id is null or undefined
   const whiteInvisible = computed(() => piece?.ids[0] == null || piece?.ids[0] === undefined)
@@ -216,7 +247,14 @@
     } else {
       throw new Error('Invalid castling dropdown item')
     }
+    // Clear the possible error message if the castling files were incorrect
+    errorMsgHandler.clear()
     draftStore.save()
+  }
+  function validateCastlingFile(text: string, side: string): string|undefined {
+    if (!piece?.castleFiles) return
+    if (text.length !== 1 || text < 'a' || text > 'p')
+      return `${side} castling file must be a single letter between 'a' and 'p'`
   }
   
   function enabledCheckboxChanged(enabled: boolean, color: 'white'|'black') {
@@ -226,6 +264,8 @@
     if (color === 'white') piece!.ids[0] = id
     else piece!.ids[1] = id
     draftStore.save()
+    // Remove any error message if the piece id was invalid
+    setTimeout(() => errorMsgHandler.clear())
   }
 </script>
 
@@ -241,6 +281,10 @@
   .left-column {
     max-width: 500px;
     margin-right: 2rem;
+  }
+  
+  .error-message {
+    margin-bottom: 1rem;
   }
   
   .field-label {

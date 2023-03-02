@@ -1,4 +1,4 @@
-<template></template>
+<template><div></div></template>
 
 <script setup lang="ts">
   import type { GameState } from '@/protochess/interfaces';
@@ -29,6 +29,12 @@
       }
       if (piece.ids[1] === '') {
         props.errorMsgHandler.show(`Piece ${pieceName(i)} is missing a symbol for Black`, -1)
+        return false
+      }
+      if (hasDuplicateSymbol(i, 0)) return false
+      if (hasDuplicateSymbol(i, 1)) return false
+      if (!piece.ids[0] && !piece.ids[1]) {
+        props.errorMsgHandler.show(`Piece ${pieceName(i)} must be available for at least 1 player`, -1)
         return false
       }
       if (piece.ids[0] && !piece.imageUrls[0]) {
@@ -101,16 +107,39 @@
     if (piece.displayName) {
       return `"${piece.displayName}"`
     }
+    let name = `at position ${index + 1}`
     if (piece.ids[0] && piece.ids[1]) {
-      return `with symbols '${piece.ids[0]}', '${piece.ids[1]}'`
+      name += ` ('${piece.ids[0]}', '${piece.ids[1]}')`
+    } else if (piece.ids[0]) {
+      name += ` ('${piece.ids[0]}')`
+    } else if (piece.ids[1]) {
+      name += ` ('${piece.ids[1]}')`
     }
-    if (piece.ids[0]) return `with symbol '${piece.ids[0]}'`
-    if (piece.ids[1]) return `with symbol '${piece.ids[1]}'`
-    return `at position ${index + 1}`
+    return name
   }
   
   function squareName(square: [number, number]): string {
     return `${String.fromCharCode(square[0] + 97)}${square[1] + 1}`
+  }
+  
+  function hasDuplicateSymbol(i: number, player: number): boolean {
+    const piece = props.state.pieceTypes[i]
+    const playerSym = piece.ids[player]
+    if (!playerSym) return false
+    if (piece.ids[1 - player] === playerSym) {
+      props.errorMsgHandler.show(`Piece ${pieceName(i)} cannot have the same symbol '${playerSym}' for both White and Black`, -1)
+      return true
+    }
+    for (let j = 0; j < i; j++) {
+      const otherPiece = props.state.pieceTypes[j]
+      if (playerSym === otherPiece.ids[0] || playerSym === otherPiece.ids[1]) {
+        const first = Math.min(i, j) + 1
+        const second = Math.max(i, j) + 1
+        props.errorMsgHandler.show(`There are 2 pieces with the symbol '${playerSym}' (positions ${first} and ${second})`, -1)
+        return true
+      }
+    }
+    return false
   }
   
 </script>

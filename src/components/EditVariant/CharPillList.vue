@@ -5,6 +5,7 @@
 <template>
   <PillList :editable="$props.editable" :validator="validator"
             :starting-pills="$props.startingChars"
+            :allow-repeat="$props.allowRepeat"
             :on-changed="$props.onChanged"/>
 </template>
 
@@ -15,6 +16,7 @@
     editable: boolean
     startingChars?: string[]
     onChanged?: (chars: string[]) => void
+    allowRepeat: boolean
   }>()
   
   function validator(str: string) {

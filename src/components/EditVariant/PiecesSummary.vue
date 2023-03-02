@@ -77,7 +77,11 @@
     padding: 0.5rem;
     display: flex;
     flex-direction: row;
-    width: fit-content;
     align-items: center;
+    width: fit-content;
+    max-width: 80%;
+  }
+  .box p {
+    overflow-wrap: anywhere;
   }
 </style>

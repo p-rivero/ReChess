@@ -85,8 +85,8 @@
         :start-text="draftStore.state.variantDisplayName"
         :on-changed="name => { draftStore.state.variantDisplayName = name; draftStore.save() }"
         :validator="(text) => {
+          if (text.length === 0) return 'Please enter the name of this variant'
           if (text.length > 50) return 'Variant name must be at most 50 characters long'
-          if (text.length === 0) return 'Please enter the name of your variant'
           if (text.length < 3) return 'Variant name must be at least 3 characters long'
         }"
         :error-handler="errorMsgHandler"/>

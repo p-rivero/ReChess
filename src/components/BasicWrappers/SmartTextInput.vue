@@ -29,9 +29,14 @@
   }>()
   
   if (props.validator) {
-    if (!props.errorHandler) throw new Error('Must provide SmartErrorMessage ref if validator is provided')
+    if (!props.errorHandler) throw new Error('If a validator is provided, must also provide an ErrorMessageHandler')
     const errorHandlerUser: ErrorHandlerUser = {
-      refresh: () => props.validator?.(textInput.value?.value ?? ''),
+      refresh: () => {
+        const errorMsg = props.validator?.(textInput.value?.value ?? '')
+        if (errorMsg) isError.value = true
+        else isError.value = false
+        return errorMsg
+      },
       priority: props.errorPriority ?? 0,
     }
     props.errorHandler.register(errorHandlerUser)

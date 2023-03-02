@@ -30,6 +30,8 @@ do
     echo "    mask-repeat: no-repeat;" >> $DIR/icons.scss
     echo "    width: 100%;" >> $DIR/icons.scss
     echo "    height: 100%;" >> $DIR/icons.scss
+    echo "    -webkit-mask-position: center;" >> $DIR/icons.scss
+    echo "    mask-position: center;" >> $DIR/icons.scss
     echo "}" >> $DIR/icons.scss
     echo "" >> $DIR/icons.scss
 done
