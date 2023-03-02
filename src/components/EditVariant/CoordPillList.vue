@@ -6,7 +6,7 @@
   <PillList :editable="$props.editable" :validator="validator"
             :starting-pills="startingPills"
             :allow-repeat="$props.allowRepeat"
-            :on-changed="onChanged"/>
+            @changed="onChanged"/>
 </template>
 
 <script setup lang="ts">
@@ -16,8 +16,11 @@
   const props = defineProps<{
     editable: boolean
     startingCoords?: [number, number][]
-    onChanged?: (coords: [number, number][]) => void
     allowRepeat: boolean
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'changed', coords: [number, number][]): void
   }>()
   
   const startingPills = props.startingCoords?.map((coord) => pairToCoords(coord))
@@ -28,6 +31,6 @@
   
   function onChanged(pills: string[]) {
     const coords = pills.map((pill) => coordsToPair(pill))
-    props.onChanged?.(coords)
+    emit('changed', coords)
   }
 </script>

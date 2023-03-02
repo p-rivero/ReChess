@@ -13,7 +13,7 @@
     :white-pov=whitePov
     :initial-config=currentBoardConfig
     :piece-images="pieceImages"
-    :after-mount="$props.afterMount"
+    @mounted="emit('mounted')"
     
     :key="boardUpdateKey"
     ref="board"
@@ -33,7 +33,10 @@
     whitePov: boolean
     viewOnly: boolean
     showCoordinates: boolean
-    afterMount?: () => void
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'mounted'): void
   }>()
   
   // Initial board configuration

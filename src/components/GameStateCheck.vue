@@ -10,9 +10,14 @@
     errorMsgHandler: ErrorMessageHandler
   }>()
 
-  console.log('GameStateCheck')
-  if (checkPieces()) {
-    checkProtochess()
+  // Start async function
+  check()
+  
+  async function check() {
+    if (!checkPieces()) return
+    if (!await checkProtochess()) return
+    // Clear the error message and enable the publish button
+    props.errorMsgHandler.clear()
   }
   
   
@@ -97,7 +102,6 @@
       props.errorMsgHandler.show(`Illegal starting position: ${e}`, -1)
       return false
     }
-    props.errorMsgHandler.clear()
     return true
   }
   

@@ -16,7 +16,10 @@
   const props = defineProps<{
     items: string[],
     startItem: string,
-    onChanged?: (item: string) => void
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'changed', item: string): void
   }>()
   
   onMounted(() => {
@@ -28,6 +31,6 @@
   function selectChanged(dropdown: EventTarget | null) {
     if (!dropdown) throw new Error('Dropdown event target is null')
     const item = (dropdown as HTMLInputElement).value
-    props.onChanged?.(item)
+    emit('changed', item)
   }
 </script>

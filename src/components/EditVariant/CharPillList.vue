@@ -6,7 +6,7 @@
   <PillList :editable="$props.editable" :validator="validator"
             :starting-pills="$props.startingChars"
             :allow-repeat="$props.allowRepeat"
-            :on-changed="$props.onChanged"/>
+            @changed="pills => emit('changed', pills)"/>
 </template>
 
 <script setup lang="ts">
@@ -15,9 +15,13 @@
   defineProps<{
     editable: boolean
     startingChars?: string[]
-    onChanged?: (chars: string[]) => void
     allowRepeat: boolean
   }>()
+  
+  const emit = defineEmits<{
+    (event: 'changed', chars: string[]): void
+  }>()
+  
   
   function validator(str: string) {
     // Use [...str] because str.length counts the number of UTF-16 code units,

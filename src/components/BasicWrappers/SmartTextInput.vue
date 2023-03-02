@@ -22,10 +22,13 @@
     multiline: boolean,
     placeholder?: string,
     startText?: string,
-    onChanged?: (text: string) => void
     validator? : (text: string) => string | undefined
     errorHandler?: ErrorMessageHandler
     errorPriority?: number
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'changed', text: string): void
   }>()
   
   if (props.validator) {
@@ -54,7 +57,7 @@
     let text = textInput.value.value
     
     if (validate(text)) {
-      props.onChanged?.(text)
+      emit('changed', text)
     }
   }
   

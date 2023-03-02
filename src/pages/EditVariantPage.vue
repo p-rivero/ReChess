@@ -9,18 +9,18 @@
       
       <div class="board-container">
         <ViewableChessBoard ref="board" :size="500" :white-pov="true" :view-only="false" :show-coordinates="true"
-          :key="stateKey" :after-mount="updateBoard"/>
+          :key="stateKey" @mounted="updateBoard"/>
       </div>
       
       <div class="horizontal-field">
         <div class="field-label"><label>Board size:</label></div>
         <SmartNumberInput class="width-5rem" :min="2" :max="16" :default="8"
           :start-value="draftStore.state.boardHeight"
-          :on-changed="height => { draftStore.state.boardHeight = height; draftStore.save() }"/>
+          @changed="height => { draftStore.state.boardHeight = height; draftStore.save() }"/>
         <div class="field-label-both"><label>x</label></div>
         <SmartNumberInput class="width-5rem" :min="2" :max="16" :default="8"
           :start-value="draftStore.state.boardWidth"
-          :on-changed="width => { draftStore.state.boardWidth = width; draftStore.save() }"/>
+          @changed="width => { draftStore.state.boardWidth = width; draftStore.save() }"/>
       </div>
       
       <div class="horizontal-field">
@@ -30,7 +30,7 @@
         <div class="field-body">
           <SmartDropdown :items="['White', 'Black']"
             :start-item="draftStore.state.playerToMove === 0 ? 'White' : 'Black'"
-            :on-changed="item => { draftStore.state.playerToMove = item === 'White' ? 0 : 1; draftStore.save() }"/>
+            @changed="item => { draftStore.state.playerToMove = item === 'White' ? 0 : 1; draftStore.save() }"/>
         </div>
       </div>
       
@@ -83,7 +83,7 @@
     <div class="column">
       <SmartTextInput :multiline="false" class="is-large" placeholder="Variant name"
         :start-text="draftStore.state.variantDisplayName"
-        :on-changed="name => { draftStore.state.variantDisplayName = name; draftStore.save() }"
+        @changed="name => { draftStore.state.variantDisplayName = name; draftStore.save() }"
         :validator="(text) => {
           if (text.length === 0) return 'Please enter the name of this variant'
           if (text.length > 50) return 'Variant name must be at most 50 characters long'
@@ -94,7 +94,7 @@
       <br>
       <SmartTextInput :multiline="true" placeholder="Describe the rules of the variant and how fun it is to play!"
         :start-text="draftStore.state.variantDescription"
-        :on-changed="text => { draftStore.state.variantDescription = text; draftStore.save() }"
+        @changed="text => { draftStore.state.variantDescription = text; draftStore.save() }"
         :validator="(text) => {if (text.length > 500) return 'Variant description must be at most 500 characters long'}"
         :error-handler="errorMsgHandler"/>
       <br>
@@ -104,21 +104,21 @@
         <div class="column is-narrow left-column">
           <SmartCheckbox text="Capturing is forced" class="rules-field"
             :start-value="draftStore.state.globalRules.capturingIsForced"
-            :on-changed="value => { draftStore.state.globalRules.capturingIsForced = value; draftStore.save() }"/>
+            @changed="value => { draftStore.state.globalRules.capturingIsForced = value; draftStore.save() }"/>
           <br>
           <SmartCheckbox text="Check is forbidden" class="rules-field"
             :start-value="draftStore.state.globalRules.checkIsForbidden"
-            :on-changed="value => { draftStore.state.globalRules.checkIsForbidden = value; draftStore.save() }"/>
+            @changed="value => { draftStore.state.globalRules.checkIsForbidden = value; draftStore.save() }"/>
         </div>
         
         <div class="column">
           <SmartCheckbox text="Stalemated player loses" class="rules-field"
             :start-value="draftStore.state.globalRules.stalematedPlayerLoses"
-            :on-changed="value => { draftStore.state.globalRules.stalematedPlayerLoses = value; draftStore.save() }"/>
+            @changed="value => { draftStore.state.globalRules.stalematedPlayerLoses = value; draftStore.save() }"/>
           <br>
           <SmartCheckbox text="Invert ALL win conditions" class="rules-field"
             :start-value="draftStore.state.globalRules.invertWinConditions"
-            :on-changed="value => { draftStore.state.globalRules.invertWinConditions = value; draftStore.save() }"/>
+            @changed="value => { draftStore.state.globalRules.invertWinConditions = value; draftStore.save() }"/>
         </div>
       </div>
       <div class="horizontal-field">
@@ -127,7 +127,7 @@
         </div>
         <SmartNumberInput class="width-5rem" :min="0" :max="200" :default="3"
           :start-value="draftStore.state.globalRules.repetitionsDraw"
-          :on-changed="value => { draftStore.state.globalRules.repetitionsDraw = value; draftStore.save() }"/>
+          @changed="value => { draftStore.state.globalRules.repetitionsDraw = value; draftStore.save() }"/>
       </div>
       <div class="horizontal-field">
         <div class="field-label">
@@ -135,7 +135,7 @@
         </div>
         <SmartNumberInput class="width-5rem" :min="0" :max="200" :default="0" placeholder="-"
           :start-value="draftStore.state.globalRules.checksToLose"
-          :on-changed="value => { draftStore.state.globalRules.checksToLose = value; draftStore.save() }"/>
+          @changed="value => { draftStore.state.globalRules.checksToLose = value; draftStore.save() }"/>
         
         <div class="field-label-right">
           <label>times</label>
@@ -146,16 +146,16 @@
       <PiecesSummary 
         :editable="true"
         :state="draftStore.state"
-        :on-edit-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
-        :on-delete-click="pieceIndex => deletePiece(pieceIndex)"
-        :on-new-click="createNewPiece" />
+        @edit-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
+        @delete-click="pieceIndex => deletePiece(pieceIndex)"
+        @new-click="createNewPiece" />
       
       <!-- TODO: Invalid squares -->
       
       <label class="label" style="margin-top: 2rem;">TEMPORARY FOR DEMO:</label>
       <SmartTextInput :multiline="false" placeholder="(Temp) FEN string" class="rules-field" :key="stateKey"
         :start-text="placementsToFen(draftStore.state)"
-        :on-changed="text => { draftStore.state.pieces = fenToPlacements(text); draftStore.save() }"/>
+        @changed="text => { draftStore.state.pieces = fenToPlacements(text); draftStore.save() }"/>
     </div>
   </div>
   <GameStateCheck :state="draftStore.state" :error-msg-handler="errorMsgHandler" :key="stateKey" />
@@ -183,7 +183,7 @@
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const stateKey = computed(() => JSON.stringify(draftStore.state))
   
-  const hasError = ref(false)
+  const hasError = ref(true)
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
   async function updateBoard() {

@@ -14,7 +14,10 @@
   const props = defineProps<{
     text: string
     startValue?: boolean
-    onChanged?: (value: boolean) => void
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'changed', value: boolean): void
   }>()
   
   onMounted(() => {
@@ -25,7 +28,7 @@
   function checkboxChanged(checkbox: EventTarget | null) {
     if (!checkbox) throw new Error('Checkbox event target is null')
     const checked = (checkbox as HTMLInputElement).checked
-    props.onChanged?.(checked)
+    emit('changed', checked)
   }
 </script>
 

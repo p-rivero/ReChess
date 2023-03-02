@@ -18,7 +18,10 @@
     max?: number,
     default: number,
     startValue: number,
-    onChanged?: (value: number) => void
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'changed', value: number): void
   }>()
   
   const placeholder = props.placeholder || props.default.toString()
@@ -35,7 +38,7 @@
     if (!input) throw new Error('Number input event target is null')
     const valueStr = (input as HTMLInputElement).value
     const value = parseInt(valueStr)
-    props.onChanged?.(normalizeValue(value))
+    emit('changed', normalizeValue(value))
   }
   
   function onBlur(input: EventTarget | null) {

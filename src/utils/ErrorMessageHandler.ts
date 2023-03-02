@@ -43,10 +43,8 @@ export class ErrorMessageHandler {
   // Clear the error message, poll all users for a new error message
   clear() {
     this.currentPriority = NaN
-    console.log('clear')
     for (const user of this.messageUsers) {
       const refreshResult = user.refresh()
-      console.log('refreshResult', refreshResult)
       if (refreshResult) {
         this.show(refreshResult, user.priority)
         return

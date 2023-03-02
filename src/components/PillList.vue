@@ -67,101 +67,104 @@ function stringsToPills(list: string[]): Pill[] {
 
 
 <script setup lang="ts">
-import { ref } from "vue"
+  import { ref } from "vue"
 
 
-const props = defineProps<{
-  editable: boolean
-  validator: (text: string) => boolean
-  startingPills?: string[]
-  onChanged?: (pills: string[]) => void
-  allowRepeat: boolean
-}>()
+  const props = defineProps<{
+    editable: boolean
+    validator: (text: string) => boolean
+    startingPills?: string[]
+    allowRepeat: boolean
+  }>()
+
+  const emit = defineEmits<{
+    (event: 'changed', pills: string[]): void
+  }>()
 
 
-const pills = ref<Pill[]>(stringsToPills(props.startingPills ?? []))
-const pillInput = ref<HTMLInputElement[]>()
+  const pills = ref<Pill[]>(stringsToPills(props.startingPills ?? []))
+  const pillInput = ref<HTMLInputElement[]>()
 
-function onPillClick(pill: Pill) {
-  if (!props.editable) return
-  if (pill.editing) return
-  // Signal that the pill is being edited
-  pill.editing = true
-  focusPillInput()
-}
-
-function onPillInput(pill: Pill, event: Event) {
-  const input = event.target as HTMLInputElement
-  pill.text = input.value
-}
-
-function finishEdit(pill: Pill) {
-  // If the pill is empty, don't call the validator and remove it
-  if (pill.text === '') {
-    removePill(pill)
-    callbackOnChanged()
-    return
+  function onPillClick(pill: Pill) {
+    if (!props.editable) return
+    if (pill.editing) return
+    // Signal that the pill is being edited
+    pill.editing = true
+    focusPillInput()
   }
-  const repeatError = !props.allowRepeat && pills.value.some((p) => p.text === pill.text && p !== pill)
-  if (!repeatError && props.validator(pill.text)) {
-    pill.originalText = pill.text
-    pill.error = false
-    pill.editing = false
-    callbackOnChanged()
-  } else {
-    if (!pill.error) {
-      // First attempt: show error, re-focus input
-      pill.error = true
-      focusPillInput()
-    } else {
-      // Second attempt: revert to original text, stop editing
-      pill.text = pill.originalText
+
+  function onPillInput(pill: Pill, event: Event) {
+    const input = event.target as HTMLInputElement
+    pill.text = input.value
+  }
+
+  function finishEdit(pill: Pill) {
+    // If the pill is empty, don't call the validator and remove it
+    if (pill.text === '') {
+      removePill(pill)
+      callbackOnChanged()
+      return
+    }
+    const repeatError = !props.allowRepeat && pills.value.some((p) => p.text === pill.text && p !== pill)
+    if (!repeatError && props.validator(pill.text)) {
+      pill.originalText = pill.text
       pill.error = false
       pill.editing = false
-      // Pill was just created and the user entered invalid text
-      if (pill.originalText === '') removePill(pill)
+      callbackOnChanged()
+    } else {
+      if (!pill.error) {
+        // First attempt: show error, re-focus input
+        pill.error = true
+        focusPillInput()
+      } else {
+        // Second attempt: revert to original text, stop editing
+        pill.text = pill.originalText
+        pill.error = false
+        pill.editing = false
+        // Pill was just created and the user entered invalid text
+        if (pill.originalText === '') removePill(pill)
+      }
     }
   }
-}
 
-function cancelEdit(pill: Pill) {
-  pill.text = pill.originalText
-  pill.error = false
-  pill.editing = false
-}
-
-function removePill(pill: Pill) {
-  const index = pills.value.indexOf(pill)
-  // Pill may already have been removed (e.g. pressing enter can also trigger blur)
-  if (index === -1) return
-  pills.value.splice(index, 1)
-  callbackOnChanged()
-}
-
-function onAddPillClick() {
-  const pill: Pill = {
-    text: "",
-    editing: true,
-    error: false,
-    originalText: "",
+  function cancelEdit(pill: Pill) {
+    pill.text = pill.originalText
+    pill.error = false
+    pill.editing = false
   }
-  pills.value.push(pill)
-  focusPillInput()
-}
 
-function focusPillInput() {
-  // Wait for the DOM to update, then focus the input
-  setTimeout(() => {
-    // Pill may have been removed by clicking the delete button
-    if (pillInput.value === undefined) return
-    if (pillInput.value.length === 0) return
-    pillInput.value[pillInput.value.length-1].focus()
-  })
-}
+  function removePill(pill: Pill) {
+    const index = pills.value.indexOf(pill)
+    // Pill may already have been removed (e.g. pressing enter can also trigger blur)
+    if (index === -1) return
+    pills.value.splice(index, 1)
+    callbackOnChanged()
+  }
 
-function callbackOnChanged() {
-  props.onChanged?.(pills.value.map((pill) => pill.text))
-}
+  function onAddPillClick() {
+    const pill: Pill = {
+      text: "",
+      editing: true,
+      error: false,
+      originalText: "",
+    }
+    pills.value.push(pill)
+    focusPillInput()
+  }
+
+  function focusPillInput() {
+    // Wait for the DOM to update, then focus the input
+    setTimeout(() => {
+      // Pill may have been removed by clicking the delete button
+      if (pillInput.value === undefined) return
+      if (pillInput.value.length === 0) return
+      pillInput.value[pillInput.value.length-1].focus()
+    })
+  }
+
+  function callbackOnChanged() {
+    emit('changed', pills.value.map((pill) => pill.text))
+  }
 
 </script>
 

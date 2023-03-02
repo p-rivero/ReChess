@@ -48,14 +48,14 @@
           if (text.length > 40) return 'Piece name must be at most 40 characters long'
           if (text.length < 3) return 'Piece name must be at least 3 characters long'
         }"
-        :on-changed="name => { piece!.displayName = name; draftStore.save() }"/>
+        @changed="name => { piece!.displayName = name; draftStore.save() }"/>
       <br>
       <br>
       <div class="columns">
         <div class="column">
           <div class="horizontal-field">
             <SmartCheckbox text="White" class="margin-right-1rem" :start-value="!whiteInvisible"
-              :on-changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
+              @changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
             <img v-if="piece?.imageUrls[0]" class="piece-image" alt="White piece" :class="{ invisible: whiteInvisible }"
               :src="piece?.imageUrls[0] ?? ''" />
             <div v-else class="piece-image" :class="{ invisible: whiteInvisible }">
@@ -72,14 +72,14 @@
                 if (text.length === 0) return 'Missing piece symbol for White player'
                 if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
               }"
-              :on-changed="text => { pieceIdWhite = text; piece!.ids[0] = text; draftStore.save() }"/>
+              @changed="text => { pieceIdWhite = text; piece!.ids[0] = text; draftStore.save() }"/>
           </div>
         </div>
         
         <div class="column">
           <div class="horizontal-field">
             <SmartCheckbox text="Black" class="margin-right-1rem" :start-value="!blackInvisible"
-              :on-changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
+              @changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
             <img v-if="piece?.imageUrls[1]" class="piece-image" alt="Black piece" :class="{ invisible: blackInvisible }"
               :src="piece?.imageUrls[1] ?? ''" />
             <div v-else class="piece-image" :class="{ invisible: blackInvisible }">
@@ -94,7 +94,7 @@
                 if (text.length === 0) return 'Missing piece symbol for Black player'
                 if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
               }"
-              :on-changed="text => { pieceIdBlack = text; piece!.ids[1] = text; draftStore.save() }"/>
+              @changed="text => { pieceIdBlack = text; piece!.ids[1] = text; draftStore.save() }"/>
           </div>
         </div>
       </div>
@@ -102,7 +102,7 @@
       <label class="label">Behavior:</label>
       <SmartCheckbox text="Leader" class="rules-field"
         :startValue="piece?.isLeader"
-        :onChanged="value => { piece!.isLeader = value; draftStore.save() }"/>
+        @changed="value => { piece!.isLeader = value; draftStore.save() }"/>
       
       <div class="horizontal-field">
         <div class="field-label">
@@ -119,7 +119,7 @@
             :start-text="numberToLetter(piece?.castleFiles?.[0])"
             :error-handler="errorMsgHandler"
             :validator="text => validateCastlingFile(text, 'Queenside')"
-            :on-changed="text => { castleFileQueenside = letterToNumber(text); piece!.castleFiles![0] = castleFileQueenside; draftStore.save() }"/>
+            @changed="text => { castleFileQueenside = letterToNumber(text); piece!.castleFiles![0] = castleFileQueenside; draftStore.save() }"/>
           <div class="field-label-both">
             <label>Kingside file</label>
           </div>
@@ -127,7 +127,7 @@
             :start-text="numberToLetter(piece?.castleFiles?.[1])"
             :error-handler="errorMsgHandler"
             :validator="text => validateCastlingFile(text, 'Kingside')"
-            :on-changed="text => { castleFileKingside = letterToNumber(text); piece!.castleFiles![1] = castleFileKingside; draftStore.save() }"/>
+            @changed="text => { castleFileKingside = letterToNumber(text); piece!.castleFiles![1] = castleFileKingside; draftStore.save() }"/>
         </div>
       </div>
       
@@ -135,12 +135,12 @@
         <div class="column ">
           <SmartCheckbox text="Explode when capturing" class="rules-field"
             :startValue="piece?.explodes"
-            :onChanged="value => { piece!.explodes = value; draftStore.save() }"/>
+            @changed="value => { piece!.explodes = value; draftStore.save() }"/>
         </div>
         <div class="column">
           <SmartCheckbox text="Immune to other explosions" class="rules-field"
             :startValue="piece?.immuneToExplosion"
-            :onChanged="value => { piece!.immuneToExplosion = value; draftStore.save() }"/>
+            @changed="value => { piece!.immuneToExplosion = value; draftStore.save() }"/>
         </div>
       </div>
       <br>
@@ -150,7 +150,7 @@
       <label>Double jump when standing on:</label>
       <CoordPillList :editable="true" style="margin-bottom: 1.5rem;" :allow-repeat="false"
         :starting-coords="piece?.doubleJumpSquares"
-        :on-changed="coords => {piece!.doubleJumpSquares = coords; draftStore.save()}"/>
+        @changed="coords => {piece!.doubleJumpSquares = coords; draftStore.save()}"/>
         
       <label class="label">Capture:</label>
       <div style="margin-bottom: 1.5rem;"> <MovementSlideRow :piece-index="pieceIndex" :type="'capture'"/> </div>
@@ -159,7 +159,7 @@
       <label>Promote when landing on:</label>
       <CoordPillList :editable="true" :allow-repeat="false"
         :starting-coords="piece?.promotionSquares"
-        :on-changed="coords => {piece!.promotionSquares = coords; draftStore.save()}"/>
+        @changed="coords => {piece!.promotionSquares = coords; draftStore.save()}"/>
       <br>
         
       <div class="columns">
@@ -167,14 +167,14 @@
           <label>(White) Promote to:</label>
           <CharPillList :editable="true" :allow-repeat="false"
             :starting-pills="piece?.promoVals[0]"
-            :on-changed="promos => {piece!.promoVals[0] = promos; draftStore.save()}"/>
+            @changed="promos => {piece!.promoVals[0] = promos; draftStore.save()}"/>
         </div>
         
         <div v-if="!blackInvisible" class="column">
           <label>(Black) Promote to:</label>
           <CharPillList :editable="true" :allow-repeat="false"
             :starting-pills="piece?.promoVals[1]"
-            :on-changed="promos => {piece!.promoVals[1] = promos; draftStore.save()}"/>
+            @changed="promos => {piece!.promoVals[1] = promos; draftStore.save()}"/>
         </div>
       </div>
       
@@ -182,10 +182,10 @@
       <label class="label">TEMPORARY FOR DEMO:</label>
       <SmartTextInput :multiline="false" placeholder="(Temp) URL for white piece image" class="rules-field"
         :start-text="piece?.imageUrls[0] ?? undefined"
-        :on-changed="text => { piece!.imageUrls[0] = text; draftStore.save() }"/>
+        @changed="text => { piece!.imageUrls[0] = text; draftStore.save() }"/>
       <SmartTextInput :multiline="false" placeholder="(Temp) URL for black piece image" class="rules-field"
         :start-text="piece?.imageUrls[1] ?? undefined"
-        :on-changed="text => { piece!.imageUrls[1] = text; draftStore.save() }"/>
+        @changed="text => { piece!.imageUrls[1] = text; draftStore.save() }"/>
       
     </div>
   </div>

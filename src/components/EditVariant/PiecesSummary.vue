@@ -1,8 +1,8 @@
 <template>
   <div v-for="(piece, pieceIndex) in props.state.pieceTypes" class="piece-container" :key="pieceIndex">
     <div v-if="editable">
-      <button class="button icon-edit color-theme transparent-button margin-right-1rem" @click="onEditClick(pieceIndex)"></button>
-      <button class="button icon-trash color-theme transparent-button margin-right-1rem" @click="onDeleteClick(pieceIndex)"></button>
+      <button class="button icon-edit color-theme transparent-button margin-right-1rem" @click="emit('edit-click', pieceIndex)"></button>
+      <button class="button icon-trash color-theme transparent-button margin-right-1rem" @click="emit('delete-click', pieceIndex)"></button>
     </div>
     <div class="box">
       <img v-if="piece.ids[0] != null && piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="piece-image">
@@ -18,7 +18,7 @@
     </div>
   </div>
   <br>
-  <button class="button" @click="onNewClick">
+  <button class="button" @click="emit('new-click')">
     <span class="icon">
       <div class="icon-add color-black icon"></div>
     </span>
@@ -32,9 +32,12 @@
   const props = defineProps<{
     editable: boolean
     state: GameState
-    onEditClick: (pieceIndex: number) => void
-    onDeleteClick: (pieceIndex: number) => void
-    onNewClick: () => void
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'edit-click', pieceIndex: number): void
+    (event: 'delete-click', pieceIndex: number): void
+    (event: 'new-click'): void
   }>()
   
 </script>
