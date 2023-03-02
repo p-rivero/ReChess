@@ -4,15 +4,15 @@
       <img
         class="button piece-button"
         :src="piece.url"
-        :class="{'is-primary': selectedIndex === index}"
-        @click="onPieceClick(index)"/>
+        :class="{'is-primary': selectedId === piece.id}"
+        @click="onPieceClick(piece.id)"/>
     </div>
     <div class="control">
-      <button class="button piece-button" :class="{'is-primary': selectedIndex === 'delete'}" :style="{zIndex}" @click="onDeleteClick()">
+      <button class="button piece-button" :class="{'is-primary': selectedId === 'delete'}" :style="{zIndex}" @click="onDeleteClick()">
         <span class="icon-trash"
         :class="{
-          'color-black': selectedIndex !== 'delete',
-          'color-white': selectedIndex === 'delete',
+          'color-black': selectedId !== 'delete',
+          'color-white': selectedId === 'delete',
         }"></span>
       </button>
     </div>
@@ -23,7 +23,7 @@
   import type { GameState } from '@/protochess/interfaces'
   import { ref } from 'vue'
   
-  const selectedIndex = ref<number|'delete'|'none'>('none')
+  const selectedId = ref<string|'delete'|'none'>('none')
     
   const props = defineProps<{
     state: GameState
@@ -31,9 +31,16 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'piece-selected', piece: number|'delete'): void
+    (event: 'piece-selected', piece: string|'delete'): void
     (event: 'piece-deselected'): void
   }>()
+  
+  defineExpose({
+    cancelPlacement: () => {
+      selectedId.value = 'none'
+      emit('piece-deselected')
+    },
+  })
   
   // Extract the id and url from the piece definition
   let pieceList: {id: string, url: string}[] = []
@@ -56,21 +63,21 @@
     }
   }
   
-  function onPieceClick(index: number) {
-    if (selectedIndex.value === index) {
-      selectedIndex.value = 'none'
+  function onPieceClick(id: string) {
+    if (selectedId.value === id) {
+      selectedId.value = 'none'
       emit('piece-deselected')
     } else {
-      selectedIndex.value = index
-      emit('piece-selected', index)
+      selectedId.value = id
+      emit('piece-selected', id)
     }
   }
   function onDeleteClick() {
-    if (selectedIndex.value === 'delete') {
-      selectedIndex.value = 'none'
+    if (selectedId.value === 'delete') {
+      selectedId.value = 'none'
       emit('piece-deselected')
     } else {
-      selectedIndex.value = 'delete'
+      selectedId.value = 'delete'
       emit('piece-selected', 'delete')
     }
   }

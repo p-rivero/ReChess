@@ -24,9 +24,8 @@
         <a class="navbar-item" href="/">
           <img src="@/assets/img/logo.svg" alt="ReChess: Chess reinvented by you">
         </a>
-        <a class="navbar-item" href="/">
-          Home
-        </a>
+        <a class="navbar-item" href="/">Browse</a>
+        <a class="navbar-item" href="/edit">Create</a>
       </div>
       <div class="navbar-end">
         <div class="navbar-item only-when-big">

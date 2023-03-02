@@ -37,10 +37,12 @@
       
       <div class="field">
         <label class="label">Place piece:</label>
-        <PiecePlacementButtons :z-index="11" :state="draftStore.state" :key="JSON.stringify(draftStore.state.pieceTypes)"
-          @piece-selected="index => selectedPieceIndex = index"
-          @piece-deselected="selectedPieceIndex = 'none'"/>
+        <PiecePlacementButtons ref="pieceSelector" :z-index="11" :state="draftStore.state"
+        :key="JSON.stringify(draftStore.state.pieceTypes)"
+          @piece-selected="id => selectedPieceId = id"
+          @piece-deselected="selectedPieceId = 'none'"/>
       </div>
+      <br>
       
       <SmartErrorMessage v-show="hasError" class="error-message" :handler="errorMsgHandler" />
       <button class="button bottom-button" @click="$router.push({name: 'analysis'})" :disabled="hasError">
@@ -154,15 +156,10 @@
         @new-click="createNewPiece" />
       
       <!-- TODO: Invalid squares -->
-      
-      <label class="label" style="margin-top: 2rem;">TEMPORARY FOR DEMO:</label>
-      <SmartTextInput :multiline="false" placeholder="(Temp) FEN string" class="rules-field" :key="JSON.stringify(draftStore.state.pieces)"
-        :start-text="placementsToFen(draftStore.state)"
-        @changed="text => { draftStore.state.pieces = fenToPlacements(text); draftStore.save() }"/>
     </div>
   </div>
   
-  <PopupOverlay v-if="selectedPieceIndex !== 'none'" :z-index="10" />
+  <PopupOverlay v-if="selectedPieceId !== 'none'" :z-index="10" @click="pieceSelector?.cancelPlacement()" />
 </template>
 
 
@@ -190,7 +187,8 @@
   const hasError = ref(true)
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
-  const selectedPieceIndex = ref<number|'delete'|'none'>('none')
+  const pieceSelector = ref<InstanceType<typeof PiecePlacementButtons>>()
+  const selectedPieceId = ref<string|'delete'|'none'>('none')
   
   // When state changes, update the board and run a state check
   watch(draftStore.state, () => {
@@ -216,18 +214,22 @@
   }
   
   function placePiece(coords: [number, number]) {
-    if (selectedPieceIndex.value === 'none') return
-    // Remove old placement
-    draftStore.state.pieces = draftStore.state.pieces.filter(piece => piece.x !== coords[0] || piece.y !== coords[1])
-    if (selectedPieceIndex.value !== 'delete') {
-      // Get id of selected piece
-      const id = 'd'
+    if (selectedPieceId.value === 'none') return
+    // Get index of the existing placement at this coordinate, if any
+    const existingIndex = draftStore.state.pieces.findIndex(piece => piece.x === coords[0] && piece.y === coords[1])
+    // If the piece is already placed here, do nothing
+    if (existingIndex !== -1 && draftStore.state.pieces[existingIndex].pieceId === selectedPieceId.value) return
+    // Remove old placement, if any
+    if (existingIndex !== -1) draftStore.state.pieces.splice(existingIndex, 1)
+    // Add new placement, unless the "delete" button is selected
+    if (selectedPieceId.value !== 'delete') {
       draftStore.state.pieces.push({
         x: coords[0],
         y: coords[1],
-        pieceId: id,
+        pieceId: selectedPieceId.value,
       })
     }
+    draftStore.save()
   }
   
   async function uploadFile() {
@@ -301,6 +303,6 @@
 
 <style>
   cg-board {
-    cursor: v-bind("selectedPieceIndex === 'none' ? 'default' : 'pointer'");
+    cursor: v-bind("selectedPieceId === 'none' ? 'default' : 'pointer'");
   }
 </style>

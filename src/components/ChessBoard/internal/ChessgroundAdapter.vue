@@ -7,7 +7,9 @@
 
 <template>
   <div class="chessboard">
-    <div ref="board" class="cg-board-wrap" @click="e => onClick(e)"></div>
+    <div ref="board" class="cg-board-wrap"
+      @click="e => onClick(e)"
+      @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseout="endDrag"></div>
   </div>
 </template>
 
@@ -91,6 +93,22 @@
     const coords: cg.NumberPair = [e.clientX, e.clientY]
     let key = chessgroundApi.getKeyAtDomPos(coords)
     if (key) emit('clicked', key)
+  }
+  
+  let isDragging = false
+  let canDragAgain = true
+  function startDrag() {
+    isDragging = true
+  }
+  function onDrag(e: MouseEvent) {
+    if (isDragging && canDragAgain) {
+      canDragAgain = false
+      onClick(e)
+      setTimeout(() => canDragAgain = true, 10)
+    }
+  }
+  function endDrag(e: Event) {
+    isDragging = false
   }
   
 </script>
