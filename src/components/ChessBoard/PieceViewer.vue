@@ -1,7 +1,7 @@
 <template>
   <ChessgroundAdapter
-    :width="WIDTH"
-    :height="HEIGHT"
+    :width="props.width"
+    :height="props.height"
     :size="props.size"
     :white-pov="true"
     :view-only="true"
@@ -26,6 +26,9 @@
   const props = defineProps<{
     size: number
     piece: PieceDefinition
+    width: number
+    height: number
+    position: 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   }>()
   
   const emit = defineEmits<{
@@ -34,11 +37,21 @@
   
   const image = props.piece.imageUrls[0] || props.piece.imageUrls[1] || ''
   const board = ref<InstanceType<typeof ChessgroundAdapter>>()
-    
-  const WIDTH = 7
-  const HEIGHT = 7
   
-  const PIECE_COORDS: [number, number] = [Math.floor(WIDTH/2), Math.floor(HEIGHT/2)]
+  let piece_coords: [number, number] 
+  if (props.position === 'center') {
+    piece_coords = [Math.floor(props.width/2), Math.floor(props.height/2)]
+  } else if (props.position === 'top-left') {
+    piece_coords = [0, props.height-1]
+  } else if (props.position === 'top-right') {
+    piece_coords = [props.width-1, props.height-1]
+  } else if (props.position === 'bottom-left') {
+    piece_coords = [0, 0]
+  } else if (props.position === 'bottom-right') {
+    piece_coords = [props.width-1, 0]
+  }
+  
+  
   const boardConfig: Config = {
     mapping: {
       whitePieces: ['P'],
@@ -50,28 +63,28 @@
     blockTouchScroll: true,
     coordinates: false,
     dimensions: {
-      width: WIDTH, 
-      height: HEIGHT,
+      width: props.width, 
+      height: props.height,
     },
     drawable: {
       brushes: {
         purple: {
           key: 'purple',
           color: 'purple',
-          opacity: 0.8,
-          lineWidth: 20,
+          opacity: 0.7,
+          lineWidth: 15,
         },
         green: {
           key: 'green',
           color: 'green',
-          opacity: 0.8,
-          lineWidth: 20,
+          opacity: 0.7,
+          lineWidth: 15,
         },
         red: {
           key: 'red',
           color: 'red',
-          opacity: 0.8,
-          lineWidth: 20,
+          opacity: 0.7,
+          lineWidth: 15,
         },
       },
     }
@@ -83,16 +96,16 @@
   
   function clicked(key: Key) {
     const coords = keyToPosition(key)
-    const delta: [number, number] = [coords[0] - PIECE_COORDS[0], coords[1] - PIECE_COORDS[1]]
+    const delta: [number, number] = [coords[0] - piece_coords[0], coords[1] - piece_coords[1]]
     emit('clicked', delta)
   }
   
   
   function getFen(): string {
     let fen = ''
-    fen += PIECE_COORDS[0]
+    fen += piece_coords[0]
     fen += 'P'
-    fen += '/'.repeat(PIECE_COORDS[1])
+    fen += '/'.repeat(piece_coords[1])
     return fen
   }
   
@@ -101,11 +114,11 @@
     
     let keysMove: Key[] = []
     for (const [x, y] of props.piece.translateJumpDeltas) {
-      keysMove.push(positionToKey([x + PIECE_COORDS[0], y + PIECE_COORDS[1]]))
+      keysMove.push(positionToKey([x + piece_coords[0], y + piece_coords[1]]))
     }
     let keysCapture: Key[] = []
     for (const [x, y] of props.piece.attackJumpDeltas) {
-      keysCapture.push(positionToKey([x + PIECE_COORDS[0], y + PIECE_COORDS[1]]))
+      keysCapture.push(positionToKey([x + piece_coords[0], y + piece_coords[1]]))
     }
     // Intersection of keysMove and keysCapture
     let keysBoth: Key[] = []
@@ -121,9 +134,9 @@
     }
     let keysExplosion: Key[] = []
     if (props.piece.explodes) {
-      keysExplosion.push(positionToKey(PIECE_COORDS))
+      keysExplosion.push(positionToKey(piece_coords))
       for (const [x, y] of props.piece.explosionDeltas) {
-        keysExplosion.push(positionToKey([x + PIECE_COORDS[0], y + PIECE_COORDS[1]]))
+        keysExplosion.push(positionToKey([x + piece_coords[0], y + piece_coords[1]]))
       }
     }
     
@@ -143,61 +156,77 @@
     
     // Slides
     
-    if (props.piece.translateEast && props.piece.attackEast) {
-      shapes.push(arrowShape('right', 'purple'))
-    } else if (props.piece.translateEast) {
-      shapes.push(arrowShape('right', 'green'))
-    } else if (props.piece.attackEast) {
-      shapes.push(arrowShape('right', 'red'))
+    if (piece_coords[0] < props.width-1) {
+      if (props.piece.translateEast && props.piece.attackEast) {
+        shapes.push(arrowShape('right', 'purple'))
+      } else if (props.piece.translateEast) {
+        shapes.push(arrowShape('right', 'green'))
+      } else if (props.piece.attackEast) {
+        shapes.push(arrowShape('right', 'red'))
+      }
     }
-    if (props.piece.translateWest && props.piece.attackWest) {
-      shapes.push(arrowShape('left', 'purple'))
-    } else if (props.piece.translateWest) {
-      shapes.push(arrowShape('left', 'green'))
-    } else if (props.piece.attackWest) {
-      shapes.push(arrowShape('left', 'red'))
+    if (piece_coords[0] > 0) {
+      if (props.piece.translateWest && props.piece.attackWest) {
+        shapes.push(arrowShape('left', 'purple'))
+      } else if (props.piece.translateWest) {
+        shapes.push(arrowShape('left', 'green'))
+      } else if (props.piece.attackWest) {
+        shapes.push(arrowShape('left', 'red'))
+      }
     }
-    if (props.piece.translateNorth && props.piece.attackNorth) {
-      shapes.push(arrowShape('up', 'purple'))
-    } else if (props.piece.translateNorth) {
-      shapes.push(arrowShape('up', 'green'))
-    } else if (props.piece.attackNorth) {
-      shapes.push(arrowShape('up', 'red'))
+    if (piece_coords[1] < props.height-1) {
+      if (props.piece.translateNorth && props.piece.attackNorth) {
+        shapes.push(arrowShape('up', 'purple'))
+      } else if (props.piece.translateNorth) {
+        shapes.push(arrowShape('up', 'green'))
+      } else if (props.piece.attackNorth) {
+        shapes.push(arrowShape('up', 'red'))
+      }
     }
-    if (props.piece.translateSouth && props.piece.attackSouth) {
-      shapes.push(arrowShape('down', 'purple'))
-    } else if (props.piece.translateSouth) {
-      shapes.push(arrowShape('down', 'green'))
-    } else if (props.piece.attackSouth) {
-      shapes.push(arrowShape('down', 'red'))
+    if (piece_coords[1] > 0) {
+      if (props.piece.translateSouth && props.piece.attackSouth) {
+        shapes.push(arrowShape('down', 'purple'))
+      } else if (props.piece.translateSouth) {
+        shapes.push(arrowShape('down', 'green'))
+      } else if (props.piece.attackSouth) {
+        shapes.push(arrowShape('down', 'red'))
+      }
     }
-    if (props.piece.translateNortheast && props.piece.attackNortheast) {
-      shapes.push(arrowShape('upright', 'purple'))
-    } else if (props.piece.translateNortheast) {
-      shapes.push(arrowShape('upright', 'green'))
-    } else if (props.piece.attackNortheast) {
-      shapes.push(arrowShape('upright', 'red'))
+    if (piece_coords[0] < props.width-1 && piece_coords[1] < props.height-1) {
+      if (props.piece.translateNortheast && props.piece.attackNortheast) {
+        shapes.push(arrowShape('upright', 'purple'))
+      } else if (props.piece.translateNortheast) {
+        shapes.push(arrowShape('upright', 'green'))
+      } else if (props.piece.attackNortheast) {
+        shapes.push(arrowShape('upright', 'red'))
+      }
     }
-    if (props.piece.translateNorthwest && props.piece.attackNorthwest) {
-      shapes.push(arrowShape('upleft', 'purple'))
-    } else if (props.piece.translateNorthwest) {
-      shapes.push(arrowShape('upleft', 'green'))
-    } else if (props.piece.attackNorthwest) {
-      shapes.push(arrowShape('upleft', 'red'))
+    if (piece_coords[0] > 0 && piece_coords[1] < props.height-1) {
+      if (props.piece.translateNorthwest && props.piece.attackNorthwest) {
+        shapes.push(arrowShape('upleft', 'purple'))
+      } else if (props.piece.translateNorthwest) {
+        shapes.push(arrowShape('upleft', 'green'))
+      } else if (props.piece.attackNorthwest) {
+        shapes.push(arrowShape('upleft', 'red'))
+      }
     }
-    if (props.piece.translateSoutheast && props.piece.attackSoutheast) {
-      shapes.push(arrowShape('downright', 'purple'))
-    } else if (props.piece.translateSoutheast) {
-      shapes.push(arrowShape('downright', 'green'))
-    } else if (props.piece.attackSoutheast) {
-      shapes.push(arrowShape('downright', 'red'))
+    if (piece_coords[0] < props.width-1 && piece_coords[1] > 0) {
+      if (props.piece.translateSoutheast && props.piece.attackSoutheast) {
+        shapes.push(arrowShape('downright', 'purple'))
+      } else if (props.piece.translateSoutheast) {
+        shapes.push(arrowShape('downright', 'green'))
+      } else if (props.piece.attackSoutheast) {
+        shapes.push(arrowShape('downright', 'red'))
+      }
     }
-    if (props.piece.translateSouthwest && props.piece.attackSouthwest) {
-      shapes.push(arrowShape('downleft', 'purple'))
-    } else if (props.piece.translateSouthwest) {
-      shapes.push(arrowShape('downleft', 'green'))
-    } else if (props.piece.attackSouthwest) {
-      shapes.push(arrowShape('downleft', 'red'))
+    if (piece_coords[0] > 0 && piece_coords[1] > 0) {
+      if (props.piece.translateSouthwest && props.piece.attackSouthwest) {
+        shapes.push(arrowShape('downleft', 'purple'))
+      } else if (props.piece.translateSouthwest) {
+        shapes.push(arrowShape('downleft', 'green'))
+      } else if (props.piece.attackSouthwest) {
+        shapes.push(arrowShape('downleft', 'red'))
+      }
     }
     
     return shapes
@@ -212,21 +241,21 @@
   }
   function arrowShape(dir: 'left' | 'right' | 'up' | 'down' | 'upleft' | 'upright' | 'downleft' | 'downright', brush: string): DrawShape {
     if (dir === 'left') {
-      return {orig: positionToKey(PIECE_COORDS), dest:positionToKey([0, PIECE_COORDS[1]]), brush}
+      return {orig: positionToKey(piece_coords), dest:positionToKey([0, piece_coords[1]]), brush}
     } else if (dir === 'right') {
-      return {orig: positionToKey(PIECE_COORDS), dest:positionToKey([WIDTH-1, PIECE_COORDS[1]]), brush}
+      return {orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, piece_coords[1]]), brush}
     } else if (dir === 'up') {
-      return {orig: positionToKey(PIECE_COORDS), dest:positionToKey([PIECE_COORDS[0], HEIGHT-1]), brush}
+      return {orig: positionToKey(piece_coords), dest:positionToKey([piece_coords[0], props.height-1]), brush}
     } else if (dir === 'down') {
-      return {orig: positionToKey(PIECE_COORDS), dest:positionToKey([PIECE_COORDS[0], 0]), brush}
+      return {orig: positionToKey(piece_coords), dest:positionToKey([piece_coords[0], 0]), brush}
     } else if (dir === 'upleft') {
-      return {orig: positionToKey(PIECE_COORDS), dest:positionToKey([0, HEIGHT-1]), brush}
+      return {orig: positionToKey(piece_coords), dest:positionToKey([0, props.height-1]), brush}
     } else if (dir === 'upright') {
-      return {orig: positionToKey(PIECE_COORDS), dest:positionToKey([WIDTH-1, HEIGHT-1]), brush}
+      return {orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, props.height-1]), brush}
     } else if (dir === 'downleft') {
-      return {orig: positionToKey(PIECE_COORDS), dest:positionToKey([0, 0]), brush}
+      return {orig: positionToKey(piece_coords), dest:positionToKey([0, 0]), brush}
     } else if (dir === 'downright') {
-      return {orig: positionToKey(PIECE_COORDS), dest:positionToKey([WIDTH-1, 0]), brush}
+      return {orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, 0]), brush}
     } else {
       throw new Error('Invalid direction')
     }

@@ -9,17 +9,8 @@
     <div class="column is-narrow left-column">
       
       <div class="board-container">
-        <PieceViewer v-if="piece" :size="500" :piece="piece" style="z-index: 11;"
+        <PieceViewerWithZoom v-if="piece" :size="500" :piece="piece" style="z-index: 11;"
           @clicked="editDelta"/>
-      </div>
-      
-      <div class="field">
-        <label class="label">Zoom:</label>
-        <div class="field is-grouped is-grouped-multiline">
-          <div class="control">
-            <button class="button">todo</button>
-          </div>
-        </div>
       </div>
       
       <br>
@@ -200,7 +191,7 @@
 
 
 <script setup lang="ts">
-  import PieceViewer from '@/components/ChessBoard/PieceViewer.vue'
+  import PieceViewerWithZoom from '@/components/ChessBoard/PieceViewerWithZoom.vue'
   import MovementSlideRow from '@/components/EditVariant/MovementSlideRow.vue'
   import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
@@ -311,7 +302,7 @@
   }
   
   .left-column {
-    max-width: 500px;
+    max-width: calc(500px + 1.5rem);
     margin-right: 2rem;
   }
   
@@ -383,5 +374,11 @@
   
   .invisible {
     visibility: hidden;
+  }
+</style>
+
+<style>
+  cg-board {
+    cursor: v-bind("selectedDelta[0] === 'none' ? 'default' : 'pointer'");
   }
 </style>

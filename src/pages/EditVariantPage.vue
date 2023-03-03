@@ -251,7 +251,7 @@
   }
   
   .left-column {
-    max-width: 500px;
+    max-width: calc(500px + 1.5rem);
     margin-right: 2rem;
   }
   
