@@ -1,10 +1,10 @@
 <template>
   <div class="horizontal-field">
-    <div class="field-label">
+    <div class="field-label mr-4">
       <label>{{ props.text }}</label>
     </div>
     <div class="field-body" :style="{ zIndex }">
-      <button class="button" :class="{ 'is-primary': addSelected }" @click="addClick">
+      <button class="button mr-4" :class="{ 'is-primary': addSelected }" @click="addClick">
         <span class="icon">
           <div class="icon icon-add" :class="{
             'color-black': !addSelected,
@@ -13,7 +13,6 @@
         </span>
         <span>Add</span>
       </button>
-      <div class="spacer"></div>
       <button class="button" :class="{ 'is-primary': removeSelected }" @click="removeClick">
         <span class="icon">
           <div class="icon icon-trash" :class="{
@@ -67,10 +66,5 @@
   .field-label {
     flex-basis: auto;
     flex-grow: 0;
-    margin-right: 1rem;
-  }
-  
-  .spacer {
-    width: 1rem;
   }
 </style>

@@ -7,7 +7,7 @@
   <div class="columns is-desktop reverse-columns">
     <div class="column is-narrow left-column">
       
-      <div class="board-container">
+      <div class="is-flex is-justify-content-center mb-4 board-container">
         <ViewableChessBoard ref="board" style="z-index: 20"
           :size="500" :white-pov="true" :view-only="true" :show-coordinates="true"
           @clicked="coords => placePiece(coords)"/>
@@ -44,7 +44,7 @@
       </div>
       <br>
       
-      <SmartErrorMessage v-show="hasError" class="error-message" :handler="errorMsgHandler" />
+      <SmartErrorMessage v-show="hasError" class="my-4" :handler="errorMsgHandler" />
       <button class="button bottom-button" @click="$router.push({name: 'analysis'})" :disabled="hasError">
         <span class="icon">
           <div class="icon icon-analysis color-black"></div>
@@ -255,11 +255,6 @@
     margin-right: 2rem;
   }
   
-  .error-message {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-  }
-  
   .field-label {
     flex-basis: auto;
     flex-grow: 0;
@@ -281,9 +276,6 @@
   }
   
   .board-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
     height: 500px;
   }
   

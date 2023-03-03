@@ -15,7 +15,7 @@
     <label class="label">View:</label>
     <div class="field is-grouped is-grouped-multiline" v-for="(group, index) in ZOOM_BUTTONS" :key="index">
       <div class="control" v-for="button in group" :key="`${button.width}-${button.height}-${button.position}`">
-        <button class="button view-button"
+        <button class="button view-button px-1 py-1"
           :class="{'is-active': width === button.width && height === button.height && position === button.position}"
           @click="width = button.width; height = button.height; position = button.position"
         >
@@ -65,7 +65,6 @@
   .view-button {
     width: 4rem;
     height: 4rem;
-    padding: 0.2rem;
   }
 </style>
 

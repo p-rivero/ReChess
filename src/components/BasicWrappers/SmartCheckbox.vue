@@ -1,6 +1,6 @@
 <template>
   <label class="checkbox">
-    <input type="checkbox" ref="checkboxInput" @change="checkboxChanged($event.target)">
+    <input type="checkbox" class="mr-2" ref="checkboxInput" @change="checkboxChanged($event.target)">
     <span>{{ text }}</span>
   </label>
 </template>
@@ -32,8 +32,3 @@
   }
 </script>
 
-<style scoped lang="scss">
-  input[type="checkbox"] {
-    margin-right: 0.5rem;
-  }
-</style>

@@ -2,18 +2,18 @@
   <nav class="navbar is-fixed-top has-shadow">
     <div class="navbar-brand">
       
-      <div class="navbar-burger" data-target="navbarMenu" @click="navBarBurgerClick">
+      <div class="navbar-burger ml-0 mr-auto" data-target="navbarMenu" @click="navBarBurgerClick">
         <span></span>
         <span></span>
         <span></span>
       </div>
       <div class="navbar-end">
-        <div class="navbar-item only-when-small">
+        <div class="navbar-item is-hidden-desktop">
           <ToggleThemeButton />
         </div>
       </div>
       <div class="navbar-end">
-        <div class="navbar-item only-when-small">
+        <div class="navbar-item is-hidden-desktop">
           <AccountCard />
         </div>
       </div>
@@ -28,10 +28,10 @@
         <a class="navbar-item" href="/edit">Create</a>
       </div>
       <div class="navbar-end">
-        <div class="navbar-item only-when-big">
+        <div class="navbar-item is-hidden-touch">
           <ToggleThemeButton />
         </div>
-        <div class="navbar-item only-when-big">
+        <div class="navbar-item is-hidden-touch">
           <AccountCard />
         </div>
       </div>
@@ -58,24 +58,11 @@
   .navbar-burger {
     height: 4rem;
     width: 4rem;
-    margin-left: 0;
-    margin-right: auto;
   }
   .navbar-item img {
     max-height: 2rem;
   }
   .navbar-item {
     height: 4rem;
-  }
-  
-  .only-when-small {
-    @media screen and (min-width: 1024px) {
-      display: none;
-    }
-  }
-  .only-when-big {
-    @media screen and (max-width: 1023px) {
-      display: none;
-    }
   }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <NavbarComponent />
-  <div class="page-container">
+  <div class="page-container is-flex is-flex-direction-row is-justify-content-center">
     <div class="page-content">
       <RouterView />
     </div>
@@ -14,9 +14,6 @@
 
 <style lang="scss" scoped>
   .page-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
     // Subtract the height of the navbar from the height of the page
     min-height: calc(100vh - 4rem);
   }

@@ -20,12 +20,12 @@
       :key="pillIndex"
       @click="onPillClick(pill)"
     >
-      <div class="pill-text" v-if="!pill.editing">
+      <div class="pill-text ml-2 px-1 py-0" v-if="!pill.editing">
         {{ pill.text }}
       </div>
       <input
         v-else
-        class="pill-input"
+        class="pill-input ml-2 px-1 py-0"
         type="text"
         v-autowidth
         ref="pillInput"
@@ -35,7 +35,7 @@
         @keydown.enter="finishEdit(pill)"
         @keydown.esc="cancelEdit(pill)"
       />
-      <button class="pill-delete-button delete" v-if="editable" @click="removePill(pill)"></button>
+      <button class="delete mr-2" v-if="editable" @click="removePill(pill)"></button>
     </span>
     <div class="pill tag is-primary" v-if="editable" @click="onAddPillClick()">
       <div class="add-button">+</div>
@@ -170,51 +170,40 @@ function stringsToPills(list: string[]): Pill[] {
 
 
 <style scoped lang="scss">
-  .pill-row {
-    display: flex;
-    .pill {
+  .pill {
+    height: 2rem;
+    margin: 0.25rem;
+    padding: 0;
+    border-radius: 1rem;
+    cursor: pointer;
+    .pill-text {
+      font-size: 1rem;
+      pointer-events: none;
+    }
+    
+    .pill-input {
+      font-size: 1rem;
+      color: white;
+      background-color: transparent;
+      border: none;
+      outline: none;
+    }
+    .add-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
       height: 2rem;
-      margin: 0.25rem;
-      border-radius: 1rem;
-      padding: 0;
-      padding-right: 0;
-      cursor: pointer;
-      .pill-text {
-        margin-left: 0.5rem;
-        padding: 0 0.2rem;
-        font-size: 1rem;
-        pointer-events: none;
-      }
-      
-      .pill-input {
-        margin-left: 0.5rem;
-        padding: 0 0.2rem;
-        font-size: 1rem;
-        color: white;
-        background-color: transparent;
-        border: none;
-        outline: none;
-      }
-      .pill-delete-button {
-        margin-right: 0.5rem;
-      }
-      .add-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 2rem;
-        height: 2rem;
-        font-size: 1.5rem;
-        border-radius: 50%;
-        // Hover effect
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.2);
-        }
+      font-size: 1.5rem;
+      // Hover effect
+      border-radius: 50%;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.2);
       }
     }
-    .non-editable {
-      padding-right: 0.5rem;
-      cursor: default;
-    }
+  }
+  .non-editable {
+    padding-right: 0.5rem;
+    cursor: default;
   }
 </style>

@@ -2,13 +2,13 @@
   <div class="field is-grouped is-grouped-multiline">
     <div v-for="(piece, index) in pieceList" :key="index" class="control" :style="{zIndex}">
       <img
-        class="button piece-button"
+        class="button piece-button px-1 py-1"
         :src="piece.url"
         :class="{'is-primary': selectedId === piece.id}"
         @click="onPieceClick(piece.id)"/>
     </div>
     <div class="control">
-      <button class="button piece-button" :class="{'is-primary': selectedId === 'delete'}" :style="{zIndex}" @click="onDeleteClick()">
+      <button class="button piece-button px-2 py-2" :class="{'is-primary': selectedId === 'delete'}" :style="{zIndex}" @click="onDeleteClick()">
         <span class="icon-trash"
         :class="{
           'color-black': selectedId !== 'delete',
@@ -88,7 +88,5 @@
   .piece-button {
     width: 3rem;
     height: 3rem;
-    padding: 0.2rem;
-    background-size: contain;
   }
 </style>

@@ -1,6 +1,6 @@
 <template>
-  <div class="slide-row">
-    <div style="margin-right: 1rem">
+  <div class="is-flex is-align-items-center">
+    <div class="mr-4">
       <label>Infinite slide:</label>
     </div>
     <div class="field is-grouped is-grouped-multiline">
@@ -99,10 +99,6 @@
   
 
 <style lang="scss" scoped>
-  .slide-row {
-    display: flex;
-    align-items: center;
-  }
   .arrow-button {
     width: 2.5rem;
     height: 2.5rem;

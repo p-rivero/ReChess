@@ -1,6 +1,6 @@
 <template>
   <a v-if="true" class="card-header" @click="onAccountClick">
-    <span class="card-header-icon">
+    <span class="card-header-icon py-0 pl-3 pr-0">
       <div class="account-icon icon-account color-theme"></div>
     </span>
     <p class="card-header-title">
@@ -32,10 +32,6 @@
     height: 2rem;
   }
 
-  .card-header-icon {
-    padding: 0;
-    padding-left: 12px;
-  }
   .card-header-title {
     // Don't use more than 1 line for the account name
     white-space: nowrap;

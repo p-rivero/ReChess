@@ -8,13 +8,13 @@
   <div class="columns is-desktop reverse-columns">
     <div class="column is-narrow left-column">
       
-      <div class="board-container">
+      <div class="is-flex is-justify-content-center mb-4">
         <PieceViewerWithZoom v-if="piece" :size="500" :piece="piece" style="z-index: 11;"
           @clicked="editDelta"/>
       </div>
       
       <br>
-      <SmartErrorMessage v-show="hasError" class="error-message" :handler="errorMsgHandler" />
+      <SmartErrorMessage v-show="hasError" class="mb-4" :handler="errorMsgHandler" />
       <button class="button is-primary bottom-button" @click="$router.push({name: 'edit-variant'})">
         <span class="icon">
           <div class="icon icon-check color-white"></div>
@@ -40,14 +40,14 @@
       <div class="columns">
         <div class="column">
           <div class="horizontal-field">
-            <SmartCheckbox text="White" class="margin-right-1rem" :start-value="!whiteInvisible"
+            <SmartCheckbox text="White" class="mr-4" :start-value="!whiteInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
             <img v-if="piece?.imageUrls[0]" class="piece-image" alt="White piece" :class="{ invisible: whiteInvisible }"
               :src="piece?.imageUrls[0] ?? ''" />
             <div v-else class="piece-image" :class="{ invisible: whiteInvisible }">
               <div class="icon-cross color-black"></div>
             </div>
-            <button class="icon-edit color-theme transparent-button margin-right-1rem" :class="{ invisible: whiteInvisible }" ></button>
+            <button class="icon-edit color-theme transparent-button mr-4" :class="{ invisible: whiteInvisible }" ></button>
             <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
               :error-handler="errorMsgHandler"
@@ -64,14 +64,14 @@
         
         <div class="column">
           <div class="horizontal-field">
-            <SmartCheckbox text="Black" class="margin-right-1rem" :start-value="!blackInvisible"
+            <SmartCheckbox text="Black" class="mr-4" :start-value="!blackInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
             <img v-if="piece?.imageUrls[1]" class="piece-image" alt="Black piece" :class="{ invisible: blackInvisible }"
               :src="piece?.imageUrls[1] ?? ''" />
             <div v-else class="piece-image" :class="{ invisible: blackInvisible }">
               <div class="icon-cross color-black"></div>
             </div>
-            <button class="icon-edit color-theme transparent-button margin-right-1rem" :class="{ invisible: blackInvisible }" ></button>
+            <button class="icon-edit color-theme transparent-button mr-4" :class="{ invisible: blackInvisible }" ></button>
             <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :error-handler="errorMsgHandler"
@@ -97,7 +97,7 @@
         <SmartDropdown :items="['No', 'As king', 'As rook']"
           :startItem="piece?.isCastleRook ? 'As rook' : piece?.castleFiles ? 'As king' : 'No'"
           :onChanged="item =>castlingDropdownChanged(item)"/>
-        <div v-show="piece?.castleFiles" style="display: flex; flex-direction: row; align-items: center;">
+        <div v-show="piece?.castleFiles" class="is-flex is-flex-direction-row is-align-items-center">
           <div class="field-label-both">
             <label>Queenside file</label>
           </div>
@@ -121,9 +121,9 @@
       <label class="label">Movement:</label>
       <AddRemoveButtons text="Jumps:" :z-index="11" type="move"
         :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta" />
-      <div style="margin-bottom: 1rem;"> <MovementSlideRow :piece-index="pieceIndex" type="move"/> </div>
+      <div class="mb-4"> <MovementSlideRow :piece-index="pieceIndex" type="move"/> </div>
       <label>Double jump when standing on:</label>
-      <CoordPillList :editable="true" style="margin-bottom: 1.5rem;" :allow-repeat="false"
+      <CoordPillList :editable="true" class="mb-5" :allow-repeat="false"
         :starting-coords="piece?.doubleJumpSquares"
         @changed="coords => {piece!.doubleJumpSquares = coords; draftStore.save()}"/>
         
@@ -131,7 +131,7 @@
       <label class="label">Capture:</label>
       <AddRemoveButtons text="Jumps:" :z-index="11" type="capture"
         :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta" />
-      <div style="margin-bottom: 1.5rem;"> <MovementSlideRow :piece-index="pieceIndex" type="capture"/> </div>
+      <div class="mb-5"> <MovementSlideRow :piece-index="pieceIndex" type="capture"/> </div>
       
       <br>
       <label class="label">Promote:</label>
@@ -306,10 +306,6 @@
     margin-right: 2rem;
   }
   
-  .error-message {
-    margin-bottom: 1rem;
-  }
-  
   .field-label {
     flex-shrink: 0;
     flex-grow: 0;
@@ -320,10 +316,6 @@
     @extend .field-label;
     margin-left: 1rem;
   }
-  .field-label-right {
-    @extend .field-label-both;
-    margin-right: 0;
-  }
   
   .horizontal-field {
     display: flex;
@@ -331,16 +323,8 @@
     align-items: center;
   }
   
-  .board-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
-  }
-  
   .bottom-button {
     width: 45%;
-    margin-bottom: 0.5rem;
-    margin-right: 0.5rem;
   }
   
   .transparent-button {
@@ -349,10 +333,6 @@
     background-color: transparent;
     border: none;
     background-size: contain;
-  }
-  
-  .margin-right-1rem {
-    margin-right: 1rem;
   }
   
   .rules-field:not(:last-child) {
