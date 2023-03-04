@@ -1,0 +1,52 @@
+
+@import 'variables';
+
+$scheme-main: $black-ter;
+$scheme-main-bis: $black-bis;
+$scheme-main-ter: $black-ter;
+$scheme-invert: $white;
+$scheme-invert-bis: $white-bis;
+$scheme-invert-ter: $white-ter;
+
+$primary: $dark-brown;
+$primary-light: $darker-brown;
+$primary-dark: $light-brown;
+
+$text: $grey-lightest;
+$text-light: $grey-light;
+$text-strong: $white;
+
+$link: $green;
+$link-visited: $green;
+$link-hover: $light-green;
+
+$border: $grey-dark;
+$border-hover: $grey;
+$border-light: $grey-darker;
+$border-light-hover: $grey-dark;
+
+
+$shadow: 0 0.5em 1em -0.125em rgba(0, 0, 0, 0.3), 0 0px 0 1px rgba(0, 0, 0, 0.2);
+$card-header-shadow: $shadow;
+
+
+@import 'bulma/bulma.sass';
+
+@import '@/assets/img/icons/icons.scss';
+
+.color-white {
+    background-color: $grey-lightest;
+}
+.color-black {
+    background-color: $grey-darker;
+}
+.color-primary {
+    background-color: $primary;
+}
+.color-primary-dark {
+    background-color: $primary-dark;
+}
+.color-theme {
+    @extend .color-white;
+}
+

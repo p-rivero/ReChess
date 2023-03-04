@@ -19,7 +19,7 @@
           :class="{'is-active': width === button.width && height === button.height && position === button.position}"
           @click="width = button.width; height = button.height; position = button.position"
         >
-          <span class="color-black" :class="button.icon"></span>
+          <span class="color-theme" :class="button.icon"></span>
         </button>
       </div>
     </div>

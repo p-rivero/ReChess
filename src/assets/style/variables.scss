@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik');
+$family-serif: "Rubik", serif;
+$family-primary: $family-serif;
+
+$navbar-height: 4rem;
+
+$brown: hsl(27, 50%, 50%);
+$light-brown: hsl(27, 76%, 67%);
+$dark-brown: hsl(27, 59%, 37%);
+$darker-brown: hsl(28, 48%, 30%);
+$green: hsl(137, 50%, 50%);
+$light-green: hsl(137, 50%, 80%);
+$dark-green: hsl(137, 48%, 32%);
+
+$black:        hsl(0, 0%, 4%);
+$black-bis:    hsl(0, 0%, 7%);
+$black-ter:    hsl(0, 0%, 14%);
+
+$white-ter:    hsl(0, 0%, 96%);
+$white-bis:    hsl(0, 0%, 98%);
+$white:        hsl(0, 0%, 100%);
+
+$grey-darkest:    hsl(0, 0%, 18%);
+$grey-darker:  hsl(0, 0%, 21%);
+$grey-dark:    hsl(0, 0%, 29%);
+$grey:         hsl(0, 0%, 48%);
+$grey-light:   hsl(0, 0%, 71%);
+$grey-lighter: hsl(0, 0%, 86%);
+$grey-lightest: hsl(0, 0%, 93%);

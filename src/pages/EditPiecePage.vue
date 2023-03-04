@@ -348,7 +348,7 @@
     width: 4rem;
     height: 4rem;
     flex-shrink: 0;
-    background-color: #f0d9b5;
+    background-color: #b58863;
     border-radius: 0.25rem;
   }
   

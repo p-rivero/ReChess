@@ -1,0 +1,30 @@
+
+@import 'variables';
+
+$primary: $brown;
+$primary-dark: $dark-brown;
+$primary-light: $light-brown;
+
+$link: $dark-green;
+$link-visited: $dark-green;
+$link-hover: $green;
+
+@import 'bulma/bulma.sass';
+
+@import '@/assets/img/icons/icons.scss';
+
+.color-white {
+    background-color: $grey-lightest;
+}
+.color-black {
+    background-color: $grey-darker;
+}
+.color-primary {
+    background-color: $primary;
+}
+.color-primary-dark {
+    background-color: $primary-dark;
+}
+.color-theme {
+    @extend .color-black;
+}

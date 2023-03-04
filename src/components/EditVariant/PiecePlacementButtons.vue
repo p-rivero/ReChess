@@ -11,7 +11,7 @@
       <button class="button piece-button px-2 py-2" :class="{'is-primary': selectedId === 'delete'}" :style="{zIndex}" @click="onDeleteClick()">
         <span class="icon-trash"
         :class="{
-          'color-black': selectedId !== 'delete',
+          'color-theme': selectedId !== 'delete',
           'color-white': selectedId === 'delete',
         }"></span>
       </button>

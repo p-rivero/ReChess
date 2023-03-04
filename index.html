@@ -17,12 +17,8 @@
     <meta name="msapplication-TileColor" content="#f0d9b5">
     <meta name="theme-color" content="#363636">
     
-    <script>
-      // Block rendering until the theme is loaded
-      const DEFAULT_THEME = 'light'
-      const theme = localStorage.getItem('theme') || DEFAULT_THEME
-      document.documentElement.setAttribute('data-theme', theme)
-    </script>
+    <!-- Block rendering until the theme is loaded -->
+    <script type="module" src="/src/load-css.ts"></script>
   </head>
   
   <body class="has-navbar-fixed-top">

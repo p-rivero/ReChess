@@ -7,7 +7,7 @@
       <button class="button mr-4" :class="{ 'is-primary': addSelected }" @click="addClick">
         <span class="icon">
           <div class="icon icon-add" :class="{
-            'color-black': !addSelected,
+            'color-theme': !addSelected,
             'color-white': addSelected
           }"></div>
         </span>
@@ -16,7 +16,7 @@
       <button class="button" :class="{ 'is-primary': removeSelected }" @click="removeClick">
         <span class="icon">
           <div class="icon icon-trash" :class="{
-            'color-black': !removeSelected,
+            'color-theme': !removeSelected,
             'color-white': removeSelected
           }"></div>
         </span>

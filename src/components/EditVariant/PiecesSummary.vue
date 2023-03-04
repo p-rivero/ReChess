@@ -13,14 +13,14 @@
       
       <p class="mr-4">{{ piece.displayName }}</p>
       
-      <div v-if="piece.isLeader" class="star-icon-container icon-star color-primary mb-1 mr-1"></div>
-      <strong v-if="piece.isLeader" class="has-text-primary mr-4">Leader</strong>
+      <div v-if="piece.isLeader" class="star-icon-container icon-star color-primary-dark mb-1 mr-1"></div>
+      <strong v-if="piece.isLeader" class="has-text-primary-dark mr-4">Leader</strong>
     </div>
   </div>
   <br>
   <button class="button" @click="emit('new-click')">
     <span class="icon">
-      <div class="icon-add color-black icon"></div>
+      <div class="icon-add color-theme icon"></div>
     </span>
     <span>Add piece</span>
   </button>
@@ -58,9 +58,6 @@
   .transparent-button {
     width: 2rem;
     height: 2rem;
-    background-color: transparent;
-    border: none;
-    background-size: contain;
   }
   
   .star-icon-container {

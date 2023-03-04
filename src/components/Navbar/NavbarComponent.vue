@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar is-fixed-top has-shadow">
+  <nav class="navbar is-fixed-top">
     <div class="navbar-brand">
       
       <div class="navbar-burger ml-0 mr-auto" data-target="navbarMenu" @click="navBarBurgerClick">
@@ -52,8 +52,9 @@
 </script>
 
 <style lang="scss" scoped>
-  .navbar.has-shadow {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  .navbar {
+    box-shadow: 0 0.2em 0.3em rgba(0, 0, 0, 0.2);
+    // box-shadow: 0 0.5em 1em -0.125em rgba(0, 0, 0, 0.2), 0 0px 0 1px rgba(0, 0, 0, 0.2);
   }
   .navbar-burger {
     height: 4rem;
