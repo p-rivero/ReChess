@@ -12,11 +12,20 @@ html[data-theme="light"] {
 }
 
 
-// Common global classes for both light and dark themes.
+// Common utilities for both light and dark themes.
 
 .color-white {
     background-color: $grey-lightest;
 }
 .color-black {
     background-color: $grey-darker;
+}
+
+.sz-2 {
+    width: 2rem !important;
+    height: 2rem !important;
+}
+.sz-3 {
+    width: 3rem !important;
+    height: 3rem !important;
 }

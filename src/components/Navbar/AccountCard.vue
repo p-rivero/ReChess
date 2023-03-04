@@ -1,7 +1,7 @@
 <template>
   <a v-if="true" class="card-header" @click="onAccountClick">
     <span class="card-header-icon py-0 pl-3 pr-0">
-      <div class="account-icon icon-account color-theme"></div>
+      <div class="account-icon sz-2 icon-account color-theme" style="border-radius: 50%;"></div>
     </span>
     <p class="card-header-title">
       My user name
@@ -26,11 +26,6 @@
 
 
 <style lang="scss" scoped>
-  .account-icon {
-    border-radius: 50%;
-    width: 2rem;
-    height: 2rem;
-  }
 
   .card-header-title {
     // Don't use more than 1 line for the account name

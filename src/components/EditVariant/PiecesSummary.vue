@@ -1,15 +1,15 @@
 <template>
   <div v-for="(piece, pieceIndex) in props.state.pieceTypes" class="piece-container mb-4" :key="pieceIndex">
     <div v-if="editable">
-      <button class="button icon-edit color-theme transparent-button mr-4" @click="emit('edit-click', pieceIndex)"></button>
-      <button class="button icon-trash color-theme transparent-button mr-4" @click="emit('delete-click', pieceIndex)"></button>
+      <button class="button icon-edit color-theme sz-2 mr-4" @click="emit('edit-click', pieceIndex)"></button>
+      <button class="button icon-trash color-theme sz-2 mr-4" @click="emit('delete-click', pieceIndex)"></button>
     </div>
     <div class="box">
-      <img v-if="piece.ids[0] != null && piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="piece-image mr-4">
-      <div v-else alt="piece image" class="piece-image mr-4 icon-cross" :class="{'color-theme': piece.ids[0] != null}"></div>
+      <img v-if="piece.ids[0] != null && piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="sz-3 mr-4">
+      <div v-else alt="piece image" class="sz-3 mr-4 icon-cross" :class="{'color-theme': piece.ids[0] != null}"></div>
       
-      <img v-if="piece.ids[1] != null && piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="piece-image mr-4">
-      <div v-else alt="piece image" class="piece-image mr-4 icon-cross" :class="{'color-theme': piece.ids[1] != null}"></div>
+      <img v-if="piece.ids[1] != null && piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="sz-3 mr-4">
+      <div v-else alt="piece image" class="sz-3 mr-4 icon-cross" :class="{'color-theme': piece.ids[1] != null}"></div>
       
       <p class="mr-4">{{ piece.displayName }}</p>
       
@@ -46,18 +46,6 @@
   .piece-container {
     display: flex;
     align-items: center;
-  }
-  
-  .piece-image {
-    width: 3rem;
-    height: 3rem;
-    background-size: contain;
-    display: inline-block;
-  }
-  
-  .transparent-button {
-    width: 2rem;
-    height: 2rem;
   }
   
   .star-icon-container {

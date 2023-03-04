@@ -47,7 +47,7 @@
             <div v-else class="piece-image" :class="{ invisible: whiteInvisible }">
               <div class="icon-cross color-black"></div>
             </div>
-            <button class="icon-edit color-theme transparent-button mr-4" :class="{ invisible: whiteInvisible }" ></button>
+            <button class="icon-edit color-theme sz-2 mr-4" :class="{ invisible: whiteInvisible }" ></button>
             <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
               :error-handler="errorMsgHandler"
@@ -71,7 +71,7 @@
             <div v-else class="piece-image" :class="{ invisible: blackInvisible }">
               <div class="icon-cross color-black"></div>
             </div>
-            <button class="icon-edit color-theme transparent-button mr-4" :class="{ invisible: blackInvisible }" ></button>
+            <button class="icon-edit color-theme sz-2 mr-4" :class="{ invisible: blackInvisible }" ></button>
             <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :error-handler="errorMsgHandler"
@@ -325,11 +325,6 @@
   
   .bottom-button {
     width: 45%;
-  }
-  
-  .transparent-button {
-    width: 2rem;
-    height: 2rem;
   }
   
   .rules-field:not(:last-child) {

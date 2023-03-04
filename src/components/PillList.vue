@@ -38,7 +38,7 @@
       <button class="delete mr-2" v-if="editable" @click="removePill(pill)"></button>
     </span>
     <div class="pill tag is-primary" v-if="editable" @click="onAddPillClick()">
-      <div class="add-button">+</div>
+      <div class="add-button sz-2">+</div>
     </div>
   </div>
 </template>
@@ -192,8 +192,6 @@ function stringsToPills(list: string[]): Pill[] {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 2rem;
-      height: 2rem;
       font-size: 1.5rem;
       // Hover effect
       border-radius: 50%;

@@ -9,7 +9,7 @@
       </div>
       <div class="navbar-end">
         <div class="navbar-item is-hidden-desktop">
-          <ToggleThemeButton />
+          <button class="button sz-2 icon-theme color-theme" @click="toggleTheme"></button>
         </div>
       </div>
       <div class="navbar-end">
@@ -29,7 +29,7 @@
       </div>
       <div class="navbar-end">
         <div class="navbar-item is-hidden-touch">
-          <ToggleThemeButton />
+          <button class="button sz-2 icon-theme color-theme" @click="toggleTheme"></button>
         </div>
         <div class="navbar-item is-hidden-touch">
           <AccountCard />
@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
   import AccountCard from '@/components/Navbar/AccountCard.vue'
-  import ToggleThemeButton from '@/components/Navbar/ToggleThemeButton.vue';
+  import { toggleTheme } from '@/utils/theme'
   
   function navBarBurgerClick() {
     const navbarBurger = document.querySelector('.navbar-burger')
