@@ -18,13 +18,16 @@ $text-strong: $white;
 
 $link: $green;
 $link-visited: $green;
-$link-hover: $light-green;
+$link-hover: $grey-lighter;
+$link-focus: $light-green;
+$link-focus-border: $light-green;
+$link-active: $green;
+$link-active-border: $green;
 
 $border: $grey-dark;
 $border-hover: $grey;
 $border-light: $grey-darker;
 $border-light-hover: $grey-dark;
-
 
 $shadow: 0 0.5em 1em -0.125em rgba(0, 0, 0, 0.3), 0 0px 0 1px rgba(0, 0, 0, 0.2);
 $card-header-shadow: $shadow;

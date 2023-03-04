@@ -52,9 +52,11 @@
 </script>
 
 <style lang="scss" scoped>
-  .navbar {
+  [data-theme="light"] .navbar {
     box-shadow: 0 0.2em 0.3em rgba(0, 0, 0, 0.2);
-    // box-shadow: 0 0.5em 1em -0.125em rgba(0, 0, 0, 0.2), 0 0px 0 1px rgba(0, 0, 0, 0.2);
+  }
+  [data-theme="dark"] .navbar {
+    box-shadow: 0 0.5em 1em -0.125em rgba(0, 0, 0, 0.2), 0 0px 0 1px rgba(0, 0, 0, 0.2);
   }
   .navbar-burger {
     height: 4rem;
