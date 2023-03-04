@@ -10,3 +10,13 @@ html[data-theme="dark"] {
 html[data-theme="light"] {
     background-color: $white;
 }
+
+
+// Common global classes for both light and dark themes.
+
+.color-white {
+    background-color: $grey-lightest;
+}
+.color-black {
+    background-color: $grey-darker;
+}

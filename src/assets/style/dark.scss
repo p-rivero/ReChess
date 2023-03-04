@@ -34,12 +34,6 @@ $card-header-shadow: $shadow;
 
 @import '@/assets/img/icons/icons.scss';
 
-.color-white {
-    background-color: $grey-lightest;
-}
-.color-black {
-    background-color: $grey-darker;
-}
 .color-primary {
     background-color: $primary;
 }
@@ -47,6 +41,5 @@ $card-header-shadow: $shadow;
     background-color: $primary-dark;
 }
 .color-theme {
-    @extend .color-white;
+    background-color: $grey-lightest;
 }
-

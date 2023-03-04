@@ -13,12 +13,6 @@ $link-hover: $green;
 
 @import '@/assets/img/icons/icons.scss';
 
-.color-white {
-    background-color: $grey-lightest;
-}
-.color-black {
-    background-color: $grey-darker;
-}
 .color-primary {
     background-color: $primary;
 }
@@ -26,5 +20,5 @@ $link-hover: $green;
     background-color: $primary-dark;
 }
 .color-theme {
-    @extend .color-black;
+    background-color: $grey-darker;
 }
