@@ -49,9 +49,10 @@
                 if (whiteInvisible && blackInvisible) return 'This piece must be available to White, Black or both players'
                 if (whiteInvisible) return
                 if (text.length === 0) return 'Missing piece symbol for White player'
+                if (text === piece?.ids[1]) return 'The piece symbol for White and Black must be different'
                 if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
               }"
-              @changed="text => { pieceIdWhite = text; piece!.ids[0] = text; draftStore.save() }"/>
+              @changed="text => updatePieceId(text, 'white')"/>
           </div>
         </div>
         
@@ -66,9 +67,10 @@
               :validator="text => {
                 if (blackInvisible) return
                 if (text.length === 0) return 'Missing piece symbol for Black player'
+                if (text === piece?.ids[0]) return 'The piece symbol for White and Black must be different'
                 if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
               }"
-              @changed="text => { pieceIdBlack = text; piece!.ids[1] = text; draftStore.save() }"/>
+              @changed="text => updatePieceId(text, 'black')"/>
           </div>
         </div>
       </div>
@@ -276,6 +278,21 @@
       if (adding) piece.explosionDeltas.push(delta)
     } else {
       throw new Error('Invalid selectedDelta')
+    }
+    draftStore.save()
+  }
+  
+  function updatePieceId(newId: string, color: 'white'|'black') {
+    // Remove all existing placements of this piece
+    const oldId = color === 'white' ? piece!.ids[0] : piece!.ids[1]
+    draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== oldId)
+    // Update the piece id
+    if (color === 'white') {
+      pieceIdWhite.value = newId;
+      piece!.ids[0] = newId;
+    } else {
+      pieceIdBlack.value = newId;
+      piece!.ids[1] = newId;
     }
     draftStore.save()
   }

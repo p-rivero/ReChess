@@ -11,7 +11,7 @@
 <script setup lang="ts">
   import { toRefs } from "vue";
   const props = defineProps<{
-    imageUrl: string|null|undefined
+    imageUrl?: string|null
   }>()
   const {imageUrl} = toRefs(props);
   
