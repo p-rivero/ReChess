@@ -30,12 +30,13 @@
 <script setup lang="ts">
   import PieceViewer from './PieceViewer.vue'
   import type { PieceDefinition } from '@/protochess/interfaces'
-  import { ref } from 'vue'
+  import { ref, toRefs } from 'vue'
   
-  defineProps<{
+  const props = defineProps<{
     size: number
     piece: PieceDefinition
   }>()
+  const { piece } = toRefs(props)
   
   const emit = defineEmits<{
     (event: 'clicked', delta: [number, number]): void

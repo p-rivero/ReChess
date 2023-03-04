@@ -21,7 +21,7 @@
   import type { DrawShape } from 'chessgroundx/draw'
   import type { PieceDefinition } from '@/protochess/interfaces'
   import { keyToPosition, positionToKey } from '@/utils/chess-coords'
-  import { onMounted, ref, watch } from 'vue'
+  import { onMounted, ref, watch, computed } from 'vue'
   
   const props = defineProps<{
     size: number
@@ -35,8 +35,11 @@
     (event: 'clicked', delta: [number, number]): void
   }>()
   
-  const image = props.piece.imageUrls[0] || props.piece.imageUrls[1] || ''
+  const image = computed(() => props.piece.imageUrls[0] || props.piece.imageUrls[1] || '')
   const board = ref<InstanceType<typeof ChessgroundAdapter>>()
+    
+  watch(props.piece, () => board.value?.setShapes(getShapes()))
+  onMounted(() => board.value?.setShapes(getShapes()))
   
   let piece_coords: [number, number] 
   if (props.position === 'center') {
@@ -89,9 +92,6 @@
       },
     }
   }
-  
-  watch(props.piece, () => board.value?.setShapes(getShapes()))
-  onMounted(() => board.value?.setShapes(getShapes()))
   
   
   function clicked(key: Key) {

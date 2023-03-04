@@ -1,8 +1,12 @@
 <template>
   <div v-for="(piece, pieceIndex) in props.state.pieceTypes" class="piece-container mb-4" :key="pieceIndex">
     <div v-if="editable">
-      <button class="button icon-edit color-theme sz-2 mr-4" @click="emit('edit-click', pieceIndex)"></button>
-      <button class="button icon-trash color-theme sz-2 mr-4" @click="emit('delete-click', pieceIndex)"></button>
+      <button class="button sz-3 mr-4 px-1 py-1 fit-content" @click="emit('edit-click', pieceIndex)">
+        <div class="icon-edit color-theme"></div>
+      </button>
+      <button class="button sz-3 mr-4 px-1 py-1 fit-content" @click="emit('delete-click', pieceIndex)">
+        <div class="icon-trash color-theme"></div>
+      </button>
     </div>
     <div class="box">
       <img v-if="piece.ids[0] != null && piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="sz-3 mr-4">
@@ -19,9 +23,7 @@
   </div>
   <br>
   <button class="button" @click="emit('new-click')">
-    <span class="icon">
-      <div class="icon-add color-theme icon"></div>
-    </span>
+    <div class="sz-icon icon-add color-theme"></div>
     <span>Add piece</span>
   </button>
 </template>

@@ -5,21 +5,17 @@
     </div>
     <div class="field-body" :style="{ zIndex }">
       <button class="button mr-4" :class="{ 'is-primary': addSelected }" @click="addClick">
-        <span class="icon">
-          <div class="icon icon-add" :class="{
-            'color-theme': !addSelected,
-            'color-white': addSelected
-          }"></div>
-        </span>
+        <div class="sz-icon icon-add" :class="{
+          'color-theme': !addSelected,
+          'color-white': addSelected
+        }"></div>
         <span>Add</span>
       </button>
       <button class="button" :class="{ 'is-primary': removeSelected }" @click="removeClick">
-        <span class="icon">
-          <div class="icon icon-trash" :class="{
-            'color-theme': !removeSelected,
-            'color-white': removeSelected
-          }"></div>
-        </span>
+        <div class="sz-icon icon-trash" :class="{
+          'color-theme': !removeSelected,
+          'color-white': removeSelected
+        }"></div>
         <span>Remove</span>
       </button>
     </div>

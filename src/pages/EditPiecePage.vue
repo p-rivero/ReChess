@@ -16,9 +16,7 @@
       <br>
       <SmartErrorMessage v-show="hasError" class="mb-4" :handler="errorMsgHandler" />
       <button class="button is-primary bottom-button" @click="$router.push({name: 'edit-variant'})">
-        <span class="icon">
-          <div class="icon icon-check color-white"></div>
-        </span>
+        <div class="sz-icon icon-check color-white"></div>
         <span>Done</span>
       </button>
     </div>
@@ -42,12 +40,7 @@
           <div class="horizontal-field">
             <SmartCheckbox text="White" class="mr-4" :start-value="!whiteInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
-            <img v-if="piece?.imageUrls[0]" class="piece-image" alt="White piece" :class="{ invisible: whiteInvisible }"
-              :src="piece?.imageUrls[0] ?? ''" />
-            <div v-else class="piece-image" :class="{ invisible: whiteInvisible }">
-              <div class="icon-cross color-black"></div>
-            </div>
-            <button class="icon-edit color-theme sz-2 mr-4" :class="{ invisible: whiteInvisible }" ></button>
+            <PieceImageEdit :imageUrl="piece?.imageUrls[0]" :class="{ invisible: whiteInvisible }"/>
             <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
               :error-handler="errorMsgHandler"
@@ -66,12 +59,7 @@
           <div class="horizontal-field">
             <SmartCheckbox text="Black" class="mr-4" :start-value="!blackInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
-            <img v-if="piece?.imageUrls[1]" class="piece-image" alt="Black piece" :class="{ invisible: blackInvisible }"
-              :src="piece?.imageUrls[1] ?? ''" />
-            <div v-else class="piece-image" :class="{ invisible: blackInvisible }">
-              <div class="icon-cross color-black"></div>
-            </div>
-            <button class="icon-edit color-theme sz-2 mr-4" :class="{ invisible: blackInvisible }" ></button>
+            <PieceImageEdit :imageUrl="piece?.imageUrls[1]" :class="{ invisible: blackInvisible }"/>
             <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :error-handler="errorMsgHandler"
@@ -200,6 +188,7 @@
   import CharPillList from '@/components/EditVariant/CharPillList.vue'
   import CoordPillList from '@/components/EditVariant/CoordPillList.vue'
   import AddRemoveButtons from '@/components/EditVariant/AddRemoveButtons.vue'
+  import PieceImageEdit from '@/components/EditVariant/PieceImageEdit.vue'
   import PopupOverlay from '@/components/PopupOverlay.vue'
   import type { PieceDefinition } from '@/protochess/interfaces'
   import { useVariantDraftStore } from '@/stores/variant-draft'
