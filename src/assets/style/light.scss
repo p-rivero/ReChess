@@ -5,13 +5,13 @@ $primary: $brown;
 $primary-dark: $dark-brown;
 $primary-light: $light-brown;
 
-$link: $dark-green;
-$link-visited: $dark-green;
+$link: $primary;
+$link-visited: $primary;
 $link-hover: $grey-darker;
-$link-focus: $dark-green;
-$link-focus-border: $dark-green;
-$link-active: $green;
-$link-active-border: $green;
+$link-focus: $primary-light;
+$link-focus-border: $primary-light;
+$link-active: $primary;
+$link-active-border: $primary;
 
 @import "node_modules/bulma-checkbox/bulma-checkbox";
 @import 'bulma/bulma.sass';

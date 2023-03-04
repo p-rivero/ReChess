@@ -1,6 +1,6 @@
 <template>
   <button class="button mr-4 px-1 py-1 fit-content">
-    <img v-if="imageUrl" class="piece-image" alt="White piece" :src="imageUrl" />
+    <img v-if="imageUrl" class="piece-image" alt="piece image" draggable="false" :src="imageUrl" />
     <div v-else class="piece-image">
       <div class="icon-cross color-black"></div>
     </div>

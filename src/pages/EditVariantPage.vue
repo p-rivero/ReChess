@@ -46,11 +46,11 @@
       
       <SmartErrorMessage v-show="hasError" class="my-4" :handler="errorMsgHandler" />
       <button class="button bottom-button" @click="$router.push({name: 'analysis'})" :disabled="hasError">
-        <div class="sz-icon icon-analysis color-white"></div>
+        <div class="sz-icon icon-analysis color-theme"></div>
         <span>Analysis board</span>
       </button>
       <button class="button bottom-button" @click="$router.push({name: 'play'})" :disabled="hasError">
-        <div class="sz-icon icon-cpu color-white"></div>
+        <div class="sz-icon icon-cpu color-theme"></div>
         <span>Play against engine</span>
       </button>
       <br>
@@ -61,11 +61,11 @@
       <br>
       <br>
       <button class="button bottom-button" @click="draftStore.backupFile">
-        <div class="sz-icon icon-download color-white"></div>
+        <div class="sz-icon icon-download color-theme"></div>
         <span>Back up</span>
       </button>
       <button class="button bottom-button" @click="uploadFile">
-        <div class="sz-icon icon-upload color-white"></div>
+        <div class="sz-icon icon-upload color-theme"></div>
         <span>Upload</span>
       </button>
       <br>

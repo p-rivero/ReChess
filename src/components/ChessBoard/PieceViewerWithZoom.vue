@@ -13,13 +13,16 @@
     
     <br>
     <label class="label">View:</label>
-    <div class="field is-grouped is-grouped-multiline" v-for="(group, index) in ZOOM_BUTTONS" :key="index">
-      <div class="control" v-for="button in group" :key="`${button.width}-${button.height}-${button.position}`">
+    <div class="field is-grouped is-grouped-multiline" v-for="(group, groupIndex) of ZOOM_BUTTONS" :key="groupIndex">
+      <div class="control" v-for="(button, buttonIndex) of group" :key="buttonIndex">
         <button class="button view-button px-1 py-1"
           :class="{'is-active': width === button.width && height === button.height && position === button.position}"
           @click="width = button.width; height = button.height; position = button.position"
         >
-          <span class="color-theme" :class="button.icon"></span>
+          <span :class="[
+            button.icon,
+            (width === button.width && height === button.height && position === button.position) ? 'color-primary' : 'color-theme',
+          ]"></span>
         </button>
       </div>
     </div>

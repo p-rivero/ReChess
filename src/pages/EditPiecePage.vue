@@ -46,7 +46,7 @@
               :error-handler="errorMsgHandler"
               :error-priority="1"
               :validator="text => {
-                if (whiteInvisible && blackInvisible) return 'This piece should be available to at least 1 player'
+                if (whiteInvisible && blackInvisible) return 'This piece must be available to White, Black or both players'
                 if (whiteInvisible) return
                 if (text.length === 0) return 'Missing piece symbol for White player'
                 if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
@@ -74,7 +74,7 @@
       </div>
       
       <label class="label">Behavior:</label>
-      <SmartCheckbox text="Leader" class="rules-field"
+      <SmartCheckbox text="Leader (can be checked/checkmated)" class="rules-field"
         :startValue="piece?.isLeader"
         @changed="value => { piece!.isLeader = value; draftStore.save() }"/>
       
@@ -85,7 +85,7 @@
         <SmartDropdown :items="['No', 'As king', 'As rook']"
           :startItem="piece?.isCastleRook ? 'As rook' : piece?.castleFiles ? 'As king' : 'No'"
           :onChanged="item =>castlingDropdownChanged(item)"/>
-        <div v-show="piece?.castleFiles" class="is-flex is-flex-direction-row is-align-items-center">
+        <div v-show="piece?.castleFiles" class="is-flex-not-important is-flex-direction-row is-align-items-center">
           <div class="field-label-both">
             <label>Queenside file</label>
           </div>
@@ -335,6 +335,10 @@
   
   .invisible {
     visibility: hidden;
+  }
+  
+  .is-flex-not-important {
+    display: flex;
   }
 </style>
 

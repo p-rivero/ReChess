@@ -3,6 +3,7 @@
     <div v-for="(piece, index) in pieceList" :key="index" class="control" :style="{zIndex}">
       <img
         class="button sz-3 px-1 py-1"
+        draggable="false"
         :src="piece.url"
         :class="{'is-primary': selectedId === piece.id}"
         @click="onPieceClick(piece.id)"/>

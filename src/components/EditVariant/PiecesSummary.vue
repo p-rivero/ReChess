@@ -9,10 +9,10 @@
       </button>
     </div>
     <div class="box">
-      <img v-if="piece.ids[0] != null && piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="sz-3 mr-4">
+      <img v-if="piece.ids[0] != null && piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="sz-3 mr-4" draggable="false">
       <div v-else alt="piece image" class="sz-3 mr-4 icon-cross" :class="{'color-theme': piece.ids[0] != null}"></div>
       
-      <img v-if="piece.ids[1] != null && piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="sz-3 mr-4">
+      <img v-if="piece.ids[1] != null && piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="sz-3 mr-4" draggable="false">
       <div v-else alt="piece image" class="sz-3 mr-4 icon-cross" :class="{'color-theme': piece.ids[1] != null}"></div>
       
       <p class="mr-4">{{ piece.displayName }}</p>
