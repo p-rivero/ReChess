@@ -1,7 +1,8 @@
 <template>
-  <label class="checkbox">
-    <input type="checkbox" class="mr-2" ref="checkboxInput" @change="checkboxChanged($event.target)">
-    <span>{{ text }}</span>
+  <label class="b-checkbox checkbox">
+    <input type="checkbox" value="false" ref="checkboxInput" @change="checkboxChanged($event.target)" />
+    <span class="check"></span>
+    <span class="control-label">{{ text }}</span>
   </label>
 </template>
 
@@ -31,4 +32,3 @@
     emit('changed', checked)
   }
 </script>
-

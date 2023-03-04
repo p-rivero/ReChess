@@ -32,17 +32,7 @@ $border-light-hover: $grey-dark;
 $shadow: 0 0.5em 1em -0.125em rgba(0, 0, 0, 0.3), 0 0px 0 1px rgba(0, 0, 0, 0.2);
 $card-header-shadow: $shadow;
 
-
+@import "node_modules/bulma-checkbox/bulma-checkbox";
 @import 'bulma/bulma.sass';
 
-@import '@/assets/img/icons/icons.scss';
-
-.color-primary {
-    background-color: $primary;
-}
-.color-primary-dark {
-    background-color: $primary-dark;
-}
-.color-theme {
-    background-color: $grey-lightest;
-}
+@import 'icons';

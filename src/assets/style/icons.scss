@@ -1,0 +1,38 @@
+
+// Import auto-generated icon classes
+@import '@/assets/img/icons/icons.scss';
+
+.color-white {
+    background-color: $grey-lightest;
+}
+.color-black {
+    background-color: $grey-darker;
+}
+
+.color-primary {
+    background-color: $primary;
+}
+.color-primary-dark {
+    background-color: $primary-dark;
+}
+.color-theme {
+    background-color: $text;
+}
+
+button:focus .color-theme {
+    background-color: $link-focus;
+}
+button:active .color-theme {
+    background-color: $link-active;
+}
+
+
+// Size utility classes
+.sz-2 {
+    width: 2rem !important;
+    height: 2rem !important;
+}
+.sz-3 {
+    width: 3rem !important;
+    height: 3rem !important;
+}
