@@ -1,0 +1,12 @@
+// Use a grey background for the body while the page is loading.
+// This mitigates a white FOUC in Firefox.
+
+@import 'variables';
+
+html[data-theme="dark"] {
+    background-color: $black-ter;
+}
+
+html[data-theme="light"] {
+    background-color: $white;
+}

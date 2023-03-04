@@ -24,5 +24,9 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('../src', import.meta.url))
     }
+  },
+  build: {
+    // Needed for top-level await
+    target: ['chrome89', 'firefox89', 'safari15', 'edge89', 'opera75'],
   }
 })

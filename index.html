@@ -18,7 +18,10 @@
     <meta name="theme-color" content="#363636">
     
     <!-- Block rendering until the theme is loaded -->
-    <script type="module" src="/src/load-css.ts"></script>
+    <script type="module">
+      import { loadTheme } from "@/utils/theme"
+      await loadTheme()
+    </script>
   </head>
   
   <body class="has-navbar-fixed-top">

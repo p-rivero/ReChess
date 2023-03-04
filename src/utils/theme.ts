@@ -11,13 +11,13 @@ export function toggleTheme() {
 
 export async function loadTheme() {
   const theme = localStorage.getItem('theme') || DEFAULT_THEME
+  // Set the theme on the document root element, so that background.scss
+  // displays the correct placeholder to avoid a FOUC
+  document.documentElement.setAttribute('data-theme', theme)
+  // Load the theme's stylesheet
   if (theme === 'light') {
-    // console.log('import: light')
-    // Load the light theme CSS
     await import('@/assets/style/light.scss')
   } else {
-    console.log('import: dark')
-    // Load the dark theme CSS
     await import('@/assets/style/dark.scss')
   }
 }

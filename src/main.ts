@@ -6,6 +6,8 @@ import { router } from '@/router'
 import { getProtochess, initializeProtochess, protochessSupportsThreads } from '@/protochess/protochess'
 
 
+import '@/assets/style/background.scss'
+
 // Don't await initializeProtochess(), since it needs to fetch a large wasm file
 // and we don't want to block the app from mounting.
 // Instead, getProtochess() will wait for the wasm module to be initialized.
