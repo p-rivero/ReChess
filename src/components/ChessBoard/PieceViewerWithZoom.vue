@@ -1,7 +1,6 @@
 <template>
-  <div>
+  <div class="w-100 h-100">
     <PieceViewer
-      :size-rem="sizeRem"
       :piece="piece"
       :width="width"
       :height="height"
@@ -36,7 +35,6 @@
   import { ref, toRefs } from 'vue'
   
   const props = defineProps<{
-    sizeRem: number
     piece: PieceDefinition
   }>()
   const { piece } = toRefs(props)

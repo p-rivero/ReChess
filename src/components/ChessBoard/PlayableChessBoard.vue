@@ -7,7 +7,6 @@
 
 <template>
   <ViewableChessBoard 
-    :size-rem=props.sizeRem
     :white-pov=whitePov
     :view-only=false
     :show-coordinates=true
@@ -27,7 +26,6 @@
   }
   
   const props = defineProps<{
-    sizeRem: number
     white: 'human' | 'engine' | CustomMoveCallback
     black: 'human' | 'engine' | CustomMoveCallback
   }>()

@@ -9,7 +9,6 @@
   <ChessgroundAdapter
     :width="currentWidth"
     :height="currentHeight"
-    :size-rem="props.sizeRem"
     :white-pov="whitePov"
     :initial-config="currentBoardConfig"
     :piece-images="pieceImages"
@@ -30,7 +29,6 @@
   import { ref } from 'vue'
 
   const props = defineProps<{
-    sizeRem: number
     whitePov: boolean
     viewOnly: boolean
     showCoordinates: boolean

@@ -120,15 +120,13 @@
     position: absolute;
     top: 6px;
     width: 100%;
-    opacity: 1;
     border-bottom: 7px solid rgba(214, 79, 0, 0.4);
     margin-top: -3px;
   }
   .eval-gauge .marker {
     position: absolute;
-    top: 1px;
+    top: 0;
     width: 100%;
-    opacity: 1;
     border-bottom: 2px solid rgba(112, 112, 112, 0.5);
   }
   

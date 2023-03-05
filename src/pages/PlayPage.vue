@@ -1,5 +1,5 @@
 <template>
-  <PlayableChessBoard ref='board' :size-rem=50 :white="'human'" :black="'engine'" />
+  <PlayableChessBoard ref='board' :white="'human'" :black="'engine'" />
 </template>
 
 <script setup lang="ts">

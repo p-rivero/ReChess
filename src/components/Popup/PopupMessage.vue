@@ -10,8 +10,8 @@
         {{ messageText }}
       </section>
       <footer class="modal-card-foot">
-        <button class="button is-primary" @click="accept">{{ primaryButtonText }}</button>
-        <button v-if="secondaryButtonText" class="button" @click="cancel">{{ secondaryButtonText }}</button>
+        <button ref="primaryButton" class="button is-primary" @click="accept" @keydown.esc="cancel">{{ primaryButtonText }}</button>
+        <button v-if="secondaryButtonText" class="button" @click="cancel" @keydown.esc="cancel">{{ secondaryButtonText }}</button>
       </footer>
     </div>
   </div>
@@ -24,6 +24,7 @@
   const popup = ref<HTMLElement>()
   const titleText = ref<string>('')
   const messageText = ref<string>('')
+  const primaryButton = ref<HTMLButtonElement>()
   const primaryButtonText = ref<string>('')
   const secondaryButtonText = ref<string|null>('')
   
@@ -48,6 +49,7 @@
       }
       popup.value?.classList.add('is-active')
       document.documentElement.classList.add('is-clipped')
+      primaryButton.value?.focus()
     },
     hide: closePopup,
   })

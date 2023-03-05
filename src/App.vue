@@ -1,7 +1,7 @@
 <template>
   <NavbarComponent />
   <div class="page-container is-flex is-flex-direction-row is-justify-content-center">
-    <div class="page-content">
+    <div class="page-content w-100 px-4 py-4">
       <RouterView />
     </div>
   </div>
@@ -19,8 +19,6 @@
   }
   
   .page-content {
-    width: 100%;
     max-width: 1250px;
-    padding: 1rem;
   }
 </style>

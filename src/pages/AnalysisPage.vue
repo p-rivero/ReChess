@@ -1,7 +1,7 @@
 <template>
   <div class="is-flex is-flex-direction-column is-align-items-center">
-    <div class="is-flex">
-      <PlayableChessBoard ref='board' :size-rem=50 :white="'human'" :black="'human'" />
+    <div class="is-flex h-100 w-100">
+      <PlayableChessBoard ref='board' :white="'human'" :black="'human'" />
       <EvaluationGauge class="ml-2" ref="gauge" :white-pov="true" />
     </div>
   </div>

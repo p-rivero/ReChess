@@ -6,7 +6,7 @@
 -->
 
 <template>
-  <div class="chessboard">
+  <div class="chessboard w-100 h-100">
     <div ref="board" class="cg-board-wrap"
       @click="e => onClick(e)"
       @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseout="endDrag"></div>
@@ -32,7 +32,6 @@
     width: number
     height: number
     initialConfig: Config
-    sizeRem: number
     whitePov: boolean
     pieceImages: PieceImages
   }>()
@@ -56,13 +55,18 @@
   const DARK_COLOR = '#b58863';
   const backgroundSvg = chessboardSvg(props.width, props.height, LIGHT_COLOR, DARK_COLOR)
   const boardBackground = 'url("data:image/svg+xml;utf8,' + backgroundSvg + '")'
-  const widthPercent = 100 / props.width + '%'
-  const heightPercent = 100 / props.height + '%'
+  const squareWidthPercent = 100 / props.width + '%'
+  const squareHeightPercent = 100 / props.height + '%'
   
-  const sizePerSquare = props.sizeRem / Math.max(props.width, props.height)
-  const componentHeight = computed(() => props.height * sizePerSquare + 'rem')
-  const componentWidth = computed(() => props.width * sizePerSquare + 'rem')
+  const sizePercentPerSquare = 100 / Math.max(props.width, props.height)
+  const componentHeightPercent = props.height * sizePercentPerSquare
+  const componentWidthPercent = props.width * sizePercentPerSquare
+  const [wrapWidth, wrapHeight] = 
+    (componentWidthPercent === 100) ?
+    ['100%', `${componentHeightPercent}%`] :
+    [`${componentWidthPercent}%`, '100%']
   
+  // Coordinates text colors
   const bottomLeftTextColor = props.height % 2 === 0 ? LIGHT_COLOR : DARK_COLOR
   const bottomLeftTextOpposite = props.height % 2 === 0 ? DARK_COLOR : LIGHT_COLOR
   const topRightTextColor = props.width % 2 === 0 ? LIGHT_COLOR : DARK_COLOR
@@ -126,8 +130,8 @@
   }
 
   .cg-wrap {
-    width: v-bind(componentWidth);
-    height: v-bind(componentHeight);
+    padding-right: v-bind(wrapWidth);
+    padding-bottom: v-bind(wrapHeight);
     position: relative;
     display: block;
   }
@@ -150,8 +154,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: v-bind(widthPercent);
-    height: v-bind(heightPercent);
+    width: v-bind(squareWidthPercent);
+    height: v-bind(squareHeightPercent);
     pointer-events: none;
   }
   cg-board square.move-dest {
@@ -190,8 +194,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: v-bind(widthPercent);
-    height: v-bind(heightPercent);
+    width: v-bind(squareWidthPercent);
+    height: v-bind(squareHeightPercent);
     background-size: cover;
     z-index: 2;
     will-change: transform;

@@ -9,7 +9,7 @@
       
       <div class="is-flex is-justify-content-center mb-4 board-container">
         <ViewableChessBoard ref="board" style="z-index: 20"
-          :size-rem="30" :white-pov="true" :view-only="true" :show-coordinates="true"
+          :white-pov="true" :view-only="true" :show-coordinates="true"
           @clicked="coords => placePiece(coords)"/>
       </div>
       
@@ -96,7 +96,7 @@
       
       <label class="label">Rules:</label>
       <div class="columns is-mobile">
-        <div class="column is-narrow left-column">
+        <div class="column ">
           <SmartCheckbox text="Capturing is forced" class="rules-field"
             :start-value="draftStore.state.globalRules.capturingIsForced"
             @changed="value => { draftStore.state.globalRules.capturingIsForced = value; draftStore.save() }"/>
@@ -264,8 +264,15 @@
   }
   
   .left-column {
-    max-width: 31.5rem;
-    margin-right: 2rem;
+    max-width: 32rem;
+  }
+  
+  // In mobile, allow left column to be as small as needed
+  @media screen and (max-width: 1023px) {
+    .left-column {
+      min-width: none;
+      margin-right: 0;
+    }
   }
   
   .field-label {
@@ -289,7 +296,7 @@
   }
   
   .board-container {
-    height: 500px;
+    height: 31rem;
   }
   
   .bottom-button {

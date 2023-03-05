@@ -2,7 +2,6 @@
   <ChessgroundAdapter
     :width="props.width"
     :height="props.height"
-    :size-rem="props.sizeRem"
     :white-pov="true"
     :view-only="true"
     :initial-config="boardConfig"
@@ -24,7 +23,6 @@
   import { onMounted, ref, watch, computed } from 'vue'
   
   const props = defineProps<{
-    sizeRem: number
     piece: PieceDefinition
     width: number
     height: number
