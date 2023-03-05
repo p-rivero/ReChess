@@ -3,8 +3,14 @@
  -->
  
 <template>
-  <div class="eval-gauge" :class="{'reverse': !whitePov}">
-    <div class="black-bar"></div>
+  <div class="is-flex">
+    <div class="eval-gauge" :class="{'reverse': !whitePov}">
+      <div class="black-bar"></div>
+    </div>
+    <div>
+      <div class="ml-2 eval-text">{{ evalText }}</div>
+      <div class="ml-2">{{ depthText }}</div>
+    </div>
   </div>
 </template>
 
@@ -17,10 +23,11 @@
   }>()
   
   const blackBarHeight = ref('50%')
+  const evalText = ref('')
+  const depthText = ref('')
   
   defineExpose({
-    // todo està al reves
-    updateEvaluation(evaluation: number|`#${number}`, invert: boolean) {
+    updateEvaluation(evaluation: number|`#${number}`, depth: number, invert: boolean) {
       console.log('eval', evaluation)
       let blackGaugePercent: number
       if (typeof evaluation === 'string' && evaluation.startsWith('#')) {
@@ -28,15 +35,19 @@
         // Negative adjustedMate means that black is winning
         const adjustedMate = invert ? -mateIn : mateIn
         blackGaugePercent = 100 - mateToWinOdds(adjustedMate)
+        evalText.value = `#${adjustedMate}`
       } else if (typeof evaluation === 'number') {
         // Negative adjustedCentipawns means that black is winning
         const adjustedCentipawns = invert ? -evaluation : evaluation
         blackGaugePercent = 100 - cpToWinOdds(adjustedCentipawns)
+        const plusSign = adjustedCentipawns > 0 ? '+' : ''
+        evalText.value = plusSign + (adjustedCentipawns / 100).toFixed(1)
       } else {
         throw new Error('Unexpected evaluation format: ' + evaluation)
       }
       console.log('percent', -blackGaugePercent)
       blackBarHeight.value = `${blackGaugePercent}%`
+      depthText.value = `Depth ${depth}`
     }
   })
   
@@ -74,7 +85,6 @@
   .eval-gauge {
     display: block;
     width: 20px;
-    height: 200px;
     background-color: #ccc;
   }
   .eval-gauge .black-bar {
@@ -87,5 +97,11 @@
   }
   .eval-gauge.reverse {
     transform: rotate(180deg);
+  }
+  
+  .eval-text {
+    font-size: 1.5em;
+    font-weight: bold;
+    width: 5rem;
   }
 </style>

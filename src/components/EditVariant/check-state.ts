@@ -1,6 +1,6 @@
 import type { GameState, PieceDefinition } from "@/protochess/interfaces"
 import { getProtochess } from "@/protochess/protochess"
-import type { ErrorMessageHandler } from "@/utils/ErrorMessageHandler"
+import type { ErrorMessageHandler } from "@/utils/error-message-handler"
 
 export async function checkState(state: GameState, errorMsgHandler: ErrorMessageHandler) {
   if (!checkPieces(state, errorMsgHandler)) return
@@ -84,8 +84,7 @@ async function checkProtochess(state: GameState, errorMsgHandler: ErrorMessageHa
   try {
     const protochess = await getProtochess()
     await protochess.setState(state)
-    // Search at depth 1 to see if the engine can find a move
-    await protochess.getBestMove(1)
+    await protochess.validatePosition()
   } catch (e) {
     // Use priority -1, which is lower than the priority of text input errors
     errorMsgHandler.show(`Illegal starting position: ${e}`, -1)

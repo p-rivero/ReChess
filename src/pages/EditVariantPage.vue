@@ -167,7 +167,7 @@
   import { onMounted, ref, watch } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { placementsToFen } from '@/utils/fen-to-placements'
-  import { ErrorMessageHandler } from '@/utils/ErrorMessageHandler'
+  import { ErrorMessageHandler } from '@/utils/error-message-handler'
   import { useRouter } from 'vue-router'
   
   const draftStore = useVariantDraftStore()

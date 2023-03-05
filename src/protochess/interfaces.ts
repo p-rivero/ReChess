@@ -4,6 +4,7 @@
 export interface Protochess {
   toString(): Promise<string>,
   playerToMove(): Promise<'white' | 'black'>,
+  validatePosition(): Promise<void>,
   playBestMove(depth: number): Promise<MakeMoveResult>,
   playBestMoveTimeout(time: number): Promise<MakeMoveResultWithDepth>,
   makeMove(move: MoveInfo): Promise<MakeMoveResult>,
@@ -142,6 +143,7 @@ export interface IWasmModule {
   wasmObject: {
     toString(): Promise<any>,
     playerToMove(): Promise<any>,
+    validatePosition(): Promise<any>,
     playBestMove(depth: number): Promise<any>,
     playBestMoveTimeout(time: number): Promise<any>,
     makeMove(move: MoveInfo): Promise<any>,

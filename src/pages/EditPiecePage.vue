@@ -198,7 +198,7 @@
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { numberToLetter, letterToNumber } from '@/utils/chess-coords'
-  import { ErrorMessageHandler } from '@/utils/ErrorMessageHandler'
+  import { ErrorMessageHandler } from '@/utils/error-message-handler'
   
   const router = useRouter(); 
   const route = useRoute()

@@ -1,6 +1,10 @@
 <template>
-  <PlayableChessBoard ref='board' :size=1000 :white="'human'" :black="'human'" />
-  <EvaluationGauge ref="gauge" :white-pov="true" />
+  <div class="is-flex is-flex-direction-column is-align-items-center">
+    <div class="is-flex">
+      <PlayableChessBoard ref='board' :size=1000 :white="'human'" :black="'human'" />
+      <EvaluationGauge class="ml-2" ref="gauge" :white-pov="true" />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -9,10 +13,10 @@
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { getProtochess } from '@/protochess/protochess'
-  import { pairToCoords } from '@/utils/chess-coords'
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
+  const evalText = ref<string>('')
   const draftStore = useVariantDraftStore()
     
   onMounted(async () => {
@@ -30,7 +34,7 @@
     const mv = await protochess.getBestMoveTimeout(1)
     const player = await protochess.playerToMove()
     
-    gauge.value?.updateEvaluation(mv.evaluation, player === 'black')
+    gauge.value?.updateEvaluation(mv.evaluation, mv.depth, player === 'black')
     board.value?.drawArrow(mv.from, mv.to, 'analysis')
   }
 </script>
