@@ -50,7 +50,6 @@
     viewOnly: props.viewOnly,
     disableContextMenu: true,
     blockTouchScroll: true,
-    // TODO: Coordinates are not working
     coordinates: props.showCoordinates,
     dimensions: {
       width: currentWidth, 
@@ -60,7 +59,16 @@
       enabled: false,
     },
     drawable: {
+      eraseOnClick: false,
       defaultSnapToValidMove: false,
+      brushes: {
+        analysis: {
+          key: 'analysis',
+          color: '#244b9e',
+          opacity: 0.5,
+          lineWidth: 15,
+        },
+      }
     },
   }
   let pieceImages: PieceImages = { white: [], black: [] }
@@ -152,6 +160,26 @@
     explode: (positions: [number, number][]) => {
       const keys = positions.map(positionToKey)
       board.value?.explode(keys)
+    },
+    
+    // Draw an arrow between two positions
+    drawArrow: (from: [number, number], to: [number, number], brush: string) => {
+      const fromKey = positionToKey(from)
+      const toKey = positionToKey(to)
+      const shapes = board.value?.getShapes() || []
+      shapes.push({
+        orig: fromKey,
+        dest: toKey,
+        brush,
+      })
+      board.value?.setShapes(shapes)
+    },
+    
+    // Clear all arrows
+    clearArrows: (brush: string) => {
+      let shapes = board.value?.getShapes()
+      shapes = shapes?.filter(s => s.brush != brush) || []
+      board.value?.setShapes(shapes)
     },
   })
   

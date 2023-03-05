@@ -78,6 +78,16 @@
     explode: (positions: [number, number][]) => {
       board.value?.explode(positions)
     },
+    
+    // Draw an arrow between the given positions
+    drawArrow: (from: [number, number], to: [number, number], brush: string) => {
+      board.value?.drawArrow(from, to, brush)
+    },
+    
+    // Clear all arrows
+    clearArrows: (brush: string) => {
+      board.value?.clearArrows(brush)
+    },
   })
   
   

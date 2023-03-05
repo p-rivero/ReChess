@@ -128,10 +128,10 @@ function adaptMoveInfoWithEval(moveInfoEval: any): MoveInfoWithEval {
   const moveInfo: MoveInfo = moveInfoEval.moveInfo
   const evalNumeric: number = moveInfoEval.evaluation
   // Depth in ply of a possible mate
-  const mateDepth = MATE_VALUE - Math.abs(evalNumeric)
+  const mateDepth = MATE_VALUE - Math.abs(evalNumeric) + 1
   const multiplier = evalNumeric < 0 ? -1 : 1
   // Possible mate in n moves (negative if engine is losing)
-  const mate = multiplier * Math.floor(mateDepth/2)
+  const mate = multiplier * Math.floor(mateDepth / 2)
   // If this is mate (mateDepth < MAX_DEPTH), return a string like "MATE 5"
   const evaluation: number | `#${number}` = mateDepth < MAX_DEPTH ? `#${mate}` : evalNumeric
   
