@@ -105,7 +105,6 @@
   function onDrag(e: MouseEvent) {
     if (isDragging && canDragAgain) {
       canDragAgain = false
-      console.log('dragging')
       onClick(e)
       setTimeout(() => canDragAgain = true, 10)
     }
@@ -299,8 +298,11 @@
     background-image: v-bind(boardBackground);
     background-repeat: no-repeat;
   }
-  .chessboard piece._-piece {
-    background-image: url('@/assets/board/wall.svg');
+  [data-theme="dark"] .chessboard piece._-piece {
+    background-color: hsl(0, 0%, 14%);
+  }
+  [data-theme="light"] .chessboard piece._-piece {
+      background-color: hsl(0, 0%, 100%);
   }
   .chessboard square.exploding1 {
     background-image: url('@/assets/board/explosion1.svg');

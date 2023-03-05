@@ -144,6 +144,19 @@
 }
 
 
+/* block.svg */
+.icon-block {
+    -webkit-mask-image: url("@/assets/img/icons/block.svg");
+    mask-image: url("@/assets/img/icons/block.svg");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+
 /* check.svg */
 .icon-check {
     -webkit-mask-image: url("@/assets/img/icons/check.svg");

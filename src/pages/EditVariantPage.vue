@@ -144,8 +144,6 @@
         @edit-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
         @delete-click="pieceIndex => deletePiece(pieceIndex)"
         @new-click="createNewPiece" />
-      
-      <!-- TODO: Invalid squares -->
     </div>
   </div>
   
@@ -180,7 +178,7 @@
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
   const pieceSelector = ref<InstanceType<typeof PiecePlacementButtons>>()
-  const selectedPieceId = ref<string|'delete'|'none'>('none')
+  const selectedPieceId = ref<string|'wall'|'delete'|'none'>('none')
   
   const popupMessage = ref<InstanceType<typeof PopupMessage>>()
   
@@ -221,15 +219,26 @@
     // If the piece is already placed here, do nothing
     if (existingIndex !== -1 && draftStore.state.pieces[existingIndex].pieceId === selectedPieceId.value) return
     // Remove old placement, if any
-    if (existingIndex !== -1) draftStore.state.pieces.splice(existingIndex, 1)
-    // Add new placement, unless the "delete" button is selected
-    if (selectedPieceId.value !== 'delete') {
-      draftStore.state.pieces.push({
-        x: coords[0],
-        y: coords[1],
-        pieceId: selectedPieceId.value,
-      })
+    if (existingIndex !== -1) draftStore.state.pieces.splice(existingIndex, 1)    
+    // Remove existing wall, if any
+    draftStore.state.invalidSquares = draftStore.state.invalidSquares.filter(square => square[0] !== coords[0] || square[1] !== coords[1])
+    // Add wall
+    if (selectedPieceId.value === 'wall') {
+      draftStore.state.invalidSquares.push(coords)
+      draftStore.save()
+      return
     }
+    // Delete existing piece (don't need to do anything else)
+    if (selectedPieceId.value === 'delete') {
+      draftStore.save()
+      return
+    }
+    // Add new placement
+    draftStore.state.pieces.push({
+      x: coords[0],
+      y: coords[1],
+      pieceId: selectedPieceId.value,
+    })
     draftStore.save()
   }
   

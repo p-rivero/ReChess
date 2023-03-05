@@ -32,7 +32,10 @@ export function placementsToFen(state: GameState): string {
     let row = ''
     let empty = 0
     for (let x = 0; x < state.boardWidth; x++) {
-      const piece = state.pieces.find((p) => p.x === x && p.y === y)
+      let piece = state.pieces.find((p) => p.x === x && p.y === y)
+      if (state.invalidSquares.find(([sx, sy]) => sx === x && sy === y)) {
+        piece = { pieceId: '*', x, y }
+      }
       if (piece) {
         if (empty) {
           row += empty

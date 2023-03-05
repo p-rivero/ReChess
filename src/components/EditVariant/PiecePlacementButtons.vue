@@ -9,7 +9,16 @@
         @click="onPieceClick(piece.id)"/>
     </div>
     <div class="control">
-      <button class="button sz-3 px-2 py-2" :class="{'is-primary': selectedId === 'delete'}" :style="{zIndex}" @click="onDeleteClick()">
+      <button class="button sz-3 px-2 py-2" :class="{'is-primary': selectedId === 'wall'}" :style="{zIndex}" @click="onPieceClick('wall')">
+        <span class="icon-block"
+        :class="{
+          'color-theme': selectedId !== 'wall',
+          'color-white': selectedId === 'wall',
+        }"></span>
+      </button>
+    </div>
+    <div class="control">
+      <button class="button sz-3 px-2 py-2" :class="{'is-primary': selectedId === 'delete'}" :style="{zIndex}" @click="onPieceClick('delete')">
         <span class="icon-trash"
         :class="{
           'color-theme': selectedId !== 'delete',
@@ -24,7 +33,7 @@
   import type { GameState } from '@/protochess/interfaces'
   import { ref } from 'vue'
   
-  const selectedId = ref<string|'delete'|'none'>('none')
+  const selectedId = ref<string|'wall'|'delete'|'none'>('none')
     
   const props = defineProps<{
     state: GameState
@@ -32,7 +41,7 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'piece-selected', piece: string|'delete'): void
+    (event: 'piece-selected', piece: string|'wall'|'delete'): void
     (event: 'piece-deselected'): void
   }>()
   
@@ -64,22 +73,13 @@
     }
   }
   
-  function onPieceClick(id: string) {
+  function onPieceClick(id: string|'wall'|'delete') {
     if (selectedId.value === id) {
       selectedId.value = 'none'
       emit('piece-deselected')
     } else {
       selectedId.value = id
       emit('piece-selected', id)
-    }
-  }
-  function onDeleteClick() {
-    if (selectedId.value === 'delete') {
-      selectedId.value = 'none'
-      emit('piece-deselected')
-    } else {
-      selectedId.value = 'delete'
-      emit('piece-selected', 'delete')
     }
   }
     
