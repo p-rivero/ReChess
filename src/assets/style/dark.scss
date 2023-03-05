@@ -4,9 +4,9 @@
 $scheme-main: $black-ter;
 $scheme-main-bis: $black-bis;
 $scheme-main-ter: $black-ter;
-$scheme-invert: $white;
-$scheme-invert-bis: $white-bis;
-$scheme-invert-ter: $white-ter;
+$scheme-invert: $black;
+$scheme-invert-bis: $black-bis;
+$scheme-invert-ter: $black-ter;
 
 $primary: $brown;
 $primary-dark: $dark-brown;
@@ -28,6 +28,8 @@ $border: $grey-dark;
 $border-hover: $grey;
 $border-light: $grey-darker;
 $border-light-hover: $grey-dark;
+
+$modal-card-head-background-color: $scheme-main-bis;
 
 $shadow: 0 0.5em 1em -0.125em rgba(0, 0, 0, 0.3), 0 0px 0 1px rgba(0, 0, 0, 0.2);
 $card-header-shadow: $shadow;

@@ -191,7 +191,7 @@
   import CoordPillList from '@/components/EditVariant/CoordPillList.vue'
   import AddRemoveButtons from '@/components/EditVariant/AddRemoveButtons.vue'
   import PieceImageEdit from '@/components/EditVariant/PieceImageEdit.vue'
-  import PopupOverlay from '@/components/PopupOverlay.vue'
+  import PopupOverlay from '@/components/Popup/PopupOverlay.vue'
   import type { PieceDefinition } from '@/protochess/interfaces'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { paramToInt } from '@/utils/param-to-int'

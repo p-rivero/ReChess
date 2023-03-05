@@ -26,6 +26,12 @@ button:active .color-theme {
     background-color: $link-active;
 }
 
+button.delete {
+    &::before, &::after {
+        background-color: $text;
+    }
+}
+
 
 // Size utility classes
 .sz-icon {

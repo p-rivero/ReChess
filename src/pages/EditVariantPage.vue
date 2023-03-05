@@ -150,6 +150,7 @@
   </div>
   
   <PopupOverlay v-if="selectedPieceId !== 'none'" :z-index="10" @click="pieceSelector?.cancelPlacement()" />
+  <PopupMessage buttons="ok-cancel" ref="popupMessage" />
 </template>
 
 
@@ -161,7 +162,8 @@
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
-  import PopupOverlay from '@/components/PopupOverlay.vue'
+  import PopupOverlay from '@/components/Popup/PopupOverlay.vue'
+  import PopupMessage from '@/components/Popup/PopupMessage.vue'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
   import { checkState } from '@/components/EditVariant/check-state'
   import { onMounted, ref, watch } from 'vue'
@@ -180,6 +182,8 @@
   const pieceSelector = ref<InstanceType<typeof PiecePlacementButtons>>()
   const selectedPieceId = ref<string|'delete'|'none'>('none')
   
+  const popupMessage = ref<InstanceType<typeof PopupMessage>>()
+  
   // When state changes, update the board and run a state check
   watch(draftStore.state, () => updateBoardAndError(), { deep: true })
   onMounted(() => updateBoardAndError())
@@ -193,9 +197,15 @@
   }
   
   function deletePiece(pieceIndex: number) {
-    // TODO: Ask for confirmation
-    draftStore.state.pieceTypes.splice(pieceIndex, 1)
-    draftStore.save()
+    popupMessage.value?.show(
+      'Delete piece',
+      'Are you sure you want to delete this piece? This cannot be undone.',
+      'yes-no',
+      () => {
+        draftStore.state.pieceTypes.splice(pieceIndex, 1)
+        draftStore.save()
+      }
+    )
   }
   function createNewPiece() {
     // Limit to 26 pieces for now, since IDs are internally encoded as a single lowercase letter
@@ -227,7 +237,11 @@
     const success = await draftStore.uploadFile()
     // Refresh the page if the upload was successful
     if (success) router.go(0)
-    else alert('Could not import file, make sure the format is correct')
+    else popupMessage.value?.show(
+      'Could not import file',
+      'Make sure that the file is a .json with the correct format',
+      'ok'
+    )
   }
 </script>
 
