@@ -6,6 +6,13 @@
   <div class="is-flex">
     <div class="eval-gauge" :class="{'reverse': !whitePov}">
       <div class="black-bar"></div>
+      <tick class="marker" style="height: 12.5%"></tick>
+      <tick class="marker" style="height: 25%"></tick>
+      <tick class="marker" style="height: 37.5%"></tick>
+      <tick class="center-line" style="height: 50%"></tick>
+      <tick class="marker" style="height: 62.5%"></tick>
+      <tick class="marker" style="height: 75%"></tick>
+      <tick class="marker" style="height: 87.5%"></tick>
     </div>
     <div>
       <div class="ml-2 eval-text">{{ evalText }}</div>
@@ -83,20 +90,46 @@
 
 <style scoped lang="scss">
   .eval-gauge {
+    position: relative;
     display: block;
     width: 20px;
     background-color: #ccc;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      box-shadow: 0 0 5px rgb(0 0 0 / 60%) inset;
+    }
   }
   .eval-gauge .black-bar {
     display: block;
     width: 100%;
     height: 50%;
-    background-color: #000;
+    background-color: #0f0f0f;
     height: v-bind(blackBarHeight);
     transition: height 0.5s;
   }
   .eval-gauge.reverse {
     transform: rotate(180deg);
+  }
+  
+  .eval-gauge .center-line {
+    position: absolute;
+    top: 6px;
+    width: 100%;
+    opacity: 1;
+    border-bottom: 7px solid rgba(214, 79, 0, 0.4);
+    margin-top: -3px;
+  }
+  .eval-gauge .marker {
+    position: absolute;
+    top: 1px;
+    width: 100%;
+    opacity: 1;
+    border-bottom: 2px solid rgba(112, 112, 112, 0.5);
   }
   
   .eval-text {
