@@ -1,7 +1,7 @@
 <template>
   <div class="is-flex is-flex-direction-column is-align-items-center">
     <div class="is-flex">
-      <PlayableChessBoard ref='board' :size=1000 :white="'human'" :black="'human'" />
+      <PlayableChessBoard ref='board' :size-rem=50 :white="'human'" :black="'human'" />
       <EvaluationGauge class="ml-2" ref="gauge" :white-pov="true" />
     </div>
   </div>
@@ -16,7 +16,6 @@
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
-  const evalText = ref<string>('')
   const draftStore = useVariantDraftStore()
     
   onMounted(async () => {

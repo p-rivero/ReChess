@@ -9,7 +9,7 @@
       
       <div class="is-flex is-justify-content-center mb-4 board-container">
         <ViewableChessBoard ref="board" style="z-index: 20"
-          :size="500" :white-pov="true" :view-only="true" :show-coordinates="true"
+          :size-rem="30" :white-pov="true" :view-only="true" :show-coordinates="true"
           @clicked="coords => placePiece(coords)"/>
       </div>
       
@@ -264,7 +264,7 @@
   }
   
   .left-column {
-    max-width: calc(500px + 1.5rem);
+    max-width: 31.5rem;
     margin-right: 2rem;
   }
   

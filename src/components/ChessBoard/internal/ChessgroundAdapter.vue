@@ -22,7 +22,7 @@
   import type { Api } from 'chessgroundx/api'
   import type { Config } from 'chessgroundx/config'
   import type { DrawShape } from 'chessgroundx/draw'
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   
   // Map from piece id to the URL of the image to use
   export type PlayerPieceImages = [string, string][]
@@ -32,7 +32,7 @@
     width: number
     height: number
     initialConfig: Config
-    size: number
+    sizeRem: number
     whitePov: boolean
     pieceImages: PieceImages
   }>()
@@ -59,9 +59,9 @@
   const widthPercent = 100 / props.width + '%'
   const heightPercent = 100 / props.height + '%'
   
-  const sizePerSquare = props.size / Math.max(props.width, props.height)
-  const componentHeight = props.height * sizePerSquare + 'px'
-  const componentWidth = props.width * sizePerSquare + 'px'
+  const sizePerSquare = props.sizeRem / Math.max(props.width, props.height)
+  const componentHeight = computed(() => props.height * sizePerSquare + 'rem')
+  const componentWidth = computed(() => props.width * sizePerSquare + 'rem')
   
   const bottomLeftTextColor = props.height % 2 === 0 ? LIGHT_COLOR : DARK_COLOR
   const bottomLeftTextOpposite = props.height % 2 === 0 ? DARK_COLOR : LIGHT_COLOR

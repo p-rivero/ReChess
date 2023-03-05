@@ -9,7 +9,7 @@
     <div class="column is-narrow left-column">
       
       <div class="is-flex is-justify-content-center mb-4">
-        <PieceViewerWithZoom v-if="piece" :size="500" :piece="piece" style="z-index: 11;"
+        <PieceViewerWithZoom v-if="piece" :size-rem="30" :piece="piece" style="z-index: 11;"
           @clicked="editDelta"/>
       </div>
       
@@ -308,7 +308,7 @@
   }
   
   .left-column {
-    max-width: calc(500px + 1.5rem);
+    max-width: 31.5rem;
     margin-right: 2rem;
   }
   
