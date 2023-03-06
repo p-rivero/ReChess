@@ -36,6 +36,7 @@
   
   const emit = defineEmits<{
     (event: 'clicked', position: [number, number]): void
+    (event: 'user-moved', from: [number, number], to: [number, number]): void
   }>()
   
   // Initial board configuration
@@ -52,6 +53,11 @@
     dimensions: {
       width: currentWidth, 
       height: currentHeight,
+    },
+    movable: {
+      events: {
+        after: (from, to, _) => emit('user-moved', keyToPosition(from), keyToPosition(to))
+      }
     },
     premovable: {
       enabled: false,
@@ -140,18 +146,6 @@
     // Toggle between white and black point of view
     toggleOrientation: () => {
       board.value?.toggleOrientation()
-    },
-    
-    // Set a callback that will be called when the user makes a move (not when makeMove() is called)
-    onMoveCallback: (callback: (from: [number, number], to: [number, number]) => void) => {
-      const newConfig: Config = {
-        movable: {
-          events: {
-            after: (from, to, _) => callback(keyToPosition(from), keyToPosition(to))
-          }
-        }
-      }
-      incrementalUpdateConfig(newConfig)
     },
     
     // Cause an explosion at the given positions

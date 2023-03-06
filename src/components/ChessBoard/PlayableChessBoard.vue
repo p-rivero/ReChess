@@ -10,13 +10,14 @@
     :white-pov=whitePov
     :view-only=false
     :show-coordinates=true
+    @user-moved="userMovedCallback"
     
     ref="board"
   />
 </template>
 
 <script setup lang="ts">
-  import type { GameState, MoveInfo, MakeMoveResult } from '@/protochess/interfaces';
+  import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner } from '@/protochess/interfaces';
   import { getProtochess } from '@/protochess/protochess';
   import { ref, onMounted } from 'vue';
   import ViewableChessBoard from './ViewableChessBoard.vue'
@@ -29,15 +30,17 @@
     white: 'human' | 'engine' | CustomMoveCallback
     black: 'human' | 'engine' | CustomMoveCallback
   }>()
+  
+  const emit = defineEmits<{
+    (event: 'user-moved', from: [number, number], to: [number, number]): void
+    (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner): void
+  }>()
+  
+  
   // If both or no players are humans, default to white
   const whitePov = props.white == 'human' || props.black != 'human'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
-    
-  onMounted(async () => {
-    // At the start, add a callback to play the user's moves
-    board.value?.onMoveCallback(userMovedCallback)
-  })
   
   defineExpose({
     // Set the state of the board by loading a FEN string
@@ -64,14 +67,6 @@
       board.value?.toggleOrientation()
     },
     
-    // Set a callback that will be called when the user makes a move (not when makeMove() is called)
-    onMoveCallback: (callback: (from: [number, number], to: [number, number]) => void) => {
-      board.value?.onMoveCallback(async (from, to) => {
-        await userMovedCallback(from, to)
-        callback(from, to)
-      })
-    },
-    
     // Cause an explosion at the given positions
     explode: (positions: [number, number][]) => {
       board.value?.explode(positions)
@@ -96,6 +91,8 @@
     // TODO: Allow the user to choose the promotion piece
     const promotion = possiblePromotions.length > 0 ? possiblePromotions[0] : undefined
     await synchronizeBoardState({ from, to, promotion })
+    
+    emit('user-moved', from, to)
   }
   
   // Called in order to make the computer play its move
@@ -118,16 +115,21 @@
   // If playMoveBefore is specified, it will be played before synchronizing the state
   async function synchronizeBoardState(playMoveBefore?: MoveInfo) {
     const protochess = await getProtochess()
+    let moveResult: 'stop'|'continue' = 'continue'
     if (playMoveBefore) {
       const result = await protochess.makeMove(playMoveBefore)
       board.value?.makeMove(playMoveBefore.from, playMoveBefore.to)
-      handleResult(result)
+      moveResult = handleResult(result)
     }
     const state = await protochess.getState()
+    board.value?.setState(state)
+    
+    // Game has ended
+    if (moveResult == 'stop') return
+    
     const moves = await protochess.legalMoves()
     const moveWhite = props.white == 'human' && state.playerToMove == 0
     const moveBlack = props.black == 'human' && state.playerToMove == 1
-    board.value?.setState(state)
     board.value?.setMovable(moveWhite, moveBlack, moves)
     
     const nextPlayer = state.playerToMove == 0 ? props.white : props.black
@@ -139,9 +141,12 @@
     }
   }
   
-  async function handleResult(result: MakeMoveResult) {
+  function handleResult(result: MakeMoveResult): 'stop'|'continue' {
     // Show effect for exploded squares
     board.value?.explode(result.exploded)
+    if (result.flag === 'Ok') return 'continue'
+    
+    return 'stop'
     console.log('Make move result:', result)
   }
   
