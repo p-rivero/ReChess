@@ -25,6 +25,11 @@
   }>()
   
   
+  const emit = defineEmits<{
+    (event: 'piece-moved', from: [number, number], to: [number, number]): void
+    (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner): void
+  }>()
+  
   defineExpose({
     async setState(state: GameState) {
       if (board.value === undefined) {
@@ -38,10 +43,11 @@
   })
   
   
-  async function pieceMoved(_from: [number, number], _to: [number, number]) {
+  async function pieceMoved(from: [number, number], to: [number, number]) {
     if (props.hasGauge) {
       await updateEvaluation()
     }
+    emit ('piece-moved', from, to)
   }
   
   function gameOver(flag: MakeMoveFlag, winner: MakeMoveWinner) {
@@ -52,7 +58,7 @@
     if (props.hasGauge) {
       gauge.value?.gameOver(winner)
     }
-    console.log('Game over: ' + flag + ' ' + winner)
+    emit('game-over', flag, winner)
   }
   
   async function updateEvaluation() {

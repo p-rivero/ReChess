@@ -23,8 +23,19 @@ export interface Protochess {
 }
 
 
-export type MakeMoveFlag = 'Ok' | 'IllegalMove' | 'Checkmate' | 'LeaderCaptured' | 'PieceInWinSquare' | 'CheckLimit' | 'Stalemate' | 'Repetition';
-export type MakeMoveWinner = 'White' | 'Black' | 'None';
+export type MakeMoveFlag =
+  'Ok' |
+  'IllegalMove' |
+  'Checkmate' |
+  'LeaderCaptured' |
+  'AllPiecesCaptured' |
+  'PieceInWinSquare' |
+  'CheckLimit' |
+  'Stalemate' |
+  'Repetition'
+  
+export type MakeMoveWinner = 'White' | 'Black' | 'None'
+
 export interface MakeMoveResult {
   flag: MakeMoveFlag,
   winner: MakeMoveWinner,

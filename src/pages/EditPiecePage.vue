@@ -107,6 +107,11 @@
         </div>
       </div>
       
+      <label>Win instantly when standing on:</label>
+      <CoordPillList :editable="true" class="mb-5" :allow-repeat="false"
+        :starting-coords="piece?.winSquares"
+        @changed="coords => {piece!.winSquares = coords; draftStore.save()}"/>
+      
       <br>
       <label class="label">Movement:</label>
       <AddRemoveButtons text="Jumps:" :z-index="11" type="move"

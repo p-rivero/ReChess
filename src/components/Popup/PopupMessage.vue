@@ -1,6 +1,6 @@
 <template>
   <div class="modal" ref="popup">
-    <div class="modal-background" @click="cancel"></div>
+    <div class="modal-background" @click="backgroundClick"></div>
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">{{ titleText }}</p>
@@ -22,14 +22,15 @@
   import { ref } from 'vue'
   
   const popup = ref<HTMLElement>()
-  const titleText = ref<string>('')
-  const messageText = ref<string>('')
+  const titleText = ref('')
+  const messageText = ref('')
   const primaryButton = ref<HTMLButtonElement>()
-  const primaryButtonText = ref<string>('')
-  const secondaryButtonText = ref<string|null>('')
+  const primaryButtonText = ref('')
+  const secondaryButtonText = ref<string|null>(null)
   
   let acceptCallback: () => void
   let cancelCallback: () => void
+  let isImportant = false
   
   defineExpose({
     show: (title: string, message: string, buttons: 'ok' | 'ok-cancel' | 'yes-no', accept?: () => void, cancel?: () => void) => {
@@ -51,6 +52,10 @@
       document.documentElement.classList.add('is-clipped')
       primaryButton.value?.focus()
     },
+    showImportant(title: string, message: string, buttons: 'ok' | 'ok-cancel' | 'yes-no', accept?: () => void, cancel?: () => void) {
+      isImportant = true
+      this.show(title, message, buttons, accept, cancel)
+    },
     hide: closePopup,
   })
   
@@ -63,7 +68,13 @@
     closePopup()
   }
   
+  function backgroundClick() {
+    if (!isImportant) {
+      cancel()
+    }
+  }
   function closePopup() {
+    isImportant = false
     popup.value?.classList.remove('is-active')
     document.documentElement.classList.remove('is-clipped')
   }
