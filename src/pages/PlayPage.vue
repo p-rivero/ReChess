@@ -1,20 +1,17 @@
 <template>
-  <PlayableChessBoard ref='board' :white="'human'" :black="'engine'" />
+  <BoardWithGui ref="board" :white="'human'" :black="'engine'" :has-gauge="false" />
 </template>
 
 <script setup lang="ts">
-  import {ref, onMounted} from 'vue'
-  import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
+  import BoardWithGui from '@/components/GameUI/BoardWithGui.vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { ref, onMounted } from 'vue'
   
-  const board = ref<InstanceType<typeof PlayableChessBoard>>()
+  const board = ref<InstanceType<typeof BoardWithGui>>()
+    
   const draftStore = useVariantDraftStore()
   
-  onMounted(() => {
-    if (board.value === undefined) {
-      throw new Error('Reference to board is undefined')
-    }
-    board.value.setState(draftStore.state)
+  onMounted(async () => {
+    board.value?.setState(draftStore.state)
   })
 </script>
-

@@ -19,10 +19,10 @@
 <script setup lang="ts">
   import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner } from '@/protochess/interfaces';
   import { getProtochess } from '@/protochess/protochess';
-  import { ref, onMounted } from 'vue';
+  import { ref } from 'vue';
   import ViewableChessBoard from './ViewableChessBoard.vue'
   
-  interface CustomMoveCallback {
+  export interface CustomMoveCallback {
     (playerToMove: 'white'|'black'): Promise<MoveInfo>
   }
   
@@ -32,7 +32,7 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'user-moved', from: [number, number], to: [number, number]): void
+    (event: 'piece-moved', from: [number, number], to: [number, number]): void
     (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner): void
   }>()
   
@@ -91,8 +91,6 @@
     // TODO: Allow the user to choose the promotion piece
     const promotion = possiblePromotions.length > 0 ? possiblePromotions[0] : undefined
     await synchronizeBoardState({ from, to, promotion })
-    
-    emit('user-moved', from, to)
   }
   
   // Called in order to make the computer play its move
@@ -117,15 +115,20 @@
     const protochess = await getProtochess()
     let moveResult: 'stop'|'continue' = 'continue'
     if (playMoveBefore) {
+      // Play the move before synchronizing the state
       const result = await protochess.makeMove(playMoveBefore)
       board.value?.makeMove(playMoveBefore.from, playMoveBefore.to)
+      // Handle the result, if the game has ended don't emit piece-moved
       moveResult = handleResult(result)
+      if (moveResult === 'continue') {
+        emit('piece-moved', playMoveBefore.from, playMoveBefore.to)
+      }
     }
     const state = await protochess.getState()
     board.value?.setState(state)
     
-    // Game has ended
-    if (moveResult == 'stop') return
+    // Game has ended, don't continue
+    if (moveResult === 'stop') return
     
     const moves = await protochess.legalMoves()
     const moveWhite = props.white == 'human' && state.playerToMove == 0
@@ -145,9 +148,9 @@
     // Show effect for exploded squares
     board.value?.explode(result.exploded)
     if (result.flag === 'Ok') return 'continue'
+    emit('game-over', result.flag, result.winner)
     
     return 'stop'
-    console.log('Make move result:', result)
   }
   
 </script>

@@ -6,13 +6,13 @@
   <div class="is-flex">
     <div class="eval-gauge" :class="{'reverse': !whitePov}">
       <div class="black-bar"></div>
-      <tick class="marker" style="height: 12.5%"></tick>
-      <tick class="marker" style="height: 25%"></tick>
-      <tick class="marker" style="height: 37.5%"></tick>
-      <tick class="center-line" style="height: 50%"></tick>
-      <tick class="marker" style="height: 62.5%"></tick>
-      <tick class="marker" style="height: 75%"></tick>
-      <tick class="marker" style="height: 87.5%"></tick>
+      <div class="marker" style="height: 12.5%"></div>
+      <div class="marker" style="height: 25%"></div>
+      <div class="marker" style="height: 37.5%"></div>
+      <div class="center-line" style="height: 50%"></div>
+      <div class="marker" style="height: 62.5%"></div>
+      <div class="marker" style="height: 75%"></div>
+      <div class="marker" style="height: 87.5%"></div>
     </div>
     <div>
       <div class="ml-2 eval-text">{{ evalText }}</div>
@@ -23,6 +23,7 @@
 
 
 <script setup lang="ts">
+  import type { MakeMoveWinner } from '@/protochess/interfaces'
   import { ref } from 'vue'
   
   defineProps<{
@@ -53,6 +54,20 @@
       }
       blackBarHeight.value = `${blackGaugePercent}%`
       depthText.value = `Depth ${depth}`
+    },
+    
+    gameOver(winner: MakeMoveWinner) {
+      if (winner === 'White') {
+        evalText.value = '1-0'
+        blackBarHeight.value = '0%'
+      } else if (winner === 'Black') {
+        evalText.value = '0-1'
+        blackBarHeight.value = '100%'
+      } else {
+        evalText.value = '1/2-1/2'
+        blackBarHeight.value = '50%'
+      }
+      depthText.value = 'Game over'
     }
   })
   

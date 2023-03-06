@@ -1,39 +1,18 @@
 <template>
-  <div class="is-flex is-flex-direction-column is-align-items-center">
-    <div class="is-flex h-100 w-100">
-      <PlayableChessBoard ref='board' :white="'human'" :black="'human'" @user-moved="updateEvaluation"/>
-      <EvaluationGauge class="ml-2" ref="gauge" :white-pov="true" />
-    </div>
-  </div>
+  <BoardWithGui ref="board" :white="'human'" :black="'human'" :has-gauge="true" />
 </template>
 
 <script setup lang="ts">
-  import {ref, onMounted} from 'vue'
-  import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
-  import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
+  import BoardWithGui from '@/components/GameUI/BoardWithGui.vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
-  import { getProtochess } from '@/protochess/protochess'
+  import { ref, onMounted } from 'vue'
   
-  const board = ref<InstanceType<typeof PlayableChessBoard>>()
-  const gauge = ref<InstanceType<typeof EvaluationGauge>>()
+  const board = ref<InstanceType<typeof BoardWithGui>>()
+    
   const draftStore = useVariantDraftStore()
-    
-  onMounted(async () => {
-    if (board.value === undefined) {
-      throw new Error('Reference to board is undefined')
-    }
-    await board.value.setState(draftStore.state)
-    await updateEvaluation()
-  })
   
-  async function updateEvaluation() {
-    board.value?.clearArrows('analysis')
-    const protochess = await getProtochess()
-    const mv = await protochess.getBestMoveTimeout(1)
-    const player = await protochess.playerToMove()
-    
-    gauge.value?.updateEvaluation(mv.evaluation, mv.depth, player === 'black')
-    board.value?.drawArrow(mv.from, mv.to, 'analysis')
-  }
+  onMounted(async () => {
+    board.value?.setState(draftStore.state)
+  })
 </script>
 
