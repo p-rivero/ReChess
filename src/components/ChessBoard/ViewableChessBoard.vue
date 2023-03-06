@@ -1,7 +1,8 @@
 <!--
   This component is a higher level wrapper around the ChessgroundAdapter component.
   It's capable of rendering a GameState, but it doesn't know anything about the game engine or the rules of chess.
-  You can use this component directly for view-only boards. For interactive boards, use the PlayableChessBoard component instead.
+  You can use this component directly for view-only boards. For interactive boards (even if none of the players
+  is the user, like when watching a game), use the PlayableChessBoard component instead.
   Note that the initial size of the board is 0x0, so you must call setState() for the board to be visible.
 -->
 
@@ -12,7 +13,9 @@
     :white-pov="whitePov"
     :initial-config="currentBoardConfig"
     :piece-images="pieceImages"
+    :capture-wheel-events="captureWheelEvents"
     @clicked="key => emit('clicked', keyToPosition(key))"
+    @wheel="up => emit('wheel', up)"
     
     :key="boardUpdateKey"
     ref="board"
@@ -32,11 +35,13 @@
     whitePov: boolean
     viewOnly: boolean
     showCoordinates: boolean
+    captureWheelEvents: boolean
   }>()
   
   const emit = defineEmits<{
     (event: 'clicked', position: [number, number]): void
     (event: 'user-moved', from: [number, number], to: [number, number]): void
+    (event: 'wheel', up: boolean): void
   }>()
   
   // Initial board configuration

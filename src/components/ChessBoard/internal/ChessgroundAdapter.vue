@@ -9,7 +9,10 @@
   <div class="chessboard w-100 h-100">
     <div ref="board" class="cg-board-wrap"
       @click="e => onClick(e)"
-      @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseout="endDrag"></div>
+      @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseout="endDrag"
+      @touchstart="onTap"
+      @wheel="onWheel">
+    </div>
   </div>
 </template>
 
@@ -34,10 +37,12 @@
     initialConfig: Config
     whitePov: boolean
     pieceImages: PieceImages
+    captureWheelEvents: boolean
   }>()
   
   const emit = defineEmits<{
     (event: 'clicked', position: cg.Key): void
+    (event: 'wheel', up: boolean): void
   }>()
 
   // When mounted, create the chessground board and store the reference to the API handle
@@ -96,8 +101,14 @@
   }
   
   function onClick(e: MouseEvent) {
+    emitClick([e.clientX, e.clientY])
+  }
+  function onTap(e: TouchEvent) {
+    const touch: Touch = e.targetTouches[0]
+    emitClick([touch.clientX, touch.clientY])
+  }
+  function emitClick(coords: [number, number]) {
     if (chessgroundApi === undefined) throw new Error('Chessground API is not initialized')
-    const coords: cg.NumberPair = [e.pageX, e.pageY]
     let key = chessgroundApi.getKeyAtDomPos(coords)
     if (key) emit('clicked', key)
   }
@@ -118,13 +129,34 @@
     isDragging = false
   }
   
+  function onWheel(e: WheelEvent) {
+    if (props.captureWheelEvents) {
+      e.preventDefault()
+      emit('wheel', e.deltaY < 0)
+    }
+  }
+  
   // Redraw the board when the window is resized
   // https://github.com/lichess-org/chessground/issues/54
-  function onResize() {
+  function redrawBoard() {
     chessgroundApi?.redrawAll()
   }
-  window.addEventListener('resize', onResize)
-  onUnmounted(() => window.removeEventListener('resize', onResize))
+  const redrawBoardDebounced = debounce(redrawBoard)
+  window.addEventListener('resize', redrawBoard)
+  window.addEventListener('scroll', redrawBoardDebounced)
+  onUnmounted(() => window.removeEventListener('resize', redrawBoard))
+  onUnmounted(() => window.removeEventListener('scroll', redrawBoardDebounced))
+  
+  
+  // https://gist.github.com/ca0v/73a31f57b397606c9813472f7493a940
+  function debounce<T extends Function>(cb: T, wait = 20) {
+    let h = 0
+    let callable = (...args: any) => {
+      clearTimeout(h)
+      h = setTimeout(() => cb(...args), wait)
+    }
+    return callable as any as T
+  }
   
 </script>
 

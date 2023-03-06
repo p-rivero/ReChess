@@ -9,7 +9,7 @@
       
       <div class="is-flex is-justify-content-center mb-4 board-container">
         <ViewableChessBoard ref="board" style="z-index: 20"
-          :white-pov="true" :view-only="true" :show-coordinates="true"
+          :white-pov="true" :view-only="true" :show-coordinates="true" :capture-wheel-events="false"
           @clicked="coords => placePiece(coords)"/>
       </div>
       

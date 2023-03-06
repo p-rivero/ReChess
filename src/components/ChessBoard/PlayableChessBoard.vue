@@ -1,5 +1,6 @@
 <!--
-  This component is built on top of ViewableChessBoard and is meant for boards where the user controls 1 or 2 of the players.
+  This component is built on top of ViewableChessBoard and is meant for playable boards where the user controls between 0 and 2 players.
+  It allows using the scroll wheel to rewind the game.
   It uses the Protochess engine to restrict the user's moves to valid ones.
   Note that, since the Protochess object is shared, at any given time there can only be 1 instance of PlayableChessBoard.
 -->
@@ -7,10 +8,12 @@
 
 <template>
   <ViewableChessBoard 
-    :white-pov=whitePov
-    :view-only=false
-    :show-coordinates=true
+    :white-pov="whitePov"
+    :view-only="false"
+    :show-coordinates="true"
+    :capture-wheel-events="true"
     @user-moved="userMovedCallback"
+    @wheel="onWheel"
     
     ref="board"
   />
@@ -151,6 +154,11 @@
     emit('game-over', result.flag, result.winner)
     
     return 'stop'
+  }
+  
+  
+  function onWheel(up: boolean) {
+    console.log('wheel', up)
   }
   
 </script>

@@ -319,7 +319,7 @@
   // In mobile, allow left column to be as small as needed
   @media screen and (max-width: 1023px) {
     .left-column {
-      min-width: none;
+      min-width: 0;
     }
   }
     

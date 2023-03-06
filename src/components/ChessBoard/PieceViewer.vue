@@ -6,6 +6,7 @@
     :view-only="true"
     :initial-config="boardConfig"
     :piece-images="{white: [['P', image]], black: []}"
+    :capture-wheel-events="false"
     @clicked="clicked"
     
     ref="board"
