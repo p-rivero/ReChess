@@ -168,6 +168,7 @@
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { placementsToFen } from '@/utils/fen-to-placements'
   import { ErrorMessageHandler } from '@/utils/error-message-handler'
+  import { clone } from '@/utils/clone'
   import { useRouter } from 'vue-router'
   
   const draftStore = useVariantDraftStore()
@@ -188,7 +189,7 @@
   function updateBoardAndError() {
     checkState(draftStore.state, errorMsgHandler)
     // Clone state and add GUI fields
-    let state = JSON.parse(JSON.stringify(draftStore.state))
+    let state = clone(draftStore.state)
     state.fen = placementsToFen(draftStore.state)
     state.inCheck = false
     board.value?.setState(state)

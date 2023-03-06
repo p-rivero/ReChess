@@ -5,6 +5,7 @@ import sanitizeFilename from 'sanitize-filename'
 import type { GameState, PieceDefinition, PiecePlacement } from '@/protochess/interfaces'
 import { isGameState } from '@/protochess/interfaces.guard'
 import { exportFile, importFile } from '@/utils/file-io'
+import { clone } from '@/utils/clone'
 
 export const useVariantDraftStore = defineStore('variant-draft', () => {
   
@@ -25,7 +26,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   
   function addPiece() {
     // Clone the default piece and add it to the list of pieces
-    const newPiece = JSON.parse(JSON.stringify(DEFAULT_PIECE))
+    const newPiece = clone(DEFAULT_PIECE)
     state.value.pieceTypes.push(newPiece)
     save()
   }

@@ -25,7 +25,8 @@
   import type { Api } from 'chessgroundx/api'
   import type { Config } from 'chessgroundx/config'
   import type { DrawShape } from 'chessgroundx/draw'
-  import { ref, onMounted, computed, onUnmounted } from 'vue'
+  import { ref, onMounted, onUnmounted } from 'vue'
+  import { clone } from '@/utils/clone'
   
   // Map from piece id to the URL of the image to use
   export type PlayerPieceImages = [string, string][]
@@ -86,7 +87,7 @@
     movePiece: (from: cg.Key, to: cg.Key) => chessgroundApi!.move(from, to),
     setPieces: (diff: cg.PiecesDiff) => chessgroundApi!.setPieces(diff),
     explode: (keys: cg.Key[]) => chessgroundApi!.explode(keys),
-    getShapes: () => JSON.parse(JSON.stringify(chessgroundApi!.state.drawable.shapes)) as DrawShape[],
+    getShapes: () => clone(chessgroundApi!.state.drawable.shapes) as DrawShape[],
     setShapes: (shapes: DrawShape[]) => chessgroundApi!.setAutoShapes(shapes),
   })
   

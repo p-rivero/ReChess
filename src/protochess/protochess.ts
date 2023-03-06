@@ -1,4 +1,5 @@
 
+import { clone } from '@/utils/clone'
 import * as Comlink from 'comlink'
 import type {
   Protochess,
@@ -87,7 +88,7 @@ async function init(): Promise<Protochess> {
     },
     async setState(state: GameState): Promise<void> {
       // Clone the state object manually to avoid errors when passing it to wasm
-      const stateClone = JSON.parse(JSON.stringify(state))
+      const stateClone = clone(state)
       return wasm.wasmObject.setState(stateClone)
     },
     async getState(): Promise<GameStateGui> {
