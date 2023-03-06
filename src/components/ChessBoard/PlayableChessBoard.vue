@@ -7,16 +7,21 @@
 
 
 <template>
-  <ViewableChessBoard 
-    :white-pov="whitePov"
-    :view-only="false"
-    :show-coordinates="true"
-    :capture-wheel-events="true"
-    @user-moved="userMovedCallback"
-    @wheel="onWheel"
-    
-    ref="board"
-  />
+  <!-- Overlay an image on top of ViewableChessBoard -->
+  <div class="board-container w-100 h-100">
+    <ViewableChessBoard 
+      class="board"
+      :white-pov="whitePov"
+      :view-only="false"
+      :show-coordinates="true"
+      :capture-wheel-events="true"
+      @user-moved="userMovedCallback"
+      @wheel="onWheel"
+      
+      ref="board"
+    />
+    <PromotionPopup ref="promotionPopup"/>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -25,6 +30,7 @@
   import { MoveHistoryManager } from '@/utils/move-history-manager'
   import { ref } from 'vue';
   import ViewableChessBoard from './ViewableChessBoard.vue'
+  import PromotionPopup from '@/components/GameUI/PromotionPopup.vue';
   
   export interface CustomMoveCallback {
     (playerToMove: 'white'|'black'): Promise<MoveInfo>
@@ -45,22 +51,17 @@
   const whitePov = props.white == 'human' || props.black != 'human'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
+  const promotionPopup = ref<InstanceType<typeof PromotionPopup>>()
   
   const moveHistory = new MoveHistoryManager(false)
   
   defineExpose({
-    // Set the state of the board by loading a FEN string
-    loadFen: async (fen: string) => {
-      const protochess = await getProtochess()
-      await protochess.loadFen(fen)
-      await synchronizeBoardState()
-    },
-    
     // Set the state of the board
     setState: async (state: GameState) => {
       const protochess = await getProtochess()
       await protochess.setState(state)
       await synchronizeBoardState()
+      promotionPopup.value?.initState(state)
       moveHistory.initialize(state)
     },
     
@@ -95,8 +96,17 @@
   async function userMovedCallback(from: [number, number], to: [number, number]) {
     const protochess = await getProtochess()
     const possiblePromotions = await protochess.possiblePromotions(from[0], from[1], to[0], to[1])
-    // TODO: Allow the user to choose the promotion piece
-    const promotion = possiblePromotions.length > 0 ? possiblePromotions[0] : undefined
+    let promotion: string|undefined = undefined
+    if (possiblePromotions.length > 0) {
+      // Choose promotion
+      let promoIndex = await promotionPopup.value!.pickPromotion(to, possiblePromotions)
+      if (promoIndex === undefined) {
+        // User cancelled
+        await synchronizeBoardState()
+        return
+      }
+      promotion = possiblePromotions[promoIndex]
+    }
     await synchronizeBoardState({ from, to, promotion })
   }
   
@@ -194,3 +204,18 @@
   }
   
 </script>
+
+<style scoped>
+  .board {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+  
+  .board-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+</style>
