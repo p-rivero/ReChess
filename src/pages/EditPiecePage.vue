@@ -199,7 +199,7 @@
   import PopupOverlay from '@/components/Popup/PopupOverlay.vue'
   import type { PieceDefinition } from '@/protochess/interfaces'
   import { useVariantDraftStore } from '@/stores/variant-draft'
-  import { paramToInt } from '@/utils/param-to-int'
+  import { paramToInt } from '@/utils/ts-utils'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { numberToLetter, letterToNumber } from '@/utils/chess-coords'

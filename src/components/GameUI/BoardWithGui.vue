@@ -8,12 +8,13 @@
 </template>
 
 <script setup lang="ts">
-  import {ref, onMounted} from 'vue'
+  import { ref } from 'vue'
   import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
   import type { CustomMoveCallback } from '@/components/ChessBoard/PlayableChessBoard.vue'
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
   import { getProtochess } from '@/protochess/protochess'
   import type { GameState, MakeMoveFlag, MakeMoveWinner } from '@/protochess/interfaces'
+  import { debounce } from '@/utils/ts-utils'
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
@@ -26,7 +27,7 @@
   
   
   const emit = defineEmits<{
-    (event: 'piece-moved', from: [number, number], to: [number, number]): void
+    (event: 'piece-moved', from?: [number, number], to?: [number, number]): void
     (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner): void
   }>()
   
@@ -43,9 +44,9 @@
   })
   
   
-  async function pieceMoved(from: [number, number], to: [number, number]) {
+  async function pieceMoved(from?: [number, number], to?: [number, number]) {
     if (props.hasGauge) {
-      await updateEvaluation()
+      await debounce(updateEvaluation, 200)()
     }
     emit ('piece-moved', from, to)
   }

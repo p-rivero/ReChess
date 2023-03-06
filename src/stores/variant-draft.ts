@@ -5,7 +5,7 @@ import sanitizeFilename from 'sanitize-filename'
 import type { GameState, PieceDefinition, PiecePlacement } from '@/protochess/interfaces'
 import { isGameState } from '@/protochess/interfaces.guard'
 import { exportFile, importFile } from '@/utils/file-io'
-import { clone } from '@/utils/clone'
+import { clone } from '@/utils/ts-utils'
 
 export const useVariantDraftStore = defineStore('variant-draft', () => {
   

@@ -148,6 +148,20 @@
       }
     },
     
+    // Highlight last move
+    highlightMove: (from: [number, number], to: [number, number]) => {
+      const fromKey = positionToKey(from)
+      const toKey = positionToKey(to)
+      const newConfig: Config = {
+        lastMove: [fromKey, toKey],
+      }
+      incrementalUpdateConfig(newConfig)
+    },
+    clearHighlightMove: () => {
+      const newConfig: Config = { lastMove: [] }
+      incrementalUpdateConfig(newConfig)
+    },
+    
     // Toggle between white and black point of view
     toggleOrientation: () => {
       board.value?.toggleOrientation()

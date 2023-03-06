@@ -168,8 +168,9 @@
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { placementsToFen } from '@/utils/fen-to-placements'
   import { ErrorMessageHandler } from '@/utils/error-message-handler'
-  import { clone } from '@/utils/clone'
+  import { clone } from '@/utils/ts-utils'
   import { useRouter } from 'vue-router'
+  import type { GameStateGui } from '@/protochess/interfaces'
   
   const draftStore = useVariantDraftStore()
   const router = useRouter()
@@ -189,7 +190,7 @@
   function updateBoardAndError() {
     checkState(draftStore.state, errorMsgHandler)
     // Clone state and add GUI fields
-    let state = clone(draftStore.state)
+    let state = clone(draftStore.state) as GameStateGui
     state.fen = placementsToFen(draftStore.state)
     state.inCheck = false
     board.value?.setState(state)

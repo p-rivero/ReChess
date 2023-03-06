@@ -21,7 +21,8 @@
 
 <script setup lang="ts">
   import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner } from '@/protochess/interfaces';
-  import { getProtochess } from '@/protochess/protochess';
+  import { getProtochess } from '@/protochess/protochess'
+  import { MoveHistoryManager } from '@/utils/move-history-manager'
   import { ref } from 'vue';
   import ViewableChessBoard from './ViewableChessBoard.vue'
   
@@ -35,7 +36,7 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'piece-moved', from: [number, number], to: [number, number]): void
+    (event: 'piece-moved', from?: [number, number], to?: [number, number]): void
     (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner): void
   }>()
   
@@ -44,6 +45,8 @@
   const whitePov = props.white == 'human' || props.black != 'human'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
+  
+  const moveHistory = new MoveHistoryManager(false)
   
   defineExpose({
     // Set the state of the board by loading a FEN string
@@ -58,6 +61,7 @@
       const protochess = await getProtochess()
       await protochess.setState(state)
       await synchronizeBoardState()
+      moveHistory.initialize(state)
     },
     
     // Move a piece from one position to another, and optionally promote it
@@ -116,23 +120,29 @@
   // If playMoveBefore is specified, it will be played before synchronizing the state
   async function synchronizeBoardState(playMoveBefore?: MoveInfo) {
     const protochess = await getProtochess()
-    let moveResult: 'stop'|'continue' = 'continue'
+    let moveResult: 'none'|'ok'|'stop' = 'none'
     if (playMoveBefore) {
       // Play the move before synchronizing the state
       const result = await protochess.makeMove(playMoveBefore)
-      board.value?.makeMove(playMoveBefore.from, playMoveBefore.to)
+      board.value?.highlightMove(playMoveBefore.from, playMoveBefore.to)
       // Handle the result, if the game has ended don't emit piece-moved
       moveResult = handleResult(result)
-      if (moveResult === 'continue') {
-        emit('piece-moved', playMoveBefore.from, playMoveBefore.to)
-      }
     }
     const state = await protochess.getState()
     board.value?.setState(state)
     
+    // Move was played, emit piece-moved and store history
+    if (moveResult !== 'none') {
+      moveHistory.newMove(playMoveBefore!, state)
+      emit('piece-moved', playMoveBefore!.from, playMoveBefore!.to)
+    }
     // Game has ended, don't continue
     if (moveResult === 'stop') return
     
+    updateMovableSquares(state)
+  }
+  async function updateMovableSquares(state: GameState) {
+    const protochess = await getProtochess()
     const moves = await protochess.legalMoves()
     const moveWhite = props.white == 'human' && state.playerToMove == 0
     const moveBlack = props.black == 'human' && state.playerToMove == 1
@@ -147,18 +157,40 @@
     }
   }
   
-  function handleResult(result: MakeMoveResult): 'stop'|'continue' {
+  function handleResult(result: MakeMoveResult): 'ok'|'stop' {
     // Show effect for exploded squares
     board.value?.explode(result.exploded)
-    if (result.flag === 'Ok') return 'continue'
+    if (result.flag === 'Ok') return 'ok'
     emit('game-over', result.flag, result.winner)
-    
     return 'stop'
   }
   
   
-  function onWheel(up: boolean) {
-    console.log('wheel', up)
+  async function onWheel(up: boolean) {
+    const protochess = await getProtochess()
+    // Attempt to get the history entry
+    const entry = up ? moveHistory.undo() : moveHistory.redo()
+    if (!entry) return
+    
+    // Update the state of the engine and the board
+    await protochess.setState(entry.state)
+    const guiState = await protochess.getState()
+    board.value?.setState(guiState)
+    
+    // Update highlighted move
+    if (entry.move) {
+      board.value?.highlightMove(entry.move.from, entry.move.to)
+    } else {
+      board.value?.clearHighlightMove()
+    }
+    
+    // Update movable squares
+    if (moveHistory.canMakeMove()) {
+      updateMovableSquares(entry.state)
+    } else {
+      board.value?.setMovable(false, false, [])
+    }
+    emit('piece-moved')
   }
   
 </script>

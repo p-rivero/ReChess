@@ -26,7 +26,7 @@
   import type { Config } from 'chessgroundx/config'
   import type { DrawShape } from 'chessgroundx/draw'
   import { ref, onMounted, onUnmounted } from 'vue'
-  import { clone } from '@/utils/clone'
+  import { clone, debounce } from '@/utils/ts-utils'
   
   // Map from piece id to the URL of the image to use
   export type PlayerPieceImages = [string, string][]
@@ -147,17 +147,6 @@
   window.addEventListener('scroll', redrawBoardDebounced)
   onUnmounted(() => window.removeEventListener('resize', redrawBoard))
   onUnmounted(() => window.removeEventListener('scroll', redrawBoardDebounced))
-  
-  
-  // https://gist.github.com/ca0v/73a31f57b397606c9813472f7493a940
-  function debounce<T extends Function>(cb: T, wait = 20) {
-    let h = 0
-    let callable = (...args: any) => {
-      clearTimeout(h)
-      h = setTimeout(() => cb(...args), wait)
-    }
-    return callable as any as T
-  }
   
 </script>
 

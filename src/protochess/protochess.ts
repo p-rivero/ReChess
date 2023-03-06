@@ -1,5 +1,5 @@
 
-import { clone } from '@/utils/clone'
+import { clone } from '@/utils/ts-utils'
 import * as Comlink from 'comlink'
 import type {
   Protochess,
