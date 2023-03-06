@@ -31,3 +31,8 @@ button.delete {
         background-color: $text;
     }
 }
+.is-primary button.delete {
+    &::before, &::after {
+        background-color: $grey-lightest;
+    }
+}

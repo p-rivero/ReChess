@@ -35,7 +35,6 @@
   
   defineExpose({
     updateEvaluation(evaluation: number|`#${number}`, depth: number, invert: boolean) {
-      console.log('eval', evaluation)
       let blackGaugePercent: number
       if (typeof evaluation === 'string' && evaluation.startsWith('#')) {
         const mateIn = parseInt(evaluation.slice(1))
@@ -52,7 +51,6 @@
       } else {
         throw new Error('Unexpected evaluation format: ' + evaluation)
       }
-      console.log('percent', -blackGaugePercent)
       blackBarHeight.value = `${blackGaugePercent}%`
       depthText.value = `Depth ${depth}`
     }

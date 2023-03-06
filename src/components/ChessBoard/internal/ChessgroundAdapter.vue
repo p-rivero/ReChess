@@ -22,7 +22,7 @@
   import type { Api } from 'chessgroundx/api'
   import type { Config } from 'chessgroundx/config'
   import type { DrawShape } from 'chessgroundx/draw'
-  import { ref, onMounted, computed } from 'vue'
+  import { ref, onMounted, computed, onUnmounted } from 'vue'
   
   // Map from piece id to the URL of the image to use
   export type PlayerPieceImages = [string, string][]
@@ -97,7 +97,7 @@
   
   function onClick(e: MouseEvent) {
     if (chessgroundApi === undefined) throw new Error('Chessground API is not initialized')
-    const coords: cg.NumberPair = [e.clientX, e.clientY]
+    const coords: cg.NumberPair = [e.pageX, e.pageY]
     let key = chessgroundApi.getKeyAtDomPos(coords)
     if (key) emit('clicked', key)
   }
@@ -117,6 +117,14 @@
   function endDrag() {
     isDragging = false
   }
+  
+  // Redraw the board when the window is resized
+  // https://github.com/lichess-org/chessground/issues/54
+  function onResize() {
+    chessgroundApi?.redrawAll()
+  }
+  window.addEventListener('resize', onResize)
+  onUnmounted(() => window.removeEventListener('resize', onResize))
   
 </script>
 

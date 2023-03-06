@@ -108,7 +108,6 @@
     const minWaitTime = 1000
     const startTime = Date.now()
     const bestMove = await protochess.getBestMoveTimeout(timeoutSeconds)
-    console.log('Eval (from engine POV):', bestMove.evaluation, 'Depth:', bestMove.depth)
     
     const waitTime = Math.max(0, minWaitTime - (Date.now() - startTime))
     await new Promise(resolve => setTimeout(resolve, waitTime))

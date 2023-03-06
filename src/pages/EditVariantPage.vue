@@ -200,7 +200,9 @@
       'Are you sure you want to delete this piece? This cannot be undone.',
       'yes-no',
       () => {
+        const ids = draftStore.state.pieceTypes[pieceIndex].ids
         draftStore.state.pieceTypes.splice(pieceIndex, 1)
+        draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== ids[0] && p.pieceId !== ids[1])
         draftStore.save()
       }
     )

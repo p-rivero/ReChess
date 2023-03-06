@@ -24,7 +24,9 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   }
   
   function addPiece() {
-    state.value.pieceTypes.push(DEFAULT_PIECE)
+    // Clone the default piece and add it to the list of pieces
+    const newPiece = JSON.parse(JSON.stringify(DEFAULT_PIECE))
+    state.value.pieceTypes.push(newPiece)
     save()
   }
   function setWidth(width: number) {

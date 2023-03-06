@@ -1,5 +1,5 @@
 <template>
-  <a v-if="true" class="card-header" @click="onAccountClick">
+  <a v-if="false" class="card-header" @click="onAccountClick">
     <span class="card-header-icon py-0 pl-3 pr-0">
       <div class="account-icon sz-2 icon-account color-theme" style="border-radius: 50%;"></div>
     </span>
