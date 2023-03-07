@@ -51,7 +51,7 @@
       </button>
       <button class="button bottom-button" @click="$router.push({name: 'play'})" :disabled="hasError">
         <div class="sz-icon icon-cpu color-theme"></div>
-        <span>Play against engine</span>
+        <span>Play vs. engine</span>
       </button>
       <br>
       <button class="button is-primary bottom-button" :disabled="hasError">

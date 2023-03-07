@@ -89,6 +89,7 @@
     explode: (keys: cg.Key[]) => chessgroundApi!.explode(keys),
     getShapes: () => clone(chessgroundApi!.state.drawable.shapes) as DrawShape[],
     setShapes: (shapes: DrawShape[]) => chessgroundApi!.setAutoShapes(shapes),
+    redrawAll: () => chessgroundApi!.redrawAll(),
   })
   
   

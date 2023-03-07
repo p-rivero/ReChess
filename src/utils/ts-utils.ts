@@ -22,3 +22,10 @@ export function debounce<T extends Function>(cb: T, wait = 20) {
   }
   return callable as any as T
 }
+
+// Assume the font size will not change
+let fontSz: number | undefined = undefined
+export function remToPx(rem: number): number {
+  if (fontSz === undefined) fontSz = parseFloat(getComputedStyle(document.documentElement).fontSize)
+  return rem * fontSz;
+}

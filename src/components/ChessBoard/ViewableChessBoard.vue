@@ -192,6 +192,11 @@
       shapes = shapes?.filter(s => s.brush != brush) || []
       board.value?.setShapes(shapes)
     },
+    
+    // Redraw the board
+    redraw: () => {
+      board.value?.redrawAll()
+    },
   })
   
   function idToRole(id: string): cg.Role {

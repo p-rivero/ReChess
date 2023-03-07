@@ -7,8 +7,7 @@
 
 
 <template>
-  <!-- Overlay an image on top of ViewableChessBoard -->
-  <div class="board-container w-100 h-100">
+  <div class="board-container" ref="container" style="width: 100%">
     <ViewableChessBoard 
       class="board"
       :white-pov="whitePov"
@@ -28,7 +27,8 @@
   import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner } from '@/protochess/interfaces';
   import { getProtochess } from '@/protochess/protochess'
   import { MoveHistoryManager } from '@/utils/move-history-manager'
-  import { ref } from 'vue';
+  import { remToPx } from '@/utils/ts-utils'
+  import { onMounted, onUnmounted, ref } from 'vue';
   import ViewableChessBoard from './ViewableChessBoard.vue'
   import PromotionPopup from '@/components/GameUI/PromotionPopup.vue';
   
@@ -51,6 +51,7 @@
   const whitePov = props.white == 'human' || props.black != 'human'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
+  const container = ref<HTMLElement>()
   const promotionPopup = ref<InstanceType<typeof PromotionPopup>>()
   
   const moveHistory = new MoveHistoryManager(false)
@@ -99,7 +100,13 @@
     let promotion: string|undefined = undefined
     if (possiblePromotions.length > 0) {
       // Choose promotion
-      let promoIndex = await promotionPopup.value!.pickPromotion(to, possiblePromotions)
+      let promoPromise = promotionPopup.value!.pickPromotion(to, possiblePromotions)
+      // Make sure the popup is visible
+      setTimeout(resizeAndRedraw)
+      // Wait for the user to choose a promotion
+      let promoIndex = await promoPromise
+      // Restore the board to its original size
+      setTimeout(resizeAndRedraw)
       if (promoIndex === undefined) {
         // User cancelled
         await synchronizeBoardState()
@@ -203,19 +210,37 @@
     emit('piece-moved')
   }
   
-</script>
-
-<style scoped>
-  .board {
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
+  // Ensure the entire board is visible on screen (make width smaller if board height is too big)
+  function handleResize() {
+    if (!container.value) return
+    // 4rem for header, 1rem for top padding, 1rem for bottom padding
+    const maxHeight = window.innerHeight - remToPx(6)
+    const currentHeight = container.value.scrollHeight
+    const currentWidthStyle = container.value.style.width
+    // Important: The container element must have inline style="width: 100%"
+    const currentWidthPercent = parseFloat(currentWidthStyle.slice(0, -1))
+    const maxWidthPercent = currentWidthPercent * (maxHeight / currentHeight)
+    container.value.style.width = `${Math.min(100, maxWidthPercent)}%`
+  }
+  onMounted(() => {
+    resizeAndRedraw()
+    window.addEventListener('resize', handleResize)
+  })
+  onUnmounted(() => window.removeEventListener('resize', handleResize))
+  
+  function resizeAndRedraw() {
+    // Might need to resize twice for all elements to be visible
+    handleResize()
+    handleResize()
+    board.value?.redraw()
   }
   
+</script>
+
+<style scoped lang="scss">
   .board-container {
+    // Needed for promotion popup
     position: relative;
-    width: 100%;
-    height: 100%;
+    // Don't set width 100% here, make sure it's inline
   }
 </style>
