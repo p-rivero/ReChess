@@ -144,7 +144,7 @@ export interface GlobalRules {
 
 export interface IWasmModule {
   init(): Promise<void>,
-  supportsThreads: boolean,
+  supportsThreads: Promise<boolean>,
   wasmObject: {
     toString(): Promise<any>,
     playerToMove(): Promise<any>,

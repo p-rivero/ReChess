@@ -1,6 +1,7 @@
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
+import { getStorage, ref } from "firebase/storage"
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 
 declare global {
@@ -30,4 +31,6 @@ initializeAppCheck(app, {
 })
 const db = getFirestore(app)
 
-export { db }
+const storage = getStorage(app)
+
+export { db, storage }

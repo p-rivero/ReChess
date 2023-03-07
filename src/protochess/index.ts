@@ -47,7 +47,7 @@ async function init(): Promise<Protochess> {
   // wasm is an object that lives in the worker thread, but appears to be local
   await wasm.init()
   
-  supportsThreads = wasm.supportsThreads
+  supportsThreads = await wasm.supportsThreads
   if (supportsThreads) {
     console.info('WebAssembly supports threads, using multi-threaded version')
   } else {
