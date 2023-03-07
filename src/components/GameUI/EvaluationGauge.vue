@@ -23,7 +23,7 @@
 
 
 <script setup lang="ts">
-  import type { MakeMoveWinner } from '@/protochess/interfaces'
+  import type { MakeMoveWinner } from '@/protochess/types'
   import { ref } from 'vue'
   
   defineProps<{

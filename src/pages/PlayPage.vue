@@ -8,7 +8,7 @@
   import PopupMessage from '@/components/Popup/PopupMessage.vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { ref, onMounted } from 'vue'
-  import type { MakeMoveFlag, MakeMoveWinner } from '@/protochess/interfaces'
+  import type { MakeMoveFlag, MakeMoveWinner } from '@/protochess/types'
   
   const board = ref<InstanceType<typeof BoardWithGui>>()
   const popup = ref<InstanceType<typeof PopupMessage>>()

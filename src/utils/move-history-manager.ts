@@ -1,5 +1,5 @@
 
-import type { GameState, MoveInfo } from "@/protochess/interfaces"
+import type { GameState, MoveInfo } from "@/protochess/types"
 import { clone } from "@/utils/ts-utils"
 
 type MoveHistoryEntry = {

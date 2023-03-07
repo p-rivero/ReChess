@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 import { plugin as VueInputAutowidth } from 'vue-input-autowidth'
 import App from '@/App.vue'
 import { router } from '@/router'
-import { getProtochess, initializeProtochess, protochessSupportsThreads } from '@/protochess/protochess'
+import { getProtochess, initializeProtochess, protochessSupportsThreads } from '@/protochess'
 
 
 import '@/assets/style/background.scss'

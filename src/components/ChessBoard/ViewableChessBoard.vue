@@ -24,7 +24,7 @@
 
 
 <script setup lang="ts">
-  import type { GameStateGui, MoveList } from '@/protochess/interfaces';
+  import type { GameStateGui, MoveList } from '@/protochess/types';
   import type * as cg from 'chessgroundx/types';
   import { positionToKey, keyToPosition } from '@/utils/chess-coords';
   import type { Config } from 'chessgroundx/config';

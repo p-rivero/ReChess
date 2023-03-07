@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
   import PieceViewer from './PieceViewer.vue'
-  import type { PieceDefinition } from '@/protochess/interfaces'
+  import type { PieceDefinition } from '@/protochess/types'
   import { ref, toRefs } from 'vue'
   
   const props = defineProps<{

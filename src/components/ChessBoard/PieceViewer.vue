@@ -19,7 +19,7 @@
   import type { Config } from 'chessgroundx/config'
   import type { Key } from 'chessgroundx/types'
   import type { DrawShape } from 'chessgroundx/draw'
-  import type { PieceDefinition } from '@/protochess/interfaces'
+  import type { PieceDefinition } from '@/protochess/types'
   import { keyToPosition, positionToKey } from '@/utils/chess-coords'
   import { onMounted, ref, watch, computed } from 'vue'
   

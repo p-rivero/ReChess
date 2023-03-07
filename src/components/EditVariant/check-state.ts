@@ -1,5 +1,5 @@
-import type { GameState, PieceDefinition } from "@/protochess/interfaces"
-import { getProtochess } from "@/protochess/protochess"
+import type { GameState, PieceDefinition } from "@/protochess/types"
+import { getProtochess } from "@/protochess"
 import type { ErrorMessageHandler } from "@/utils/error-message-handler"
 
 export async function checkState(state: GameState, errorMsgHandler: ErrorMessageHandler) {

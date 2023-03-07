@@ -10,7 +10,7 @@
 
 
 <script setup lang="ts">
-  import type { GameState } from '@/protochess/interfaces'
+  import type { GameState } from '@/protochess/types'
   import { ref } from 'vue'
 
   let variant: GameState | null = null

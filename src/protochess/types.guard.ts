@@ -1,8 +1,8 @@
 /*
- * Generated type guards for "interfaces.ts".
+ * Generated type guards for "types.ts".
  * WARNING: Do not manually change this file.
  */
-import type { GameState, GameStateGui, PieceDefinition } from "./interfaces";
+import type { GameState, GameStateGui, PieceDefinition } from "./types";
 
 export function isGameState(obj: unknown): obj is GameState {
     const typedObj = obj as GameState

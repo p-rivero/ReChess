@@ -12,8 +12,8 @@
   import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
   import type { CustomMoveCallback } from '@/components/ChessBoard/PlayableChessBoard.vue'
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
-  import { getProtochess } from '@/protochess/protochess'
-  import type { GameState, MakeMoveFlag, MakeMoveWinner } from '@/protochess/interfaces'
+  import { getProtochess } from '@/protochess'
+  import type { GameState, MakeMoveFlag, MakeMoveWinner } from '@/protochess/types'
   import { debounce } from '@/utils/ts-utils'
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()

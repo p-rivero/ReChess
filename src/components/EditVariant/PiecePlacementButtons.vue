@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { GameState } from '@/protochess/interfaces'
+  import type { GameState } from '@/protochess/types'
   import { ref } from 'vue'
   
   const selectedId = ref<string|'wall'|'delete'|'none'>('none')

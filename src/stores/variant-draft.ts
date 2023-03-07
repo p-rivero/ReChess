@@ -2,8 +2,8 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import sanitizeFilename from 'sanitize-filename'
 
-import type { GameState, PieceDefinition, PiecePlacement } from '@/protochess/interfaces'
-import { isGameState } from '@/protochess/interfaces.guard'
+import type { GameState, PieceDefinition, PiecePlacement } from '@/protochess/types'
+import { isGameState } from '@/protochess/types.guard'
 import { exportFile, importFile } from '@/utils/file-io'
 import { clone } from '@/utils/ts-utils'
 

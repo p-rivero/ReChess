@@ -170,7 +170,7 @@
   import { ErrorMessageHandler } from '@/utils/error-message-handler'
   import { clone } from '@/utils/ts-utils'
   import { useRouter } from 'vue-router'
-  import type { GameStateGui } from '@/protochess/interfaces'
+  import type { GameStateGui } from '@/protochess/types'
   
   const draftStore = useVariantDraftStore()
   const router = useRouter()

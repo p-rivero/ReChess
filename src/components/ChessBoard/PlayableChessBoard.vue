@@ -24,8 +24,8 @@
 </template>
 
 <script setup lang="ts">
-  import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner } from '@/protochess/interfaces';
-  import { getProtochess } from '@/protochess/protochess'
+  import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner } from '@/protochess/types';
+  import { getProtochess } from '@/protochess'
   import { MoveHistoryManager } from '@/utils/move-history-manager'
   import { remToPx } from '@/utils/ts-utils'
   import { onMounted, onUnmounted, ref } from 'vue';

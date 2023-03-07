@@ -1,4 +1,4 @@
-import type { GameState, PiecePlacement } from '@/protochess/interfaces'
+import type { GameState, PiecePlacement } from '@/protochess/types'
 
 export function fenToPlacements(fen: string): PiecePlacement[] {
   const placements: PiecePlacement[] = []

@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { GameState } from '@/protochess/interfaces'
+  import type { GameState } from '@/protochess/types'
   
   const props = defineProps<{
     editable: boolean
