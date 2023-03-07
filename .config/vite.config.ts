@@ -28,5 +28,12 @@ export default defineConfig({
   build: {
     // Needed for top-level await
     target: ['chrome89', 'firefox89', 'safari15', 'edge89', 'opera75'],
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage'],
+        }
+      }
+    },
   }
 })

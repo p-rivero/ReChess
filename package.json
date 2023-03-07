@@ -21,6 +21,7 @@
     "bulma-checkbox": "^1.2.1",
     "chessgroundx": "./chessgroundx",
     "comlink": "^4.3.1",
+    "firebase": "^9.17.2",
     "pinia": "^2.0.21",
     "protochess-multithread": "./protochess-engine/protochess-engine-wasm/pkg-parallel",
     "protochess-singlethread": "./protochess-engine/protochess-engine-wasm/pkg",
@@ -33,7 +34,7 @@
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
-    "@types/node": "^16.11.56",
+    "@types/node": "^16.18.14",
     "@vitejs/plugin-vue": "^3.0.3",
     "@vue/eslint-config-typescript": "^11.0.0",
     "@vue/tsconfig": "^0.1.3",
