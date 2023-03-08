@@ -209,11 +209,11 @@
       black: [],
     }
     for (const pieceDef of state.pieceTypes) {
-      if (pieceDef.ids[0] && pieceDef.imageUrls[0]) {
-        images.white.push([pieceDef.ids[0], pieceDef.imageUrls[0]])
+      if (pieceDef.ids[0]) {
+        images.white.push([pieceDef.ids[0], pieceDef.imageUrls[0] ?? ''])
       }
-      if (pieceDef.ids[1] && pieceDef.imageUrls[1]) {
-        images.black.push([pieceDef.ids[1], pieceDef.imageUrls[1]])
+      if (pieceDef.ids[1]) {
+        images.black.push([pieceDef.ids[1], pieceDef.imageUrls[1] ?? ''])
       }
     }
     // Sort by id to ensure the order is consistent

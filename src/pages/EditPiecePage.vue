@@ -259,11 +259,15 @@
   function enabledCheckboxChanged(enabled: boolean, color: 'white'|'black') {
     const textBoxVal = color === 'white' ? pieceIdWhite.value : pieceIdBlack.value
     const enabledId = textBoxVal ?? ''
-    const id = enabled ? enabledId : null
-    if (color === 'white') piece!.ids[0] = id
-    else piece!.ids[1] = id
+    const newId = enabled ? enabledId : null
+    const i = color === 'white' ? 0 : 1
+    // Remove placements of the piece
+    const oldId = piece!.ids[i] ?? ''
+    draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== oldId)
+    // Set the new id
+    piece!.ids[i] = newId
     draftStore.save()
-    // Remove any error message if the piece id was invalid
+    // Remove error message if the piece id was invalid before
     setTimeout(() => errorMsgHandler.clear())
   }
   

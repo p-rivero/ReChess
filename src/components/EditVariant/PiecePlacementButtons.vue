@@ -5,6 +5,7 @@
         class="button sz-3 px-1 py-1"
         draggable="false"
         :src="piece.url"
+        :alt="`Select ${piece.id}`"
         :class="{'is-primary': selectedId === piece.id}"
         @click="onPieceClick(piece.id)"/>
     </div>

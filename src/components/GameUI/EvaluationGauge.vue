@@ -120,7 +120,6 @@
   .eval-gauge .black-bar {
     display: block;
     width: 100%;
-    height: 50%;
     background-color: #0f0f0f;
     height: v-bind(blackBarHeight);
     transition: height 0.5s;
