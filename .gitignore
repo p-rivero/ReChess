@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 firebase-debug.log*
 firebase-debug.*.log*
+.scannerwork
 
 node_modules
 .DS_Store

@@ -54,11 +54,11 @@
   })
   
   // Extract the id and url from the piece definition
-  let pieceList: {id: string, url: string}[] = []
+  const pieceList = ref<{id: string, url: string}[]>([])
   // First all white pieces
   for (const piece of props.state.pieceTypes) {
     if (piece.ids[0] && piece.imageUrls[0]) {
-      pieceList.push({
+      pieceList.value.push({
         id: piece.ids[0],
         url: piece.imageUrls[0],
       })
@@ -67,7 +67,7 @@
   // Then all black pieces
   for (const piece of props.state.pieceTypes) {
     if (piece.ids[1] && piece.imageUrls[1]) {
-      pieceList.push({
+      pieceList.value.push({
         id: piece.ids[1],
         url: piece.imageUrls[1],
       })

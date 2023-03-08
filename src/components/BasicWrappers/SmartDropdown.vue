@@ -8,8 +8,7 @@
 
 
 <script setup lang="ts">
-  import { onMounted } from "vue"
-  import { ref } from "vue"
+  import { onMounted, ref } from "vue"
   
   const selectDropdown = ref<HTMLInputElement>()
   

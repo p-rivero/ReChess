@@ -7,7 +7,7 @@ export function pairToCoords(pair: [number, number]): `${LetterCoord}${NumberCoo
   const [x, y] = pair
   const letter = String.fromCharCode('a'.charCodeAt(0) + x) as LetterCoord
   const number = (y + 1) as NumberCoord
-  return `${letter}${number}` as `${LetterCoord}${NumberCoord}`
+  return `${letter}${number}`
 }
 
 export function coordsToPair(coords: string): [number, number] {

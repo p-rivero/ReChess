@@ -100,7 +100,8 @@
     let promotion: string|undefined = undefined
     if (possiblePromotions.length > 0) {
       // Choose promotion
-      let promoPromise = promotionPopup.value!.pickPromotion(to, possiblePromotions)
+      if (!promotionPopup.value) throw new Error('Promotion popup not initialized')
+      let promoPromise = promotionPopup.value.pickPromotion(to, possiblePromotions)
       // Make sure the popup is visible
       setTimeout(resizeAndRedraw)
       // Wait for the user to choose a promotion
