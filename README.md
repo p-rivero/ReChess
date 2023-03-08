@@ -25,15 +25,32 @@ git pull --recurse-submodules
 Make sure you also have `cargo`, `wasm-pack` and `rustup` installed. The first compilation of the engine might take a while.
 
 
-### Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
 ### Project Setup
 
 ```sh
 npm install
 ```
+
+### Using a Firebase backend
+
+1. Create a Firebase project. Make sure to enable App Check (with reCAPTCHA), Firestore, Hosting and Storage.
+
+2. Go to [Google Cloud credentials](https://console.cloud.google.com/apis/credentials) and create 2 API Keys (you may already have one):
+   - Browser Key for production (restrict it to your domain)
+   - Private Key for development (restrict it to `localhost`)
+   
+   From the project root, run `echo VITE_RECHESS_FIREBASE_API_KEY=[your private key] >> .config/.env.local`. Keep it secret!
+   
+   Configure GitHub Actions (or the system you use) to do the same with the production key when deploying to production.
+
+3. Update `src/firebase/credentials.ts` with your Firebase credentials. The `CAPTCHA_V3_PUBLIC_KEY` is the one you created for App Check.
+   
+4. Launch the app with `npm run dev` and open the browser console. You should see a message like this:
+   ```
+   App Check debug token: <TOKEN>. You will need to add it to your app's App Check settings in the Firebase console for it to work.
+   ```
+   Copy the token and add it to your Firebase project's App Check settings (see [docs](https://firebase.google.com/docs/app-check/web/debug-provider)).
+
 
 ### Compile and Hot-Reload for Development
 
@@ -46,6 +63,8 @@ npm run dev
 ```sh
 npm run build
 ```
+
+Then you can preview the production build with `npm run preview`.
 
 ### Lint with [ESLint](https://eslint.org/)
 
