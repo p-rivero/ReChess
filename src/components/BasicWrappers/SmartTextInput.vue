@@ -1,12 +1,14 @@
 <template>
-  <input v-if="!$props.multiline" class="input" ref="textInput"
+  <input v-if="!$props.multiline" class="input" :type="type" ref="textInput"
     :class="{'is-danger': isError}"
     :placeholder="props.placeholder"
-    @input="inputChanged()">
-  <textarea v-else class="textarea" ref="textInput"
-    :class="{'is-danger': isError}"
+    @change="inputChanged"
+    @input="inputChanged">
+  <textarea v-else class="textarea" ref="textInput" 
+    :class="{'is-danger': isError}" :type="type"
     :placeholder="props.placeholder"
-    @input="inputChanged()">
+    @change="inputChanged"
+    @input="inputChanged">
   </textarea>
 </template>
 
@@ -19,9 +21,11 @@
   
   const props = defineProps<{
     multiline: boolean,
+    type?: 'text'|'email'|'password'|'date'|'time'|'datetime-local'|'month'|'week'|'url'|'tel'|'color',
     placeholder?: string,
     startText?: string,
     validator? : (text: string) => string | undefined
+    refreshHandlerOnInput?: boolean
     errorHandler?: ErrorMessageHandler
     errorPriority?: number
   }>()
@@ -29,6 +33,15 @@
   const emit = defineEmits<{
     (event: 'changed', text: string): void
   }>()
+  
+  
+  defineExpose({
+    focus: () => {
+      if (!textInput.value) throw new Error('Number input is null')
+      textInput.value.focus()
+    }
+  })
+  
   
   if (props.validator) {
     if (!props.errorHandler) throw new Error('If a validator is provided, must also provide an ErrorMessageHandler')
@@ -52,11 +65,13 @@
   })
   
   function inputChanged() {
+    console.log('input changed')
     if (!textInput.value) throw new Error('Number input is null')
     let text = textInput.value.value
     
     if (validate(text)) {
       emit('changed', text)
+      if (props.refreshHandlerOnInput) props.errorHandler?.clear()
     }
   }
   

@@ -1,26 +1,29 @@
 <template>
-  <a v-if="false" class="card-header" @click="onAccountClick">
+  <a v-if="authStore.user" class="card-header" @click="onAccountClick">
     <span class="card-header-icon py-0 pl-3 pr-0">
       <div class="account-icon sz-2 icon-account color-theme" style="border-radius: 50%;"></div>
     </span>
     <p class="card-header-title">
-      My user name
+      {{ authStore.user!.email }}
     </p>
   </a>
-  <button v-else class="button is-primary" @click="onSignUpClick">
-    <strong>Sign up</strong>
+  <button v-else class="button is-primary" @click="onSignInClick">
+    <strong>Sign in</strong>
   </button>
 </template>
 
 
 <script setup lang="ts">
-  
+  import { useAuthStore } from '@/stores/auth-user'
+  import { getSignInPopup } from '../Popup/sign-in-popup'
+  const authStore = useAuthStore()
+    
   async function onAccountClick() {
-    console.log('Account clicked')
+    authStore.signOut()
   }
   
-  async function onSignUpClick() {
-    console.log('Sign up clicked')
+  async function onSignInClick() {
+    getSignInPopup().show()
   }
 </script>
 

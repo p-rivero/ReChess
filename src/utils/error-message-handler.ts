@@ -14,6 +14,8 @@ export class ErrorMessageHandler {
   hasErrorRef: Ref<boolean>
   currentPriority = NaN
   
+  // The passed ref will be set to true when there is an error
+  // This allows disabling buttons and other UI elements
   constructor(hasErrorRef: Ref<boolean>) {
     this.hasErrorRef = hasErrorRef
   }

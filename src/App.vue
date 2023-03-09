@@ -1,4 +1,5 @@
 <template>
+  <SignInPopup ref="signInPopup" />
   <NavbarComponent />
   <div class="page-container is-flex is-flex-direction-row is-justify-content-center">
     <div class="page-content w-100 px-4 py-4">
@@ -9,6 +10,13 @@
 
 <script setup lang="ts">
   import NavbarComponent from '@/components/Navbar/NavbarComponent.vue'
+  import { ref } from 'vue'
+  import SignInPopup from '@/components/Popup/SignInPopup.vue'
+  import { setSignInPopup } from '@/components/Popup/sign-in-popup'
+  
+  const signInPopup = ref<InstanceType<typeof SignInPopup>>()
+  setSignInPopup(signInPopup)
+  
 </script>
 
 
@@ -20,5 +28,16 @@
   
   .page-content {
     max-width: 1250px;
+  }
+</style>
+
+<style lang="scss">
+  // Hide the scrollbar
+  body::-webkit-scrollbar {
+    display: none;
+  }
+  body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 </style>

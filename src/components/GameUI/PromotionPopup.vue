@@ -70,10 +70,8 @@
         await new Promise(resolve => setTimeout(resolve, 100))
       }
       if (selectedIndex.value === -1) {
-        console.log('returning undefined')
         return undefined
       }
-      console.log('returning', selectedIndex.value)
       return selectedIndex.value
     },
   })
