@@ -7,15 +7,18 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   type User,
+  updateProfile,
 } from 'firebase/auth'
 
 
 export const useAuthStore = defineStore('auth-user', () => {
   let initialized = false
   const user = ref<User|null>(null)
+  let inhibitLogIn = false
   
   // Called when user signs in or out (or when the page is refreshed)
   onAuthStateChanged(auth, newUser => {
+    if (inhibitLogIn) return
     initialized = true
     user.value = newUser
   });
@@ -27,9 +30,14 @@ export const useAuthStore = defineStore('auth-user', () => {
   }
   
   async function emailRegister(email: string, username: string, password: string): Promise<void> {
+    // Do not store the user until the username is set
+    inhibitLogIn = true
     const credential = await createUserWithEmailAndPassword(auth, email, password)
-    // Set the username
-    
+    await updateProfile(credential.user, { displayName: username })
+    // Update the user
+    user.value = credential.user
+    initialized = true
+    inhibitLogIn = false
   }
   
   async function signOut(): Promise<void> {

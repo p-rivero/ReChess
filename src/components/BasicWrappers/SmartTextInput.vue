@@ -65,7 +65,6 @@
   })
   
   function inputChanged() {
-    console.log('input changed')
     if (!textInput.value) throw new Error('Number input is null')
     let text = textInput.value.value
     

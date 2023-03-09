@@ -22,18 +22,18 @@
           @changed="text => email = text"/>
       </div>
       
-      <div v-if="isRegister" class="mb-5">
-        <label class="label">Username</label>
-        <SmartTextInput ref="usernameRef" :multiline="false" placeholder="Your username" 
+      <div v-show="isRegister" class="mb-5">
+        <label class="label">Display name</label>
+        <SmartTextInput ref="usernameRef" :multiline="false" placeholder="Your name" 
           :error-handler="errorHandler"
           :refresh-handler-on-input="true"
           :validator="text => {
             if (text === '' && !isStrict) return undefined
-            if (text === '') return 'Please enter a username'
-            if (text.length < 3) return 'Username must be at least 3 characters long'
-            if (text.length > 25) return 'Username must be at most 25 characters long'
+            if (text === '') return 'Please enter a name'
+            if (text.length < 3) return 'Display name must be at least 3 characters long'
+            if (text.length > 25) return 'Display name must be at most 25 characters long'
           }"
-          @changed="text => username = text"/>
+          @changed="text => displayName = text"/>
       </div>
       
       <div class="mb-5">
@@ -49,7 +49,7 @@
           @changed="text => password = text"/>
       </div>
       
-      <div v-if="isRegister" class="mb-5">
+      <div v-show="isRegister" class="mb-5">
         <label class="label">Repeat password</label>
         <SmartTextInput :multiline="false" type="password" placeholder="Password"
           :error-handler="errorHandler"
@@ -97,7 +97,7 @@
   const usernameRef = ref<InstanceType<typeof SmartTextInput>>()
   const loadingSocialSignin = ref(true)
   const email = ref('')
-  const username = ref('')
+  const displayName = ref('')
   const password = ref('')
   const passwordRepeat = ref('')
   const isRegister = ref(false)
@@ -109,38 +109,37 @@
   
   
   defineExpose({
-    show: () => {
+    show: async () => {
+      // Don't show if already logged in
+      const logged = await authStore.isLogged()
+      if (logged) return
+      
+      // Mount firebaseui
+      authUI.start('#firebaseui-auth-container', {
+        signInFlow: 'popup',
+        signInSuccessUrl: '/',
+        signInOptions: [
+          GoogleAuthProvider.PROVIDER_ID,
+          GithubAuthProvider.PROVIDER_ID,
+        ],
+        callbacks: {
+          signInSuccessWithAuthResult: _authResult => {
+            closePopup()
+            // Don't redirect.
+            return false
+          },
+          uiShown: () => {
+            loadingSocialSignin.value = false
+          },
+        }
+      })
+      
       popup.value?.classList.add('is-active')
       document.documentElement.classList.add('is-clipped')
       emailRef.value?.focus()
     },
     hide: closePopup,
   })
-
-  
-  onMounted(async () => {
-    const logged = await authStore.isLogged()
-    if (logged) closePopup()
-    authUI.start('#firebaseui-auth-container', {
-      signInFlow: 'popup',
-      signInSuccessUrl: '/',
-      signInOptions: [
-        GoogleAuthProvider.PROVIDER_ID,
-        GithubAuthProvider.PROVIDER_ID,
-      ],
-      callbacks: {
-        signInSuccessWithAuthResult: _authResult => {
-          closePopup()
-          // Don't redirect.
-          return false
-        },
-        uiShown: () => {
-          loadingSocialSignin.value = false
-        },
-      }
-    })
-  })
-  
   
   async function signInClick() {
     if (isRegister.value) await register()
@@ -148,7 +147,7 @@
   }
   
   async function register() {
-    if (email.value === '' || username.value === '' || password.value === '' || passwordRepeat.value === '') {
+    if (email.value === '' || displayName.value === '' || password.value === '' || passwordRepeat.value === '') {
       // Refresh error messages, now in strict mode
       isStrict.value = true
       errorHandler.clear()
@@ -156,7 +155,7 @@
     }
     
     try {
-      await authStore.emailRegister(email.value, username.value, password.value)
+      await authStore.emailRegister(email.value, displayName.value, password.value)
       closePopup()
     } catch (e) {
       if (!(e instanceof FirebaseError)) throw e
