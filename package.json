@@ -22,6 +22,7 @@
     "chessgroundx": "./chessgroundx",
     "comlink": "^4.3.1",
     "firebase": "^9.17.2",
+    "firebaseui": "^6.0.2",
     "pinia": "^2.0.21",
     "protochess-multithread": "./protochess-engine/protochess-engine-wasm/pkg-parallel",
     "protochess-singlethread": "./protochess-engine/protochess-engine-wasm/pkg",

@@ -14,8 +14,8 @@ export default defineConfig({
           // These headers are required for SharedArrayBuffer to work (which is required for WASM threads)
           // This only enables the headers for the vite dev server, make sure to add them to your production server as well
           // Use COEP:credentialless instead of COEP:require-corp. Both allow SharedArrayBuffer, but require-corp blocks cross-origin images (required for firebase)
-          res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
-          res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+          // res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
+          // res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
           next();
         });
       },
