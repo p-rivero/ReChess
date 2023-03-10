@@ -1,6 +1,6 @@
 import type { GameState, PieceDefinition } from "@/protochess/types"
 import { getProtochess } from "@/protochess"
-import type { ErrorMessageHandler } from "@/utils/error-message-handler"
+import type { ErrorMessageHandler } from "@/utils/errors/error-message-handler"
 
 export async function checkState(state: GameState, errorMsgHandler: ErrorMessageHandler) {
   if (!checkPieces(state, errorMsgHandler)) return

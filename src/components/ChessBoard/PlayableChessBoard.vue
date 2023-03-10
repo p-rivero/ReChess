@@ -26,7 +26,7 @@
 <script setup lang="ts">
   import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner } from '@/protochess/types';
   import { getProtochess } from '@/protochess'
-  import { MoveHistoryManager } from '@/utils/move-history-manager'
+  import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
   import { remToPx } from '@/utils/ts-utils'
   import { onMounted, onUnmounted, ref } from 'vue';
   import ViewableChessBoard from './ViewableChessBoard.vue'

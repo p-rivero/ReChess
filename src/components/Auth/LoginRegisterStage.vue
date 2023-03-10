@@ -82,7 +82,6 @@
   import 'firebaseui/dist/firebaseui.css'
   import { GoogleAuthProvider } from 'firebase/auth'
   import { GithubAuthProvider } from 'firebase/auth'
-  import { FirebaseError } from '@firebase/util'
   
   import { ref } from 'vue'
   import { useAuthStore } from '@/stores/auth-user'
@@ -90,7 +89,8 @@
   
   import SmartTextInput from '../BasicWrappers/SmartTextInput.vue'
   import SmartErrorMessage from '../BasicWrappers/SmartErrorMessage.vue'
-  import { ErrorMessageHandler } from '@/utils/error-message-handler'
+  import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
   
   
   const emailRef = ref<InstanceType<typeof SmartTextInput>>()
@@ -162,12 +162,7 @@
       await authStore.emailRegister(email.value, displayName.value, password.value)
       emit('check-verify')
     } catch (e) {
-      if (!(e instanceof FirebaseError)) throw e
-      if (e.code === 'auth/email-already-in-use') {
-        errorHandler.show('This email is already in use', -1)
-        return
-      }
-      throw e
+      errorHandler.showException(e)
     }
   }
   
@@ -179,23 +174,19 @@
       return
     }
     
+    
     try {
       await authStore.emailLogIn(email.value, password.value)
       emit('check-verify')
     } catch (e) {
-      if (!(e instanceof FirebaseError)) throw e
-      if (e.code === 'auth/user-not-found') {
+      if (e instanceof UserNotFoundError) {
         isRegister.value = true
         isStrict.value = false
         errorHandler.clear()
         usernameRef.value?.focus()
-        return
+      } else {
+        errorHandler.showException(e)
       }
-      if (e.code === 'auth/wrong-password') {
-        errorHandler.show('The password is incorrect', -1)
-        return
-      }
-      throw e
     }
   }
 </script>

@@ -8,9 +8,12 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendEmailVerification,
+type UserCredential,
 } from 'firebase/auth'
 import { User } from './user'
 import { doc, setDoc } from '@firebase/firestore'
+import { RechessError } from '@/utils/errors/RechessError'
+import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
 
 
 export class AuthUser extends User {
@@ -46,6 +49,7 @@ export const useAuthStore = defineStore('auth-user', () => {
       return
     }
     verified.value = newUser.emailVerified
+    // TODO: Get username from database
     user.value = new AuthUser(newUser, username ?? 'test_username')
   }
   
@@ -69,6 +73,7 @@ export const useAuthStore = defineStore('auth-user', () => {
         }
       })
     } catch (e) {
+      throw new RechessError('CANNOT_CREATE_USER')
     }
   }
   
@@ -77,14 +82,38 @@ export const useAuthStore = defineStore('auth-user', () => {
   // Attemps to log in with an email and password, throws an error if it fails (e.g. wrong password or user does not exist)
   // Updates the stored user if successful
   async function emailLogIn(email: string, password: string): Promise<void> {
-    await signInWithEmailAndPassword(auth, email, password)
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+    } catch (e: any) {
+      switch (e.code) {
+        case 'auth/user-not-found':
+          throw new UserNotFoundError()
+        case 'auth/wrong-password':
+          throw new RechessError('WRONG_PASSWORD')
+        default:
+          throw e
+      }
+    }
   }
+  
   
   // Creates a new user with an email and password, and updates the stored user
   async function emailRegister(email: string, username: string, password: string): Promise<void> {
     // Do not store the user until the database is updated
     inhibitLogIn = true
-    const credential = await createUserWithEmailAndPassword(auth, email, password)
+    
+    let credential: UserCredential
+    try {
+      credential = await createUserWithEmailAndPassword(auth, email, password)
+    } catch (e: any) {
+      switch (e.code) {
+        case 'auth/email-already-in-use':
+          throw new RechessError('EMAIL_ALREADY_IN_USE')
+        default:
+          throw e
+      }
+    }
+    
     try {
       await createUserInDB(credential.user, username)
     } catch (e) {
@@ -96,6 +125,7 @@ export const useAuthStore = defineStore('auth-user', () => {
     await updateUser(credential.user, username)
     inhibitLogIn = false
   }
+  
   
   // Signs out the user and updates the store
   async function signOut(): Promise<void> {

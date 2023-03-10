@@ -20,7 +20,7 @@
   import type { Key } from 'chessgroundx/types'
   import type { DrawShape } from 'chessgroundx/draw'
   import type { PieceDefinition } from '@/protochess/types'
-  import { keyToPosition, positionToKey } from '@/utils/chess-coords'
+  import { keyToPosition, positionToKey } from '@/utils/chess/chess-coords'
   import { onMounted, ref, watch, computed } from 'vue'
   
   const props = defineProps<{

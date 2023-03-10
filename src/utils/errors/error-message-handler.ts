@@ -1,4 +1,5 @@
 import type { Ref } from "vue"
+import { RechessError } from "./RechessError"
 
 export interface ErrorHandlerText {
   show: (message: string) => void
@@ -40,6 +41,18 @@ export class ErrorMessageHandler {
     this.messageText.forEach((messageText) => {
       messageText.show(message)
     })
+  }
+  
+  // Show an exception
+  showException(exception: unknown, priority: number = 0) {
+    if (exception instanceof RechessError) {
+      this.show(exception.localizedMessage, priority)
+    } else if (exception instanceof Error) {
+      this.show(exception.message, priority)
+    } else {
+      this.show('Unknown error', priority)
+      console.error('Non-error exception was thrown', exception)
+    }
   }
   
   // Clear the error message, poll all users for a new error message

@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
   import { nextTick, onMounted, ref } from "vue"
-  import type { ErrorMessageHandler, ErrorHandlerUser } from "@/utils/error-message-handler"
+  import type { ErrorMessageHandler, ErrorHandlerUser } from "@/utils/errors/error-message-handler"
   
   const textInput = ref<HTMLInputElement>()
   const isError = ref<boolean>(false)
