@@ -47,7 +47,7 @@
   }>()
   
   defineExpose({
-    cancelPlacement: () => {
+    cancelPlacement() {
       selectedId.value = 'none'
       emit('piece-deselected')
     },

@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref } from "vue"
+  import { nextTick, onMounted, ref } from "vue"
   import type { ErrorMessageHandler, ErrorHandlerUser } from "@/utils/error-message-handler"
   
   const textInput = ref<HTMLInputElement>()
@@ -36,9 +36,9 @@
   
   
   defineExpose({
-    focus: () => {
-      if (!textInput.value) throw new Error('Number input is null')
-      textInput.value.focus()
+    focus() {
+      if (!textInput.value) throw new Error('Text input is null')
+      nextTick(() => textInput.value!.focus())
     }
   })
   

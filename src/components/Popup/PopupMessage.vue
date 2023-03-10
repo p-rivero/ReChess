@@ -33,7 +33,7 @@
   let isImportant = false
   
   defineExpose({
-    show: (title: string, message: string, buttons: 'ok' | 'ok-cancel' | 'yes-no', accept?: () => void, cancel?: () => void) => {
+    show(title: string, message: string, buttons: 'ok' | 'ok-cancel' | 'yes-no', accept?: () => void, cancel?: () => void) {
       titleText.value = title
       messageText.value = message
       acceptCallback = accept ?? (() => {})

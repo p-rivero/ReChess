@@ -58,7 +58,7 @@
   
   defineExpose({
     // Set the state of the board
-    setState: async (state: GameState) => {
+    async setState(state: GameState) {
       const protochess = await getProtochess()
       await protochess.setState(state)
       await synchronizeBoardState()
@@ -67,27 +67,27 @@
     },
     
     // Move a piece from one position to another, and optionally promote it
-    makeMove: (from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', id: string}) => {
+    makeMove(from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', id: string}) {
       board.value?.makeMove(from, to, promotion)
     },
     
     // Toggle between white and black point of view
-    toggleOrientation: () => {
+    toggleOrientation() {
       board.value?.toggleOrientation()
     },
     
     // Cause an explosion at the given positions
-    explode: (positions: [number, number][]) => {
+    explode(positions: [number, number][]) {
       board.value?.explode(positions)
     },
     
     // Draw an arrow between the given positions
-    drawArrow: (from: [number, number], to: [number, number], brush: string) => {
+    drawArrow(from: [number, number], to: [number, number], brush: string) {
       board.value?.drawArrow(from, to, brush)
     },
     
     // Clear all arrows
-    clearArrows: (brush: string) => {
+    clearArrows(brush: string) {
       board.value?.clearArrows(brush)
     },
   })

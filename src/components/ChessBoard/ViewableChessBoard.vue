@@ -88,7 +88,7 @@
   
   defineExpose({
     // Set the state of the board
-    setState: (state: GameStateGui) => {
+    setState(state: GameStateGui) {
       if (state.boardWidth < 2 || state.boardHeight < 2) {
         throw new Error('Minimum board size is 2x2')
       }
@@ -118,7 +118,7 @@
     },
     
     // Define which sides are movable by the user
-    setMovable: (white: boolean, black: boolean, moves: MoveList[]) => {
+    setMovable(white: boolean, black: boolean, moves: MoveList[]) {
       let dests = new Map<cg.Orig, cg.Key[]>()
       for (const mv of moves) {
         const fromKey = positionToKey([mv.x, mv.y])
@@ -136,7 +136,7 @@
     },
     
     // Move a piece from one position to another, and optionally promote it
-    makeMove: (from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', id: string}) => {
+    makeMove(from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', id: string}) {
       const fromKey = positionToKey(from)
       const toKey = positionToKey(to)
       board.value?.movePiece(fromKey, toKey)
@@ -149,7 +149,7 @@
     },
     
     // Highlight last move
-    highlightMove: (from: [number, number], to: [number, number]) => {
+    highlightMove(from: [number, number], to: [number, number]) {
       const fromKey = positionToKey(from)
       const toKey = positionToKey(to)
       const newConfig: Config = {
@@ -157,24 +157,24 @@
       }
       incrementalUpdateConfig(newConfig)
     },
-    clearHighlightMove: () => {
+    clearHighlightMove() {
       const newConfig: Config = { lastMove: [] }
       incrementalUpdateConfig(newConfig)
     },
     
     // Toggle between white and black point of view
-    toggleOrientation: () => {
+    toggleOrientation() {
       board.value?.toggleOrientation()
     },
     
     // Cause an explosion at the given positions
-    explode: (positions: [number, number][]) => {
+    explode(positions: [number, number][]) {
       const keys = positions.map(positionToKey)
       board.value?.explode(keys)
     },
     
     // Draw an arrow between two positions
-    drawArrow: (from: [number, number], to: [number, number], brush: string) => {
+    drawArrow(from: [number, number], to: [number, number], brush: string) {
       const fromKey = positionToKey(from)
       const toKey = positionToKey(to)
       const shapes = board.value?.getShapes() || []
@@ -187,14 +187,14 @@
     },
     
     // Clear all arrows
-    clearArrows: (brush: string) => {
+    clearArrows(brush: string) {
       let shapes = board.value?.getShapes()
       shapes = shapes?.filter(s => s.brush != brush) || []
       board.value?.setShapes(shapes)
     },
     
     // Redraw the board
-    redraw: () => {
+    redraw() {
       board.value?.redrawAll()
     },
   })
