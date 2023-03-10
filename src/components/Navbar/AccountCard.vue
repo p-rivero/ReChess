@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
   import { useAuthStore } from '@/stores/auth-user'
-  import { getSignInPopup } from '../Popup/sign-in-popup'
+  import { requestSignIn } from '@/components/Auth/auth-manager'
   const authStore = useAuthStore()
     
   async function onAccountClick() {
@@ -24,7 +24,7 @@
   }
   
   async function onSignInClick() {
-    getSignInPopup().show()
+    await requestSignIn()
   }
 </script>
 

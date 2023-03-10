@@ -22,11 +22,10 @@ rules_version = '2';
 //      username: string
 //      numWins: boolean
 //    }
-//    /private/{doc}: {
+//    /private/doc: {
 //      SERVER: {
 //        email: string
 //        banned: boolean
-//        admin: boolean
 //      }
 //    }
 //    /games/{gameId}: {
@@ -55,6 +54,20 @@ rules_version = '2';
 //    }
 //  }
 
+function isAuth(id) {
+  return isAuthUnverified(id) && request.auth.token.email_verified;
+}
+function isAuthUnverified(id) {
+  return request.auth != null && request.auth.uid != null && debug(request.auth.uid) == string(id);
+}
+function mapEq(mapA, mapB) {
+  return mapA.diff(mapB).affectedKeys().size() == 0;
+}
+function serverUnchanged() {
+  return mapEq(request.resource.data.SERVER, resource.data.SERVER);
+}
+
+
 service cloud.firestore {
   match /databases/{database}/documents {
     // Uncomment to allow read/write access on all documents to all users
@@ -64,16 +77,31 @@ service cloud.firestore {
     
     match /users/{userId} {
       allow read;
-      allow update: if request.auth.uid == userId;
-      // Disallow creating and deleting users, they are created and deleted by the server
-      allow create: if false;
+      allow update: if isAuth(userId) && serverUnchanged();
+      
+      // When creating a user, the user must be authenticated and the starting data must be correct. Allow unverified accounts, since at the time of creation, the user has not yet verified their email.
+      allow create: if
+        isAuthUnverified(userId) &&
+        (request.resource.data.name == null || request.resource.data.name == request.auth.token.name) &&
+        (request.resource.data.profileImg == null || request.resource.data.profileImg == request.auth.token.picture) &&
+        request.resource.data.SERVER.username.size() >= 3 &&
+        request.resource.data.SERVER.username.size() <= 25 &&
+        request.resource.data.SERVER.username.matches('^[a-zA-Z0-9_]+$') &&
+        request.resource.data.SERVER.numWins == 0;
+        
+      // Disallow creating and deleting users
       allow delete: if false;
       
       // Subcollection with a single document for data that other users cannot read
-      match /private/{privateDoc} {
-        allow read: if request.auth.uid == userId;
-        allow update: if request.auth.uid == userId;
-        allow create: if false;
+      match /private/{doc} {
+        allow read: if isAuth(userId);
+        allow update: if isAuth(userId) && serverUnchanged();
+          
+        allow create: if
+          isAuthUnverified(userId) &&
+          request.resource.data.SERVER.email == request.auth.token.email &&
+          request.resource.data.SERVER.banned == false;
+        
         allow delete: if false;
       }
       
@@ -87,7 +115,10 @@ service cloud.firestore {
     
     
     match /variants/{variantId} {
-      allow read, write: if request.auth.uid == resource.data.creatorId;
+      allow read;
+      // Create if authenticated, update if authenticated and creator
+      allow create: if isAuth(request.resource.data.creatorId);
+      allow update: if isAuth(resource.data.creatorId);
     }
     
   }

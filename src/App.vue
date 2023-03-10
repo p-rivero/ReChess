@@ -10,12 +10,16 @@
 
 <script setup lang="ts">
   import NavbarComponent from '@/components/Navbar/NavbarComponent.vue'
-  import { ref } from 'vue'
+  import { ref, onMounted } from 'vue'
   import SignInPopup from '@/components/Popup/SignInPopup.vue'
-  import { setSignInPopup } from '@/components/Popup/sign-in-popup'
+  import { setSignInPopup, signInRefresh } from '@/components/Auth/auth-manager'
   
   const signInPopup = ref<InstanceType<typeof SignInPopup>>()
   setSignInPopup(signInPopup)
+  
+  onMounted(() => {
+    signInRefresh()
+  })
   
 </script>
 
