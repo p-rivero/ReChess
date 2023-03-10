@@ -3,7 +3,10 @@
     <div class="modal-background" @click="closePopup"></div>
     <div class="box modal-card signin-card">
       
-      <LoginRegisterStage v-show="currentStage === 'loginRegister'" ref="loginRegisterStage"/>
+      <LoginRegisterStage v-show="currentStage === 'loginRegister'" ref="loginRegisterStage"
+        @check-verify="checkEmailVerified" @choose-username="chooseUsername"/>
+        
+      <VerifyEmailStage v-show="currentStage === 'verifyEmail'" />
       
     </div>
   </div>
@@ -13,7 +16,9 @@
 <script setup lang="ts">
 
   import { ref } from 'vue'
+  import { checkEmailVerified } from '@/components/Auth/auth-manager';
   import LoginRegisterStage from '@/components/Auth/LoginRegisterStage.vue'
+  import VerifyEmailStage from '@/components/Auth/VerifyEmailStage.vue';
   
   const popup = ref<HTMLElement>()
   const loginRegisterStage = ref<InstanceType<typeof LoginRegisterStage>>()
@@ -23,7 +28,7 @@
     
   defineExpose({
     async show(stage: Stage) {
-      if (currentStage.value) throw new Error('Popup already open')
+      hideCurrentStage()
       currentStage.value = stage
       initCurrentStage()
       popup.value?.classList.add('is-active')
@@ -31,6 +36,8 @@
     },
     hide: closePopup,
   })
+  
+  
   
   function initCurrentStage() {
     switch (currentStage.value) {
@@ -59,9 +66,15 @@
   }
   
   function closePopup() {
+    // Only allow closing if we're in the loginRegister stage
+    if (currentStage.value !== 'loginRegister') return
     popup.value?.classList.remove('is-active')
     document.documentElement.classList.remove('is-clipped')
     hideCurrentStage()
+  }
+  
+  function chooseUsername() {
+    // TODO
   }
 
 </script>

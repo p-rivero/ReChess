@@ -7,15 +7,15 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  updateProfile,
   sendEmailVerification,
 } from 'firebase/auth'
 import { User } from './user'
-import { collection, doc, setDoc } from '@firebase/firestore'
+import { doc, setDoc } from '@firebase/firestore'
 
 
 export class AuthUser extends User {
   public email: string
+  public verified: boolean
   
   constructor(user: FirebaseUser, username: string) {
     const displayName = user.displayName ?? undefined // null -> undefined
@@ -24,13 +24,14 @@ export class AuthUser extends User {
     
     if (!user.email) throw new Error('User has no email')
     this.email = user.email
+    this.verified = user.emailVerified
   }
 }
 
 export const useAuthStore = defineStore('auth-user', () => {
   let initialized = false
   let inhibitLogIn = false
-  const user = ref<User|null>(null)
+  const user = ref<AuthUser|null>(null)
   const verified = ref(false)
   
   // Called when user signs in or out (or when the page is refreshed)
@@ -50,30 +51,36 @@ export const useAuthStore = defineStore('auth-user', () => {
   
   async function createUserInDB(user: FirebaseUser, username: string) {
     // Create public user data
-    await setDoc(doc(db, "users", user.uid), {
-      name: user.displayName,
-      profileImg: user.photoURL,
-      SERVER: {
-        username: username,
-        numWins: 0,
-      }
-    })
-    // Create private user data
-    await setDoc(doc(db, "users", user.uid, "private", "doc"), {
-      SERVER: {
-        email: user.email,
-        banned: false,
-      }
-    })
+    // TODO: Batched writes
+    try {
+      await setDoc(doc(db, "users", user.uid), {
+        name: user.displayName,
+        profileImg: user.photoURL,
+        SERVER: {
+          username: username,
+          numWins: 0,
+        }
+      })
+      // Create private user data
+      await setDoc(doc(db, "users", user.uid, "private", "doc"), {
+        SERVER: {
+          email: user.email,
+          banned: false,
+        }
+      })
+    } catch (e) {
+    }
   }
   
   
   
-  // Attemps to log in with an email and password, returning true if the user exists
+  // Attemps to log in with an email and password, throws an error if it fails (e.g. wrong password or user does not exist)
+  // Updates the stored user if successful
   async function emailLogIn(email: string, password: string): Promise<void> {
     await signInWithEmailAndPassword(auth, email, password)
   }
   
+  // Creates a new user with an email and password, and updates the stored user
   async function emailRegister(email: string, username: string, password: string): Promise<void> {
     // Do not store the user until the database is updated
     inhibitLogIn = true
@@ -81,7 +88,7 @@ export const useAuthStore = defineStore('auth-user', () => {
     try {
       await createUserInDB(credential.user, username)
     } catch (e) {
-      // If the database update fails, delete the user
+      // If the database update fails, delete the user auth
       await credential.user.delete()
       throw e
     }
@@ -90,10 +97,12 @@ export const useAuthStore = defineStore('auth-user', () => {
     inhibitLogIn = false
   }
   
+  // Signs out the user and updates the store
   async function signOut(): Promise<void> {
     await auth.signOut()
   }
   
+  // Returns true if the user is logged in, false otherwise
   async function isLogged() {
     // Wait for the user to be initialized
     while (!initialized) await new Promise(resolve => setTimeout(resolve, 100))

@@ -4,11 +4,11 @@
       <div class="account-icon sz-2 icon-account color-theme" style="border-radius: 50%;"></div>
     </span>
     <p class="card-header-title">
-      {{ authStore.user!.displayName }}
+      {{ authStore.user!.name }}
     </p>
   </a>
   <button v-else class="button is-primary" @click="onSignInClick">
-    <strong>Sign in</strong>
+    <p>Sign in</p>
   </button>
 </template>
 
@@ -20,7 +20,6 @@
     
   async function onAccountClick() {
     authStore.signOut()
-    alert('Signed out')
   }
   
   async function onSignInClick() {

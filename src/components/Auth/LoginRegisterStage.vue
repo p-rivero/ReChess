@@ -16,6 +16,7 @@
           if (!(/^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$/).test(text))
             return 'The email has an invalid format'
         }"
+        :start-text="email"
         @changed="text => email = text"/>
     </div>
     
@@ -31,6 +32,7 @@
           if (text.length > 25) return 'Username must be at most 25 characters long'
           if (!(/^[a-zA-Z0-9_]+$/).test(text)) return 'Username can only contain letters, numbers, and underscores'
         }"
+        :start-text="displayName"
         @changed="text => displayName = text"/>
     </div>
     
@@ -44,6 +46,8 @@
           if (text === '') return 'The password is required'
           if (text.length < 6 && isRegister) return 'Password must be at least 6 characters long'
         }"
+        :emit-changed-when-error="true"
+        :start-text="password"
         @changed="text => password = text"/>
     </div>
     
@@ -56,6 +60,7 @@
           if (text === '' && !isStrict) return undefined
           if (text.length < 6 || text !== password) return 'Passwords must match and be at least 6 characters long'
         }"
+        :start-text="passwordRepeat"
         @changed="text => passwordRepeat = text"/>
     </div>
     
@@ -88,7 +93,6 @@
   import { ErrorMessageHandler } from '@/utils/error-message-handler'
   
   
-  const popup = ref<HTMLElement>()
   const emailRef = ref<InstanceType<typeof SmartTextInput>>()
   const usernameRef = ref<InstanceType<typeof SmartTextInput>>()
   const loadingSocialSignin = ref(true)

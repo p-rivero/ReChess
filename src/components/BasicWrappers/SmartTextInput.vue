@@ -28,6 +28,7 @@
     refreshHandlerOnInput?: boolean
     errorHandler?: ErrorMessageHandler
     errorPriority?: number
+    emitChangedWhenError?: boolean
   }>()
   
   const emit = defineEmits<{
@@ -68,10 +69,13 @@
     if (!textInput.value) throw new Error('Number input is null')
     let text = textInput.value.value
     
-    if (validate(text)) {
+    const validated = validate(text)
+    // When emitChangedWhenError flag is set, emit the changed event even if the input is invalid
+    if (validated || props.emitChangedWhenError)
       emit('changed', text)
-      if (props.refreshHandlerOnInput) props.errorHandler?.clear()
-    }
+    // When refreshHandlerOnInput flag is set, always refresh the error message (not needed if this validator already failed)
+    if (validated && props.refreshHandlerOnInput)
+      props.errorHandler?.clear()
   }
   
   function validate(text: string): boolean {
