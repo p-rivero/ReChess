@@ -7,52 +7,7 @@ rules_version = '2';
 // that field will be rejected. This field contains data that can be read by anyone
 // with read access to the document, but can only be modified by a server-side function.
 
-
-//  SCHEMA:
-//
-//  usernames/{username}: {
-//    userId: string
-//  }
-//
-//  users/{userId}: {
-//    name?: string
-//    about?: string
-//    profileImg?: string
-//    SERVER: {
-//      username: string
-//      numWins: boolean
-//    }
-//    /private/doc: {
-//      SERVER: {
-//        email: string
-//        banned: boolean
-//      }
-//    }
-//    /games/{gameId}: {
-//      timePlayed: timestamp
-//      result: 'win' | 'lose' | 'draw'
-//      variantName: string
-//      variantId: string
-//      opponentName: string
-//      opponentId: string
-//    }
-//  }
-//
-//  userUpvotes/{userID}: {
-//    [variantId]: {
-//      timeUpvoted: timestamp
-//      variantName: string
-//    }
-//  }
-//
-//  variants/{variantId}: {
-//    name: string
-//    creatorId: string
-//    description: string
-//    /serverPublic/{doc}: {
-//      numUpvotes: number
-//    }
-//  }
+// See firestore.d.ts for the database schema
 
 function isAuth(id) {
   return isAuthUnverified(id) && request.auth.token.email_verified;
@@ -83,13 +38,14 @@ service cloud.firestore {
       allow create: if
         isAuthUnverified(userId) &&
         (request.resource.data.name == null || request.resource.data.name == request.auth.token.name) &&
+        request.resource.data.about == '' &&
         (request.resource.data.profileImg == null || request.resource.data.profileImg == request.auth.token.picture) &&
         request.resource.data.SERVER.username.size() >= 3 &&
         request.resource.data.SERVER.username.size() <= 25 &&
         request.resource.data.SERVER.username.matches('^[a-zA-Z0-9_]+$') &&
         request.resource.data.SERVER.numWins == 0;
         
-      // Disallow creating and deleting users
+      // Disallow deleting users for now
       allow delete: if false;
       
       // Subcollection with a single document for data that other users cannot read

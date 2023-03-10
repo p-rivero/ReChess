@@ -26,6 +26,7 @@
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
+          if (!isRegister) return undefined
           if (text === '' && !isStrict) return undefined
           if (text === '') return 'Please enter a username'
           if (text.length < 3) return 'Username must be at least 3 characters long'
@@ -57,6 +58,7 @@
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
+          if (!isRegister) return undefined
           if (text === '' && !isStrict) return undefined
           if (text.length < 6 || text !== password) return 'Passwords must match and be at least 6 characters long'
         }"
@@ -67,7 +69,8 @@
     <SmartErrorMessage class="mb-4" v-show="hasError" :handler="errorHandler" />
     
     <div>
-      <button class="button is-primary" :disabled="hasError" @click="signInClick">
+      <button class="button is-primary" @click="signInClick"
+        :class="{'is-loading': loading}" :disabled="hasError || loading">
         {{ isRegister ? 'Register' : 'Sign in' }}
       </button>
     </div>
@@ -102,6 +105,7 @@
   const passwordRepeat = ref('')
   const isRegister = ref(false)
   const isStrict = ref(false)
+  const loading = ref(false)
   
   const authStore = useAuthStore()
   const hasError = ref(false)
@@ -134,6 +138,7 @@
     hide() {
       isStrict.value = false
       isRegister.value = false
+      loading.value = false
       passwordRepeat.value = ''
     }
   })
@@ -146,8 +151,14 @@
   
   
   async function signInClick() {
-    if (isRegister.value) await register()
-    else await logIn()
+    loading.value = true
+    try {
+      if (isRegister.value) await register()
+      else await logIn()
+    } catch (e) {
+      errorHandler.showException(e)
+    }
+    loading.value = false
   }
   
   async function register() {
@@ -157,13 +168,9 @@
       errorHandler.clear()
       return
     }
-    
-    try {
-      await authStore.emailRegister(email.value, displayName.value, password.value)
-      emit('check-verify')
-    } catch (e) {
-      errorHandler.showException(e)
-    }
+    // This throws an error if the email or username is already taken
+    await authStore.emailRegister(email.value, displayName.value, password.value)
+    emit('check-verify')
   }
   
   async function logIn() {
@@ -174,19 +181,18 @@
       return
     }
     
-    
     try {
       await authStore.emailLogIn(email.value, password.value)
       emit('check-verify')
     } catch (e) {
       if (e instanceof UserNotFoundError) {
+        // Transition to register
         isRegister.value = true
         isStrict.value = false
         errorHandler.clear()
         usernameRef.value?.focus()
-      } else {
-        errorHandler.showException(e)
       }
+      throw e
     }
   }
 </script>
