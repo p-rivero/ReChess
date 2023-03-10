@@ -4,11 +4,12 @@
     
     <p class="mb-3">You just need to verify your email address. We've sent an email to <b>{{ authStore.user?.email }}</b>.</p>
     
-    <a @click="resendEmail">Send again</a>
+    <p v-if="sentMessage" class="has-text-weight-light" >{{ sentMessage }}</p>
+    <a v-else @click="resendEmail">Send again</a>
     
     <div class="is-flex mt-5">
       <p class="mr-3">Changed your mind?</p>
-      <a @click="hide">Logout</a>
+      <a @click="logout">Logout</a>
     </div>
     
   </div>
@@ -17,20 +18,40 @@
 
 <script setup lang="ts">  
   import { useAuthStore } from '@/stores/auth-user'
+  import { useRouter } from 'vue-router'
+  import { ref } from 'vue'
   
   const authStore = useAuthStore()
+  const router = useRouter()
+  const sentMessage = ref<string>()
   
   defineExpose({
     init() {
       // Nothing to do at the moment
     },
-    hide() {
-      // Nothing to do at the moment
+    cleanup() {
+      sentMessage.value = ''
     }
   })
   
-  function resendEmail() {
-    // authStore.sendEmailVerification()
+  const emit = defineEmits<{
+    (event: 'close-popup'): void
+  }>()
+  
+  async function resendEmail() {
+    try {
+      sentMessage.value = 'Sending...'
+      await authStore.sendEmailVerification()
+      sentMessage.value = 'Sent!'
+    } catch (error) {
+      console.error(error)
+      sentMessage.value = 'Too many email requests. Please try again later.'
+    }
+  }
+  
+  async function logout() {
+    await authStore.signOut()
+    emit('close-popup')
   }
   
 </script>

@@ -1,12 +1,13 @@
 <template>
   <div class="modal" ref="popup">
-    <div class="modal-background" @click="closePopup"></div>
+    <div class="modal-background" @click="closePopup(true)"></div>
     <div class="box modal-card signin-card">
       
       <LoginRegisterStage v-show="currentStage === 'loginRegister'" ref="loginRegisterStage"
         @check-verify="checkEmailVerified" @choose-username="chooseUsername"/>
         
-      <VerifyEmailStage v-show="currentStage === 'verifyEmail'" />
+      <VerifyEmailStage v-show="currentStage === 'verifyEmail'" ref="verifyEmailStage" 
+        @close-popup="closePopup"/>
       
     </div>
   </div>
@@ -22,13 +23,15 @@
   
   const popup = ref<HTMLElement>()
   const loginRegisterStage = ref<InstanceType<typeof LoginRegisterStage>>()
+  const verifyEmailStage = ref<InstanceType<typeof VerifyEmailStage>>()
+  
     
   type Stage = 'loginRegister'|'chooseUsername'|'verifyEmail'
   const currentStage = ref<Stage>()
     
   defineExpose({
     async show(stage: Stage) {
-      hideCurrentStage()
+      cleanupCurrentStage()
       currentStage.value = stage
       initCurrentStage()
       popup.value?.classList.add('is-active')
@@ -45,36 +48,41 @@
         loginRegisterStage.value?.init()
         break
       case 'chooseUsername':
+        // TODO
         break
       case 'verifyEmail':
+        verifyEmailStage.value?.init()
         break
     }
     // TODO
   }
-  function hideCurrentStage() {
+  function cleanupCurrentStage() {
     switch (currentStage.value) {
       case 'loginRegister':
-        loginRegisterStage.value?.hide()
+        loginRegisterStage.value?.cleanup()
         break
       case 'chooseUsername':
         // TODO
         break
       case 'verifyEmail':
+        verifyEmailStage.value?.cleanup()
         break
     }
     currentStage.value = undefined
   }
   
-  function closePopup() {
+  function closePopup(clickBackground = false) {
     // Only allow closing if we're in the loginRegister stage
-    if (currentStage.value !== 'loginRegister') return
+    if (clickBackground && currentStage.value !== 'loginRegister') return
     popup.value?.classList.remove('is-active')
     document.documentElement.classList.remove('is-clipped')
-    hideCurrentStage()
+    cleanupCurrentStage()
   }
   
   function chooseUsername() {
-    // TODO
+    cleanupCurrentStage()
+    currentStage.value = 'chooseUsername'
+    initCurrentStage()
   }
 
 </script>

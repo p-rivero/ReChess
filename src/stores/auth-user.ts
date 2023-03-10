@@ -35,7 +35,6 @@ export const useAuthStore = defineStore('auth-user', () => {
     updateUser(newUser)
   })
   async function updateUser(newUser: fb.User|null) {
-    initialized = true
     if (!newUser || !newUser.email) {
       user.value = null
       return
@@ -44,21 +43,25 @@ export const useAuthStore = defineStore('auth-user', () => {
     // The auth token does not include the username, we need to fetch it from the database
     const username = await DB.getUsername(newUser.uid)
     user.value = new AuthUser(newUser, username)
-  }  
+    initialized = true
+  }
   
   
   // Attemps to log in with an email and password, throws an error if it fails (e.g. wrong password or user does not exist)
   // Updates the stored user if successful
   async function emailLogIn(email: string, password: string): Promise<void> {
     try {
+      initialized = false
       await fb.signInWithEmailAndPassword(auth, email, password)
     } catch (e: any) {
+      initialized = true
       switch (e.code) {
         case 'auth/user-not-found':
           throw new UserNotFoundError()
         case 'auth/wrong-password':
           throw new RechessError('WRONG_PASSWORD')
         default:
+          console.error('Unknown error while logging in with email and password', e)
           throw e
       }
     }
@@ -100,6 +103,16 @@ export const useAuthStore = defineStore('auth-user', () => {
     await auth.signOut()
   }
   
+  async function sendEmailVerification() {
+    if (!auth.currentUser) throw new Error('User is not logged in')
+    await fb.sendEmailVerification(auth.currentUser, {
+      url: 'https://rechess-web--preview-test-kbq2rc6i.web.app/?success=verify',
+      handleCodeInApp: true
+    })
+    // Obtain code from the user.
+    // await applyActionCode(auth, code)
+  }
+  
   // Returns true if the user is logged in, false otherwise
   async function isLogged() {
     // Wait for the user to be initialized
@@ -107,7 +120,7 @@ export const useAuthStore = defineStore('auth-user', () => {
     return user.value !== null
   }
 
-  return { emailLogIn, emailRegister, signOut, isLogged, user }
+  return { emailLogIn, emailRegister, signOut, sendEmailVerification, isLogged, user }
 })
 
 
@@ -116,6 +129,7 @@ export const useAuthStore = defineStore('auth-user', () => {
 
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import type { UserDoc, UserPrivateDoc } from '@/firebase/firestore'
+import { applyActionCode } from 'firebase/auth'
 namespace DB {
   
   export async function createUser(user: fb.User, username: string) {

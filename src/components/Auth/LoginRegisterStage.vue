@@ -135,7 +135,7 @@
       })
       emailRef.value?.focus()
     },
-    hide() {
+    cleanup() {
       isStrict.value = false
       isRegister.value = false
       loading.value = false
@@ -170,6 +170,8 @@
     }
     // This throws an error if the email or username is already taken
     await authStore.emailRegister(email.value, displayName.value, password.value)
+    // Also send a verification email
+    await authStore.sendEmailVerification()
     emit('check-verify')
   }
   
@@ -191,6 +193,7 @@
         isStrict.value = false
         errorHandler.clear()
         usernameRef.value?.focus()
+        return
       }
       throw e
     }
