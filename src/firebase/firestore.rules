@@ -52,7 +52,7 @@ service cloud.firestore {
     function usernameIsTaken(username) {
       return exists(/databases/$(database)/documents/usernames/$(username));
     }
-    function isUsername(username) {
+    function isValidUsername(username) {
       return username.size() >= 3 &&
         username.size() <= 25 &&
         username.matches('^[a-zA-Z0-9_]+$');
@@ -64,8 +64,10 @@ service cloud.firestore {
       allow create: if
         // When creating a user, the user must be authenticated and the starting data must be correct. Allow unverified accounts, since at the time of creation, the user has not yet verified their email.
         isAuthUnverified(request.resource.data.userId) &&
-        isUsername(username) &&
-        !usernameIsTaken(username);
+        isValidUsername(username) &&
+        !usernameIsTaken(username) &&
+        // Username must be registered batched with a user document
+        getAfter(/databases/$(database)/documents/users/$(request.resource.data.userId)).data.SERVER.username == username;
       
       allow update: if false;
       
@@ -94,9 +96,11 @@ service cloud.firestore {
         request.resource.data.about == '' &&
         nullOrEq(request.resource.data.profileImg, request.auth.token.picture) &&
         // Username is correct and not taken
-        isUsername(request.resource.data.SERVER.username) &&
+        isValidUsername(request.resource.data.SERVER.username) &&
         !usernameIsTaken(request.resource.data.SERVER.username) &&
-        request.resource.data.SERVER.numWins == 0;
+        request.resource.data.SERVER.numWins == 0 &&
+        // Username must be registered batched with a user document
+        getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.SERVER.username)).data.userId == userId;
         
       // Disallow deleting users for now
       allow delete: if false;

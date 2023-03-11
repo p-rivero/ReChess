@@ -32,7 +32,8 @@ export const useAuthStore = defineStore('auth-user', () => {
   // Called when user signs in or out (or when the page is refreshed)
   fb.onAuthStateChanged(auth, async newUser => {
     if (inhibitLogIn) return
-    updateUser(newUser)
+    await updateUser(newUser)
+    initialized = true
   })
   async function updateUser(newUser: fb.User|null) {
     if (!newUser || !newUser.email) {
@@ -43,7 +44,6 @@ export const useAuthStore = defineStore('auth-user', () => {
     // The auth token does not include the username, we need to fetch it from the database
     const username = await DB.getUsername(newUser.uid)
     user.value = new AuthUser(newUser, username)
-    initialized = true
   }
   
   

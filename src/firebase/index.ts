@@ -31,7 +31,7 @@ if (import.meta.env.DEV) {
 
 enableMultiTabIndexedDbPersistence(db).catch((err) => {
   if (err.code === 'failed-precondition') {
-    console.log('Persistence could not be enabled because another tab is already open')
+    console.warn('Persistence could not be enabled because another tab is already open')
   } else if (err.code === 'unimplemented') {
     console.warn('The current browser does NOT support firestore persistence.')
   }
