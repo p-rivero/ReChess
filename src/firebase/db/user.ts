@@ -8,9 +8,9 @@ import type { User } from '@firebase/auth'
 export async function createUser(user: User, username: string) {
   const batch = writeBatch(db)
   const newPublicData: UserDoc = {
-    name: user.displayName ?? undefined,
+    name: user.displayName,
     about: '',
-    profileImg: user.photoURL ?? undefined,
+    profileImg: user.photoURL,
     SERVER: {
       username: username,
       numWins: 0,

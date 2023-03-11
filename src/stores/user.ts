@@ -16,7 +16,9 @@ export class User {
   }
   
   static fromDoc(doc: UserDoc): User {
-    return new User(doc.SERVER.username, doc.name, doc.about, doc.profileImg)
+    const name = doc.name ?? undefined
+    const profileImg = doc.profileImg ?? undefined
+    return new User(doc.SERVER.username, name, doc.about, profileImg)
   }
   
   public get name() {

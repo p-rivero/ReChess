@@ -135,8 +135,15 @@
         ],
         callbacks: {
           signInSuccessWithAuthResult: _authResult => {
-            emit('choose-username')
-            // Don't redirect.
+            loading.value = true
+            // If this is the first time the user signs in, we need to ask them to choose a username
+            // Otherwise, we can just skip this step and ckeck if the user is verified
+            if (_authResult.additionalUserInfo?.isNewUser) {
+              emit('choose-username')
+            } else {
+              emit('check-verify')
+            }
+            // Don't redirect
             return false
           },
           uiShown: () => {

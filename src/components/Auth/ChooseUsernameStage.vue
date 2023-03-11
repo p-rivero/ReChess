@@ -64,6 +64,7 @@
     cleanup() {
       username.value = ''
       usernameStatus.value = 'unknown'
+      hasError.value = false
     }
   })
   

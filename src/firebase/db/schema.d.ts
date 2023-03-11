@@ -1,6 +1,9 @@
 
 import { Timestamp } from 'firebase/firestore'
 
+// WARNING: The Firebase client requires null instead of undefined
+// Use "| null" instead of "?" for optional fields
+
 // usernames/{username}
 export interface UsernameDoc {
   userId: string
@@ -8,9 +11,9 @@ export interface UsernameDoc {
 
 // users/{userId}
 export interface UserDoc {
-  name?: string
+  name: string | null
   about: string
-  profileImg?: string
+  profileImg: string | null
   SERVER: {
     username: string
     numWins: number
