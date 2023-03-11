@@ -9,18 +9,25 @@ rules_version = '2';
 
 // See firestore.d.ts for the database schema
 
+
+// HELPER FUNCTIONS
+
+// Returns true if the user is authenticated and has the given id
 function isAuth(id) {
   return isAuthUnverified(id) && request.auth.token.email_verified;
 }
+// Same as isAuth, but does not require the email to be verified
 function isAuthUnverified(id) {
   return request.auth != null && request.auth.uid != null && request.auth.uid == id;
 }
 
+// Checks that two maps are equal
 function mapEq(mapA, mapB) {
   return mapA.diff(mapB).affectedKeys().size() == 0;
 }
-function serverUnchanged() {
-  return mapEq(request.resource.data.SERVER, resource.data.SERVER);
+// Checks that the given field is null or equal to the given value
+function nullOrEq(nullable, val) {
+  return nullable == null || nullable == val;
 }
 
 // Checks that the request contains all the required fields and no extra extra fields
@@ -28,51 +35,84 @@ function hasCorrectFields(required, optional) {
   let allowed = required.concat(optional);
   return request.resource.data.keys().hasAll(required) && request.resource.data.keys().hasOnly(allowed);
 }
+// Same as hasCorrectFields, but checks the SERVER field
+function serverHasCorrectFields(required, optional) {
+  let allowed = required.concat(optional);
+  return request.resource.data.SERVER.keys().hasAll(required) && request.resource.data.SERVER.keys().hasOnly(allowed);
+}
+// Checks that the SERVER field has not changed
+function serverUnchanged() {
+  return mapEq(request.resource.data.SERVER, resource.data.SERVER);
+}
 
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Uncomment to allow read/write access on all documents to all users
-    // match /{document=**} {
-    //   allow read, write;
-    // }
+    
+    function usernameIsTaken(username) {
+      return exists(/databases/$(database)/documents/usernames/$(username));
+    }
+    function isUsername(username) {
+      return username.size() >= 3 &&
+        username.size() <= 25 &&
+        username.matches('^[a-zA-Z0-9_]+$');
+    }
+    
+    
+    match /usernames/{username} {
+      allow read;
+      allow create: if
+        // When creating a user, the user must be authenticated and the starting data must be correct. Allow unverified accounts, since at the time of creation, the user has not yet verified their email.
+        isAuthUnverified(request.resource.data.userId) &&
+        isUsername(username) &&
+        !usernameIsTaken(username);
+      
+      allow update: if false;
+      
+      // Disallow deleting usernames for now
+      allow delete: if false;
+    }
     
     match /users/{userId} {
-      allow read;
-      allow update: if isAuth(userId) && serverUnchanged();
       
-      // When creating a user, the user must be authenticated and the starting data must be correct. Allow unverified accounts, since at the time of creation, the user has not yet verified their email.
+      function isUserDoc() {
+        return hasCorrectFields(['about', 'SERVER'], ['name', 'profileImg']) &&
+          serverHasCorrectFields(['username', 'numWins'], []);
+      }
+      function isPrivateUserDoc() {
+        return hasCorrectFields(['SERVER'], []) &&
+          serverHasCorrectFields(['email', 'banned'], []);
+      }
+      
+      allow read;
+      allow update: if isUserDoc() && isAuth(userId) && serverUnchanged();
+      
       allow create: if
+        isUserDoc() &&
         isAuthUnverified(userId) &&
-        (request.resource.data.name == null || request.resource.data.name == request.auth.token.name) &&
+        nullOrEq(request.resource.data.name, request.auth.token.name) &&
         request.resource.data.about == '' &&
-        (request.resource.data.profileImg == null || request.resource.data.profileImg == request.auth.token.picture) &&
-        request.resource.data.SERVER.username.size() >= 3 &&
-        request.resource.data.SERVER.username.size() <= 25 &&
-        request.resource.data.SERVER.username.matches('^[a-zA-Z0-9_]+$') &&
+        nullOrEq(request.resource.data.profileImg, request.auth.token.picture) &&
+        // Username is correct and not taken
+        isUsername(request.resource.data.SERVER.username) &&
+        !usernameIsTaken(request.resource.data.SERVER.username) &&
         request.resource.data.SERVER.numWins == 0;
         
       // Disallow deleting users for now
       allow delete: if false;
       
-      // Subcollection with a single document for data that other users cannot read
+      
       match /private/{doc} {
         allow read: if isAuth(userId);
-        allow update: if isAuth(userId) && serverUnchanged();
+        allow update: if isPrivateUserDoc() && isAuth(userId) && serverUnchanged();
           
         allow create: if
+          isPrivateUserDoc() &&
           isAuthUnverified(userId) &&
           request.resource.data.SERVER.email == request.auth.token.email &&
           request.resource.data.SERVER.banned == false;
         
         allow delete: if false;
-      }
-      
-      // Subcollection with a single document for data that the user cannot modify
-      // but everyone can read
-      match /server/{serverPrivateDoc} {
-        allow read;
-        allow write: if false;
       }
     }
     

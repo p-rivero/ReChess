@@ -2,7 +2,7 @@ import { FIREBASE_CONFIG, CAPTCHA_V3_PUBLIC_KEY } from './credentials'
 
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { initializeApp } from 'firebase/app'
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore'
+import { connectFirestoreEmulator, enableMultiTabIndexedDbPersistence, getFirestore } from 'firebase/firestore'
 import { connectStorageEmulator, getStorage } from "firebase/storage"
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 import { getAuth, connectAuthEmulator, browserLocalPersistence } from "firebase/auth";
@@ -28,6 +28,14 @@ if (import.meta.env.DEV) {
   connectFirestoreEmulator(db, 'localhost', 8080)
   connectStorageEmulator(storage, 'localhost', 9199)
 }
+
+enableMultiTabIndexedDbPersistence(db).catch((err) => {
+  if (err.code === 'failed-precondition') {
+    console.log('Persistence could not be enabled because another tab is already open')
+  } else if (err.code === 'unimplemented') {
+    console.warn('The current browser does NOT support firestore persistence.')
+  }
+})
 
 initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider(CAPTCHA_V3_PUBLIC_KEY),

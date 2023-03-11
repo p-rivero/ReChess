@@ -24,7 +24,7 @@
     
     
     <div class="column">
-      <SmartTextInput :multiline="false" class="is-large" placeholder="Piece name" :start-text="piece?.displayName"
+      <SmartTextInput class="is-large" placeholder="Piece name" :start-text="piece?.displayName"
         :error-handler="errorMsgHandler"
         :error-priority="2"
         :validator="text => {
@@ -41,7 +41,7 @@
             <SmartCheckbox text="White" class="mr-4" :start-value="!whiteInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
             <PieceImageEdit :imageUrl="piece?.imageUrls[0]" :class="{ invisible: whiteInvisible }"/>
-            <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
+            <SmartTextInput class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
               :error-handler="errorMsgHandler"
               :error-priority="1"
@@ -61,7 +61,7 @@
             <SmartCheckbox text="Black" class="mr-4" :start-value="!blackInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
             <PieceImageEdit :imageUrl="piece?.imageUrls[1]" :class="{ invisible: blackInvisible }"/>
-            <SmartTextInput :multiline="false" class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
+            <SmartTextInput class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :error-handler="errorMsgHandler"
               :validator="text => {
@@ -91,7 +91,7 @@
           <div class="field-label-both">
             <label>Queenside file</label>
           </div>
-          <SmartTextInput :multiline="false" class="width-3rem" placeholder="c"
+          <SmartTextInput class="width-3rem" placeholder="c"
             :start-text="numberToLetter(piece?.castleFiles?.[0])"
             :error-handler="errorMsgHandler"
             :validator="text => validateCastlingFile(text, 'Queenside')"
@@ -99,7 +99,7 @@
           <div class="field-label-both">
             <label>Kingside file</label>
           </div>
-          <SmartTextInput :multiline="false" class="width-3rem" placeholder="g"
+          <SmartTextInput class="width-3rem" placeholder="g"
             :start-text="numberToLetter(piece?.castleFiles?.[1])"
             :error-handler="errorMsgHandler"
             :validator="text => validateCastlingFile(text, 'Kingside')"
@@ -172,10 +172,10 @@
       
       <br>
       <label class="label">TEMPORARY FOR MVP:</label>
-      <SmartTextInput :multiline="false" placeholder="(Temp) URL for white piece image" class="rules-field"
+      <SmartTextInput placeholder="(Temp) URL for white piece image" class="rules-field"
         :start-text="piece?.imageUrls[0] ?? undefined"
         @changed="text => { piece!.imageUrls[0] = text; draftStore.save() }"/>
-      <SmartTextInput :multiline="false" placeholder="(Temp) URL for black piece image" class="rules-field"
+      <SmartTextInput placeholder="(Temp) URL for black piece image" class="rules-field"
         :start-text="piece?.imageUrls[1] ?? undefined"
         @changed="text => { piece!.imageUrls[1] = text; draftStore.save() }"/>
       

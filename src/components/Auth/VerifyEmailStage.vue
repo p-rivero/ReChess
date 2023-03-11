@@ -22,7 +22,6 @@
   import { ref } from 'vue'
   
   const authStore = useAuthStore()
-  const router = useRouter()
   const sentMessage = ref<string>()
   
   defineExpose({

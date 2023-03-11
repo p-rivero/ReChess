@@ -1,5 +1,5 @@
 <template>
-  <input v-if="!$props.multiline" class="input" :type="type" ref="textInput"
+  <input v-if="!multiline" class="input" :type="type" ref="textInput"
     :class="{'is-danger': isError}"
     :placeholder="props.placeholder"
     @change="inputChanged"
@@ -20,7 +20,7 @@
   const isError = ref<boolean>(false)
   
   const props = defineProps<{
-    multiline: boolean,
+    multiline?: boolean,
     type?: 'text'|'email'|'password'|'date'|'time'|'datetime-local'|'month'|'week'|'url'|'tel'|'color',
     placeholder?: string,
     startText?: string,

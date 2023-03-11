@@ -7,7 +7,7 @@
     
     <div class="mb-5">
       <label class="label">Email</label>
-      <SmartTextInput ref="emailRef" :multiline="false" type="email" placeholder="Email" 
+      <SmartTextInput ref="emailRef" type="email" placeholder="Email" 
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -22,7 +22,7 @@
     
     <div v-show="isRegister" class="mb-5">
       <label class="label">Username</label>
-      <SmartTextInput ref="usernameRef" :multiline="false" placeholder="your_username" 
+      <SmartTextInput class="mb-2" ref="usernameRef" placeholder="your_username" 
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -33,13 +33,22 @@
           if (text.length > 25) return 'Username must be at most 25 characters long'
           if (!(/^[a-zA-Z0-9_]+$/).test(text)) return 'Username can only contain letters, numbers, and underscores'
         }"
-        :start-text="displayName"
-        @changed="text => displayName = text"/>
+        :start-text="username"
+        @changed="updateUsername"/>
+      <p class="help"
+        :style="{visibility: username ? 'visible' : 'hidden'}"
+        :class="{
+          'has-text-danger': usernameStatus === 'taken',
+          'has-text-success': usernameStatus === 'available',
+        }" >
+        <b>rechess.org/users/{{ username }}</b>
+        {{ usernameStatus === 'taken' ? 'is already taken' : usernameStatus === 'available' ? 'is available' : '' }}
+      </p>
     </div>
     
     <div class="mb-5">
       <label class="label">Password</label>
-      <SmartTextInput :multiline="false" type="password" placeholder="Password" 
+      <SmartTextInput type="password" placeholder="Password" 
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -54,7 +63,7 @@
     
     <div v-show="isRegister" class="mb-5">
       <label class="label">Repeat password</label>
-      <SmartTextInput :multiline="false" type="password" placeholder="Password"
+      <SmartTextInput type="password" placeholder="Password"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -70,7 +79,7 @@
     
     <div>
       <button class="button is-primary" @click="signInClick"
-        :class="{'is-loading': loading}" :disabled="hasError || loading">
+        :class="{'is-loading': loading}" :disabled="hasError || loading || (isRegister && usernameStatus !== 'available')">
         {{ isRegister ? 'Register' : 'Sign in' }}
       </button>
     </div>
@@ -94,13 +103,14 @@
   import SmartErrorMessage from '../BasicWrappers/SmartErrorMessage.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
+  import { debounce } from '@/utils/ts-utils'
   
   
   const emailRef = ref<InstanceType<typeof SmartTextInput>>()
   const usernameRef = ref<InstanceType<typeof SmartTextInput>>()
   const loadingSocialSignin = ref(true)
   const email = ref('')
-  const displayName = ref('')
+  const username = ref('')
   const password = ref('')
   const passwordRepeat = ref('')
   const isRegister = ref(false)
@@ -108,6 +118,7 @@
   const loading = ref(false)
   
   const authStore = useAuthStore()
+  const usernameStatus = ref<'available' | 'taken' | 'unknown'>('unknown')
   const hasError = ref(false)
   const errorHandler = new ErrorMessageHandler(hasError)
   
@@ -139,7 +150,9 @@
       isStrict.value = false
       isRegister.value = false
       loading.value = false
+      username.value = ''
       passwordRepeat.value = ''
+      usernameStatus.value = 'unknown'
     }
   })
   
@@ -149,6 +162,21 @@
   }>()
   
   
+  
+  async function updateUsername(name: string) {
+    username.value = name
+    usernameStatus.value = 'unknown'
+    if (name === '') return
+    // Limit the number of requests to the server
+    const checkDebounced = debounce(async () => {
+      const available = await authStore.checkUsername(name)
+      // This result is obsolete, user has already changed the username
+      if (name !== username.value) return
+      usernameStatus.value = available ? 'available' : 'taken'
+      errorHandler.clear()
+    }, 1500)
+    await checkDebounced()
+  }
   
   async function signInClick() {
     loading.value = true
@@ -162,14 +190,14 @@
   }
   
   async function register() {
-    if (email.value === '' || displayName.value === '' || password.value === '' || passwordRepeat.value === '') {
+    if (email.value === '' || username.value === '' || password.value === '' || passwordRepeat.value === '') {
       // Refresh error messages, now in strict mode
       isStrict.value = true
       errorHandler.clear()
       return
     }
     // This throws an error if the email or username is already taken
-    await authStore.emailRegister(email.value, displayName.value, password.value)
+    await authStore.emailRegister(email.value, username.value, password.value)
     // Also send a verification email
     await authStore.sendEmailVerification()
     emit('check-verify')

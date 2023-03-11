@@ -1,6 +1,11 @@
 
 import { Timestamp } from 'firebase/firestore'
 
+// usernames/{username}
+export interface UsernameDoc {
+  userId: string
+}
+
 // users/{userId}
 export interface UserDoc {
   name: string | null

@@ -76,7 +76,7 @@
     
     
     <div class="column">
-      <SmartTextInput :multiline="false" class="is-large" placeholder="Variant name"
+      <SmartTextInput class="is-large" placeholder="Variant name"
         :start-text="draftStore.state.variantDisplayName"
         @changed="name => { draftStore.state.variantDisplayName = name; draftStore.save() }"
         :validator="(text) => {

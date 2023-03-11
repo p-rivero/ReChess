@@ -6,6 +6,9 @@
       <LoginRegisterStage v-show="currentStage === 'loginRegister'" ref="loginRegisterStage"
         @check-verify="checkVerify" @choose-username="chooseUsername"/>
         
+      <ChooseUsernameStage v-show="currentStage === 'chooseUsername'" ref="chooseUsernameStage"
+        @close-popup="closePopup"/>
+        
       <VerifyEmailStage v-show="currentStage === 'verifyEmail'" ref="verifyEmailStage" 
         @close-popup="closePopup"/>
       
@@ -19,10 +22,12 @@
   import { ref } from 'vue'
   import { checkEmailVerified } from '@/components/Auth/auth-manager';
   import LoginRegisterStage from '@/components/Auth/LoginRegisterStage.vue'
-  import VerifyEmailStage from '@/components/Auth/VerifyEmailStage.vue';
+  import ChooseUsernameStage from '../Auth/ChooseUsernameStage.vue'
+  import VerifyEmailStage from '@/components/Auth/VerifyEmailStage.vue'
   
   const popup = ref<HTMLElement>()
   const loginRegisterStage = ref<InstanceType<typeof LoginRegisterStage>>()
+  const chooseUsernameStage = ref<InstanceType<typeof ChooseUsernameStage>>()
   const verifyEmailStage = ref<InstanceType<typeof VerifyEmailStage>>()
   
     
@@ -48,7 +53,7 @@
         loginRegisterStage.value?.init()
         break
       case 'chooseUsername':
-        // TODO
+        chooseUsernameStage.value?.init()
         break
       case 'verifyEmail':
         verifyEmailStage.value?.init()
@@ -61,7 +66,7 @@
         loginRegisterStage.value?.cleanup()
         break
       case 'chooseUsername':
-        // TODO
+        chooseUsernameStage.value?.cleanup()
         break
       case 'verifyEmail':
         verifyEmailStage.value?.cleanup()

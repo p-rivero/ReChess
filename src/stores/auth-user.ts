@@ -106,7 +106,7 @@ export const useAuthStore = defineStore('auth-user', () => {
   async function sendEmailVerification() {
     if (!auth.currentUser) throw new Error('User is not logged in')
     await fb.sendEmailVerification(auth.currentUser, {
-      url: 'https://rechess-web--preview-test-kbq2rc6i.web.app/?success=verify',
+      url: window.location.origin,
       handleCodeInApp: true
     })
     // Obtain code from the user.
@@ -119,8 +119,13 @@ export const useAuthStore = defineStore('auth-user', () => {
     while (!initialized) await new Promise(resolve => setTimeout(resolve, 100))
     return user.value !== null
   }
+  
+  // Returns true if a username is available
+  async function checkUsername(username: string): Promise<boolean> {
+    return (await DB.getUserId(username)) === undefined
+  }
 
-  return { emailLogIn, emailRegister, signOut, sendEmailVerification, isLogged, user }
+  return { emailLogIn, emailRegister, signOut, sendEmailVerification, isLogged, checkUsername, user }
 })
 
 
@@ -128,8 +133,7 @@ export const useAuthStore = defineStore('auth-user', () => {
 // Firestore access
 
 import { doc, getDoc, writeBatch } from 'firebase/firestore'
-import type { UserDoc, UserPrivateDoc } from '@/firebase/firestore'
-import { applyActionCode } from 'firebase/auth'
+import type { UserDoc, UsernameDoc, UserPrivateDoc } from '@/firebase/firestore'
 namespace DB {
   
   export async function createUser(user: fb.User, username: string) {
@@ -150,8 +154,12 @@ namespace DB {
         banned: false,
       }
     }
+    const newUsername: UsernameDoc = {
+      userId: user.uid,
+    }
     batch.set(doc(db, "users", user.uid), newPublicData)
     batch.set(doc(db, "users", user.uid, "private", "doc"), newPrivateData)
+    batch.set(doc(db, "usernames", username), newUsername)
     
     try {
       await batch.commit()
@@ -163,9 +171,15 @@ namespace DB {
   export async function getUsername(uid: string): Promise<string> {
     const document = await getDoc(doc(db, "users", uid))
     // The document should always exist
-    const data = document.data()
-    if (!data) return '[ERROR]'
-    const userDoc = data as UserDoc
-    return userDoc.SERVER.username
+    if (!document.exists()) return '[ERROR]'
+    const data = document.data() as UserDoc
+    return data.SERVER.username
+  }
+  
+  export async function getUserId(username: string): Promise<string | undefined> {
+    const document = await getDoc(doc(db, "usernames", username))
+    if (!document.exists()) return undefined
+    const data = document.data() as UsernameDoc
+    return data.userId
   }
 }
