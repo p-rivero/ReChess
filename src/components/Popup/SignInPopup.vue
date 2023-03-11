@@ -4,7 +4,7 @@
     <div class="box modal-card signin-card">
       
       <LoginRegisterStage v-show="currentStage === 'loginRegister'" ref="loginRegisterStage"
-        @check-verify="checkEmailVerified" @choose-username="chooseUsername"/>
+        @check-verify="checkVerify" @choose-username="chooseUsername"/>
         
       <VerifyEmailStage v-show="currentStage === 'verifyEmail'" ref="verifyEmailStage" 
         @close-popup="closePopup"/>
@@ -54,7 +54,6 @@
         verifyEmailStage.value?.init()
         break
     }
-    // TODO
   }
   function cleanupCurrentStage() {
     switch (currentStage.value) {
@@ -69,6 +68,14 @@
         break
     }
     currentStage.value = undefined
+  }
+  
+  
+  async function checkVerify() {
+    const isVerified = await checkEmailVerified()
+    if (isVerified) {
+      closePopup()
+    }
   }
   
   function closePopup(clickBackground = false) {

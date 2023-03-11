@@ -127,14 +127,13 @@ export const useAuthStore = defineStore('auth-user', () => {
 
 // Firestore access
 
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, writeBatch } from 'firebase/firestore'
 import type { UserDoc, UserPrivateDoc } from '@/firebase/firestore'
 import { applyActionCode } from 'firebase/auth'
 namespace DB {
   
   export async function createUser(user: fb.User, username: string) {
-    // Create public user data
-    // TODO: Batched writes
+    const batch = writeBatch(db)
     const newPublicData: UserDoc = {
       name: user.displayName,
       about: '',
@@ -151,10 +150,11 @@ namespace DB {
         banned: false,
       }
     }
+    batch.set(doc(db, "users", user.uid), newPublicData)
+    batch.set(doc(db, "users", user.uid, "private", "doc"), newPrivateData)
     
     try {
-      await setDoc(doc(db, "users", user.uid), newPublicData)
-      await setDoc(doc(db, "users", user.uid, "private", "doc"), newPrivateData)
+      await batch.commit()
     } catch (e) {
       throw new RechessError('CANNOT_CREATE_USER')
     }

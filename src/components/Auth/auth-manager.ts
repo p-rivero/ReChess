@@ -23,7 +23,8 @@ export async function requestSignIn(): Promise<void> {
   showPopup('loginRegister')
 }
 
-export async function checkEmailVerified() {
+// Returns true if the user is verified, false otherwise
+export async function checkEmailVerified(): Promise<boolean> {
   // Called then the user has created an account with email and password,
   // or every time the user refreshes the page
   const authStore = useAuthStore()
@@ -33,10 +34,11 @@ export async function checkEmailVerified() {
   const verified = authStore.user.verified
   if (verified) {
     // Email is verified, nothing else to do
-    return
+    return true
   }
   // Email is not verified, show a popup
   showPopup('verifyEmail')
+  return false
 }
 
 function showPopup(stage: 'loginRegister'|'chooseUsername'|'verifyEmail') {

@@ -13,13 +13,20 @@ function isAuth(id) {
   return isAuthUnverified(id) && request.auth.token.email_verified;
 }
 function isAuthUnverified(id) {
-  return request.auth != null && request.auth.uid != null && debug(request.auth.uid) == string(id);
+  return request.auth != null && request.auth.uid != null && request.auth.uid == id;
 }
+
 function mapEq(mapA, mapB) {
   return mapA.diff(mapB).affectedKeys().size() == 0;
 }
 function serverUnchanged() {
   return mapEq(request.resource.data.SERVER, resource.data.SERVER);
+}
+
+// Checks that the request contains all the required fields and no extra extra fields
+function hasCorrectFields(required, optional) {
+  let allowed = required.concat(optional);
+  return request.resource.data.keys().hasAll(required) && request.resource.data.keys().hasOnly(allowed);
 }
 
 
