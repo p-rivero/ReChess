@@ -18,7 +18,6 @@
 
 <script setup lang="ts">  
   import { useAuthStore } from '@/stores/auth-user'
-  import { useRouter } from 'vue-router'
   import { ref } from 'vue'
   
   const authStore = useAuthStore()
@@ -34,7 +33,7 @@
   })
   
   const emit = defineEmits<{
-    (event: 'close-popup'): void
+    (event: 'check-verify'): void
   }>()
   
   async function resendEmail() {
@@ -50,7 +49,7 @@
   
   async function logout() {
     await authStore.signOut()
-    emit('close-popup')
+    emit('check-verify')
   }
   
 </script>

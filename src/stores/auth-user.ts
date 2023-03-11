@@ -11,15 +11,18 @@ import * as fb from 'firebase/auth'
 
 
 export class AuthUser extends User {
+  public uid: string
   public email: string
   public verified: boolean
   
   constructor(user: fb.User, username: string) {
+    if (!user.email) throw new Error('User has no email')
+    
     const displayName = user.displayName ?? undefined // null -> undefined
     const photoURL = user.photoURL ?? undefined // null -> undefined
     super(username, displayName, undefined, photoURL)
     
-    if (!user.email) throw new Error('User has no email')
+    this.uid = user.uid
     this.email = user.email
     this.verified = user.emailVerified
   }
@@ -99,6 +102,16 @@ export const useAuthStore = defineStore('auth-user', () => {
     inhibitLogIn = false
   }
   
+  // Creates a new user that is already authenticated with a third party provider
+  async function thirdPartyRegister(username: string): Promise<void> {
+    if (!auth.currentUser) throw new Error('User needs to be logged in with a third party provider')
+    try {
+      await UserDB.createUser(auth.currentUser, username)
+    } catch (e) {
+      throw new RechessError('CANNOT_CREATE_USER')
+    }
+  }
+  
   
   // Signs out the user and updates the store
   async function signOut(): Promise<void> {
@@ -116,7 +129,7 @@ export const useAuthStore = defineStore('auth-user', () => {
   }
   
   // Returns true if the user is logged in, false otherwise
-  async function isLogged() {
+  async function isLogged(): Promise<boolean> {
     // Wait for the user to be initialized
     while (!initialized) await new Promise(resolve => setTimeout(resolve, 100))
     return user.value !== null
@@ -127,5 +140,5 @@ export const useAuthStore = defineStore('auth-user', () => {
     return (await UserDB.getId(username)) === undefined
   }
 
-  return { emailLogIn, emailRegister, signOut, sendEmailVerification, isLogged, checkUsername, user }
+  return { emailLogIn, emailRegister, thirdPartyRegister, signOut, sendEmailVerification, isLogged, checkUsername, user }
 })

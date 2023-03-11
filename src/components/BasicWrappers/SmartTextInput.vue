@@ -2,12 +2,10 @@
   <input v-if="!multiline" class="input" :type="type" ref="textInput"
     :class="{'is-danger': isError}"
     :placeholder="props.placeholder"
-    @change="inputChanged"
     @input="inputChanged">
   <textarea v-else class="textarea" ref="textInput" 
     :class="{'is-danger': isError}" :type="type"
     :placeholder="props.placeholder"
-    @change="inputChanged"
     @input="inputChanged">
   </textarea>
 </template>

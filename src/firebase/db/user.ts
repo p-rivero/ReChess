@@ -58,8 +58,9 @@ export async function getUserByUsername(username: string): Promise<UserDoc | und
 // userId -> username
 export async function getUsername(uid: string): Promise<string> {
   const user = await getUserById(uid)
-  // The document should always exist
-  if (!user) return '[ERROR]'
+  // If the user has logged in with a third-party provider, the document
+  // doesn't exist until they choose a username.
+  if (!user) return ''
   return user.SERVER.username
 }
 

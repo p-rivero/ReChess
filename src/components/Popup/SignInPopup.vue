@@ -7,7 +7,7 @@
         @check-verify="checkVerify" @choose-username="chooseUsername"/>
         
       <ChooseUsernameStage v-show="currentStage === 'chooseUsername'" ref="chooseUsernameStage"
-        @close-popup="closePopup"/>
+        @check-verify="checkVerify" @close-popup="closePopup"/>
         
       <VerifyEmailStage v-show="currentStage === 'verifyEmail'" ref="verifyEmailStage" 
         @close-popup="closePopup"/>

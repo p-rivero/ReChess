@@ -21,7 +21,7 @@
           'has-text-danger': usernameStatus === 'taken',
           'has-text-success': usernameStatus === 'available',
         }" >
-        <b>rechess.org/users/{{ username }}</b>
+        rechess.org/users/<b>{{ username }}</b>
         {{ usernameStatus === 'taken' ? 'is already taken' : usernameStatus === 'available' ? 'is available' : '' }}
       </p>
     </div>
@@ -69,28 +69,35 @@
   
   const emit = defineEmits<{
     (event: 'close-popup'): void
+    (event: 'check-verify'): void
   }>()
   
   
   
   async function updateUsername(name: string) {
+    if (name === username.value) return
     username.value = name
     usernameStatus.value = 'unknown'
     if (name === '') return
     // Limit the number of requests to the server
-    const checkDebounced = debounce(async () => {
-      const available = await authStore.checkUsername(name)
-      // This result is obsolete, user has already changed the username
-      if (name !== username.value) return
-      usernameStatus.value = available ? 'available' : 'taken'
-      errorHandler.clear()
-    }, 1500)
-    await checkDebounced()
+    await checkDebounced(name)
   }
+  const checkDebounced = debounce(async (name: string) => {
+    const available = await authStore.checkUsername(name)
+    // This result is obsolete, user has already changed the username
+    if (name !== username.value) return
+    usernameStatus.value = available ? 'available' : 'taken'
+    errorHandler.clear()
+  }, 1000)
   
   async function submit() {
-    await authStore.setUsername(username.value)
-    emit('close-popup')
+    try {
+      await authStore.thirdPartyRegister(username.value)
+    } catch (e) {
+      errorHandler.showException(e)
+      return
+    }
+    emit('check-verify')
   }
   
   async function logout() {

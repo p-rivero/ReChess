@@ -2,6 +2,7 @@ import type { Ref } from 'vue'
 import type SigninPopup from '@/components/Popup/SignInPopup.vue'
 
 import { useAuthStore } from '@/stores/auth-user'
+import { useUserStore } from '@/stores/user'
 
 let signInPopup: Ref<InstanceType<typeof SigninPopup> | undefined> | null = null
 
@@ -11,12 +12,18 @@ export function setSignInPopup(popup: Ref<InstanceType<typeof SigninPopup> | und
 
 export async function signInRefresh() {
   const authStore = useAuthStore()
+  const userStore = useUserStore()
   const isLogged = await authStore.isLogged()
   // Allow users to use the website without logging in
   if (!isLogged) return
   // If the user is authenticated, make sure they have completed the sign in process
   // For social logins, choose a username
-  // TODO: Get the user from the database
+  const user = await userStore.getUserById(authStore.user!.uid)
+  if (!user) {
+    // Logged but user document does not exist, show the choose username popup
+    showPopup('chooseUsername')
+    return
+  }
   // For email logins, verify the email
   checkEmailVerified()
 }

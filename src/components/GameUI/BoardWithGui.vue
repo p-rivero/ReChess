@@ -44,9 +44,10 @@
   })
   
   
+  const updateEvalDebounced = debounce(updateEvaluation, 200)
   async function pieceMoved(from?: [number, number], to?: [number, number]) {
     if (props.hasGauge) {
-      await debounce(updateEvaluation, 200)()
+      await updateEvalDebounced()
     }
     emit ('piece-moved', from, to)
   }
