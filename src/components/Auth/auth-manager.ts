@@ -15,7 +15,9 @@ export async function signInRefresh() {
   // Allow users to use the website without logging in
   if (!isLogged) return
   // If the user is authenticated, make sure they have completed the sign in process
+  // For social logins, choose a username
   // TODO: Get the user from the database
+  // For email logins, verify the email
   checkEmailVerified()
 }
 

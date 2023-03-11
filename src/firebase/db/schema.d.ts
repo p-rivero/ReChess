@@ -8,9 +8,9 @@ export interface UsernameDoc {
 
 // users/{userId}
 export interface UserDoc {
-  name: string | null
+  name?: string
   about: string
-  profileImg: string | null
+  profileImg?: string
   SERVER: {
     username: string
     numWins: number

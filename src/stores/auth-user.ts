@@ -1,11 +1,13 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-import { auth, db } from '@/firebase'
-import * as fb from 'firebase/auth'
-import { User } from './user'
+import { auth } from '@/firebase'
+import { UserDB } from '@/firebase/db'
+import { User } from '@/stores/user'
 import { RechessError } from '@/utils/errors/RechessError'
 import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
+
+import * as fb from 'firebase/auth'
 
 
 export class AuthUser extends User {
@@ -42,7 +44,7 @@ export const useAuthStore = defineStore('auth-user', () => {
     }
     verified.value = newUser.emailVerified
     // The auth token does not include the username, we need to fetch it from the database
-    const username = await DB.getUsername(newUser.uid)
+    const username = await UserDB.getUsername(newUser.uid)
     user.value = new AuthUser(newUser, username)
   }
   
@@ -86,11 +88,11 @@ export const useAuthStore = defineStore('auth-user', () => {
     }
     
     try {
-      await DB.createUser(credential.user, username)
+      await UserDB.createUser(credential.user, username)
     } catch (e) {
       // If the database update fails, delete the user auth
       await credential.user.delete()
-      throw e
+      throw new RechessError('CANNOT_CREATE_USER')
     }
     // Update the user in the store
     await updateUser(credential.user)
@@ -122,64 +124,8 @@ export const useAuthStore = defineStore('auth-user', () => {
   
   // Returns true if a username is available
   async function checkUsername(username: string): Promise<boolean> {
-    return (await DB.getUserId(username)) === undefined
+    return (await UserDB.getId(username)) === undefined
   }
 
   return { emailLogIn, emailRegister, signOut, sendEmailVerification, isLogged, checkUsername, user }
 })
-
-
-
-// Firestore access
-
-import { doc, getDoc, writeBatch } from 'firebase/firestore'
-import type { UserDoc, UsernameDoc, UserPrivateDoc } from '@/firebase/firestore'
-namespace DB {
-  
-  export async function createUser(user: fb.User, username: string) {
-    const batch = writeBatch(db)
-    const newPublicData: UserDoc = {
-      name: user.displayName,
-      about: '',
-      profileImg: user.photoURL,
-      SERVER: {
-        username: username,
-        numWins: 0,
-      }
-    }
-    if (!user.email) throw new Error('User must have an email')
-    const newPrivateData: UserPrivateDoc = {
-      SERVER: {
-        email: user.email,
-        banned: false,
-      }
-    }
-    const newUsername: UsernameDoc = {
-      userId: user.uid,
-    }
-    batch.set(doc(db, "users", user.uid), newPublicData)
-    batch.set(doc(db, "users", user.uid, "private", "doc"), newPrivateData)
-    batch.set(doc(db, "usernames", username), newUsername)
-    
-    try {
-      await batch.commit()
-    } catch (e) {
-      throw new RechessError('CANNOT_CREATE_USER')
-    }
-  }
-  
-  export async function getUsername(uid: string): Promise<string> {
-    const document = await getDoc(doc(db, "users", uid))
-    // The document should always exist
-    if (!document.exists()) return '[ERROR]'
-    const data = document.data() as UserDoc
-    return data.SERVER.username
-  }
-  
-  export async function getUserId(username: string): Promise<string | undefined> {
-    const document = await getDoc(doc(db, "usernames", username))
-    if (!document.exists()) return undefined
-    const data = document.data() as UsernameDoc
-    return data.userId
-  }
-}
