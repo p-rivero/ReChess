@@ -94,10 +94,12 @@
   import 'firebaseui/dist/firebaseui.css'
   import { GoogleAuthProvider } from 'firebase/auth'
   import { GithubAuthProvider } from 'firebase/auth'
+  import type { UserCredential } from '@firebase/auth'
   
   import { ref } from 'vue'
   import { useAuthStore } from '@/stores/auth-user'
   import { authUI } from '@/firebase'
+  import { UserDB } from '@/firebase/db'
   
   import SmartTextInput from '../BasicWrappers/SmartTextInput.vue'
   import SmartErrorMessage from '../BasicWrappers/SmartErrorMessage.vue'
@@ -134,15 +136,17 @@
           GithubAuthProvider.PROVIDER_ID,
         ],
         callbacks: {
-          signInSuccessWithAuthResult: _authResult => {
+          signInSuccessWithAuthResult: (authResult: UserCredential) => {
             loading.value = true
             // If this is the first time the user signs in, we need to ask them to choose a username
-            // Otherwise, we can just skip this step and ckeck if the user is verified
-            if (_authResult.additionalUserInfo?.isNewUser) {
-              emit('choose-username')
-            } else {
-              emit('check-verify')
-            }
+            UserDB.getUserById(authResult.user.uid).then(user => {
+              if (user) {
+                // User exists, we can just skip this step and ckeck directly if the user is verified
+                emit('check-verify')
+              } else {
+                emit('choose-username')
+              }
+            })
             // Don't redirect
             return false
           },

@@ -29,7 +29,8 @@
     <SmartErrorMessage class="mb-4" v-show="hasError" :handler="errorHandler" />
     
     <div class="is-flex">
-      <button class="button is-primary" @click="submit" :disabled="hasError || !username || usernameStatus !== 'available'">
+      <button class="button is-primary" @click="submit" :class="{'is-loading': loading}"
+        :disabled="hasError || loading || !username || usernameStatus !== 'available'">
         Submit
       </button>
     </div>
@@ -55,6 +56,7 @@
   const username = ref('')
   const usernameStatus = ref<'available' | 'taken' | 'unknown'>('unknown')
   const hasError = ref(false)
+  const loading = ref(false)
   const errorHandler = new ErrorMessageHandler(hasError)
   
   defineExpose({
@@ -65,6 +67,7 @@
       username.value = ''
       usernameStatus.value = 'unknown'
       hasError.value = false
+      loading.value = false
     }
   })
   
@@ -92,11 +95,14 @@
   }, 1000)
   
   async function submit() {
+    loading.value = true
     try {
       await authStore.thirdPartyRegister(username.value)
     } catch (e) {
       errorHandler.showException(e)
       return
+    } finally {
+      loading.value = false
     }
     emit('check-verify')
   }
