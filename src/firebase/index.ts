@@ -5,6 +5,7 @@ import { initializeApp } from 'firebase/app'
 import { connectFirestoreEmulator, enableMultiTabIndexedDbPersistence, getFirestore } from 'firebase/firestore'
 import { connectStorageEmulator, getStorage } from "firebase/storage"
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
+import { getPerformance } from "firebase/performance";
 import { getAuth, connectAuthEmulator, browserLocalPersistence } from "firebase/auth";
 import * as firebaseui from 'firebaseui'
 
@@ -18,6 +19,7 @@ const app = initializeApp(FIREBASE_CONFIG)
 const db = getFirestore(app)
 const storage = getStorage(app)
 const auth = getAuth(app)
+const perf = getPerformance(app)
 
 auth.setPersistence(browserLocalPersistence)
 

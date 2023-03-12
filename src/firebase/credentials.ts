@@ -1,7 +1,7 @@
 
 const FIREBASE_CONFIG = {
   apiKey: import.meta.env.VITE_RECHESS_FIREBASE_API_KEY,
-  authDomain: 'rechess-web.firebaseapp.com',
+  authDomain: 'rechess.org',
   projectId: 'rechess-web',
   storageBucket: 'rechess-web.appspot.com',
   messagingSenderId: '598255262821',
