@@ -13,10 +13,11 @@ export function exportFile(file: Blob, fileName: string) {
 }
 
 // Prompt the user to select a file and return the file as a Blob object
-export function importFile(): Promise<Blob> {
+export function importFile(contentType: string): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const input = document.createElement('input')
     input.type = 'file'
+    input.accept = contentType
     input.onchange = () => {
       const file = input.files?.item(0)
       if (file) {
@@ -27,4 +28,10 @@ export function importFile(): Promise<Blob> {
     }
     input.click()
   })
+}
+
+// Compute the SHA-256 hash of a Blob object
+export async function hashBlob(blob: Blob): Promise<string> {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', await blob.arrayBuffer())
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('')
 }

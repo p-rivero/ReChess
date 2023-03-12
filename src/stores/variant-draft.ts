@@ -55,7 +55,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   }
   
   async function uploadFile(): Promise<boolean> {
-    const fileBlob = await importFile()
+    const fileBlob = await importFile('application/json')
     const fileText = await fileBlob.text()
     try {
       const fileObj = JSON.parse(fileText)
@@ -90,8 +90,13 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     if (state?.timesInCheck?.some((times: any) => times < 0 || times > 200)) return false
     return true
   }
+  
+  // Attempts to publish the variant to the server. If successful, returns the id of the variant.
+  async function publish(): Promise<string | undefined> {
+    return undefined
+  }
 
-  return { state, save, addPiece, setWidth, setHeight, backupFile, uploadFile }
+  return { state, save, addPiece, setWidth, setHeight, backupFile, uploadFile, publish }
 })
 
 const DEFAULT_DRAFT: GameState = {

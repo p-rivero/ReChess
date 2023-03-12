@@ -45,16 +45,16 @@
       <br>
       
       <SmartErrorMessage v-show="hasError" class="my-4" :handler="errorMsgHandler" />
-      <button class="button bottom-button" @click="$router.push({name: 'analysis'})" :disabled="hasError">
+      <button class="button bottom-button" @click="$router.push({name: 'analysis'})" :disabled="hasError || loading">
         <div class="sz-icon icon-analysis color-theme"></div>
         <span>Analysis board</span>
       </button>
-      <button class="button bottom-button" @click="$router.push({name: 'play'})" :disabled="hasError">
+      <button class="button bottom-button" @click="$router.push({name: 'play'})" :disabled="hasError || loading">
         <div class="sz-icon icon-cpu color-theme"></div>
         <span>Play vs. engine</span>
       </button>
       <br>
-      <button class="button is-primary bottom-button" :disabled="hasError">
+      <button class="button is-primary bottom-button" :disabled="hasError || loading" @click="publish">
         <div class="sz-icon icon-rocket color-white"></div>
         <span>Publish variant</span>
       </button>
@@ -148,7 +148,6 @@
   </div>
   
   <PopupOverlay v-if="selectedPieceId !== 'none'" :z-index="10" @click="pieceSelector?.cancelPlacement()" />
-  <PopupMessage buttons="ok-cancel" ref="popupMessage" />
 </template>
 
 
@@ -161,9 +160,9 @@
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import PopupOverlay from '@/components/Popup/PopupOverlay.vue'
-  import PopupMessage from '@/components/Popup/PopupMessage.vue'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
   import { checkState } from '@/components/EditVariant/check-state'
+  import { showPopup } from '@/components/Popup/popup-manager'
   import { onMounted, ref, watch } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { placementsToFen } from '@/utils/chess/fen-to-placements'
@@ -176,14 +175,13 @@
   const router = useRouter()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   
-  const hasError = ref(true)
+  const hasError = ref(false)
+  const loading = ref(false)
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
   const pieceSelector = ref<InstanceType<typeof PiecePlacementButtons>>()
   const selectedPieceId = ref<string|'wall'|'delete'|'none'>('none')
-  
-  const popupMessage = ref<InstanceType<typeof PopupMessage>>()
-  
+    
   // When state changes, update the board and run a state check
   watch(draftStore.state, () => updateBoardAndError(), { deep: true })
   onMounted(() => updateBoardAndError())
@@ -197,7 +195,7 @@
   }
   
   function deletePiece(pieceIndex: number) {
-    popupMessage.value?.show(
+    showPopup(
       'Delete piece',
       'Are you sure you want to delete this piece? This cannot be undone.',
       'yes-no',
@@ -211,7 +209,10 @@
   }
   function createNewPiece() {
     // Limit to 26 pieces for now, since IDs are internally encoded as a single lowercase letter
-    if (draftStore.state.pieceTypes.length >= 26) return
+    if (draftStore.state.pieceTypes.length >= 26) {
+      showPopup('Cannot add new piece', 'For now, the maximum number of pieces is 26.', 'ok')
+      return
+    }
     draftStore.addPiece()
     router.push({ name: 'edit-piece', params: { pieceIndex: draftStore.state.pieceTypes.length - 1 } })
   }
@@ -250,10 +251,30 @@
     const success = await draftStore.uploadFile()
     // Refresh the page if the upload was successful
     if (success) router.go(0)
-    else popupMessage.value?.show(
+    else showPopup(
       'Could not import file',
       'Make sure that the file is a .json with the correct format',
       'ok'
+    )
+  }
+  
+  async function publish() {
+    showPopup(
+      'Are you sure you want to publish this variant?',
+      'You cannot remove it or edit elements that affect gameplay. However, you are able to change its name and description.',
+      'yes-no',
+      async () => {
+        loading.value = true
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        const id = await draftStore.publish()
+        loading.value = false
+        if (id) router.push({ name: 'variant', params: { variantId: id } })
+        else showPopup(
+          'Could not publish variant',
+          'Please try again later. If the problem persists, back up your variant and open an issue in GitHub.',
+          'ok'
+        )
+      }
     )
   }
 </script>
@@ -274,7 +295,7 @@
   // In mobile, allow left column to be as small as needed
   @media screen and (max-width: 1023px) {
     .left-column {
-      min-width: none;
+      min-width: 0;
       margin-right: 0;
     }
   }

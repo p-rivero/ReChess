@@ -80,3 +80,9 @@
   }
   
 </script>
+
+<style scoped lang="scss">
+  .modal-card-title {
+    flex-shrink: 1;
+  }
+</style>

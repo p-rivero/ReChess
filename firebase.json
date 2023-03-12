@@ -26,11 +26,11 @@
     ]
   },
   "firestore": {
-    "rules": "src/firebase/firestore.rules",
-    "indexes": "src/firebase/firestore.indexes.json"
+    "rules": "src/firebase/db/firestore.rules",
+    "indexes": "src/firebase/db/firestore.indexes.json"
   },
   "storage": {
-    "rules": "src/firebase/storage.rules"
+    "rules": "src/firebase/storage/storage.rules"
   },
   "emulators": {
     "auth": {

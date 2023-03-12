@@ -40,7 +40,9 @@
           <div class="horizontal-field">
             <SmartCheckbox text="White" class="mr-4" :start-value="!whiteInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
-            <PieceImageEdit :imageUrl="piece?.imageUrls[0]" :class="{ invisible: whiteInvisible }"/>
+            <PieceImageEdit :imageUrl="piece?.imageUrls[0]" :class="{ invisible: whiteInvisible }"
+              @image-changed="url => { piece!.imageUrls[0] = url; errorMsgHandler.clear(); draftStore.save() }"
+              @upload-error="imageUploadFailed"/>
             <SmartTextInput class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
               :error-handler="errorMsgHandler"
@@ -60,7 +62,9 @@
           <div class="horizontal-field">
             <SmartCheckbox text="Black" class="mr-4" :start-value="!blackInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
-            <PieceImageEdit :imageUrl="piece?.imageUrls[1]" :class="{ invisible: blackInvisible }"/>
+            <PieceImageEdit :imageUrl="piece?.imageUrls[1]" :class="{ invisible: blackInvisible }"
+              @image-changed="url => { piece!.imageUrls[1] = url; errorMsgHandler.clear(); draftStore.save() }"
+              @upload-error="imageUploadFailed"/>
             <SmartTextInput class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :error-handler="errorMsgHandler"
@@ -204,6 +208,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { numberToLetter, letterToNumber } from '@/utils/chess/chess-coords'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import { showPopup } from '@/components/Popup/popup-manager'
   
   const router = useRouter(); 
   const route = useRoute()
@@ -305,6 +310,14 @@
     }
     draftStore.save()
   }
+  
+  function imageUploadFailed() {
+    showPopup(
+      'Could not upload image',
+      'Make sure you uploaded a valid image file. Keep in mind that the maximum upload size is 200kB, so SVG files are recommended.',
+      'ok'
+    )
+  }
 </script>
 
 
@@ -318,12 +331,14 @@
   
   .left-column {
     min-width: 32rem;
+    max-width: 32rem;
   }
   
   // In mobile, allow left column to be as small as needed
   @media screen and (max-width: 1023px) {
     .left-column {
       min-width: 0;
+      margin-right: 0;
     }
   }
     

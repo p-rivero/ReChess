@@ -7,7 +7,7 @@ rules_version = '2';
 // that field will be rejected. This field contains data that can be read by anyone
 // with read access to the document, but can only be modified by a server-side function.
 
-// See db/schema.d.ts for the database schema
+// See schema.d.ts for the database schema
 
 
 // HELPER FUNCTIONS

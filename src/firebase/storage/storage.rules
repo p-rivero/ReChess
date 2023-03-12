@@ -1,0 +1,25 @@
+rules_version = '2';
+
+function authMetadata() {
+  return request.auth.uid != null && request.auth.uid == request.resource.metadata.userId
+}
+
+function sizeKb(maxSizeKilobytes) {
+  // Use KiB instead of KB, since it's more permissive and we don't care about the exact size.
+  return request.resource.size < maxSizeKilobytes * 1024;
+}
+
+function isImage() {
+  return request.resource.contentType.matches('image/.*');
+}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /piece-images/{pieceId} {
+      allow read;
+      allow create, update: if authMetadata() && sizeKb(200) && isImage();
+      // Cannot delete a created image, since other variants may reference it.
+      allow delete: false;
+    }
+  }
+}
