@@ -273,7 +273,6 @@
       'yes-no',
       async () => {
         loading.value = true
-        await new Promise(resolve => setTimeout(resolve, 2000))
         const id = await draftStore.publish()
         loading.value = false
         if (id) router.push({ name: 'variant', params: { variantId: id } })

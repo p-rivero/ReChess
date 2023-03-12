@@ -46,7 +46,10 @@ export interface VariantDoc {
   name: string
   creatorId: string
   description: string
-  // TODO: Variant itself
+  // JSON string that corresponds to the GameState interface in src/protochess/types.ts
+  // Validated client-side (on every fetch), since server-side validation would require importing
+  // the protochess wasm module on the cloud function
+  initialState: string
   SERVER: {
     numUpvotes: number
   }

@@ -3,22 +3,24 @@ import { defineStore } from 'pinia'
 import sanitizeFilename from 'sanitize-filename'
 
 import type { GameState, PieceDefinition, PiecePlacement } from '@/protochess/types'
-import { isGameState } from '@/protochess/types.guard'
 import { exportFile, importFile } from '@/utils/file-io'
 import { clone } from '@/utils/ts-utils'
+import { parseGameStateJson } from '@/utils/chess/game-state-json'
+import { createVariant } from '@/firebase/db/variant'
+import { useAuthStore } from '@/stores/auth-user'
 
 export const useVariantDraftStore = defineStore('variant-draft', () => {
   
   // Initialize the draft in json format from localStorage if it exists
   const variantDraftJSON = localStorage.getItem('variantDraft')
-  let variantDraftObj = variantDraftJSON ? JSON.parse(variantDraftJSON) : null
-  // Check if the draft fits the GameState type. If it doesn't, set the draft to the default value.
-  if (!isValidGameState(variantDraftObj)) {
-    variantDraftObj = DEFAULT_DRAFT
+  let initialState = clone(DEFAULT_DRAFT)
+  if (variantDraftJSON) {
+    let storedDraft = parseGameStateJson(variantDraftJSON)
+    if (storedDraft) {
+      initialState = storedDraft
+    }
   }
-  const variantDraftTyped = variantDraftObj as GameState
-  
-  const state = ref(variantDraftTyped)
+  const state = ref(initialState)
   
   function save() {
     localStorage.setItem('variantDraft', JSON.stringify(state.value))
@@ -57,43 +59,24 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   async function uploadFile(): Promise<boolean> {
     const fileBlob = await importFile('application/json')
     const fileText = await fileBlob.text()
-    try {
-      const fileObj = JSON.parse(fileText)
-      if (isValidGameState(fileObj)) {
-        state.value = fileObj
-        save()
-        return true
-      }
-    } catch (e) {
-      // Do nothing and return false
-    }
-    return false
-  }
-  
-  
-  function isValidGameState(state: any): boolean {
-    if (!isGameState(state)) return false
-    if (state.pieceTypes.length > 26) return false
-    if (state.boardWidth < 1 || state.boardWidth > 16) return false
-    if (state.boardHeight < 1 || state.boardHeight > 16) return false
-    if (state.invalidSquares.some((square: any) => square.x < 0 || square.x >= state.boardWidth || square.y < 0 || square.y >= state.boardHeight)) return false
-    if (state.pieces.some((piece: any) => piece.x < 0 || piece.x >= state.boardWidth || piece.y < 0 || piece.y >= state.boardHeight)) return false
-    if (state.epSquareAndVictim &&
-      (  state.epSquareAndVictim[0][0] < 0
-      || state.epSquareAndVictim[0][0] >= state.boardWidth
-      || state.epSquareAndVictim[0][1] < 0
-      || state.epSquareAndVictim[0][1] >= state.boardHeight
-      || state.epSquareAndVictim[1][0] < 0
-      || state.epSquareAndVictim[1][0] >= state.boardWidth
-      || state.epSquareAndVictim[1][1] < 0
-      || state.epSquareAndVictim[1][1] >= state.boardHeight)) return false
-    if (state?.timesInCheck?.some((times: any) => times < 0 || times > 200)) return false
+    const newGameState = parseGameStateJson(fileText)
+    if (!newGameState) return false
+    state.value = newGameState
+    save()
     return true
   }
   
   // Attempts to publish the variant to the server. If successful, returns the id of the variant.
   async function publish(): Promise<string | undefined> {
-    return undefined
+    const authStore = useAuthStore()
+    await authStore.isLogged()
+    if (!authStore.user) return undefined
+    try {
+      return await createVariant(authStore.user.uid, state.value)
+    } catch (e) {
+      console.error('Error while trying to create variant', e)
+      return undefined
+    }
   }
 
   return { state, save, addPiece, setWidth, setHeight, backupFile, uploadFile, publish }

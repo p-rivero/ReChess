@@ -132,7 +132,7 @@ export const useAuthStore = defineStore('auth-user', () => {
   // Returns true if the user is logged in, false otherwise
   async function isLogged(): Promise<boolean> {
     // Wait for the user to be initialized
-    while (!initialized) await new Promise(resolve => setTimeout(resolve, 100))
+    while (!initialized) await new Promise(resolve => setTimeout(resolve, 20))
     return user.value !== null
   }
   
