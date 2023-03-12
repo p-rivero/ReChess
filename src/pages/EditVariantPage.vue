@@ -165,6 +165,7 @@
   import { showPopup } from '@/components/Popup/popup-manager'
   import { onMounted, ref, watch } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { useAuthStore } from '@/stores/auth-user'
   import { placementsToFen } from '@/utils/chess/fen-to-placements'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { clone } from '@/utils/ts-utils'
@@ -172,6 +173,7 @@
   import type { GameStateGui } from '@/protochess/types'
   
   const draftStore = useVariantDraftStore()
+  const authStore = useAuthStore()
   const router = useRouter()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   
@@ -181,10 +183,16 @@
   
   const pieceSelector = ref<InstanceType<typeof PiecePlacementButtons>>()
   const selectedPieceId = ref<string|'wall'|'delete'|'none'>('none')
+  
+  // This page is only accessible when logged in
+  onMounted(async () => {
+    const logged = await authStore.isLogged()
+    if (!logged) router.push({ name: 'home' })
+  })
     
   // When state changes, update the board and run a state check
   watch(draftStore.state, () => updateBoardAndError(), { deep: true })
-  onMounted(() => updateBoardAndError())
+  onMounted(updateBoardAndError)
   function updateBoardAndError() {
     checkState(draftStore.state, errorMsgHandler)
     // Clone state and add GUI fields

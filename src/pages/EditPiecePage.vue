@@ -203,8 +203,9 @@
   import PopupOverlay from '@/components/Popup/PopupOverlay.vue'
   import type { PieceDefinition } from '@/protochess/types'
   import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { useAuthStore } from '@/stores/auth-user'
   import { paramToInt } from '@/utils/ts-utils'
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { numberToLetter, letterToNumber } from '@/utils/chess/chess-coords'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
@@ -213,10 +214,18 @@
   const router = useRouter(); 
   const route = useRoute()
   const draftStore = useVariantDraftStore()
+  const authStore = useAuthStore()
   const pieceIndex = paramToInt(route.params.pieceIndex)
   let piece: PieceDefinition|null = null
+  
+  // This page is only accessible when logged in
+  onMounted(async () => {
+    const logged = await authStore.isLogged()
+    if (!logged) router.push({ name: 'home' })
+  })
+  
+  // Incorrect piece index, redirect to edit-variant
   if (Number.isNaN(pieceIndex) || pieceIndex < 0 || pieceIndex >= draftStore.state.pieceTypes.length) {
-    // Incorrect piece index, redirect to edit-variant
     router.push({ name: 'edit-variant' })
   } else {
     piece = draftStore.state.pieceTypes[pieceIndex]
