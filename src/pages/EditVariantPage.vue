@@ -275,7 +275,7 @@
         loading.value = true
         const id = await draftStore.publish()
         loading.value = false
-        if (id) router.push({ name: 'variant', params: { variantId: id } })
+        if (id) router.push({ name: 'variant-details', params: { variantId: id } })
         else showPopup(
           'Could not publish variant',
           'Please try again later. If the problem persists, back up your variant and open an issue in GitHub.',

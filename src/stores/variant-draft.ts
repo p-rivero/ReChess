@@ -72,7 +72,11 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     await authStore.isLogged()
     if (!authStore.user) return undefined
     try {
-      return await createVariant(authStore.user.uid, state.value)
+      const id = await createVariant(authStore.user.uid, state.value)
+      // Draft published successfully, remove it from localStorage
+      localStorage.removeItem('variantDraft')
+      await new Promise(resolve => setTimeout(resolve, 3000))
+      return id
     } catch (e) {
       console.error('Error while trying to create variant', e)
       return undefined

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteParams, RouteRecordRaw } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
 import PlayPage from '@/pages/PlayPage.vue'
+import VariantDetailsPage from '@/pages/VariantDetailsPage.vue'
 import EditVariantPage from '@/pages/EditVariantPage.vue'
 import EditPiecePage from '@/pages/EditPiecePage.vue'
 import AnalysisPage from '@/pages/AnalysisPage.vue'
@@ -30,6 +31,11 @@ export const routes: RouteRecordRaw[] = [
     name: 'play',
     path: '/play',
     component: PlayPage,
+  },
+  {
+    name: 'variant-details',
+    path: '/variant/:variantId',
+    component: VariantDetailsPage,
   },
   {
     name: 'edit-variant',
