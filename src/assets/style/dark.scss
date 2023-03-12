@@ -16,13 +16,13 @@ $text: $grey-lightest;
 $text-light: $grey-light;
 $text-strong: $white;
 
-$link: $primary;
-$link-visited: $primary;
+$link: $primary-light;
+$link-visited: $primary-light;
 $link-hover: $grey-lighter;
-$link-focus: $primary-light;
-$link-focus-border: $primary-light;
-$link-active: $primary;
-$link-active-border: $primary;
+$link-focus: $primary;
+$link-focus-border: $primary;
+$link-active: $primary-light;
+$link-active-border: $primary-light;
 
 $border: $grey-dark;
 $border-hover: $grey;
