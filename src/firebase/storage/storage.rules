@@ -19,7 +19,7 @@ service firebase.storage {
       allow read;
       allow create, update: if authMetadata() && sizeKb(200) && isImage();
       // Cannot delete a created image, since other variants may reference it.
-      allow delete: false;
+      allow delete: if false;
     }
   }
 }

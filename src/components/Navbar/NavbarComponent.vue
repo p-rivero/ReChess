@@ -25,7 +25,7 @@
           <img src="@/assets/img/logo.svg" alt="ReChess: Chess reinvented by you">
         </a>
         <a class="navbar-item" href="/">Browse</a>
-        <a class="navbar-item" href="/edit">Create</a>
+        <a class="navbar-item" @click="create">Create</a>
       </div>
       <div class="navbar-end">
         <div class="navbar-item is-hidden-touch">
@@ -40,14 +40,30 @@
 </template>
 
 <script setup lang="ts">
+  import { useRouter } from 'vue-router'
   import AccountCard from '@/components/Navbar/AccountCard.vue'
+  import { requestSignIn } from '@/components/Auth/auth-manager';
+  import { useAuthStore } from '@/stores/auth-user'
   import { toggleTheme } from '@/utils/theme'
+  
+  const authStore = useAuthStore()
+  const router = useRouter()
   
   function navBarBurgerClick() {
     const navbarBurger = document.querySelector('.navbar-burger')
     const navbarMenu = document.querySelector('.navbar-menu')
     navbarBurger?.classList.toggle('is-active')
     navbarMenu?.classList.toggle('is-active')
+  }
+  
+  
+  async function create() {
+    const logged = await authStore.isLogged()
+    if (logged) {
+      router.push({ name: 'edit-variant' })
+    } else {
+      await requestSignIn()
+    }
   }
 </script>
 

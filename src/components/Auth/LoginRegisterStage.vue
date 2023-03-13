@@ -129,36 +129,43 @@
   const errorHandler = new ErrorMessageHandler(hasError)
   
   
+  const firebaseuiSettings = {
+    signInFlow: 'popup',
+    signInSuccessUrl: '/',
+    signInOptions: [
+      GoogleAuthProvider.PROVIDER_ID,
+      GithubAuthProvider.PROVIDER_ID,
+    ],
+    callbacks: {
+      signInSuccessWithAuthResult: (authResult: UserCredential) => {
+        loading.value = true
+        // If this is the first time the user signs in, we need to ask them to choose a username
+        UserDB.getUserById(authResult.user.uid).then(user => {
+          if (user) {
+            // User exists, we can just skip this step and ckeck directly if the user is verified
+            emit('check-verify')
+          } else {
+            emit('choose-username')
+          }
+        })
+        // Don't redirect
+        return false
+      },
+      uiShown: () => {
+        loadingSocialSignin.value = false
+      },
+    }
+  }
+  
   defineExpose({
     init() {
-      // Mount firebaseui
-      authUI.start('#firebaseui-auth-container', {
-        signInFlow: 'popup',
-        signInSuccessUrl: '/',
-        signInOptions: [
-          GoogleAuthProvider.PROVIDER_ID,
-          GithubAuthProvider.PROVIDER_ID,
-        ],
-        callbacks: {
-          signInSuccessWithAuthResult: (authResult: UserCredential) => {
-            loading.value = true
-            // If this is the first time the user signs in, we need to ask them to choose a username
-            UserDB.getUserById(authResult.user.uid).then(user => {
-              if (user) {
-                // User exists, we can just skip this step and ckeck directly if the user is verified
-                emit('check-verify')
-              } else {
-                emit('choose-username')
-              }
-            })
-            // Don't redirect
-            return false
-          },
-          uiShown: () => {
-            loadingSocialSignin.value = false
-          },
-        }
-      })
+      try {
+        // Mount firebaseui
+        authUI.start('#firebaseui-auth-container', firebaseuiSettings)
+      } catch (e) {
+        // start() failed, probably because it was already mounted
+        console.error('Could not mount firebaseui', e)
+      }
       emailRef.value?.focus()
     },
     cleanup() {

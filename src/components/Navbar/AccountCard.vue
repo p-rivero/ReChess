@@ -23,7 +23,9 @@
   const initialized = ref(false)
     
   async function onAccountClick() {
+    // TODO: Go to account page instead
     authStore.signOut()
+    window.location.reload()
   }
   
   async function onSignInClick() {
