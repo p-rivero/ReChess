@@ -2,7 +2,7 @@
 <div class="content has-text-justified">
   
 <h1><strong>TERMS OF SERVICE</strong></h1>
-<p><strong>Last updated</strong> <strong>March 12, 2023</strong></p>
+<p><strong>Last updated</strong> <strong>March 13, 2023</strong></p>
 <p><strong>AGREEMENT TO OUR LEGAL TERMS</strong></p>
 <p>We are ReChess ("<strong>Company</strong>," "<strong>we</strong>," "<strong>us</strong>," "<strong>our</strong>"). We operate the website <a href="https://rechess.org">https://rechess.org</a> (the "<strong>Site</strong>"), as well as any other related products and services that refer or link to these legal terms (the "<strong>Legal Terms</strong>") (collectively, the "<strong>Services</strong>").</p>
 <p>You can contact us by email at <a href="mailto:admin@rechess.org">admin@rechess.org</a>.</p>
@@ -99,12 +99,9 @@
   <li>Interfere with, disrupt, or create an undue burden on the Services or the networks or services connected to the Services.</li>
   <li>Harass, annoy, intimidate, or threaten any of our employees or agents engaged in providing any portion of the Services to you.</li>
   <li>Attempt to bypass any measures of the Services designed to prevent or restrict access to the Services, or any portion of the Services.</li>
-  <li>Copy or adapt the Services' software, including but not limited to Flash, PHP, HTML, JavaScript, or other code.</li>
-  <li>Except as permitted by applicable law, decipher, decompile, disassemble, or reverse engineer any of the software comprising or in any way making up a part of the Services.</li>
   <li>Except as may be the result of standard search engine or Internet browser usage, use, launch, develop, or distribute any automated system, including without limitation, any spider, robot, cheat utility, scraper, or offline reader that accesses the Services, or use or launch any unauthorized script or other software.</li>
   <li>Use a buying agent or purchasing agent to make purchases on the Services.</li>
   <li>Make any unauthorized use of the Services, including collecting usernames and/or email addresses of users by electronic or other means for the purpose of sending unsolicited email, or creating user accounts by automated means or under false pretenses.</li>
-  <li>Use the Services as part of any effort to compete with us or otherwise use the Services and/or the Content for any revenue-generating endeavor or commercial enterprise.</li>
 </ul>
 <h2 id="ugc">6. USER GENERATED CONTRIBUTIONS</h2>
 <p>The Services may invite you to chat, contribute to, or participate in blogs, message boards, online forums, and other functionality, and may provide you with the opportunity to create, submit, post, display, transmit, perform, publish, distribute, or broadcast content and materials to us or on the Services, including but not limited to text, writings, video, audio, photographs, graphics, comments, suggestions, or personal information or other material (collectively, "Contributions"). Contributions may be viewable by other users of the Services and through third-party websites. As such, any Contributions you transmit may be treated as non-confidential and non-proprietary. When you create or make available any Contributions, you thereby represent and warrant that:</p>

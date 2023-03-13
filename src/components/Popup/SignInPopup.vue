@@ -1,7 +1,7 @@
 <template>
   <div class="modal" ref="popup">
     <div class="modal-background" @click="closePopup(true)"></div>
-    <div class="box modal-card signin-card">
+    <div class="box modal-card scrollable signin-card">
       
       <LoginRegisterStage v-show="currentStage === 'loginRegister'" ref="loginRegisterStage"
         @check-verify="checkVerify" @choose-username="chooseUsername"/>

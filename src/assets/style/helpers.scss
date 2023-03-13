@@ -19,3 +19,12 @@
 .w-100 {
     width: 100% !important;
 }
+
+.scrollable {
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}

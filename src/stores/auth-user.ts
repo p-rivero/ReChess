@@ -36,8 +36,8 @@ export const useAuthStore = defineStore('auth-user', () => {
   
   // Called when user signs in or out (or when the page is refreshed)
   fb.onAuthStateChanged(auth, async newUser => {
-    initialized = false
     if (inhibitLogIn) return
+    initialized = false
     await updateUser(newUser)
     initialized = true
   })
@@ -125,8 +125,6 @@ export const useAuthStore = defineStore('auth-user', () => {
       url: window.location.origin,
       handleCodeInApp: true
     })
-    // Obtain code from the user.
-    // await applyActionCode(auth, code)
   }
   
   // Returns true if the user is logged in, false otherwise

@@ -41,14 +41,3 @@
     max-width: 1250px;
   }
 </style>
-
-<style lang="scss">
-  // Hide the scrollbar
-  body::-webkit-scrollbar {
-    display: none;
-  }
-  body {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-</style>

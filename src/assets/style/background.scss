@@ -10,3 +10,8 @@ html[data-theme="dark"] {
 html[data-theme="light"] {
     background-color: $white;
 }
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: $navbar-height + 1rem;
+}

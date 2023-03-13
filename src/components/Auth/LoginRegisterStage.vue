@@ -77,6 +77,10 @@
     
     <SmartErrorMessage class="mb-4" v-show="hasError" :handler="errorHandler" />
     
+    <p v-if="isRegister" class="help mb-4">
+      By creating an account, you agree to the <a href="/tos">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+    </p>
+    
     <div>
       <button class="button is-primary" @click="signInClick"
         :class="{'is-loading': loading}" :disabled="hasError || loading || (isRegister && usernameStatus !== 'available')">

@@ -33,7 +33,7 @@
   })
   
   const emit = defineEmits<{
-    (event: 'check-verify'): void
+    (event: 'close-popup'): void
   }>()
   
   async function resendEmail() {
@@ -49,7 +49,7 @@
   
   async function logout() {
     await authStore.signOut()
-    emit('check-verify')
+    emit('close-popup')
   }
   
 </script>

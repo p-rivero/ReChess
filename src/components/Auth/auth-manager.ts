@@ -3,6 +3,7 @@ import type SigninPopup from '@/components/Popup/SignInPopup.vue'
 
 import { useAuthStore } from '@/stores/auth-user'
 import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
 
 let signInPopup: Ref<InstanceType<typeof SigninPopup> | undefined> | null = null
 
@@ -10,6 +11,15 @@ export function setSignInPopup(popup: Ref<InstanceType<typeof SigninPopup> | und
   signInPopup = popup
 }
 
+// Important routes that do not require the user to complete the sign in process
+const WHITELISTED_ROUTES = [
+  '/tos',
+  '/privacy',
+  '/cookies',
+  // Add /about here when needed
+]
+
+// Call this when the user refreshes the page
 export async function signInRefresh() {
   const authStore = useAuthStore()
   const userStore = useUserStore()
@@ -21,7 +31,7 @@ export async function signInRefresh() {
   const user = await userStore.getUserById(authStore.user!.uid)
   if (!user) {
     // Logged but user document does not exist, show the choose username popup
-    showPopup('chooseUsername')
+    showPopupIfNotWhitelisted('chooseUsername')
     return
   }
   // For email logins, verify the email
@@ -46,7 +56,7 @@ export async function checkEmailVerified(): Promise<boolean> {
     return true
   }
   // Email is not verified, show a popup
-  showPopup('verifyEmail')
+  showPopupIfNotWhitelisted('verifyEmail')
   return false
 }
 
@@ -54,4 +64,10 @@ function showPopup(stage: 'loginRegister'|'chooseUsername'|'verifyEmail') {
   if (!signInPopup) throw new Error('Sign in popup not set')
   if (!signInPopup.value) throw new Error('Sign in popup not initialized')
   signInPopup.value.show(stage)
+}
+
+function showPopupIfNotWhitelisted(stage: 'loginRegister'|'chooseUsername'|'verifyEmail') {
+  if (!WHITELISTED_ROUTES.includes(window.location.pathname)) {
+    showPopup(stage)
+  }
 }

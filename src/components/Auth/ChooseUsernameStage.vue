@@ -28,6 +28,10 @@
     
     <SmartErrorMessage class="mb-4" v-show="hasError" :handler="errorHandler" />
     
+    <p class="help mb-4">
+      By creating an account, you agree to the <a href="/tos">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+    </p>
+    
     <div class="is-flex">
       <button class="button is-primary" @click="submit" :class="{'is-loading': loading}"
         :disabled="hasError || loading || !username || usernameStatus !== 'available'">
