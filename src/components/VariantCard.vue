@@ -14,14 +14,14 @@
 </template>
 
 <script setup lang="ts">
-  import type { VariantGui } from '@/protochess/types'
+  import type { PublishedVariantGui } from '@/protochess/types'
   import { onMounted, ref } from 'vue'
   import ViewableChessBoard from './ChessBoard/ViewableChessBoard.vue'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   
   const props = defineProps<{
-    state: VariantGui
+    state: PublishedVariantGui
   }>()
   
   onMounted(async () => {

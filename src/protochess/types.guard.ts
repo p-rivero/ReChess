@@ -2,7 +2,7 @@
  * Generated type guards for "types.ts".
  * WARNING: Do not manually change this file.
  */
-import type { GameState, GameStateGui, Variant, VariantGui, PieceDefinition } from "./types";
+import type { GameState, GameStateGui, Variant, PublishedVariant, PublishedVariantGui, PieceDefinition } from "./types";
 
 export function isGameState(obj: unknown): obj is GameState {
     const typedObj = obj as GameState
@@ -74,20 +74,24 @@ export function isVariant(obj: unknown): obj is Variant {
     return (
         isGameState(typedObj) as boolean &&
         typeof typedObj["displayName"] === "string" &&
-        typeof typedObj["description"] === "string" &&
-        (typeof typedObj["uid"] === "undefined" ||
-            typeof typedObj["uid"] === "string") &&
-        (typeof typedObj["creatorDisplayName"] === "undefined" ||
-            typeof typedObj["creatorDisplayName"] === "string") &&
-        (typeof typedObj["creatorUsername"] === "undefined" ||
-            typeof typedObj["creatorUsername"] === "string")
+        typeof typedObj["description"] === "string"
     )
 }
 
-export function isVariantGui(obj: unknown): obj is VariantGui {
-    const typedObj = obj as VariantGui
+export function isPublishedVariant(obj: unknown): obj is PublishedVariant {
+    const typedObj = obj as PublishedVariant
     return (
         isVariant(typedObj) as boolean &&
+        typeof typedObj["uid"] === "string" &&
+        typeof typedObj["creatorDisplayName"] === "string" &&
+        typeof typedObj["creatorId"] === "string"
+    )
+}
+
+export function isVariantGui(obj: unknown): obj is PublishedVariantGui {
+    const typedObj = obj as PublishedVariantGui
+    return (
+        isPublishedVariant(typedObj) as boolean &&
         isGameStateGui(typedObj) as boolean
     )
 }

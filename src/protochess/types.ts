@@ -86,13 +86,15 @@ export interface GameStateGui extends GameState {
 export interface Variant extends GameState {
   displayName: string,
   description: string,
-  // Fields below are undefined if this is a draft
-  uid?: string,
-  creatorDisplayName?: string,
-  creatorUsername?: string,
+}
+/** @see {isPublishedVariant} ts-auto-guard:type-guard */
+export interface PublishedVariant extends Variant {
+  uid: string,
+  creatorDisplayName: string,
+  creatorId: string,
 }
 /** @see {isVariantGui} ts-auto-guard:type-guard */
-export interface VariantGui extends Variant, GameStateGui { }
+export interface PublishedVariantGui extends PublishedVariant, GameStateGui { }
 
 
 /** @see {isPieceDefinition} ts-auto-guard:type-guard */

@@ -11,14 +11,14 @@ export async function createUser(user: User, username: string) {
     name: user.displayName,
     about: '',
     profileImg: user.photoURL,
-    SERVER: {
+    IMMUTABLE: {
       username: username,
       numWins: 0,
     }
   }
   if (!user.email) throw new Error('User must have an email')
   const newPrivateData: UserPrivateDoc = {
-    SERVER: {
+    IMMUTABLE: {
       email: user.email,
       banned: false,
     }
@@ -61,6 +61,6 @@ export async function getUsername(uid: string): Promise<string> {
   // If the user has logged in with a third-party provider, the document
   // doesn't exist until they choose a username.
   if (!user) return ''
-  return user.SERVER.username
+  return user.IMMUTABLE.username
 }
 

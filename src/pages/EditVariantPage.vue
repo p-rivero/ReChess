@@ -171,7 +171,7 @@
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { clone } from '@/utils/ts-utils'
   import { useRouter } from 'vue-router'
-  import type { VariantGui } from '@/protochess/types'
+  import type { PublishedVariantGui } from '@/protochess/types'
   
   const draftStore = useVariantDraftStore()
   const authStore = useAuthStore()
@@ -197,7 +197,7 @@
   function updateBoardAndError() {
     checkState(draftStore.state, errorMsgHandler)
     // Clone state and add GUI fields
-    let state = clone(draftStore.state) as VariantGui
+    let state = clone(draftStore.state) as PublishedVariantGui
     state.fen = placementsToFen(draftStore.state)
     state.inCheck = false
     board.value?.setState(state)

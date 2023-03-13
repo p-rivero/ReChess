@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
 import { ref } from "vue"
 
-import type { VariantGui } from "@/protochess/types"
+import type { PublishedVariant, PublishedVariantGui } from "@/protochess/types"
 import { VariantDB } from "@/firebase/db"
 import { parseVariantJson } from "@/utils/chess/variant-json"
 import type { VariantDoc } from "@/firebase/db/schema"
@@ -10,7 +10,7 @@ import { placementsToFen } from "@/utils/chess/fen-to-placements"
 export const useVariantStore = defineStore('variant', () => {
   
   // Currently fetched variants
-  const variantList = ref<VariantGui[]>([])
+  const variantList = ref<PublishedVariantGui[]>([])
   
   // Fetches the list of variants from the database
   // TODO: Add pagination and ordering
@@ -29,7 +29,7 @@ export const useVariantStore = defineStore('variant', () => {
   }
   
   // Gets a variant from the database, or returns undefined if it doesn't exist
-  async function getVariant(id: string): Promise<VariantGui | undefined> {
+  async function getVariant(id: string): Promise<PublishedVariantGui | undefined> {
     // First check if the variant has already been fetched
     const existingVariant = variantList.value.find(variant => variant.uid === id)
     if (existingVariant) {
@@ -43,27 +43,29 @@ export const useVariantStore = defineStore('variant', () => {
   }
   
   
-  function readDocument(doc: VariantDoc, id: string): VariantGui | undefined {
-    const variant = parseVariantJson(doc.SERVER.initialState)
+  function readDocument(doc: VariantDoc, id: string): PublishedVariantGui | undefined {
+    const variant = parseVariantJson(doc.IMMUTABLE.initialState)
     if (!variant) {
       console.error('Illegal variant document', doc)
       return undefined
     }
-    // Update fields with the most recent data (this is redundant when 
-    // the variant has just been created, but the user can edit these fields)
-    variant.uid = id
-    variant.displayName = doc.name
-    variant.description = doc.description
-    variant.creatorDisplayName = doc.creatorDisplayName
-    variant.creatorUsername = 'TODO'
+    const pv: PublishedVariant = {
+      ...variant,
+      uid: id,
+      creatorDisplayName: doc.IMMUTABLE.creatorDisplayName,
+      creatorId: doc.IMMUTABLE.creatorId,
+      // Overwrite the existing name and description with the ones from the document
+      displayName: doc.name,
+      description: doc.description,
+    }
     // Also compute the GUI-specific fields, since almost all components will
     // need them and it's faster and easier to do it only once here
-    const variantGui: VariantGui = {
-      ...variant,
+    const pvg: PublishedVariantGui = {
+      ...pv,
       fen: placementsToFen(variant),
-      inCheck: false,
+      inCheck: false, // Don't show the check indicator in the preview
     }
-    return variantGui
+    return pvg
   }
   
   return { refreshList, getVariant, variantList }

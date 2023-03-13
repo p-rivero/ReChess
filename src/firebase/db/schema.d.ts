@@ -14,14 +14,14 @@ export interface UserDoc {
   name: string | null
   about: string
   profileImg: string | null
-  SERVER: {
+  IMMUTABLE: {
     username: string
     numWins: number
   }
 }
 // users/{userId}/private/doc
 export interface UserPrivateDoc {
-  SERVER: {
+  IMMUTABLE: {
     email: string
     banned: boolean
   }
@@ -45,8 +45,8 @@ export interface UserUpvotesDoc {
 export interface VariantDoc {
   name: string
   description: string
-  creatorDisplayName: string
-  SERVER: {
+  IMMUTABLE: {
+    creatorDisplayName: string
     creatorId: string
     numUpvotes: number
     // JSON string that corresponds to the GameState interface in src/protochess/types.ts

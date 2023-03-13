@@ -18,7 +18,7 @@ export class User {
   static fromDoc(doc: UserDoc): User {
     const name = doc.name ?? undefined
     const profileImg = doc.profileImg ?? undefined
-    return new User(doc.SERVER.username, name, doc.about, profileImg)
+    return new User(doc.IMMUTABLE.username, name, doc.about, profileImg)
   }
   
   public get name() {
