@@ -1,26 +1,26 @@
 import { db } from '@/firebase'
 import type { VariantDoc } from '@/firebase/db/schema'
-import type { GameState } from '@/protochess/types'
+import type { Variant } from '@/protochess/types'
 
 import { collection, addDoc, getDoc, doc, getDocs } from 'firebase/firestore'
 
 // Attempts to create a new variant in the database and returns the variant ID. Throws an error if
 // the variant name is empty, or if the write fails.
-export async function createVariant(userId: string, userName: string, state: GameState): Promise<string> {
-  if (!state.variantDisplayName) {
+export async function createVariant(userId: string, userName: string, variant: Variant): Promise<string> {
+  if (!variant.displayName) {
     throw new Error('Variant name cannot be empty')
   }
-  if (state.variantUID) {
+  if (variant.uid) {
     throw new Error('This variant already has an ID assigned, make sure to only publish drafts')
   }
   const document: VariantDoc = {
-    name: state.variantDisplayName,
-    description: state.variantDescription ?? '',
+    name: variant.displayName,
+    description: variant.description,
     creatorDisplayName: userName,
     SERVER: {
       creatorId: userId,
       numUpvotes: 0,
-      initialState: JSON.stringify(state),
+      initialState: JSON.stringify(variant),
     }
   }
   const docRef = await addDoc(collection(db, "variants"), document)

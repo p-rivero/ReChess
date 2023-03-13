@@ -77,8 +77,8 @@
     
     <div class="column">
       <SmartTextInput class="is-large" placeholder="Variant name"
-        :start-text="draftStore.state.variantDisplayName"
-        @changed="name => { draftStore.state.variantDisplayName = name; draftStore.save() }"
+        :start-text="draftStore.state.displayName"
+        @changed="name => { draftStore.state.displayName = name; draftStore.save() }"
         :validator="(text) => {
           if (text.length === 0) return 'Please enter the name of this variant'
           if (text.length > 50) return 'Variant name must be at most 50 characters long'
@@ -89,8 +89,8 @@
       <br>
       <br>
       <SmartTextInput :multiline="true" placeholder="Describe the rules of the variant and how fun it is to play!"
-        :start-text="draftStore.state.variantDescription"
-        @changed="text => { draftStore.state.variantDescription = text; draftStore.save() }"
+        :start-text="draftStore.state.description"
+        @changed="text => { draftStore.state.description = text; draftStore.save() }"
         :validator="(text) => {if (text.length > 500) return 'Variant description must be at most 500 characters long'}"
         :error-handler="errorMsgHandler"/>
       <br>
@@ -171,7 +171,7 @@
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { clone } from '@/utils/ts-utils'
   import { useRouter } from 'vue-router'
-  import type { GameStateGui } from '@/protochess/types'
+  import type { VariantGui } from '@/protochess/types'
   
   const draftStore = useVariantDraftStore()
   const authStore = useAuthStore()
@@ -197,7 +197,7 @@
   function updateBoardAndError() {
     checkState(draftStore.state, errorMsgHandler)
     // Clone state and add GUI fields
-    let state = clone(draftStore.state) as GameStateGui
+    let state = clone(draftStore.state) as VariantGui
     state.fen = placementsToFen(draftStore.state)
     state.inCheck = false
     board.value?.setState(state)

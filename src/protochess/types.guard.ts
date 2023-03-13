@@ -2,7 +2,7 @@
  * Generated type guards for "types.ts".
  * WARNING: Do not manually change this file.
  */
-import type { GameState, GameStateGui, PieceDefinition } from "./types";
+import type { GameState, GameStateGui, Variant, VariantGui, PieceDefinition } from "./types";
 
 export function isGameState(obj: unknown): obj is GameState {
     const typedObj = obj as GameState
@@ -56,13 +56,7 @@ export function isGameState(obj: unknown): obj is GameState {
         typeof typedObj["globalRules"]["stalematedPlayerLoses"] === "boolean" &&
         typeof typedObj["globalRules"]["invertWinConditions"] === "boolean" &&
         typeof typedObj["globalRules"]["repetitionsDraw"] === "number" &&
-        typeof typedObj["globalRules"]["checksToLose"] === "number" &&
-        (typeof typedObj["variantUID"] === "undefined" ||
-            typeof typedObj["variantUID"] === "string") &&
-        (typeof typedObj["variantDisplayName"] === "undefined" ||
-            typeof typedObj["variantDisplayName"] === "string") &&
-        (typeof typedObj["variantDescription"] === "undefined" ||
-            typeof typedObj["variantDescription"] === "string")
+        typeof typedObj["globalRules"]["checksToLose"] === "number"
     )
 }
 
@@ -72,6 +66,29 @@ export function isGameStateGui(obj: unknown): obj is GameStateGui {
         isGameState(typedObj) as boolean &&
         typeof typedObj["fen"] === "string" &&
         typeof typedObj["inCheck"] === "boolean"
+    )
+}
+
+export function isVariant(obj: unknown): obj is Variant {
+    const typedObj = obj as Variant
+    return (
+        isGameState(typedObj) as boolean &&
+        typeof typedObj["displayName"] === "string" &&
+        typeof typedObj["description"] === "string" &&
+        (typeof typedObj["uid"] === "undefined" ||
+            typeof typedObj["uid"] === "string") &&
+        (typeof typedObj["creatorDisplayName"] === "undefined" ||
+            typeof typedObj["creatorDisplayName"] === "string") &&
+        (typeof typedObj["creatorUsername"] === "undefined" ||
+            typeof typedObj["creatorUsername"] === "string")
+    )
+}
+
+export function isVariantGui(obj: unknown): obj is VariantGui {
+    const typedObj = obj as VariantGui
+    return (
+        isVariant(typedObj) as boolean &&
+        isGameStateGui(typedObj) as boolean
     )
 }
 

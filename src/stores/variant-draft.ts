@@ -2,10 +2,10 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import sanitizeFilename from 'sanitize-filename'
 
-import type { GameState, PieceDefinition, PiecePlacement } from '@/protochess/types'
+import type { Variant, PieceDefinition, PiecePlacement } from '@/protochess/types'
 import { exportFile, importFile } from '@/utils/file-io'
 import { clone } from '@/utils/ts-utils'
-import { parseGameStateJson } from '@/utils/chess/game-state-json'
+import { parseVariantJson } from '@/utils/chess/variant-json'
 import { createVariant } from '@/firebase/db/variant'
 import { useAuthStore } from '@/stores/auth-user'
 
@@ -15,7 +15,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   const variantDraftJSON = localStorage.getItem('variantDraft')
   let initialState = clone(DEFAULT_DRAFT)
   if (variantDraftJSON) {
-    let storedDraft = parseGameStateJson(variantDraftJSON)
+    const storedDraft = parseVariantJson(variantDraftJSON)
     if (storedDraft) {
       initialState = storedDraft
     }
@@ -47,8 +47,8 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   function backupFile() {
     const file = new Blob([JSON.stringify(state.value)], { type: 'application/json' })
     let fileName = `Unnamed variant.json`
-    if (state.value.variantDisplayName) {
-      const sanitizedName = sanitizeFilename(state.value.variantDisplayName)
+    if (state.value.displayName) {
+      const sanitizedName = sanitizeFilename(state.value.displayName)
       if (sanitizedName.length > 0 && sanitizedName !== 'Variant name') {
         fileName = `${sanitizedName}.json`
       }
@@ -59,7 +59,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   async function uploadFile(): Promise<boolean> {
     const fileBlob = await importFile('application/json')
     const fileText = await fileBlob.text()
-    const newGameState = parseGameStateJson(fileText)
+    const newGameState = parseVariantJson(fileText)
     if (!newGameState) return false
     state.value = newGameState
     save()
@@ -85,7 +85,9 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   return { state, save, addPiece, setWidth, setHeight, backupFile, uploadFile, publish }
 })
 
-const DEFAULT_DRAFT: GameState = {
+const DEFAULT_DRAFT: Variant = {
+  displayName: '',
+  description: '',
   pieceTypes: [],
   boardWidth: 8,
   boardHeight: 8,

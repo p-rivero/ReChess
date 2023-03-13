@@ -3,7 +3,6 @@ import type SigninPopup from '@/components/Popup/SignInPopup.vue'
 
 import { useAuthStore } from '@/stores/auth-user'
 import { useUserStore } from '@/stores/user'
-import { useRouter } from 'vue-router'
 
 let signInPopup: Ref<InstanceType<typeof SigninPopup> | undefined> | null = null
 

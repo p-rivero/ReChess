@@ -1,10 +1,10 @@
-import type { GameState } from '@/protochess/types'
-import { isGameState } from '@/protochess/types.guard'
+import type { Variant } from '@/protochess/types'
+import { isVariant } from '@/protochess/types.guard'
 
-export function parseGameStateJson(json: string): GameState | undefined {
+export function parseVariantJson(json: string): Variant | undefined {
   try {
     const obj = JSON.parse(json)
-    if (isValidGameState(obj)) {
+    if (isValidVariant(obj)) {
       return obj
     }
   } catch (e) {
@@ -14,8 +14,8 @@ export function parseGameStateJson(json: string): GameState | undefined {
 }
 
 
-function isValidGameState(state: any): state is GameState {
-  if (!isGameState(state)) return false
+function isValidVariant(state: any): state is Variant {
+  if (!isVariant(state)) return false
   if (state.pieceTypes.length > 26) return false
   if (state.boardWidth < 1 || state.boardWidth > 16) return false
   if (state.boardHeight < 1 || state.boardHeight > 16) return false

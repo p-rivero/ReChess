@@ -1,15 +1,16 @@
 import { defineStore } from "pinia"
 import { ref } from "vue"
 
-import type { GameState } from "@/protochess/types"
+import type { VariantGui } from "@/protochess/types"
 import { VariantDB } from "@/firebase/db"
-import { parseGameStateJson } from "@/utils/chess/game-state-json"
+import { parseVariantJson } from "@/utils/chess/variant-json"
 import type { VariantDoc } from "@/firebase/db/schema"
+import { placementsToFen } from "@/utils/chess/fen-to-placements"
 
 export const useVariantStore = defineStore('variant', () => {
   
   // Currently fetched variants
-  const variantList = ref<GameState[]>([])
+  const variantList = ref<VariantGui[]>([])
   
   // Fetches the list of variants from the database
   // TODO: Add pagination and ordering
@@ -22,15 +23,15 @@ export const useVariantStore = defineStore('variant', () => {
     const docsWithId = await VariantDB.getVariantList()
     variantList.value = []  
     for (const [doc, id] of docsWithId) {
-      const state = parseGameState(doc, id)
+      const state = readDocument(doc, id)
       if (state) variantList.value.push(state)
     }
   }
   
   // Gets a variant from the database, or returns undefined if it doesn't exist
-  async function getVariant(id: string): Promise<GameState | undefined> {
+  async function getVariant(id: string): Promise<VariantGui | undefined> {
     // First check if the variant has already been fetched
-    const existingVariant = variantList.value.find(variant => variant.variantUID === id)
+    const existingVariant = variantList.value.find(variant => variant.uid === id)
     if (existingVariant) {
       return existingVariant
     }
@@ -38,22 +39,31 @@ export const useVariantStore = defineStore('variant', () => {
     // Get the variant document from the database
     const doc = await VariantDB.getVariantById(id)
     if (!doc) return undefined
-    return parseGameState(doc, id)
+    return readDocument(doc, id)
   }
   
-  function parseGameState(doc: VariantDoc, id: string): GameState | undefined {
-    const state = parseGameStateJson(doc.SERVER.initialState)
-    if (!state) {
+  
+  function readDocument(doc: VariantDoc, id: string): VariantGui | undefined {
+    const variant = parseVariantJson(doc.SERVER.initialState)
+    if (!variant) {
       console.error('Illegal variant document', doc)
       return undefined
     }
     // Update fields with the most recent data (this is redundant when 
     // the variant has just been created, but the user can edit these fields)
-    state.variantUID = id
-    state.variantDisplayName = doc.name
-    state.variantDescription = doc.description
-    state.creatorDisplayName = doc.creatorDisplayName
-    return state
+    variant.uid = id
+    variant.displayName = doc.name
+    variant.description = doc.description
+    variant.creatorDisplayName = doc.creatorDisplayName
+    variant.creatorUsername = 'TODO'
+    // Also compute the GUI-specific fields, since almost all components will
+    // need them and it's faster and easier to do it only once here
+    const variantGui: VariantGui = {
+      ...variant,
+      fen: placementsToFen(variant),
+      inCheck: false,
+    }
+    return variantGui
   }
   
   return { refreshList, getVariant, variantList }
