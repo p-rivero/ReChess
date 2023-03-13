@@ -1,16 +1,10 @@
 <template>
   <div>
-    <div class="field is-grouped is-grouped-multiline">
-      <VariantCard v-for="(state, index) of variantStore.variantList" :state="state" :key="index" />
-    </div>
+    <p class="is-size-3">Variants</p>
+    <VariantList />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { useVariantStore } from '@/stores/variant'
-  import VariantCard from '@/components/VariantCard.vue'
-  
-  const variantStore = useVariantStore()
-  
-  variantStore.refreshList()
+  import VariantList from '@/components/ViewVariant/VariantList.vue'
 </script>

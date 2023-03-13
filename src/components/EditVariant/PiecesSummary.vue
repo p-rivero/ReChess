@@ -17,7 +17,7 @@
       
       <p class="mr-4">{{ piece.displayName }}</p>
       
-      <div v-if="piece.isLeader" class="star-icon-container icon-star color-primary-dark mb-1 mr-1"></div>
+      <div v-if="piece.isLeader" class="star-icon-container icon-star-fill color-primary-dark mb-1 mr-1"></div>
       <strong v-if="piece.isLeader" class="has-text-primary-dark mr-4">Leader</strong>
     </div>
   </div>

@@ -31,7 +31,7 @@ $border-light-hover: $grey-dark;
 
 $modal-card-head-background-color: $scheme-main-bis;
 
-$shadow: 0 0.5em 1em -0.125em rgba(0, 0, 0, 0.3), 0 0px 0 1px rgba(0, 0, 0, 0.2);
+$shadow: 0 0.2em 1.2em 0 rgba(0, 0, 0, 0.3), 0 0px 0 1px rgba(0, 0, 0, 0.2);
 $card-header-shadow: $shadow;
 
 @import "node_modules/bulma-checkbox/bulma-checkbox";

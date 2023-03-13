@@ -92,6 +92,7 @@ export interface PublishedVariant extends Variant {
   uid: string,
   creatorDisplayName: string,
   creatorId: string,
+  numUpvotes: number,
 }
 /** @see {isVariantGui} ts-auto-guard:type-guard */
 export interface PublishedVariantGui extends PublishedVariant, GameStateGui { }

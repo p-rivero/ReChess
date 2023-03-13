@@ -147,11 +147,35 @@
 }
 
 
+/* heart-fill.svg */
+.icon-heart-fill {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/heart-fill.svg");
+    mask-image: url("@/assets/img/icons/heart-fill.svg");
+}
+
+
+/* heart.svg */
+.icon-heart {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/heart.svg");
+    mask-image: url("@/assets/img/icons/heart.svg");
+}
+
+
 /* rocket.svg */
 .icon-rocket {
     @extend .icon-common;
     -webkit-mask-image: url("@/assets/img/icons/rocket.svg");
     mask-image: url("@/assets/img/icons/rocket.svg");
+}
+
+
+/* star-fill.svg */
+.icon-star-fill {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/star-fill.svg");
+    mask-image: url("@/assets/img/icons/star-fill.svg");
 }
 
 

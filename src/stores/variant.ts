@@ -54,6 +54,7 @@ export const useVariantStore = defineStore('variant', () => {
       uid: id,
       creatorDisplayName: doc.IMMUTABLE.creatorDisplayName,
       creatorId: doc.IMMUTABLE.creatorId,
+      numUpvotes: doc.IMMUTABLE.numUpvotes,
       // Overwrite the existing name and description with the ones from the document
       displayName: doc.name,
       description: doc.description,
