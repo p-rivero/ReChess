@@ -41,9 +41,9 @@
     black: 'human' | 'engine' | CustomMoveCallback
   }>()
   
+  type Result = {flag: MakeMoveFlag, winner: MakeMoveWinner}
   const emit = defineEmits<{
-    (event: 'piece-moved', from?: [number, number], to?: [number, number]): void
-    (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner): void
+    (event: 'piece-moved', from?: [number, number], to?: [number, number], result?: Result): void
   }>()
   
   
@@ -138,7 +138,8 @@
   // If playMoveBefore is specified, it will be played before synchronizing the state
   async function synchronizeBoardState(playMoveBefore?: MoveInfo) {
     const protochess = await getProtochess()
-    let moveResult: 'none'|'ok'|'stop' = 'none'
+    // 'N/A' if no move was played, undefined if a move was played but the game hasn't ended
+    let moveResult: Result | undefined | 'N/A' = 'N/A'
     if (playMoveBefore) {
       // Play the move before synchronizing the state
       const result = await protochess.makeMove(playMoveBefore)
@@ -150,12 +151,12 @@
     board.value?.setState(state)
     
     // Move was played, emit piece-moved and store history
-    if (moveResult !== 'none') {
-      moveHistory.newMove(playMoveBefore!, state)
-      emit('piece-moved', playMoveBefore!.from, playMoveBefore!.to)
+    if (moveResult !== 'N/A') {
+      moveHistory.newMove(playMoveBefore!, state, moveResult)
+      emit('piece-moved', playMoveBefore!.from, playMoveBefore!.to, moveResult)
+      // Game has ended, don't continue
+      if (moveResult) return
     }
-    // Game has ended, don't continue
-    if (moveResult === 'stop') return
     
     updateMovableSquares(state)
   }
@@ -175,12 +176,11 @@
     }
   }
   
-  function handleResult(result: MakeMoveResult): 'ok'|'stop' {
+  function handleResult(result: MakeMoveResult): Result | undefined {
     // Show effect for exploded squares
     board.value?.explode(result.exploded)
-    if (result.flag === 'Ok') return 'ok'
-    emit('game-over', result.flag, result.winner)
-    return 'stop'
+    if (result.flag === 'Ok') return undefined
+    return {flag: result.flag, winner: result.winner}
   }
   
   
@@ -208,7 +208,7 @@
     } else {
       board.value?.setMovable(false, false, [])
     }
-    emit('piece-moved')
+    emit('piece-moved', undefined, undefined, entry.result)
   }
   
   // Ensure the entire board is visible on screen (make width smaller if board height is too big)

@@ -1,7 +1,7 @@
 <template>
   <div class="is-flex is-flex-direction-column is-align-items-center">
     <div class="is-flex h-100 w-100">
-      <PlayableChessBoard ref='board' :white="white" :black="black" @piece-moved="pieceMoved" @game-over="gameOver"/>
+      <PlayableChessBoard ref='board' :white="white" :black="black" @piece-moved="pieceMoved"/>
       <EvaluationGauge v-if="hasGauge" class="ml-2" ref="gauge" :white-pov="true" />
     </div>
   </div>
@@ -28,7 +28,6 @@
   
   const emit = defineEmits<{
     (event: 'piece-moved', from?: [number, number], to?: [number, number]): void
-    (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner): void
   }>()
   
   defineExpose({
@@ -44,9 +43,12 @@
   })
   
   
-  const updateEvalDebounced = debounce(updateEvaluation, 200)
-  async function pieceMoved(from?: [number, number], to?: [number, number]) {
-    if (props.hasGauge) {
+  const updateEvalDebounced = debounce(updateEvaluation, 500)
+  async function pieceMoved(from?: [number, number], to?: [number, number], result?: {flag: MakeMoveFlag, winner: MakeMoveWinner}) {
+    if (result !== undefined) {
+      gameOver(result.flag, result.winner)
+    }
+    if (!result && props.hasGauge) {
       await updateEvalDebounced()
     }
     emit ('piece-moved', from, to)
@@ -60,7 +62,6 @@
     if (props.hasGauge) {
       gauge.value?.gameOver(winner)
     }
-    emit('game-over', flag, winner)
   }
   
   async function updateEvaluation() {

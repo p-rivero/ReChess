@@ -1,5 +1,5 @@
 
-import type { GameState, MoveInfo } from "@/protochess/types"
+import type { GameState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from "@/protochess/types"
 import { clone } from "@/utils/ts-utils"
 
 type MoveHistoryEntry = {
@@ -7,6 +7,8 @@ type MoveHistoryEntry = {
   state: GameState
   // The move that was made to reach the state (for highlighting squares)
   move?: MoveInfo
+  // The result of the move (for updating the game result)
+  result?: { flag: MakeMoveFlag, winner: MakeMoveWinner }
 }
 
 export class MoveHistoryManager {
@@ -31,7 +33,7 @@ export class MoveHistoryManager {
   }
 
   // Stores a new move in the history
-  public newMove(move: MoveInfo, newState: GameState) {
+  public newMove(move: MoveInfo, newState: GameState, result?: { flag: MakeMoveFlag, winner: MakeMoveWinner }) {
     const stateCopy = clone(newState)
     if (this.currentIndex !== this.history.length - 1) {
       // Create new branch
@@ -39,7 +41,7 @@ export class MoveHistoryManager {
       // TODO
       return
     }
-    this.history.push({ state: stateCopy, move })
+    this.history.push({ state: stateCopy, move, result })
     this.currentIndex++
   }
 
