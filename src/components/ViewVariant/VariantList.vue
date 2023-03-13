@@ -1,6 +1,6 @@
 <template>
   <div class="field is-grouped is-grouped-multiline is-align-items-center">
-    <VariantCard v-for="(state, index) of variantStore.variantList" :state="state" :key="index" />
+    <VariantCard v-for="(state, index) of variantStore.variantList" :variant="state" :key="index" />
   </div>
 </template>
 

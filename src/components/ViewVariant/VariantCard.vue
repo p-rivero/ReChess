@@ -1,15 +1,14 @@
 <template>
   <div class="card px-2 py-2 mx-3 my-4">
-    <div class="is-clickable" @click="$router.push({ name: 'variant-details', params: { variantId: state.uid } })">
+    <div class="is-clickable" @click="$router.push({ name: 'variant-details', params: { variantId: variant.uid } })">
       <div class="board-container" ref="container">
-        <ViewableChessBoard ref="board" :state="state"
-        :white-pov="true" :view-only="true" :show-coordinates="false" :capture-wheel-events="false" />
+        <ViewableChessBoard ref="board" :white-pov="true" :view-only="true" :show-coordinates="false" :capture-wheel-events="false" />
       </div>
-      <p class="mt-3 is-size-5 has-text-weight-semibold">{{ state.displayName }}</p>
+      <p class="mt-3 is-size-5 has-text-weight-semibold">{{ variant.displayName }}</p>
     </div>
     
     <p class="mb-3 has-text-weight-light" @click="creatorClicked">
-      By <a>{{ state.creatorDisplayName }}</a>
+      By <a>{{ variant.creatorDisplayName }}</a>
     </p>
     <div class="columns">
       <div class="column">
@@ -40,23 +39,23 @@
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   
   const props = defineProps<{
-    state: PublishedVariantGui
+    variant: PublishedVariantGui
   }>()
   
   const numUpvotes = computed(() => {
-    if (props.state.numUpvotes > 1000) {
-      return (props.state.numUpvotes / 1000).toFixed(1) + 'k'
+    if (props.variant.numUpvotes > 1000) {
+      return (props.variant.numUpvotes / 1000).toFixed(1) + 'k'
     }
-    return props.state.numUpvotes
+    return props.variant.numUpvotes
   })
   
   onMounted(async () => {
-    board.value?.setState(props.state)
+    board.value?.setState(props.variant)
   })
   
   
   async function creatorClicked() {
-    console.log('creator clicked', props.state.creatorId)
+    console.log('creator clicked', props.variant.creatorId)
   }
   
 </script>
