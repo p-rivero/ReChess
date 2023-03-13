@@ -1,9 +1,11 @@
 <template>
   <button class="button is-outlined mr-4 px-1 py-1 fit-content" @click="click"
     :class="{'is-danger': error}">
-    <div v-if="loading" class="button piece-image is-loading is-white is-large"></div>
-    <img v-else-if="imageUrl" class="piece-image is-loading" alt="piece image" draggable="false" :src="imageUrl" />
-    <div v-else class="piece-image is-loading">
+    <div v-if="loading" class="button piece-container is-loading is-white is-large"></div>
+    <div v-else-if="imageUrl" class="piece-container" >
+      <img class="piece-image" alt="Image of this piece" draggable="false" :src="imageUrl" />
+    </div>
+    <div v-else class="piece-container">
       <div class="icon-cross color-black"></div>
     </div>
     <div class="icon-edit color-theme sz-2"></div>
@@ -52,13 +54,21 @@
 </script>
 
 
-<style scoped>
-  .piece-image {
+<style scoped lang="scss">
+  .piece-container {
     width: 4rem;
     height: 4rem;
     flex-shrink: 0;
     background-color: #b58863;
     border-radius: 0.25rem;
+  }
+  .piece-image {
+    width: 100%;
+    height: 100%;
+    // Mimic the same rendering as the chessboard
+    transform: scale(0.9);
+    object-fit: cover;
+    object-position: left;
   }
   
   .fit-content {
