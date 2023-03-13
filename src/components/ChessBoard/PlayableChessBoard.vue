@@ -7,7 +7,7 @@
 
 
 <template>
-  <div class="board-container" ref="container" style="width: 100%">
+  <div class="board-container w-100" ref="container">
     <ViewableChessBoard 
       class="board"
       :white-pov="whitePov"

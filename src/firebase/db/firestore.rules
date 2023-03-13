@@ -122,10 +122,26 @@ service cloud.firestore {
     
     
     match /variants/{variantId} {
+      function isValidVariant(variant) {
+        let userDoc = getAfter(/databases/$(database)/documents/users/$(variant.SERVER.creatorId));
+        let expectedDisplayName = userDoc.data.name == null ? '@' + userDoc.data.SERVER.username : userDoc.data.name;
+        return hasCorrectFields(['name', 'description', 'creatorDisplayName', 'SERVER'], []) &&
+          serverHasCorrectFields(['creatorId', 'numUpvotes', 'initialState'], []) &&
+          variant.name.size() >= 3 &&
+          variant.name.size() <= 50 &&
+          variant.description.size() <= 500 &&
+          variant.creatorDisplayName == expectedDisplayName &&
+          isAuth(variant.SERVER.creatorId) &&
+          variant.SERVER.numUpvotes == 0 &&
+          variant.SERVER.initialState.size() <= 100000;
+      }
+      
       allow read;
-      // Create if authenticated, update if authenticated and creator
-      allow create: if isAuth(request.resource.data.creatorId);
-      allow update: if isAuth(resource.data.creatorId);
+      // Create if authenticated, update if authenticated and existing creator
+      allow create: if isValidVariant(request.resource.data);
+      allow update: if isAuth(resource.data.creatorId) && isValidVariant(request.resource.data) && serverUnchanged();
+      // Disallow deleting variants
+      allow delete: if false;
     }
     
   }

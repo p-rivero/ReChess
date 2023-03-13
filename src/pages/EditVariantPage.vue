@@ -84,6 +84,7 @@
           if (text.length > 50) return 'Variant name must be at most 50 characters long'
           if (text.length < 3) return 'Variant name must be at least 3 characters long'
         }"
+        :emit-changed-when-error="true"
         :error-handler="errorMsgHandler"/>
       <br>
       <br>

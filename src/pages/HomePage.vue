@@ -1,6 +1,16 @@
 <template>
   <div>
-    <button @click="$router.push('/edit')" class="button is-primary">Edit variant</button>
-    Link to <router-link to="/edit">edit variant</router-link>
+    <div class="field is-grouped is-grouped-multiline">
+      <VariantCard v-for="(state, index) of variantStore.variantList" :state="state" :key="index" />
+    </div>
   </div>
 </template>
+
+<script setup lang="ts">
+  import { useVariantStore } from '@/stores/variant'
+  import VariantCard from '@/components/VariantCard.vue'
+  
+  const variantStore = useVariantStore()
+  
+  variantStore.refreshList()
+</script>

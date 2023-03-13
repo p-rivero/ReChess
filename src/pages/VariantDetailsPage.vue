@@ -1,5 +1,7 @@
 <template>
-  Viewing details of variant {{ state?.variantDisplayName }}
+  <p>DETAILS FOR</p>
+  <br>
+  {{ state }}
 </template>
 
 
@@ -26,7 +28,7 @@
     }
     
     // Get variant info from the server
-    state.value = await variantStore.getVariantState(route.params.variantId)
+    state.value = await variantStore.getVariant(route.params.variantId)
     if (!state.value) {
       // Variant ID is incorrect (or the uploader of this variant is malicious), redirect to home page
       router.push({ name: 'home' })

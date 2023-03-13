@@ -76,8 +76,10 @@ export interface GameState {
   epSquareAndVictim?: [[number, number], [number, number]],
   timesInCheck?: [number, number],
   globalRules: GlobalRules,
+  variantUID?: string, // Undefined if this is a draft
   variantDisplayName?: string,
   variantDescription?: string,
+  creatorDisplayName?: string, // Undefined if this is a draft
 }
 /** @see {isGameStateGui} ts-auto-guard:type-guard */
 export interface GameStateGui extends GameState {
