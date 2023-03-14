@@ -11,9 +11,6 @@ export function toggleTheme() {
 
 export async function loadTheme() {
   const theme = localStorage.getItem('theme') || DEFAULT_THEME
-  // Set the theme on the document root element, so that background.scss
-  // displays the correct placeholder to avoid a FOUC
-  document.documentElement.setAttribute('data-theme', theme)
   // Load the theme's stylesheet
   if (theme === 'light') {
     await import('@/assets/style/light.scss')

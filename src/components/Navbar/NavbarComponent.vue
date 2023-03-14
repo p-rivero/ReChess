@@ -22,7 +22,7 @@
     <div id="navbarMenu" class="navbar-menu">
       <div class="navbar-start">
         <a class="navbar-item" href="/">
-          <img src="@/assets/img/logo.svg" alt="ReChess: Chess reinvented by you">
+          <img src="@/assets/img/logo.svg" class="logo" alt="ReChess: Chess reinvented by you">
         </a>
         <a class="navbar-item" href="/">Browse</a>
         <a class="navbar-item" @click="create">Create</a>
@@ -80,6 +80,9 @@
   }
   .navbar-item img {
     max-height: 2rem;
+  }
+  .logo {
+    width: 12rem;
   }
   .navbar-item {
     height: 4rem;
