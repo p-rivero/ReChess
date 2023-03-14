@@ -96,8 +96,7 @@
 
 <script setup lang="ts">
   import 'firebaseui/dist/firebaseui.css'
-  import { GoogleAuthProvider } from 'firebase/auth'
-  import { GithubAuthProvider } from 'firebase/auth'
+  import { GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth'
   import type { UserCredential } from '@firebase/auth'
   
   import { ref } from 'vue'

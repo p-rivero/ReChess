@@ -32,10 +32,15 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage'],
+          'firebaseApp': ['firebase/app'],
+          'firebaseAuth': ['firebase/auth'],
+          'firebaseFirestore': ['firebase/firestore'],
+          'firebaseStorage': ['firebase/storage'],
+          'firebasePerformance': ['firebase/performance'],
         }
       }
     },
+    sourcemap: true,
   },
   envDir: '.config',
 })

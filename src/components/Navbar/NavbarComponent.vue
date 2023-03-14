@@ -9,7 +9,7 @@
       </div>
       <div class="navbar-end">
         <div class="navbar-item is-hidden-desktop">
-          <button class="button sz-2 icon-theme color-theme" @click="toggleTheme"></button>
+          <button aria-label="toggle theme" class="button sz-2 icon-theme color-theme" @click="toggleTheme"></button>
         </div>
       </div>
       <div class="navbar-end">
@@ -29,7 +29,7 @@
       </div>
       <div class="navbar-end">
         <div class="navbar-item is-hidden-touch">
-          <button class="button sz-2 icon-theme color-theme" @click="toggleTheme"></button>
+          <button aria-label="toggle theme" class="button sz-2 icon-theme color-theme" @click="toggleTheme"></button>
         </div>
         <div class="navbar-item is-hidden-touch">
           <AccountCard />

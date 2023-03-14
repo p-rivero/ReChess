@@ -1,15 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteParams, RouteRecordRaw } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
-import PlayPage from '@/pages/PlayPage.vue'
-import VariantDetailsPage from '@/pages/VariantDetailsPage.vue'
-import EditVariantPage from '@/pages/EditVariantPage.vue'
-import EditPiecePage from '@/pages/EditPiecePage.vue'
-import AnalysisPage from '@/pages/AnalysisPage.vue'
-import PrivacyPolicyPage from '@/pages/legal/PrivacyPolicyPage.vue'
-import CookiePolicyPage from '@/pages/legal/CookiePolicyPage.vue'
-import TermsOfServicePage from '@/pages/legal/TermsOfServicePage.vue'
-
 // https://github.com/mutoe/vue3-realworld-example-app/blob/master/src/router.ts
 
 export type AppRouteNames =
@@ -30,42 +21,42 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'play',
     path: '/play',
-    component: PlayPage,
+    component: () => import('@/pages/PlayPage.vue'),
   },
   {
     name: 'variant-details',
     path: '/variant/:variantId',
-    component: VariantDetailsPage,
+    component: () => import('@/pages/VariantDetailsPage.vue'),
   },
   {
     name: 'edit-variant',
     path: '/edit',
-    component: EditVariantPage,
+    component: () => import('@/pages/EditVariantPage.vue'),
   },
   {
     name: 'edit-piece',
     path: '/edit/pieces/:pieceIndex',
-    component: EditPiecePage,
+    component: () => import('@/pages/EditPiecePage.vue'),
   },
   {
     name: 'analysis',
     path: '/analysis',
-    component: AnalysisPage,
+    component: () => import('@/pages/AnalysisPage.vue'),
   },
   {
     name: 'privacy',
     path: '/privacy',
-    component: PrivacyPolicyPage,
+    component: () => import('@/pages/legal/PrivacyPolicyPage.vue'),
   },
   {
     name: 'cookies',
     path: '/cookies',
-    component: CookiePolicyPage,
+    component: () => import('@/pages/legal/CookiePolicyPage.vue'),
   },
   {
     name: 'tos',
     path: '/tos',
-    component: TermsOfServicePage,
+    component: () => import('@/pages/legal/TermsOfServicePage.vue'),
   },
 ]
 export const router = createRouter({
