@@ -13,7 +13,7 @@
     <div class="columns">
       <div class="column">
         <button class="button is-fullwidth">
-          <div class="sz-icon icon-star color-theme"></div>
+          <div class="sz-icon icon-knight color-theme"></div>
           Play
         </button>
       </div>

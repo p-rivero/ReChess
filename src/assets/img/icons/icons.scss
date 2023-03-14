@@ -8,6 +8,8 @@
     height: 100%;
     -webkit-mask-position: center;
     mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
 }
 
 
@@ -163,6 +165,22 @@
 }
 
 
+/* knight.svg */
+.icon-knight {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/knight.svg");
+    mask-image: url("@/assets/img/icons/knight.svg");
+}
+
+
+/* report.svg */
+.icon-report {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/report.svg");
+    mask-image: url("@/assets/img/icons/report.svg");
+}
+
+
 /* rocket.svg */
 .icon-rocket {
     @extend .icon-common;
@@ -184,6 +202,14 @@
     @extend .icon-common;
     -webkit-mask-image: url("@/assets/img/icons/star.svg");
     mask-image: url("@/assets/img/icons/star.svg");
+}
+
+
+/* template.svg */
+.icon-template {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/template.svg");
+    mask-image: url("@/assets/img/icons/template.svg");
 }
 
 

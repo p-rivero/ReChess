@@ -1,10 +1,10 @@
 <template>
   <div v-for="(piece, pieceIndex) in props.state.pieceTypes" class="piece-container mb-4" :key="pieceIndex">
     <div v-if="editable">
-      <button class="button sz-3 mr-4 px-1 py-1 fit-content" @click="emit('edit-click', pieceIndex)">
+      <button class="button sz-3 mr-4 px-2 py-2 fit-content" @click="emit('edit-click', pieceIndex)">
         <div class="icon-edit color-theme"></div>
       </button>
-      <button class="button sz-3 mr-4 px-1 py-1 fit-content" @click="emit('delete-click', pieceIndex)">
+      <button class="button sz-3 mr-4 px-2 py-2 fit-content" @click="emit('delete-click', pieceIndex)">
         <div class="icon-trash color-theme"></div>
       </button>
     </div>

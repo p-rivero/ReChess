@@ -18,6 +18,8 @@ echo "    width: 100%;" >> $OUT
 echo "    height: 100%;" >> $OUT
 echo "    -webkit-mask-position: center;" >> $OUT
 echo "    mask-position: center;" >> $OUT
+echo "    -webkit-mask-size: contain;" >> $OUT
+echo "    mask-size: contain;" >> $OUT
 echo "}" >> $OUT
 echo "" >> $OUT
 
