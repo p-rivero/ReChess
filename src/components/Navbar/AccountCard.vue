@@ -1,14 +1,13 @@
 <template>
-  <p v-if="!initialized" class="loading-placeholder">Loading...</p>
-  <a v-else-if="authStore.user" class="card-header" @click="onAccountClick">
+  <a v-if="authStore.loggedUser" class="card-header" @click="onAccountClick">
     <span class="card-header-icon py-0 pl-3 pr-0">
       <div class="account-icon sz-2 icon-account color-theme" style="border-radius: 50%;"></div>
     </span>
     <p class="card-header-title">
-      {{ authStore.user!.name }}
+      {{ authStore.loggedUser.displayName }}
     </p>
   </a>
-  <button v-else class="button is-primary" @click="onSignInClick">
+  <button v-else class="button is-primary" @click="requestSignIn">
     <p>Sign in</p>
   </button>
 </template>
@@ -17,25 +16,14 @@
 <script setup lang="ts">
   import { useAuthStore } from '@/stores/auth-user'
   import { requestSignIn } from '@/components/Auth/auth-manager'
-  import { onMounted, ref } from 'vue'
   
   const authStore = useAuthStore()
-  const initialized = ref(false)
     
   async function onAccountClick() {
     // TODO: Go to account page instead
     authStore.signOut()
     window.location.reload()
   }
-  
-  async function onSignInClick() {
-    await requestSignIn()
-  }
-  
-  onMounted(async () => {
-    await authStore.isLogged()
-    initialized.value = true
-  })
 </script>
 
 

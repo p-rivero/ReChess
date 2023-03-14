@@ -4,25 +4,23 @@ import type { UserDoc } from '@/firebase/db/schema'
 
 export class User {
   public username: string
-  public displayName?: string
+  public name?: string
   public about?: string
   public profileImg?: string
+  public displayName: string
   
-  constructor(username: string, displayName?: string, about?: string, profileImg?: string) {
+  constructor(username: string, name?: string, about?: string, profileImg?: string) {
     this.username = username
-    this.displayName = displayName
+    this.name = name
     this.about = about
     this.profileImg = profileImg
+    this.displayName = name ?? `@${username}`
   }
   
   static fromDoc(doc: UserDoc): User {
     const name = doc.name ?? undefined
     const profileImg = doc.profileImg ?? undefined
     return new User(doc.IMMUTABLE.username, name, doc.about, profileImg)
-  }
-  
-  public get name() {
-    return this.displayName || `@${this.username}`
   }
 }
 

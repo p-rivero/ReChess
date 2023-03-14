@@ -29,27 +29,22 @@ export class AuthUser extends User {
 }
 
 export const useAuthStore = defineStore('auth-user', () => {
-  let initialized = false
-  let inhibitLogIn = false
-  const user = ref<AuthUser|null>(null)
+  const loggedUser = ref<AuthUser|null>(getAuthUser())
   const verified = ref(false)
   
   // Called when user signs in or out (or when the page is refreshed)
-  fb.onAuthStateChanged(auth, async newUser => {
-    if (inhibitLogIn) return
-    initialized = false
-    await updateUser(newUser)
-    initialized = true
-  })
-  async function updateUser(newUser: fb.User|null) {
+  fb.onAuthStateChanged(auth, updateUser)
+  async function updateUser(newUser: fb.User | null) {
     if (!newUser || !newUser.email) {
-      user.value = null
+      loggedUser.value = null
+      persistUser(null)
       return
     }
     verified.value = newUser.emailVerified
     // The auth token does not include the username, we need to fetch it from the database
     const username = await UserDB.getUsername(newUser.uid)
-    user.value = new AuthUser(newUser, username)
+    loggedUser.value = new AuthUser(newUser, username)
+    persistUser(loggedUser.value)
   }
   
   
@@ -57,10 +52,9 @@ export const useAuthStore = defineStore('auth-user', () => {
   // Updates the stored user if successful
   async function emailLogIn(email: string, password: string): Promise<void> {
     try {
-      initialized = false
-      await fb.signInWithEmailAndPassword(auth, email, password)
+      const credential = await fb.signInWithEmailAndPassword(auth, email, password)
+      await updateUser(credential.user)
     } catch (e: any) {
-      initialized = true
       switch (e.code) {
         case 'auth/user-not-found':
           throw new UserNotFoundError()
@@ -76,12 +70,10 @@ export const useAuthStore = defineStore('auth-user', () => {
   
   // Creates a new user with an email and password, and updates the stored user
   async function emailRegister(email: string, username: string, password: string): Promise<void> {
-    // Do not store the user until the database is updated
-    inhibitLogIn = true
-    
     let credential: fb.UserCredential
     try {
       credential = await fb.createUserWithEmailAndPassword(auth, email, password)
+      await updateUser(credential.user)
     } catch (e: any) {
       switch (e.code) {
         case 'auth/email-already-in-use':
@@ -96,11 +88,9 @@ export const useAuthStore = defineStore('auth-user', () => {
     } catch (e) {
       // If the database update fails, delete the user auth
       await credential.user.delete()
+      await updateUser(null)
       throw new RechessError('CANNOT_CREATE_USER')
     }
-    // Update the user in the store
-    await updateUser(credential.user)
-    inhibitLogIn = false
   }
   
   // Creates a new user that is already authenticated with a third party provider
@@ -127,17 +117,23 @@ export const useAuthStore = defineStore('auth-user', () => {
     })
   }
   
-  // Returns true if the user is logged in, false otherwise
-  async function isLogged(): Promise<boolean> {
-    // Wait for the user to be initialized
-    while (!initialized) await new Promise(resolve => setTimeout(resolve, 20))
-    return user.value !== null
-  }
-  
   // Returns true if a username is available
   async function checkUsername(username: string): Promise<boolean> {
     return (await UserDB.getId(username)) === undefined
   }
 
-  return { emailLogIn, emailRegister, thirdPartyRegister, signOut, sendEmailVerification, isLogged, checkUsername, user }
+  return { emailLogIn, emailRegister, thirdPartyRegister, signOut, sendEmailVerification, checkUsername, loggedUser }
 })
+
+
+
+const AUTH_USER_KEY = 'loggedUser'
+function persistUser(user: AuthUser|null) {
+  if (!user) localStorage.removeItem(AUTH_USER_KEY)
+  else localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user))
+}
+function getAuthUser(): AuthUser|null {
+  const user = localStorage.getItem(AUTH_USER_KEY)
+  if (!user) return null
+  return JSON.parse(user)
+}

@@ -186,10 +186,9 @@
   const selectedPieceId = ref<string|'wall'|'delete'|'none'>('none')
   
   // This page is only accessible when logged in
-  onMounted(async () => {
-    const logged = await authStore.isLogged()
-    if (!logged) router.push({ name: 'home' })
-  })
+  if (!authStore.loggedUser) {
+    router.push({ name: 'home' })
+  }
     
   // When state changes, update the board and run a state check
   watch(draftStore.state, () => updateBoardAndError(), { deep: true })

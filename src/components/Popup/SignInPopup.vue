@@ -35,7 +35,7 @@
   const currentStage = ref<Stage>()
     
   defineExpose({
-    async show(stage: Stage) {
+    show(stage: Stage) {
       cleanupCurrentStage()
       currentStage.value = stage
       initCurrentStage()
@@ -76,8 +76,8 @@
   }
   
   
-  async function checkVerify() {
-    const isVerified = await checkEmailVerified()
+  function checkVerify() {
+    const isVerified = checkEmailVerified()
     if (isVerified) {
       closePopup()
     }

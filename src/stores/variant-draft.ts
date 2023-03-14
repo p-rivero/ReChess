@@ -69,10 +69,9 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   // Attempts to publish the variant to the server. If successful, returns the id of the variant.
   async function publish(): Promise<string | undefined> {
     const authStore = useAuthStore()
-    await authStore.isLogged()
-    if (!authStore.user) return undefined
+    if (!authStore.loggedUser) return undefined
     try {
-      const id = await createVariant(authStore.user.uid, authStore.user.name, state.value)
+      const id = await createVariant(authStore.loggedUser.uid, authStore.loggedUser.displayName, state.value)
       // Draft published successfully, remove it from localStorage
       localStorage.removeItem('variantDraft')
       return id

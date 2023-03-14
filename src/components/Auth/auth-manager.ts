@@ -22,12 +22,11 @@ const WHITELISTED_ROUTES = [
 export async function signInRefresh() {
   const authStore = useAuthStore()
   const userStore = useUserStore()
-  const isLogged = await authStore.isLogged()
   // Allow users to use the website without logging in
-  if (!isLogged) return
+  if (!authStore.loggedUser) return
   // If the user is authenticated, make sure they have completed the sign in process
   // For social logins, choose a username
-  const user = await userStore.getUserById(authStore.user!.uid)
+  const user = await userStore.getUserById(authStore.loggedUser.uid)
   if (!user) {
     // Logged but user document does not exist, show the choose username popup
     showPopupIfNotWhitelisted('chooseUsername')
@@ -37,19 +36,17 @@ export async function signInRefresh() {
   checkEmailVerified()
 }
 
-export async function requestSignIn(): Promise<void> {
+export function requestSignIn() {
   showPopup('loginRegister')
 }
 
 // Returns true if the user is verified, false otherwise
-export async function checkEmailVerified(): Promise<boolean> {
+export function checkEmailVerified(): boolean {
   // Called then the user has created an account with email and password,
   // or every time the user refreshes the page
   const authStore = useAuthStore()
-  const isLogged = await authStore.isLogged()
-  if (!isLogged) throw new Error('Only call checkEmailVerified when logged in')
-  if (!authStore.user) throw new Error('User not set')
-  const verified = authStore.user.verified
+  if (!authStore.loggedUser) throw new Error('Only call checkEmailVerified when logged in')
+  const verified = authStore.loggedUser.verified
   if (verified) {
     // Email is verified, nothing else to do
     return true

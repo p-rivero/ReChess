@@ -5,7 +5,7 @@ import type { UploadMetadata, UploadResult } from "firebase/storage"
 
 export async function uploadBlob(file: Blob, filePath: string): Promise<UploadResult> {
   const authStore = useAuthStore()
-  const user = authStore.user
+  const user = authStore.loggedUser
   if (!user) throw new Error('User must be logged in to upload a file')
   const metadata: UploadMetadata = {
     customMetadata: {

@@ -5,14 +5,14 @@ import type { Variant } from '@/protochess/types'
 import { collection, addDoc, getDoc, doc, getDocs } from 'firebase/firestore'
 
 // Attempts to create a new variant in the database and returns the variant ID. Throws an error if the write fails.
-export async function createVariant(userId: string, userName: string, variant: Variant): Promise<string> {
+export async function createVariant(userId: string, displayName: string, variant: Variant): Promise<string> {
   const document: VariantDoc = {
     // May not match the initial state. When fetching the state, the name and description are overwritten with this fields
     name: variant.displayName,
     description: variant.description,
     IMMUTABLE: {
       // Always the same as in initialState
-      creatorDisplayName: userName,
+      creatorDisplayName: displayName,
       creatorId: userId,
       numUpvotes: 0,
       initialState: JSON.stringify(variant),

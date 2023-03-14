@@ -57,12 +57,11 @@
   }
   
   
-  async function create() {
-    const logged = await authStore.isLogged()
-    if (logged) {
+  function create() {
+    if (authStore.loggedUser) {
       router.push({ name: 'edit-variant' })
     } else {
-      await requestSignIn()
+      requestSignIn()
     }
   }
 </script>

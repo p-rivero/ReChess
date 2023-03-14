@@ -2,7 +2,7 @@
   <div>
     <p class="modal-card-title mb-3">Almost there!</p>
     
-    <p class="mb-3">You just need to verify your email address. We've sent an email to <b>{{ authStore.user?.email }}</b>.</p>
+    <p class="mb-3">You just need to verify your email address. We've sent an email to <b>{{ authStore.loggedUser?.email }}</b>.</p>
     
     <p v-if="sentMessage" class="has-text-weight-light" >{{ sentMessage }}</p>
     <a v-else @click="resendEmail">Send again</a>
