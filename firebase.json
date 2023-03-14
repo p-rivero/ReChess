@@ -15,7 +15,7 @@
     "cleanUrls": true,
     "headers": [
       {
-        "source": "**/*.@(wasm | js)",
+        "source": "**/*.@(wasm | js | css | svg)",
         "headers": [
           {
             "key": "Cache-Control",

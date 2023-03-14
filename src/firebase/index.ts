@@ -19,7 +19,7 @@ const app = initializeApp(FIREBASE_CONFIG)
 const db = getFirestore(app)
 const storage = getStorage(app)
 const auth = getAuth(app)
-const perf = getPerformance(app)
+const _perf = getPerformance(app)
 
 auth.setPersistence(browserLocalPersistence)
 
