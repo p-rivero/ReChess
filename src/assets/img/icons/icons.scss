@@ -237,6 +237,14 @@
 }
 
 
+/* user.svg */
+.icon-user {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/user.svg");
+    mask-image: url("@/assets/img/icons/user.svg");
+}
+
+
 /* zoom1.svg */
 .icon-zoom1 {
     @extend .icon-common;

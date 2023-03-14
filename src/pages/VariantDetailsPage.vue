@@ -1,9 +1,35 @@
 <template>
-  <p class="is-size-2 mb-2">{{ variant?.displayName }}</p>
-  <p class="is-size-5 has-text-weight-semibold mb-5">Created by <a>{{ variant?.creatorDisplayName }}</a></p>
-  <p>{{ variant?.description }}</p>
-  <div class="board-container" ref="container">
-    <ViewableChessBoard ref="board" :white-pov="true" :view-only="true" :show-coordinates="false" :capture-wheel-events="false" />
+  <div class="columns">
+    <div class="column is-5">
+      <p class="is-size-2 mb-2">{{ variant?.displayName }}</p>
+      <p class="is-size-5 has-text-weight-semibold mb-5">Created by <a>{{ variant?.creatorDisplayName }}</a></p>
+      <p>{{ variant?.description }}</p>
+    </div>
+    
+    <div class="column is-6 columns reverse-columns">
+      <div class="column is-5 is-narrow">
+        <button class="button is-fullwidth mb-4">
+          <div class="sz-icon icon-knight color-theme"></div>
+          Play
+        </button>
+        <button class="button is-fullwidth mb-4">
+          <div class="sz-icon icon-analysis color-theme"></div>
+          Analysis board
+        </button>
+        <button class="button is-fullwidth mb-4">
+          <div class="sz-icon icon-template color-theme"></div>
+          Use as template
+        </button>
+        <button class="button is-fullwidth mb-4">
+          <div class="sz-icon icon-report color-theme"></div>
+          Report
+        </button>
+      </div>
+      
+      <div class="column is-8">
+        <ViewableChessBoard ref="board" class="not-clickable" :white-pov="true" :view-only="true" :show-coordinates="true" :capture-wheel-events="false" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -49,7 +75,18 @@
 </script>
 
 <style scoped lang="scss">
-  .board-container {
-    max-width: 20rem;
+  .not-clickable {
+    pointer-events: none;
+  }
+  
+  @media screen and (max-width: 1023px) {
+    .reverse-columns {
+      display: flex;
+      flex-direction: column-reverse;
+      
+      .column {
+        width: 100%;
+      }
+    }
   }
 </style>

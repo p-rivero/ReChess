@@ -136,8 +136,9 @@
       GithubAuthProvider.PROVIDER_ID,
     ],
     callbacks: {
-      signInSuccessWithAuthResult: (authResult: UserCredential) => {
+      signInSuccessWithAuthResult: async (authResult: UserCredential) => {
         loading.value = true
+        await authStore.updateUser(authResult.user)
         // If this is the first time the user signs in, we need to ask them to choose a username
         UserDB.getUserById(authResult.user.uid).then(user => {
           if (user) {

@@ -89,6 +89,7 @@ export const useAuthStore = defineStore('auth-user', () => {
       // If the database update fails, delete the user auth
       await credential.user.delete()
       await updateUser(null)
+      console.error('Failed to create user in database', e)
       throw new RechessError('CANNOT_CREATE_USER')
     }
   }
@@ -99,6 +100,7 @@ export const useAuthStore = defineStore('auth-user', () => {
     try {
       await UserDB.createUser(auth.currentUser, username)
     } catch (e) {
+      console.error('Failed to create user in database', e)
       throw new RechessError('CANNOT_CREATE_USER')
     }
   }
@@ -122,7 +124,7 @@ export const useAuthStore = defineStore('auth-user', () => {
     return (await UserDB.getId(username)) === undefined
   }
 
-  return { emailLogIn, emailRegister, thirdPartyRegister, signOut, sendEmailVerification, checkUsername, loggedUser }
+  return { emailLogIn, emailRegister, thirdPartyRegister, signOut, sendEmailVerification, checkUsername, updateUser, loggedUser }
 })
 
 

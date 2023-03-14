@@ -8,7 +8,8 @@
     </p>
   </a>
   <button v-else class="button is-primary" @click="requestSignIn">
-    <p>Sign in</p>
+    <div class="sz-icon icon-user color-white"></div>
+    Sign in
   </button>
 </template>
 
