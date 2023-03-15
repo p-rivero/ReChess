@@ -8,14 +8,19 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
   import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
   import type { CustomMoveCallback } from '@/components/ChessBoard/PlayableChessBoard.vue'
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
   import { getProtochess } from '@/protochess'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { useVariantStore } from '@/stores/variant'
   import type { GameState, MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
   import { debounce } from '@/utils/ts-utils'
   
+  const route = useRoute()
+  const router = useRouter()
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
   
@@ -31,17 +36,45 @@
     (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner, playerToMove: Player): void
   }>()
   
-  defineExpose({
-    async setState(state: GameState) {
-      if (board.value === undefined) {
-        throw new Error('Reference to board is undefined')
-      }
-      await board.value.setState(state)
-      if (props.hasGauge) {
-        await updateEvaluation()
-      }
+  onMounted(async () => {
+    const protochess = await getProtochess()
+    const state = await getState()
+    if (!state) return
+    // Set the board state and make sure it's valid
+    await board.value?.setState(state)
+    try {
+      await protochess.validatePosition()
+    } catch (e) {
+      console.error(e)
+      // Invalid position, redirect to home page
+      router.push({ name: 'home' })
+    }
+    if (props.hasGauge) {
+      await updateEvaluation()
     }
   })
+  
+  
+  // If the variantId parameter is missing, use the stored draft variant
+  async function getState(): Promise<GameState|undefined> {
+    const variantId = route.params.variantId
+    if (variantId && typeof variantId === 'string') {
+      return getStateFromServer(variantId)
+    }
+    const draftStore = useVariantDraftStore()
+    const draft = draftStore.state
+    return draft
+  }
+  async function getStateFromServer(id: string): Promise<GameState|undefined> {
+    const variantStore = useVariantStore()
+    const variant = await variantStore.getVariant(id)
+    // Variant ID is incorrect (or the uploader of this variant is malicious), redirect to home page
+    if (!variant) {
+      router.push({ name: 'home' })
+      return
+    }
+    return variant
+  }
   
   
   const updateEvalDebounced = debounce(updateEvaluation, 500)

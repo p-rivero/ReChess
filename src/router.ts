@@ -40,7 +40,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     name: 'analysis',
-    path: '/analysis',
+    path: '/analysis/:variantId?',
     component: () => import('@/pages/AnalysisPage.vue'),
   },
   {

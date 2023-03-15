@@ -12,7 +12,7 @@
           <div class="sz-icon icon-knight color-white"></div>
           Play
         </button>
-        <button class="button is-fullwidth mb-4">
+        <button class="button is-fullwidth mb-4" @click="$router.push({ name: 'analysis', params: {variantId: variant?.uid} })">
           <div class="sz-icon icon-analysis color-theme"></div>
           Analysis board
         </button>
