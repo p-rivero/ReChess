@@ -4,7 +4,7 @@
       <div class="box">
         <p class="control has-icons-left has-icons-right">
           <SmartTextInput class="is-medium" placeholder="Search variants..." />
-          <span class="icon is-small is-left px-2 py-2">
+          <span class="icon is-small is-left px-3 py-3">
             <div class="icon-search color-theme"></div>
           </span>
         </p>

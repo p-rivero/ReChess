@@ -81,11 +81,12 @@
       By creating an account, you agree to the <a href="/tos">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
     </p>
     
-    <div>
-      <button class="button is-primary" @click="signInClick"
+    <div class="pb-2 is-flex is-justify-content-space-between is-align-items-center">
+      <button class="button is-primary mr-4" @click="signInClick"
         :class="{'is-loading': loading}" :disabled="hasError || loading || (isRegister && usernameStatus !== 'available')">
         {{ isRegister ? 'Register' : 'Sign in' }}
       </button>
+      <a v-if="!isRegister" @click="toggleRegister">Don't have an account?</a>
     </div>
     
     <div id="firebaseui-auth-container"></div>
@@ -240,13 +241,17 @@
     } catch (e) {
       if (e instanceof UserNotFoundError) {
         // Transition to register
-        isRegister.value = true
-        isStrict.value = false
-        errorHandler.clear()
+        toggleRegister()
         usernameRef.value?.focus()
         return
       }
       throw e
     }
+  }
+  
+  function toggleRegister() {
+    isRegister.value = !isRegister.value
+    isStrict.value = false
+    errorHandler.clear()
   }
 </script>

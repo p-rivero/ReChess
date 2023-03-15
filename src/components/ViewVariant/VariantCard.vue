@@ -10,9 +10,9 @@
     <p class="mb-3 has-text-weight-light" @click="creatorClicked">
       By <a>{{ variant.creatorDisplayName }}</a>
     </p>
-    <div class="columns">
+    <div class="columns is-mobile">
       <div class="column is-3 pr-0">
-        <button class="button is-fullwidth px-0" @click="emit('play-clicked')">
+        <button aria-label="edit variant" class="button is-fullwidth px-0" @click="emit('play-clicked')">
           <div class="icon-edit color-theme"></div>
         </button>
       </div>
