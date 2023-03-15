@@ -155,11 +155,11 @@
       const newConfig: Config = {
         lastMove: [fromKey, toKey],
       }
-      incrementalUpdateConfig(newConfig)
+      board.value?.setConfig(newConfig)
     },
     clearHighlightMove() {
       const newConfig: Config = { lastMove: [] }
-      incrementalUpdateConfig(newConfig)
+      board.value?.setConfig(newConfig)
     },
     
     // Toggle between white and black point of view
