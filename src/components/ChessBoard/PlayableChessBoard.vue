@@ -7,7 +7,8 @@
 
 
 <template>
-  <div class="board-container w-100" ref="container">
+  <!-- Important: The container element must have INLINE style="width: 100%" -->
+  <div class="board-container" style="width: 100%" ref="container">
     <ViewableChessBoard 
       class="board"
       :white-pov="whitePov"
@@ -24,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner } from '@/protochess/types';
+  import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types';
   import { getProtochess } from '@/protochess'
   import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
   import { remToPx } from '@/utils/ts-utils'
@@ -33,7 +34,7 @@
   import PromotionPopup from '@/components/GameUI/PromotionPopup.vue';
   
   export interface CustomMoveCallback {
-    (playerToMove: 'white'|'black'): Promise<MoveInfo>
+    (playerToMove: Player): Promise<MoveInfo>
   }
   
   const props = defineProps<{
@@ -67,8 +68,14 @@
     },
     
     // Move a piece from one position to another, and optionally promote it
-    makeMove(from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', id: string}) {
+    makeMove(from: [number, number], to: [number, number], promotion?: {color: Player, id: string}) {
       board.value?.makeMove(from, to, promotion)
+    },
+    
+    // Returns which player is to move
+    async playerToMove(): Promise<Player> {
+      const protochess = await getProtochess()
+      return protochess.playerToMove()
     },
     
     // Toggle between white and black point of view
@@ -127,11 +134,15 @@
     // The engine can return a move almost immediately. Wait a second to make it feel more natural
     const minWaitTime = 1000
     const startTime = Date.now()
-    const bestMove = await protochess.getBestMoveTimeout(timeoutSeconds)
-    
-    const waitTime = Math.max(0, minWaitTime - (Date.now() - startTime))
-    await new Promise(resolve => setTimeout(resolve, waitTime))
-    await synchronizeBoardState(bestMove)
+    try {
+      const bestMove = await protochess.getBestMoveTimeout(timeoutSeconds)
+      const waitTime = Math.max(0, minWaitTime - (Date.now() - startTime))
+      await new Promise(resolve => setTimeout(resolve, waitTime))
+      await synchronizeBoardState(bestMove)
+    } catch (e) {
+      // Unable to find a move, probably because the game has ended
+      console.info('Unable to find a move, game may have ended:', e)
+    }
   }
   
   // Synchonize the board state with the protochess engine

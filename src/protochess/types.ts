@@ -1,9 +1,11 @@
 
 // PUBLIC API
 
+export type Player = 'white' | 'black'
+
 export interface Protochess {
   toString(): Promise<string>,
-  playerToMove(): Promise<'white' | 'black'>,
+  playerToMove(): Promise<Player>,
   validatePosition(): Promise<void>,
   playBestMove(depth: number): Promise<MakeMoveResult>,
   playBestMoveTimeout(time: number): Promise<MakeMoveResultWithDepth>,
@@ -22,7 +24,6 @@ export interface Protochess {
   setNumThreads(threads: number): Promise<void>,
 }
 
-
 export type MakeMoveFlag =
   'Ok' |
   'IllegalMove' |
@@ -34,7 +35,7 @@ export type MakeMoveFlag =
   'Stalemate' |
   'Repetition'
   
-export type MakeMoveWinner = 'White' | 'Black' | 'None'
+export type MakeMoveWinner = Player | 'none'
 
 export interface MakeMoveResult {
   flag: MakeMoveFlag,

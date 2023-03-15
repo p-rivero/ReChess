@@ -174,15 +174,6 @@
         v-show="piece?.explodes"
         :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta" />
       
-      <br>
-      <label class="label">TEMPORARY FOR MVP:</label>
-      <SmartTextInput placeholder="(Temp) URL for white piece image" class="rules-field"
-        :start-text="piece?.imageUrls[0] ?? undefined"
-        @changed="text => { piece!.imageUrls[0] = text; draftStore.save() }"/>
-      <SmartTextInput placeholder="(Temp) URL for black piece image" class="rules-field"
-        :start-text="piece?.imageUrls[1] ?? undefined"
-        @changed="text => { piece!.imageUrls[1] = text; draftStore.save() }"/>
-      
     </div>
   </div>
   <PopupOverlay v-if="selectedDelta[0] !== 'none'" :z-index="10" @click="selectedDelta[0] = 'none'" />
@@ -201,7 +192,7 @@
   import AddRemoveButtons from '@/components/EditVariant/AddRemoveButtons.vue'
   import PieceImageEdit from '@/components/EditVariant/PieceImageEdit.vue'
   import PopupOverlay from '@/components/Popup/PopupOverlay.vue'
-  import type { PieceDefinition } from '@/protochess/types'
+  import type { PieceDefinition, Player } from '@/protochess/types'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useAuthStore } from '@/stores/auth-user'
   import { paramToInt } from '@/utils/ts-utils'
@@ -269,7 +260,7 @@
       return `${side} castling file must be a single letter between 'a' and 'p'`
   }
   
-  function enabledCheckboxChanged(enabled: boolean, color: 'white'|'black') {
+  function enabledCheckboxChanged(enabled: boolean, color: Player) {
     const textBoxVal = color === 'white' ? pieceIdWhite.value : pieceIdBlack.value
     const enabledId = textBoxVal ?? ''
     const newId = enabled ? enabledId : null
@@ -304,7 +295,7 @@
     draftStore.save()
   }
   
-  function updatePieceId(newId: string, color: 'white'|'black') {
+  function updatePieceId(newId: string, color: Player) {
     // Remove all existing placements of this piece
     const oldId = color === 'white' ? piece!.ids[0] : piece!.ids[1]
     draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== oldId)

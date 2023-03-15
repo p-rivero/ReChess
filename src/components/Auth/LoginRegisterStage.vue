@@ -95,6 +95,7 @@
 
 
 <script setup lang="ts">
+  import type * as firebaseui from 'firebaseui'
   import 'firebaseui/dist/firebaseui.css'
   import { GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth'
   import type { UserCredential } from '@firebase/auth'

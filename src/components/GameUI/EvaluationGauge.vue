@@ -16,14 +16,18 @@
     </div>
     <div>
       <div class="ml-2 eval-text">{{ evalText }}</div>
-      <div class="ml-2">{{ depthText }}</div>
+      <div class="ml-2 mb-2">{{ depthText }}</div>
+      <a v-if="explainText" class="ml-2 is-size-5" @click="explain">
+        Why?</a>
     </div>
   </div>
 </template>
 
 
 <script setup lang="ts">
-  import type { MakeMoveWinner } from '@/protochess/types'
+  import type { MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
+  import { getMessage } from '@/utils/chess/game-over-message'
+  import { showPopup } from '@/components/Popup/popup-manager';
   import { ref } from 'vue'
   
   defineProps<{
@@ -33,6 +37,7 @@
   const blackBarHeight = ref('50%')
   const evalText = ref('')
   const depthText = ref('')
+  const explainText = ref<string>()
   
   defineExpose({
     updateEvaluation(evaluation: number|`#${number}`, depth: number, invert: boolean) {
@@ -54,13 +59,14 @@
       }
       blackBarHeight.value = `${blackGaugePercent}%`
       depthText.value = `Depth ${depth}`
+      explainText.value = undefined
     },
     
-    gameOver(winner: MakeMoveWinner) {
-      if (winner === 'White') {
+    gameOver(flag: MakeMoveFlag, winner: MakeMoveWinner, playerToMove: Player) {
+      if (winner === 'white') {
         evalText.value = '1-0'
         blackBarHeight.value = '0%'
-      } else if (winner === 'Black') {
+      } else if (winner === 'black') {
         evalText.value = '0-1'
         blackBarHeight.value = '100%'
       } else {
@@ -68,8 +74,14 @@
         blackBarHeight.value = '50%'
       }
       depthText.value = 'Game over'
+      explainText.value = getMessage(flag, playerToMove)
     }
   })
+  
+  function explain() {
+    if (!explainText.value) return
+    showPopup('Why is the game over?', explainText.value, 'ok')
+  }
   
   // Convert centipawns (positive or negative) to the probability of white winning (0 to 100)
   function cpToWinOdds(cp: number): number {
@@ -145,6 +157,6 @@
   .eval-text {
     font-size: 1.5em;
     font-weight: bold;
-    width: 5rem;
+    width: 6rem;
   }
 </style>

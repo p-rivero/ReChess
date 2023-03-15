@@ -24,7 +24,7 @@
 
 
 <script setup lang="ts">
-  import type { GameStateGui, MoveList } from '@/protochess/types';
+  import type { GameStateGui, MoveList, Player } from '@/protochess/types';
   import type * as cg from 'chessgroundx/types';
   import { positionToKey, keyToPosition } from '@/utils/chess/chess-coords';
   import type { Config } from 'chessgroundx/config';
@@ -136,7 +136,7 @@
     },
     
     // Move a piece from one position to another, and optionally promote it
-    makeMove(from: [number, number], to: [number, number], promotion?: {color: 'white'|'black', id: string}) {
+    makeMove(from: [number, number], to: [number, number], promotion?: {color: Player, id: string}) {
       const fromKey = positionToKey(from)
       const toKey = positionToKey(to)
       board.value?.movePiece(fromKey, toKey)

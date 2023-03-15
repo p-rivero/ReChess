@@ -13,7 +13,7 @@
   import type { CustomMoveCallback } from '@/components/ChessBoard/PlayableChessBoard.vue'
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
   import { getProtochess } from '@/protochess'
-  import type { GameState, MakeMoveFlag, MakeMoveWinner } from '@/protochess/types'
+  import type { GameState, MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
   import { debounce } from '@/utils/ts-utils'
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
@@ -28,6 +28,7 @@
   
   const emit = defineEmits<{
     (event: 'piece-moved', from?: [number, number], to?: [number, number]): void
+    (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner, playerToMove: Player): void
   }>()
   
   defineExpose({
@@ -46,7 +47,7 @@
   const updateEvalDebounced = debounce(updateEvaluation, 500)
   async function pieceMoved(from?: [number, number], to?: [number, number], result?: {flag: MakeMoveFlag, winner: MakeMoveWinner}) {
     if (result !== undefined) {
-      gameOver(result.flag, result.winner)
+      await gameOver(result.flag, result.winner)
     }
     if (!result && props.hasGauge) {
       await updateEvalDebounced()
@@ -54,14 +55,19 @@
     emit ('piece-moved', from, to)
   }
   
-  function gameOver(flag: MakeMoveFlag, winner: MakeMoveWinner) {
+  async function gameOver(flag: MakeMoveFlag, winner: MakeMoveWinner) {
     if (flag === 'Ok' || flag === 'IllegalMove') {
       throw new Error('Invalid flag emitted from PlayableChessBoard: ' + flag)
     }
-    board.value?.clearArrows('analysis')
-    if (props.hasGauge) {
-      gauge.value?.gameOver(winner)
+    if (!board.value) {
+      throw new Error('Reference to board is undefined')
     }
+    const playerToMove = await board.value.playerToMove()
+    board.value.clearArrows('analysis')
+    if (props.hasGauge) {
+      gauge.value?.gameOver(flag, winner, playerToMove)
+    }
+    emit('game-over', flag, winner, playerToMove)
   }
   
   async function updateEvaluation() {

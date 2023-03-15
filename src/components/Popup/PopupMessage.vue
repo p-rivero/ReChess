@@ -33,9 +33,10 @@
   let isImportant = false
   
   defineExpose({
-    show(title: string, message: string, buttons: 'ok' | 'ok-cancel' | 'yes-no', accept?: () => void, cancel?: () => void) {
+    show(important: boolean, title: string, message: string, buttons: 'ok' | 'ok-cancel' | 'yes-no', accept?: () => void, cancel?: () => void) {
       titleText.value = title
       messageText.value = message
+      isImportant = important
       acceptCallback = accept ?? (() => {})
       cancelCallback = cancel ?? (() => {})
       if (buttons === 'ok-cancel') {
@@ -51,10 +52,6 @@
       popup.value?.classList.add('is-active')
       document.documentElement.classList.add('is-clipped')
       primaryButton.value?.focus()
-    },
-    showImportant(title: string, message: string, buttons: 'ok' | 'ok-cancel' | 'yes-no', accept?: () => void, cancel?: () => void) {
-      isImportant = true
-      this.show(title, message, buttons, accept, cancel)
     },
     hide: closePopup,
   })

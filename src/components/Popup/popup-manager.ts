@@ -8,7 +8,11 @@ export function setMessagePopup(popup: Ref<InstanceType<typeof PopupMessage> | u
 }
 
 export function showPopup(title: string, message: string, buttons: 'ok' | 'ok-cancel' | 'yes-no', accept?: () => void, cancel?: () => void) {
-  if (!messagePopup) throw new Error('Message popup not set')
-  if (!messagePopup.value) throw new Error('Message popup not initialized')
-  messagePopup.value.show(title, message, buttons, accept, cancel)
+  if (!messagePopup?.value) throw new Error('Message popup not initialized')
+  messagePopup.value.show(false, title, message, buttons, accept, cancel)
+}
+
+export function showPopupImportant(title: string, message: string, buttons: 'ok' | 'ok-cancel' | 'yes-no', accept?: () => void, cancel?: () => void) {
+  if (!messagePopup?.value) throw new Error('Message popup not initialized')
+  messagePopup.value.show(true, title, message, buttons, accept, cancel)
 }

@@ -12,6 +12,7 @@ import type {
   GameState,
   GameStateGui,
   MoveList,
+  Player,
 } from "./types"
 
 // Call this at the start of the app to initialize the wasm module
@@ -58,7 +59,7 @@ async function init(): Promise<Protochess> {
     async toString(): Promise<string> {
       return wasm.wasmObject.toString()
     },
-    async playerToMove(): Promise<'white' | 'black'> {
+    async playerToMove(): Promise<Player> {
       const player: 0|1 = await wasm.wasmObject.playerToMove()
       return player === 0 ? 'white' : 'black'
     },
