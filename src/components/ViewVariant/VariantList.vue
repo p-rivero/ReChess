@@ -1,5 +1,6 @@
 <template>
   <div class="field is-grouped is-grouped-multiline is-align-items-center">
+    <DraftCard v-if="showDraftCard" />
     <VariantCard v-for="(state, index) of variantStore.variantList" :variant="state" :key="index"
       @play-clicked="playClicked(state)"/>
     <PlayPopup ref="playPopup"/>
@@ -8,13 +9,24 @@
 
 <script setup lang="ts">
   import { useVariantStore } from '@/stores/variant'
+  import { useAuthStore } from '@/stores/auth-user'
   import VariantCard from '@/components/ViewVariant/VariantCard.vue'
+  import DraftCard from './DraftCard.vue'
   import PlayPopup from '@/components/Popup/PlayPopup.vue'
   import type { PublishedVariantGui } from '@/protochess/types'
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   
   const variantStore = useVariantStore()
+  const authStore = useAuthStore()
   const playPopup = ref<InstanceType<typeof PlayPopup>>()
+    
+  const showDraftCard = computed(() => {
+    // Do not show draft card if user is not logged in
+    // Also wait until the variant list is fetched to avoid distracting pop-in
+    // This means that if the server still has no variants, the draft card will 
+    // not show, but that will never happen in production
+    return authStore.loggedUser && variantStore.variantList.length > 0
+  })
   
   variantStore.refreshList()
   

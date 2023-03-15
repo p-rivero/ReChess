@@ -7,7 +7,7 @@
     </div>
     
     <div class="column is-6 columns reverse-columns">
-      <div class="column is-5 is-narrow">
+      <div class="column mt-2 is-5 is-narrow">
         <button class="button is-primary is-fullwidth mb-4" @click="playPopup?.show(variant?.uid)">
           <div class="sz-icon icon-knight color-white"></div>
           Play
@@ -17,7 +17,7 @@
           Analysis board
         </button>
         <button class="button is-fullwidth mb-4">
-          <div class="sz-icon icon-template color-theme"></div>
+          <div class="sz-icon icon-edit color-theme"></div>
           Use as template
         </button>
         <button class="button is-fullwidth mb-4">
@@ -26,7 +26,7 @@
         </button>
       </div>
       
-      <div class="column is-8">
+      <div class="column mt-2 is-8">
         <ViewableChessBoard ref="board" class="not-clickable" :white-pov="true" :view-only="true" :show-coordinates="true" :capture-wheel-events="false" />
       </div>
     </div>

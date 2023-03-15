@@ -4,7 +4,7 @@ import sanitizeFilename from 'sanitize-filename'
 
 import type { Variant, PieceDefinition, PiecePlacement } from '@/protochess/types'
 import { exportFile, importFile } from '@/utils/file-io'
-import { clone } from '@/utils/ts-utils'
+import { clone, object_equals } from '@/utils/ts-utils'
 import { parseVariantJson } from '@/utils/chess/variant-json'
 import { createVariant } from '@/firebase/db/variant'
 import { useAuthStore } from '@/stores/auth-user'
@@ -21,6 +21,8 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     }
   }
   const state = ref<Variant>(initialState)
+  // By default, seeCreateHint is true. If the user clicks on the "Hide" button, it will be set to 'false'
+  const seeCreateHint = ref(localStorage.getItem('seeCreateHint') !== 'false')
   
   function save() {
     localStorage.setItem('variantDraft', JSON.stringify(state.value))
@@ -74,14 +76,27 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
       const id = await createVariant(authStore.loggedUser.uid, authStore.loggedUser.displayName, state.value)
       // Draft published successfully, remove it from localStorage
       localStorage.removeItem('variantDraft')
+      state.value = clone(DEFAULT_DRAFT)
       return id
     } catch (e) {
       console.error('Error while trying to create variant', e)
       return undefined
     }
   }
+  
+  // Returns true if the draft is not empty
+  function hasDraft() {
+    return !object_equals(state.value, DEFAULT_DRAFT)
+  }
+  
+  // Called when the user decides to hide the hint to create a variant
+  function hideCreateHint() {
+    seeCreateHint.value = false
+    localStorage.setItem('seeCreateHint', 'false')
+  }
 
-  return { state, save, addPiece, setWidth, setHeight, backupFile, uploadFile, publish }
+  return { state, save, addPiece, setWidth, setHeight, backupFile, uploadFile, publish, hasDraft,
+    seeCreateHint, hideCreateHint }
 })
 
 const DEFAULT_DRAFT: Variant = {
