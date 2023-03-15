@@ -128,7 +128,7 @@
   const errorHandler = new ErrorMessageHandler(hasError)
   
   
-  const firebaseuiSettings = {
+  const firebaseuiSettings: firebaseui.auth.Config = {
     signInFlow: 'popup',
     signInSuccessUrl: '/',
     signInOptions: [
@@ -136,11 +136,10 @@
       GithubAuthProvider.PROVIDER_ID,
     ],
     callbacks: {
-      signInSuccessWithAuthResult: async (authResult: UserCredential) => {
+      signInSuccessWithAuthResult: (authResult: UserCredential) => {
         loading.value = true
-        await authStore.updateUser(authResult.user)
-        // If this is the first time the user signs in, we need to ask them to choose a username
-        UserDB.getUserById(authResult.user.uid).then(user => {
+        authStore.updateUser(authResult.user).then(async () => {
+          const user = await UserDB.getUserById(authResult.user.uid)
           if (user) {
             // User exists, we can just skip this step and ckeck directly if the user is verified
             emit('check-verify')

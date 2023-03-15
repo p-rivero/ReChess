@@ -8,8 +8,8 @@
     
     <div class="column is-6 columns reverse-columns">
       <div class="column is-5 is-narrow">
-        <button class="button is-fullwidth mb-4">
-          <div class="sz-icon icon-knight color-theme"></div>
+        <button class="button is-primary is-fullwidth mb-4">
+          <div class="sz-icon icon-knight color-white"></div>
           Play
         </button>
         <button class="button is-fullwidth mb-4">

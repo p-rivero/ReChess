@@ -189,6 +189,14 @@
 }
 
 
+/* search.svg */
+.icon-search {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/search.svg");
+    mask-image: url("@/assets/img/icons/search.svg");
+}
+
+
 /* star-fill.svg */
 .icon-star-fill {
     @extend .icon-common;
