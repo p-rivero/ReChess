@@ -12,7 +12,7 @@
     </p>
     <div class="columns is-mobile">
       <div class="column is-narrow pr-0">
-        <button aria-label="edit variant" class="button button-square px-0" @click="editVariant">
+        <button aria-label="use as template" class="button button-square px-0" @click="useAsTemplate">
           <div class="icon-edit color-theme"></div>
         </button>
       </div>
@@ -68,7 +68,7 @@
     board.value?.setState(props.variant)
   })
   
-  function editVariant() {
+  function useAsTemplate() {
     if (!draftStore.hasDraft()) {
       // Nothing will be lost, so just go ahead and edit
       draftStore.state = clone(props.variant)

@@ -49,7 +49,7 @@
         <div class="sz-icon icon-analysis color-theme"></div>
         <span>Analysis board</span>
       </button>
-      <button class="button bottom-button" @click="$router.push({name: 'play'})" :disabled="hasError || loading">
+      <button class="button bottom-button" @click="playPopup?.show()" :disabled="hasError || loading">
         <div class="sz-icon icon-cpu color-theme"></div>
         <span>Play vs. engine</span>
       </button>
@@ -149,6 +149,7 @@
   </div>
   
   <PopupOverlay v-if="selectedPieceId !== 'none'" :z-index="10" @click="pieceSelector?.cancelPlacement()" />
+  <PlayPopup ref="playPopup" />
 </template>
 
 
@@ -161,6 +162,7 @@
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import PopupOverlay from '@/components/Popup/PopupOverlay.vue'
+  import PlayPopup from '@/components/Popup/PlayPopup.vue'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
   import { checkState } from '@/components/EditVariant/check-state'
   import { showPopup } from '@/components/Popup/popup-manager'
@@ -177,6 +179,7 @@
   const authStore = useAuthStore()
   const router = useRouter()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
+  const playPopup = ref<InstanceType<typeof PlayPopup>>()
   
   const hasError = ref(false)
   const loading = ref(false)

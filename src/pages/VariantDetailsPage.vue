@@ -16,7 +16,7 @@
           <div class="sz-icon icon-analysis color-theme"></div>
           Analysis board
         </button>
-        <button class="button is-fullwidth mb-4">
+        <button class="button is-fullwidth mb-4" @click="useAsTemplate">
           <div class="sz-icon icon-edit color-theme"></div>
           Use as template
         </button>
@@ -39,14 +39,18 @@
   import { onMounted, ref } from 'vue';
   import { useRouter, useRoute } from 'vue-router'
   import { useVariantStore } from '@/stores/variant'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
   import type { PublishedVariantGui } from '@/protochess/types'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import PlayPopup from '@/components/Popup/PlayPopup.vue'
+  import { showPopup } from '@/components/Popup/popup-manager';
+  import { clone } from '@/utils/ts-utils'
   
 
   const router = useRouter()
   const route = useRoute()
   const variantStore = useVariantStore()
+  const draftStore = useVariantDraftStore()
   
   const variant = ref<PublishedVariantGui>()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
@@ -73,6 +77,26 @@
     }
     
     board.value?.setState(variant.value)
+  }
+  
+  function useAsTemplate() {
+    if (!draftStore.hasDraft()) {
+      // Nothing will be lost, so just go ahead and edit
+      draftStore.state = clone(variant.value!)
+      router.push({ name: 'edit-variant' })
+      return
+    }
+    const nameDetails = draftStore.state.displayName ?
+      ` named "${draftStore.state.displayName}"` : ''
+    showPopup('Overwrite draft?', `You can only store 1 draft at a time, 
+      but it seems you already have a draft${nameDetails}. 
+      If you decide to continue, it will be overwritten.`,
+      'ok-cancel',
+      () => {
+        draftStore.state = clone(variant.value!)
+        router.push({ name: 'edit-variant' })
+      }
+    )
   }
   
 </script>
