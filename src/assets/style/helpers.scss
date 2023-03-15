@@ -19,6 +19,10 @@
 .w-100 {
     width: 100% !important;
 }
+.button-square {
+    // Buttons are 2.5em tall by default
+    width: 2.5em !important;
+}
 
 .scrollable {
     overflow-y: scroll;

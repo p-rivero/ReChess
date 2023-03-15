@@ -95,7 +95,6 @@
         default: throw new Error('Invalid button index')
       }
     }
-    draftStore.save()
   }
   
 </script>

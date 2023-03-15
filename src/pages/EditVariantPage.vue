@@ -31,7 +31,7 @@
         <div class="field-body">
           <SmartDropdown :items="['White', 'Black']"
             :start-item="draftStore.state.playerToMove === 0 ? 'White' : 'Black'"
-            @changed="item => { draftStore.state.playerToMove = item === 'White' ? 0 : 1; draftStore.save() }"/>
+            @changed="item => draftStore.state.playerToMove = item === 'White' ? 0 : 1"/>
         </div>
       </div>
       
@@ -78,7 +78,7 @@
     <div class="column">
       <SmartTextInput class="is-large" placeholder="Variant name"
         :start-text="draftStore.state.displayName"
-        @changed="name => { draftStore.state.displayName = name; draftStore.save() }"
+        @changed="name => draftStore.state.displayName = name"
         :validator="(text) => {
           if (text.length === 0) return 'Please enter the name of this variant'
           if (text.length > 50) return 'Variant name must be at most 50 characters long'
@@ -90,7 +90,7 @@
       <br>
       <SmartTextInput :multiline="true" placeholder="Describe the rules of the variant and how fun it is to play!"
         :start-text="draftStore.state.description"
-        @changed="text => { draftStore.state.description = text; draftStore.save() }"
+        @changed="text => draftStore.state.description = text"
         :validator="(text) => {if (text.length > 500) return 'Variant description must be at most 500 characters long'}"
         :error-handler="errorMsgHandler"/>
       <br>
@@ -100,21 +100,21 @@
         <div class="column ">
           <SmartCheckbox text="Capturing is forced" class="rules-field"
             :start-value="draftStore.state.globalRules.capturingIsForced"
-            @changed="value => { draftStore.state.globalRules.capturingIsForced = value; draftStore.save() }"/>
+            @changed="value => draftStore.state.globalRules.capturingIsForced = value"/>
           <br>
           <SmartCheckbox text="Check is forbidden" class="rules-field"
             :start-value="draftStore.state.globalRules.checkIsForbidden"
-            @changed="value => { draftStore.state.globalRules.checkIsForbidden = value; draftStore.save() }"/>
+            @changed="value => draftStore.state.globalRules.checkIsForbidden = value"/>
         </div>
         
         <div class="column">
           <SmartCheckbox text="Stalemated player loses" class="rules-field"
             :start-value="draftStore.state.globalRules.stalematedPlayerLoses"
-            @changed="value => { draftStore.state.globalRules.stalematedPlayerLoses = value; draftStore.save() }"/>
+            @changed="value => draftStore.state.globalRules.stalematedPlayerLoses = value"/>
           <br>
           <SmartCheckbox text="Invert ALL win conditions" class="rules-field"
             :start-value="draftStore.state.globalRules.invertWinConditions"
-            @changed="value => { draftStore.state.globalRules.invertWinConditions = value; draftStore.save() }"/>
+            @changed="value => draftStore.state.globalRules.invertWinConditions = value"/>
         </div>
       </div>
       <div class="horizontal-field">
@@ -123,7 +123,7 @@
         </div>
         <SmartNumberInput class="width-5rem" :min="0" :max="200" :default="3"
           :start-value="draftStore.state.globalRules.repetitionsDraw"
-          @changed="value => { draftStore.state.globalRules.repetitionsDraw = value; draftStore.save() }"/>
+          @changed="value => draftStore.state.globalRules.repetitionsDraw = value"/>
       </div>
       <div class="horizontal-field">
         <div class="field-label">
@@ -131,7 +131,7 @@
         </div>
         <SmartNumberInput class="width-5rem" :min="0" :max="200" :default="0" placeholder="-"
           :start-value="draftStore.state.globalRules.checksToLose"
-          @changed="value => { draftStore.state.globalRules.checksToLose = value; draftStore.save() }"/>
+          @changed="value => draftStore.state.globalRules.checksToLose = value"/>
         
         <div class="field-label-right">
           <label>times</label>
@@ -211,7 +211,6 @@
         const ids = draftStore.state.pieceTypes[pieceIndex].ids
         draftStore.state.pieceTypes.splice(pieceIndex, 1)
         draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== ids[0] && p.pieceId !== ids[1])
-        draftStore.save()
       }
     )
   }
@@ -238,12 +237,10 @@
     // Add wall
     if (selectedPieceId.value === 'wall') {
       draftStore.state.invalidSquares.push(coords)
-      draftStore.save()
       return
     }
     // Delete existing piece (don't need to do anything else)
     if (selectedPieceId.value === 'delete') {
-      draftStore.save()
       return
     }
     // Add new placement
@@ -252,7 +249,6 @@
       y: coords[1],
       pieceId: selectedPieceId.value,
     })
-    draftStore.save()
   }
   
   async function uploadFile() {

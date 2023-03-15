@@ -2,7 +2,7 @@
   <div class="field is-grouped is-grouped-multiline is-align-items-center">
     <DraftCard v-if="showDraftCard" />
     <VariantCard v-for="(state, index) of variantStore.variantList" :variant="state" :key="index"
-      @play-clicked="playClicked(state)"/>
+      @play-clicked="playClicked(state)" @edit-variant="$router.push({name: 'edit-variant'})"/>
     <PlayPopup ref="playPopup"/>
   </div>
 </template>

@@ -10,11 +10,11 @@ export function getMessage(flag: MakeMoveFlag, playerToMove: Player): string {
   }
   if (flag === 'LeaderCaptured') {
     return `The ${playerUpper} leader has been captured or has exploded.
-      It is ${playerUpper}'s turn, but their designated leader piece is not on the board.`
+      It's ${playerUpper}'s turn, but their designated leader piece is not on the board.`
   }
   if (flag === 'AllPiecesCaptured') {
     return `All ${playerUpper}'s pieces have been captured.
-      It is ${playerUpper}'s turn, but they have no pieces left on the board.`
+      It's ${playerUpper}'s turn, but they have no pieces on the board.`
   }
   if (flag === 'PieceInWinSquare') {
     return `One of ${playerUpper}'s pieces has reached a winning square.`

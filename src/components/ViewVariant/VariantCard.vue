@@ -11,8 +11,8 @@
       By <a>{{ variant.creatorDisplayName }}</a>
     </p>
     <div class="columns is-mobile">
-      <div class="column is-3 pr-0">
-        <button aria-label="edit variant" class="button is-fullwidth px-0" @click="emit('play-clicked')">
+      <div class="column is-narrow pr-0">
+        <button aria-label="edit variant" class="button button-square px-0" @click="editVariant">
           <div class="icon-edit color-theme"></div>
         </button>
       </div>
@@ -40,8 +40,12 @@
   import type { PublishedVariantGui } from '@/protochess/types'
   import { onMounted, ref, computed } from 'vue'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
+  import { showPopup } from '@/components/Popup/popup-manager'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { clone } from '@/utils/ts-utils'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
+  const draftStore = useVariantDraftStore()
   
   const props = defineProps<{
     variant: PublishedVariantGui
@@ -49,6 +53,7 @@
   
   const emit = defineEmits<{
     (event: 'play-clicked'): void
+    (event: 'edit-variant'): void
   }>()
   
   
@@ -63,6 +68,25 @@
     board.value?.setState(props.variant)
   })
   
+  function editVariant() {
+    if (!draftStore.hasDraft()) {
+      // Nothing will be lost, so just go ahead and edit
+      draftStore.state = clone(props.variant)
+      emit('edit-variant')
+      return
+    }
+    const nameDetails = draftStore.state.displayName ?
+      ` named "${draftStore.state.displayName}"` : ''
+    showPopup('Overwrite draft?', `You can only store 1 draft at a time, 
+      but it seems you already have a draft${nameDetails}. 
+      If you decide to continue, it will be overwritten.`,
+      'ok-cancel',
+      () => {
+        draftStore.state = clone(props.variant)
+        emit('edit-variant')
+      }
+    )
+  }
   
   async function creatorClicked() {
     console.log('creator clicked', props.variant.creatorId)

@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import sanitizeFilename from 'sanitize-filename'
 
@@ -24,25 +24,24 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   // By default, seeCreateHint is true. If the user clicks on the "Hide" button, it will be set to 'false'
   const seeCreateHint = ref(localStorage.getItem('seeCreateHint') !== 'false')
   
-  function save() {
+  // Save every time the state changes
+  watch(state, () => {
+    console.log('Saving variant draft to localStorage')
     localStorage.setItem('variantDraft', JSON.stringify(state.value))
-  }
+  }, { deep: true })
   
   function addPiece() {
     // Clone the default piece and add it to the list of pieces
     const newPiece = clone(DEFAULT_PIECE)
     state.value.pieceTypes.push(newPiece)
-    save()
   }
   function setWidth(width: number) {
     state.value.boardWidth = width
     state.value.pieces = state.value.pieces.filter((piece: PiecePlacement) => piece.x < width)
-    save()
   }
   function setHeight(height: number) {
     state.value.boardHeight = height
     state.value.pieces = state.value.pieces.filter((piece: PiecePlacement) => piece.y < height)
-    save()
   }
   
   
@@ -64,7 +63,6 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     const newGameState = parseVariantJson(fileText)
     if (!newGameState) return false
     state.value = newGameState
-    save()
     return true
   }
   
@@ -74,9 +72,8 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     if (!authStore.loggedUser) return undefined
     try {
       const id = await createVariant(authStore.loggedUser.uid, authStore.loggedUser.displayName, state.value)
-      // Draft published successfully, remove it from localStorage
-      localStorage.removeItem('variantDraft')
-      state.value = clone(DEFAULT_DRAFT)
+      // Draft published successfully, remove it
+      discardDraft()
       return id
     } catch (e) {
       console.error('Error while trying to create variant', e)
@@ -94,9 +91,14 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     seeCreateHint.value = false
     localStorage.setItem('seeCreateHint', 'false')
   }
+  
+  // Discard the current draft
+  function discardDraft() {
+    state.value = clone(DEFAULT_DRAFT)
+  }
 
-  return { state, save, addPiece, setWidth, setHeight, backupFile, uploadFile, publish, hasDraft,
-    seeCreateHint, hideCreateHint }
+  return { state, addPiece, setWidth, setHeight, backupFile, uploadFile, publish, hasDraft,
+    seeCreateHint, hideCreateHint, discardDraft }
 })
 
 const DEFAULT_DRAFT: Variant = {

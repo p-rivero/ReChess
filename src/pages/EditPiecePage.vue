@@ -32,7 +32,7 @@
           if (text.length > 40) return 'Piece name must be at most 40 characters long'
           if (text.length < 3) return 'Piece name must be at least 3 characters long'
         }"
-        @changed="name => { piece!.displayName = name; draftStore.save() }"/>
+        @changed="name => piece!.displayName = name"/>
       <br>
       <br>
       <div class="columns">
@@ -41,7 +41,7 @@
             <SmartCheckbox text="White" class="mr-4" :start-value="!whiteInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
             <PieceImageEdit :imageUrl="piece?.imageUrls[0]" :class="{ invisible: whiteInvisible }"
-              @image-changed="url => { piece!.imageUrls[0] = url; errorMsgHandler.clear(); draftStore.save() }"
+              @image-changed="url => { piece!.imageUrls[0] = url; errorMsgHandler.clear() }"
               @upload-error="imageUploadFailed"/>
             <SmartTextInput class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
@@ -63,7 +63,7 @@
             <SmartCheckbox text="Black" class="mr-4" :start-value="!blackInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
             <PieceImageEdit :imageUrl="piece?.imageUrls[1]" :class="{ invisible: blackInvisible }"
-              @image-changed="url => { piece!.imageUrls[1] = url; errorMsgHandler.clear(); draftStore.save() }"
+              @image-changed="url => { piece!.imageUrls[1] = url; errorMsgHandler.clear() }"
               @upload-error="imageUploadFailed"/>
             <SmartTextInput class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
@@ -82,7 +82,7 @@
       <label class="label">Behavior:</label>
       <SmartCheckbox text="Leader (can be checked/checkmated)" class="rules-field"
         :startValue="piece?.isLeader"
-        @changed="value => { piece!.isLeader = value; draftStore.save() }"/>
+        @changed="value => piece!.isLeader = value"/>
       
       <div class="horizontal-field">
         <div class="field-label">
@@ -99,7 +99,7 @@
             :start-text="numberToLetter(piece?.castleFiles?.[0])"
             :error-handler="errorMsgHandler"
             :validator="text => validateCastlingFile(text, 'Queenside')"
-            @changed="text => { castleFileQueenside = letterToNumber(text); piece!.castleFiles![0] = castleFileQueenside; draftStore.save() }"/>
+            @changed="text => { castleFileQueenside = letterToNumber(text); piece!.castleFiles![0] = castleFileQueenside }"/>
           <div class="field-label-both">
             <label>Kingside file</label>
           </div>
@@ -107,14 +107,14 @@
             :start-text="numberToLetter(piece?.castleFiles?.[1])"
             :error-handler="errorMsgHandler"
             :validator="text => validateCastlingFile(text, 'Kingside')"
-            @changed="text => { castleFileKingside = letterToNumber(text); piece!.castleFiles![1] = castleFileKingside; draftStore.save() }"/>
+            @changed="text => { castleFileKingside = letterToNumber(text); piece!.castleFiles![1] = castleFileKingside }"/>
         </div>
       </div>
       
       <label>Win instantly when standing on:</label>
       <CoordPillList :editable="true" class="mb-5" :allow-repeat="false"
         :starting-coords="piece?.winSquares"
-        @changed="coords => {piece!.winSquares = coords; draftStore.save()}"/>
+        @changed="coords => piece!.winSquares = coords"/>
       
       <br>
       <label class="label">Movement:</label>
@@ -124,7 +124,7 @@
       <label>Double jump when standing on:</label>
       <CoordPillList :editable="true" class="mb-5" :allow-repeat="false"
         :starting-coords="piece?.doubleJumpSquares"
-        @changed="coords => {piece!.doubleJumpSquares = coords; draftStore.save()}"/>
+        @changed="coords => piece!.doubleJumpSquares = coords"/>
         
       <br>
       <label class="label">Capture:</label>
@@ -137,7 +137,7 @@
       <label>Promote when landing on:</label>
       <CoordPillList :editable="true" :allow-repeat="false"
         :starting-coords="piece?.promotionSquares"
-        @changed="coords => {piece!.promotionSquares = coords; draftStore.save()}"/>
+        @changed="coords => piece!.promotionSquares = coords"/>
       <br>
         
       <div class="columns">
@@ -145,14 +145,14 @@
           <label>(White) Promote to:</label>
           <CharPillList :editable="true" :allow-repeat="false"
             :starting-pills="piece?.promoVals[0]"
-            @changed="promos => {piece!.promoVals[0] = promos; draftStore.save()}"/>
+            @changed="promos => piece!.promoVals[0] = promos"/>
         </div>
         
         <div v-if="!blackInvisible" class="column">
           <label>(Black) Promote to:</label>
           <CharPillList :editable="true" :allow-repeat="false"
             :starting-pills="piece?.promoVals[1]"
-            @changed="promos => {piece!.promoVals[1] = promos; draftStore.save()}"/>
+            @changed="promos => piece!.promoVals[1] = promos"/>
         </div>
       </div>
       
@@ -162,12 +162,12 @@
         <div class="column ">
           <SmartCheckbox text="Explode when capturing" class="rules-field"
             :startValue="piece?.explodes"
-            @changed="value => { piece!.explodes = value; draftStore.save() }"/>
+            @changed="value => piece!.explodes = value"/>
         </div>
         <div class="column">
           <SmartCheckbox text="Immune to other explosions" class="rules-field"
             :startValue="piece?.immuneToExplosion"
-            @changed="value => { piece!.immuneToExplosion = value; draftStore.save() }"/>
+            @changed="value => piece!.immuneToExplosion = value"/>
         </div>
       </div>
       <AddRemoveButtons text="Explosion squares:" :z-index="11" type="explosion"
@@ -252,7 +252,6 @@
     }
     // Clear the possible error message if the castling files were incorrect
     errorMsgHandler.clear()
-    draftStore.save()
   }
   function validateCastlingFile(text: string, side: string): string|undefined {
     if (!piece?.castleFiles) return
@@ -270,7 +269,6 @@
     draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== oldId)
     // Set the new id
     piece!.ids[i] = newId
-    draftStore.save()
     // Remove error message if the piece id was invalid before
     setTimeout(() => errorMsgHandler.clear())
   }
@@ -292,7 +290,6 @@
     } else {
       throw new Error('Invalid selectedDelta')
     }
-    draftStore.save()
   }
   
   function updatePieceId(newId: string, color: Player) {
@@ -307,7 +304,6 @@
       pieceIdBlack.value = newId;
       piece!.ids[1] = newId;
     }
-    draftStore.save()
   }
   
   function imageUploadFailed() {

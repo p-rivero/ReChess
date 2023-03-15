@@ -9,10 +9,19 @@
     <p class="mb-3 has-text-weight-light is-italic">
       Your private draft
     </p>
-    <button class="button is-fullwidth" @click="editDraft">
-      <div class="sz-icon icon-edit color-theme"></div>
-      Edit draft
-    </button>
+    <div class="columns is-mobile">
+      <div class="column is-narrow pr-0">
+        <button aria-label="edit variant" class="button button-square px-0" @click="discardDraft">
+          <div class="icon-trash color-theme"></div>
+        </button>
+      </div>
+      <div class="column">
+        <button class="button is-fullwidth" @click="editDraft">
+          <div class="sz-icon icon-edit color-theme"></div>
+          Edit draft
+        </button>
+      </div>
+    </div>
   </div>
   <div v-else-if="draftStore.seeCreateHint" class="draft-card outline px-2 py-2 mx-3 my-4 is-clickable" @click="editDraft">
     <p class="has-text-weight-light my-6">
@@ -53,6 +62,15 @@
   
   function editDraft() {
     router.push({ name: 'edit-variant' })
+  }
+  
+  function discardDraft() {
+    showPopup(
+      'Discard draft?',
+      'This will delete your draft and you will not be able to recover it.',
+      'ok-cancel',
+      () => draftStore.discardDraft(),
+    )
   }
   
   function hideCreateHint() {
