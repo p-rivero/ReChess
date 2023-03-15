@@ -20,7 +20,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     name: 'play',
-    path: '/play',
+    path: '/play/:variantId?',
     component: () => import('@/pages/PlayPage.vue'),
   },
   {

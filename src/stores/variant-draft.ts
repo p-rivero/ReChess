@@ -20,7 +20,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
       initialState = storedDraft
     }
   }
-  const state = ref(initialState)
+  const state = ref<Variant>(initialState)
   
   function save() {
     localStorage.setItem('variantDraft', JSON.stringify(state.value))

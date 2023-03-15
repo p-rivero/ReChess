@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   class="icon icon-tabler icon-tabler-chess-king"
+   width="24"
+   height="24"
+   viewBox="0 0 24 24"
+   stroke-width="1"
+   stroke="currentColor"
+   fill="none"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   version="1.1"
+   id="svg12"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs16">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath3549">
+      <rect
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.71528;stroke-linejoin:round;stroke-opacity:1"
+         id="rect3551"
+         width="12"
+         height="24"
+         x="24.533333"
+         y="11.052381" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath3657">
+      <rect
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.8;stroke-linejoin:round;stroke-opacity:1"
+         id="rect3659"
+         width="12"
+         height="24"
+         x="0"
+         y="0" />
+    </clipPath>
+  </defs>
+  <rect
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.565685;stroke-linejoin:round;stroke-opacity:1"
+     id="rect3767"
+     width="12"
+     height="24"
+     x="0"
+     y="0" />
+  <rect
+     style="fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:0.565685;stroke-linejoin:round;stroke-opacity:1"
+     id="rect3767-3"
+     width="12"
+     height="24"
+     x="12"
+     y="0" />
+  <g
+     id="g881"
+     style="stroke:#363636;stroke-opacity:1"
+     clip-path="url(#clipPath3657)">
+    <path
+       d="M 8,16 6.553,16.724 A 1,1 0 0 0 6,17.618 V 20 H 18 V 17.618 A 1,1 0 0 0 17.447,16.724 L 16,16 Z"
+       id="path4"
+       style="stroke:#363636;stroke-opacity:1" />
+    <path
+       d="m 8.5,16 a 3.5,3.5 0 1 1 3.163,-5 h 0.674 a 3.5,3.5 0 1 1 3.163,5 z"
+       id="path6"
+       style="stroke:#363636;stroke-opacity:1" />
+    <path
+       d="m 9,6 h 6"
+       id="path8"
+       style="stroke:#363636;stroke-opacity:1" />
+    <path
+       d="m 12,3 v 8"
+       id="path10"
+       style="stroke:#363636;stroke-opacity:1" />
+  </g>
+  <g
+     id="g874"
+     transform="translate(-12.533333,-11.052381)"
+     style="stroke:#ededed;stroke-opacity:1"
+     clip-path="url(#clipPath3549)">
+    <path
+       d="m 20.533333,27.052381 -1.447,0.724 a 1,1 0 0 0 -0.553,0.894 v 2.382 h 12 v -2.382 a 1,1 0 0 0 -0.553,-0.894 l -1.447,-0.724 z"
+       id="path4-3"
+       style="stroke:#ededed;stroke-opacity:1" />
+    <path
+       d="m 21.033333,27.052381 a 3.5,3.5 0 1 1 3.163,-5 h 0.674 a 3.5,3.5 0 1 1 3.163,5 z"
+       id="path6-6"
+       style="stroke:#ededed;stroke-opacity:1" />
+    <path
+       d="m 21.533333,17.052381 h 6"
+       id="path8-7"
+       style="stroke:#ededed;stroke-opacity:1" />
+    <path
+       d="m 24.533333,14.052381 v 8"
+       id="path10-5"
+       style="stroke:#ededed;stroke-opacity:1" />
+  </g>
+</svg>

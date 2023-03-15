@@ -8,7 +8,7 @@
     
     <div class="column is-6 columns reverse-columns">
       <div class="column is-5 is-narrow">
-        <button class="button is-primary is-fullwidth mb-4">
+        <button class="button is-primary is-fullwidth mb-4" @click="playPopup?.show(variant?.uid)">
           <div class="sz-icon icon-knight color-white"></div>
           Play
         </button>
@@ -31,6 +31,7 @@
       </div>
     </div>
   </div>
+  <PlayPopup ref="playPopup" />
 </template>
 
 
@@ -40,6 +41,7 @@
   import { useVariantStore } from '@/stores/variant'
   import type { PublishedVariantGui } from '@/protochess/types'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
+  import PlayPopup from '@/components/Popup/PlayPopup.vue'
   
 
   const router = useRouter()
@@ -48,6 +50,7 @@
   
   const variant = ref<PublishedVariantGui>()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
+  const playPopup = ref<InstanceType<typeof PlayPopup>>()
   
   // Begin async loading of variant data
   onMounted(async () => {

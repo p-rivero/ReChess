@@ -12,7 +12,7 @@
     </p>
     <div class="columns">
       <div class="column">
-        <button class="button is-fullwidth">
+        <button class="button is-fullwidth" @click="emit('play-clicked')">
           <div class="sz-icon icon-knight color-theme"></div>
           Play
         </button>
@@ -41,6 +41,11 @@
   const props = defineProps<{
     variant: PublishedVariantGui
   }>()
+  
+  const emit = defineEmits<{
+    (event: 'play-clicked'): void
+  }>()
+  
   
   const numUpvotes = computed(() => {
     if (props.variant.numUpvotes > 1000) {

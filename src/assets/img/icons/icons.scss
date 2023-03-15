@@ -165,6 +165,14 @@
 }
 
 
+/* king.svg */
+.icon-king {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/king.svg");
+    mask-image: url("@/assets/img/icons/king.svg");
+}
+
+
 /* knight.svg */
 .icon-knight {
     @extend .icon-common;
