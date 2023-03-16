@@ -31,13 +31,17 @@ if (import.meta.env.DEV) {
   connectStorageEmulator(storage, 'localhost', 9199)
 }
 
-enableMultiTabIndexedDbPersistence(db).catch((err) => {
-  if (err.code === 'failed-precondition') {
-    console.warn('Persistence could not be enabled because another tab is already open')
-  } else if (err.code === 'unimplemented') {
-    console.warn('The current browser does NOT support firestore persistence.')
-  }
-})
+// Enable multi-tab persistence only in production, since the emulator is cleared on every restart
+// and the cached data would be out of sync
+if (!import.meta.env.DEV) {
+  enableMultiTabIndexedDbPersistence(db).catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn('Persistence could not be enabled because another tab is already open')
+    } else if (err.code === 'unimplemented') {
+      console.warn('The current browser does NOT support firestore persistence.')
+    }
+  })
+}
 
 initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider(CAPTCHA_V3_PUBLIC_KEY),
