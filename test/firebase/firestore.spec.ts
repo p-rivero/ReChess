@@ -53,13 +53,13 @@ afterEach(async () => {
 
 test('cannot access collections that do not exist', async () => {
   await assertFails(
-    query('everyone', 'nonexistent')
+    query('someone', 'nonexistent')
   )
   await assertFails(
-    get('everyone', 'nonexistent', '1234')
+    get('someone', 'nonexistent', '1234')
   )
   await assertFails(
-    set('everyone', { foo: 'bar' }, 'nonexistent', '1234')
+    set('someone', { foo: 'bar' }, 'nonexistent', '1234')
   )
 })
 

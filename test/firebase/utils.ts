@@ -19,8 +19,14 @@ const myEmail = 'my@mail.com'
 
 
 
-// Pass 'everyone' to repeat the access for all 3 auth types
-export type AuthType = 'verified' | 'unverified' | 'not logged' | 'everyone'
+// Pass 'everyone' to repeat the access for all 3 auth types and succeed if all of them succeed,
+// use it along with 'assertSucceeds' to test that the access is allowed for everyone
+
+// Pass 'someone' to repeat the access for all 3 auth types and succeed if any of them succeed
+// use it along with 'assertFails' to test that the access is denied for everyone
+
+export type AuthType = 'verified' | 'unverified' | 'not logged' | 'everyone' | 'someone'
+
 
 export type TestUtilsSignature = {
   // Get a single document
@@ -65,6 +71,20 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
       : authType === 'unverified' ? unverifiedAuth()
       : notAuth()
   }
+  // Replacement for Promise.any()
+  function tryAny<T>(promises: Promise<T>[]): Promise<T> {
+    return new Promise((resolve, reject) => {
+      let rejected = 0
+      for (const promise of promises) {
+        promise.then(resolve).catch(() => {
+          rejected++
+          // assertFails() is looking for 'permission_denied', 'permission denied' or 'unauthorized'
+          if (rejected === promises.length) reject(new Error('PERMISSION_DENIED'))
+        })
+      }
+    })
+  }
+  
   
   async function get(authType: AuthType, path: string, ...pathSegments: string[]): Promise<DocumentData|DocumentData[]> {
     if (authType === 'everyone') {
@@ -74,12 +94,27 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
         get('not logged', path, ...pathSegments),
       ])
     }
+    if (authType === 'someone') {
+      return tryAny([
+        get('verified', path, ...pathSegments),
+        get('unverified', path, ...pathSegments),
+        get('not logged', path, ...pathSegments),
+      ])
+    }
     const document = doc(getAuth(authType), path, ...pathSegments)
     return await getDoc(document)
   }
+  
   async function query(authType: AuthType, path: string, getQuery?: (col: CollectionReference)=>Query): Promise<DocumentData|DocumentData[]> {
     if (authType === 'everyone') {
       return Promise.all([
+        query('verified', path, getQuery),
+        query('unverified', path, getQuery),
+        query('not logged', path, getQuery),
+      ])
+    }
+    if (authType === 'someone') {
+      return tryAny([
         query('verified', path, getQuery),
         query('unverified', path, getQuery),
         query('not logged', path, getQuery),
@@ -90,6 +125,7 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
     const col = getAuth(authType).collection(path)
     return await getDocs(getQuery(col))
   }
+  
   async function set(authType: AuthType, data: any, path: string, ...pathSegments: string[]): Promise<void> {
     if (authType === 'everyone') {
       await Promise.all([
@@ -99,9 +135,18 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
       ])
       return
     }
+    if (authType === 'someone') {
+      await tryAny([
+        set('verified', data, path, ...pathSegments),
+        set('unverified', data, path, ...pathSegments),
+        set('not logged', data, path, ...pathSegments),
+      ])
+      return
+    }
     const document = doc(getAuth(authType), path, ...pathSegments)
     await setDoc(document, data)
   }
+  
   async function add<T>(authType: AuthType, data: T, path: string, ...pathSegments: string[]): Promise<DocumentData|DocumentData[]> {
     if (authType === 'everyone') {
       return Promise.all([
@@ -110,13 +155,29 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
         add('not logged', data, path, ...pathSegments),
       ])
     }
+    if (authType === 'someone') {
+      return tryAny([
+        add('verified', data, path, ...pathSegments),
+        add('unverified', data, path, ...pathSegments),
+        add('not logged', data, path, ...pathSegments),
+      ])
+    }
     const col = collection(getAuth(authType), path, ...pathSegments)
     return await addDoc(col, data)
   }
+  
   async function remove(authType: AuthType, path: string, ...pathSegments: string[]): Promise<void> {
     if (authType === 'everyone') {
       await Promise.all([
         // Delete does not fail if the document does not exist
+        remove('verified', path, ...pathSegments),
+        remove('unverified', path, ...pathSegments),
+        remove('not logged', path, ...pathSegments),
+      ])
+      return
+    }
+    if (authType === 'someone') {
+      await tryAny([
         remove('verified', path, ...pathSegments),
         remove('unverified', path, ...pathSegments),
         remove('not logged', path, ...pathSegments),
