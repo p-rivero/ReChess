@@ -7,7 +7,8 @@ rules_version = '2';
 // that field will be rejected. This field contains data that can be read by anyone
 // with read access to the document, but can only be modified by a server-side function.
 
-// See schema.d.ts for the database schema
+// See ./schema.d.ts for the database schema
+// See test/firebase/firestore.spec.ts for tests
 
 
 // HELPER FUNCTIONS
@@ -25,10 +26,6 @@ function isAuthUnverified(id) {
 function mapEq(mapA, mapB) {
   return mapA.diff(mapB).affectedKeys().size() == 0;
 }
-// Checks that the given field is null or equal to the given value
-function nullOrEq(nullable, val) {
-  return nullable == null || nullable == val;
-}
 
 // Checks that the request contains all the required fields and no extra extra fields
 function hasCorrectFields(required, optional) {
@@ -43,6 +40,11 @@ function hasCorrectImmutableFields(required, optional) {
 // Checks that the IMMUTABLE field has not changed
 function immutableOk() {
   return mapEq(request.resource.data.IMMUTABLE, resource.data.IMMUTABLE);
+}
+
+// Prints the input to the debug log and returns true
+function print(msg) {
+  return debug(msg) || true;
 }
 
 
@@ -79,28 +81,32 @@ service cloud.firestore {
       
       function isUserDoc() {
         return hasCorrectFields(['about', 'IMMUTABLE'], ['name', 'profileImg']) &&
-          hasCorrectImmutableFields(['username', 'numWins'], []);
+          hasCorrectImmutableFields(['username', 'numWins'], []) &&
+          request.resource.data.about.size() <= 200 &&
+          (request.resource.data.name == null ||
+            (request.resource.data.name.size() <= 50 && request.resource.data.name.size() > 0)) &&
+          (request.resource.data.profileImg == null ||
+            request.resource.data.profileImg.size() <= 600);
       }
       function isPrivateUserDoc() {
         return hasCorrectFields(['IMMUTABLE'], []) &&
-          hasCorrectImmutableFields(['email', 'banned'], []);
+          hasCorrectImmutableFields(['email', 'banned'], []) &&
+          request.resource.data.IMMUTABLE.email.size() <= 200;
       }
-      
       allow read;
       allow update: if isUserDoc() && isAuth(userId) && immutableOk();
       
       allow create: if
         isUserDoc() &&
         isAuthUnverified(userId) &&
-        nullOrEq(request.resource.data.name, request.auth.token.name) &&
-        request.resource.data.about == '' &&
-        nullOrEq(request.resource.data.profileImg, request.auth.token.picture) &&
         // Username is correct and not taken
         isValidUsername(request.resource.data.IMMUTABLE.username) &&
         !usernameIsTaken(request.resource.data.IMMUTABLE.username) &&
         request.resource.data.IMMUTABLE.numWins == 0 &&
-        // Username must be registered batched with a user document
-        getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.IMMUTABLE.username)).data.userId == userId;
+        // User must be created in a batch with a username document
+        getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.IMMUTABLE.username)).data.userId == userId &&
+        // User must be created in a batch with a private document
+        existsAfter(/databases/$(database)/documents/users/$(userId)/private/doc);
         
       // Disallow deleting users for now
       allow delete: if false;
@@ -113,6 +119,7 @@ service cloud.firestore {
         allow create: if
           isPrivateUserDoc() &&
           isAuthUnverified(userId) &&
+          doc == 'doc' && // Only 1 document allowed
           request.resource.data.IMMUTABLE.email == request.auth.token.email &&
           request.resource.data.IMMUTABLE.banned == false;
         

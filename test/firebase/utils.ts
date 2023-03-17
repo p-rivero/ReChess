@@ -12,7 +12,7 @@ import {
   getDocs,
 } from "firebase/firestore"
 import type { CollectionReference, DocumentData, Query } from "@firebase/firestore-types"
-import type { DocumentSnapshot, QuerySnapshot } from "@firebase/firestore"
+import { DocumentSnapshot, QuerySnapshot, writeBatch, WriteBatch } from "@firebase/firestore"
 
 /**
 - `verified`: logged user with a verified email
@@ -34,9 +34,27 @@ export type TestUtilsSignature = {
   add: (authType: AuthType, data: any, path: string, ...pathSegments: string[]) => Promise<DocumentData>
   // Remove a single document
   remove: (authType: AuthType, path: string, ...pathSegments: string[]) => Promise<void>
-  // 
+  // Start a batch write
+  startBatch: (authType: AuthType) => Batch
 }
 
+export class Batch {
+  batch: WriteBatch
+  db: firebase.firestore.Firestore
+  constructor(batch: WriteBatch, db: firebase.firestore.Firestore) {
+    this.batch = batch
+    this.db = db
+  }
+  set(data: any, path: string, ...pathSegments: string[]) {
+    this.batch.set(doc(this.db, path, ...pathSegments), data)
+  }
+  remove(path: string, ...pathSegments: string[]) {
+    this.batch.delete(doc(this.db, path, ...pathSegments))
+  }
+  async commit() {
+    return this.batch.commit()
+  }
+}
 
 
 export function notInitialized(): TestUtilsSignature {
@@ -46,10 +64,11 @@ export function notInitialized(): TestUtilsSignature {
     set: () => Promise.reject('Test environment not initialized'),
     add: () => Promise.reject('Test environment not initialized'),
     remove: () => Promise.reject('Test environment not initialized'),
+    startBatch: () => {throw new Error('Test environment not initialized')},
   }
 }
 
-export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string): TestUtilsSignature {
+export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEmail: string): TestUtilsSignature {
   function getAuth(authType: AuthType|RulesTestContext): firebase.firestore.Firestore {
     // If authType is a RulesTestContext, use it directly
     if (authType instanceof Object) {
@@ -57,9 +76,9 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string): Tes
     }
     switch (authType) {
       case 'verified':
-        return testEnv.authenticatedContext(myId, { email: 'my@mail.com', email_verified: true }).firestore()
+        return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: true }).firestore()
       case 'unverified':
-        return testEnv.authenticatedContext(myId, { email: 'my@mail.com', email_verified: false }).firestore()
+        return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: false }).firestore()
       case 'not logged':
         return testEnv.unauthenticatedContext().firestore()
       default:
@@ -115,5 +134,10 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string): Tes
     await deleteDoc(document)
   }
   
-  return { get, query, set, add, remove }
+  function startBatch(authType: AuthType): Batch {
+    const firestore = getAuth(authType)
+    return new Batch(writeBatch(firestore), firestore)
+  }
+  
+  return { get, query, set, add, remove, startBatch }
 }
