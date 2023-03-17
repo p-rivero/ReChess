@@ -16,6 +16,7 @@ import type {
 // Use the same ID as in the emulator if you want to see the requests in the
 // emulator UI at: http://127.0.0.1:4000/firestore/requests
 const PROJECT_ID = 'rechess-web'
+const MY_ID = 'my_id'
 
 let testEnv: RulesTestEnvironment
 let { get, query, set, add, remove }: TestUtilsSignature = notInitialized()
@@ -40,7 +41,7 @@ beforeAll(async () => {
   // Supress console warnings
   jest.spyOn(console, 'warn').mockImplementation(() => {});
   // Set up test utils
-  ({ get, query, set, add, remove } = setupTestUtils(testEnv))
+  ({ get, query, set, add, remove } = setupTestUtils(testEnv, MY_ID))
 })
 
 afterAll(async () => {
@@ -58,13 +59,13 @@ afterEach(async () => {
 
 test('cannot access collections that do not exist', async () => {
   await assertFails(
-    query('someone', 'nonexistent')
+    query('verified', 'nonexistent')
   )
   await assertFails(
-    get('someone', 'nonexistent', '1234')
+    get('verified', 'nonexistent', '1234')
   )
   await assertFails(
-    set('someone', { foo: 'bar' }, 'nonexistent', '1234')
+    set('verified', { foo: 'bar' }, 'nonexistent', '1234')
   )
 })
 
@@ -74,17 +75,15 @@ test('cannot access collections that do not exist', async () => {
 test('anyone can read which usernames are already taken', async () => {
   // Set up the database
   const user: UsernameDoc = { userId: '1234' }
-  set('admin', user, 'usernames', 'abc')
+  await set('admin', user, 'usernames', 'abc')
   
-  const data = await get('everyone', 'usernames', 'abc')
-  expect(data).toBeInstanceOf(Array)
-  expect(data).toHaveLength(3)
-  expect(data[0].userId).toBe('abc')
+  const snapshot = await get('not logged', 'usernames', 'abc')
+  expect(snapshot.exists()).toBe(true)
+  expect(snapshot.data()!.userId).toBe('1234')
   
-  
-  await assertSucceeds(
-    query('everyone', 'usernames')
-  )
+  const queryResult = await query('not logged', 'usernames')
+  expect(queryResult.size).toBe(1)
+  expect(queryResult.docs[0].data().userId).toBe('1234')
 })
 
 test('can create a username if it is not taken', async () => {
@@ -98,9 +97,9 @@ test('can create a username if it is not taken', async () => {
       numWins: 0,
     }
   }
-  set('admin', user, 'users', '1234')
+  await set('admin', user, 'users', MY_ID)
   
-  const username: UsernameDoc = { userId: '1234' }
+  const username: UsernameDoc = { userId: MY_ID }
   await assertSucceeds(
     set('unverified', username, 'usernames', 'new_username')
   )
@@ -117,11 +116,28 @@ test('cannot create a username if not authenticated', async () => {
       numWins: 0,
     }
   }
-  set('admin', user, 'users', '1234')
+  await set('admin', user, 'users', MY_ID)
   
-  const username: UsernameDoc = { userId: '1234' }
+  const username: UsernameDoc = { userId: MY_ID }
   await assertFails(
     set('not logged', username, 'usernames', 'new_username')
+  )
+})
+
+test('cannot create a username without corresponding user', async () => {
+  const user: UserDoc = {
+    name: 'new user',
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username: 'new_username',
+      numWins: 0,
+    }
+  }
+  await set('admin', user, 'users', 'A_DIFFERENT_ID')
+  
+  await assertFails(
+    set('verified', {userId: MY_ID}, 'usernames', 'cool_username')
   )
 })
   
@@ -142,25 +158,20 @@ test('cannot steal a taken username', async () => {
     about: '',
     profileImg: null,
     IMMUTABLE: {
-      username: 'cool_username', // Trying to steal this username
+      username: 'cool_username', // I'm trying to steal this username
       numWins: 0,
     }
   }
-  set('admin', username, 'usernames', 'cool_username')
-  set('admin', originalUser, 'users', '1234')
-  set('admin', maliciousUser, 'users', '5678')
+  await set('admin', username, 'usernames', 'cool_username')
+  await set('admin', originalUser, 'users', '1234')
+  await set('admin', maliciousUser, 'users', MY_ID)
   
   await assertFails(
-    set('someone', {userId: '5678'}, 'usernames', 'cool_username')
+    // Try to steal this username for my own user
+    set('verified', {userId: MY_ID}, 'usernames', 'cool_username')
   )
   await assertFails(
-    remove('someone', 'usernames', 'cool_username')
-  )
-})
-
-test('cannot create a username without corresponding user', async () => {
-  await assertFails(
-    set('someone', {userId: '123'}, 'usernames', 'cool_username')
+    remove('verified', 'usernames', 'cool_username')
   )
 })
 
@@ -169,9 +180,9 @@ test('cannot create a username without corresponding user', async () => {
 
 test('anyone can read created variants', async () => {
   await assertSucceeds(
-    get('everyone', 'variants', '1234')
+    get('not logged', 'variants', '1234')
   )
   await assertSucceeds(
-    query('everyone', 'variants')
+    query('not logged', 'variants')
   )
 })
