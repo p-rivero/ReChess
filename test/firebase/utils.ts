@@ -1,7 +1,7 @@
 // UTILITIES FOR WRITING SHORTER TESTS
 
 import type firebase from "firebase/compat"
-import type { RulesTestEnvironment } from "@firebase/rules-unit-testing"
+import type { RulesTestContext, RulesTestEnvironment } from "@firebase/rules-unit-testing"
 import {
   doc,
   collection,
@@ -12,20 +12,24 @@ import {
   getDocs,
 } from "firebase/firestore"
 import type { CollectionReference, DocumentData, Query } from "@firebase/firestore-types"
+import type { QuerySnapshot } from "@firebase/firestore"
 
 const myId = 'user_abc'
 const theirId = 'user_xyz'
 const myEmail = 'my@mail.com'
 
 
-
-// Pass 'everyone' to repeat the access for all 3 auth types and succeed if all of them succeed,
-// use it along with 'assertSucceeds' to test that the access is allowed for everyone
-
-// Pass 'someone' to repeat the access for all 3 auth types and succeed if any of them succeed
-// use it along with 'assertFails' to test that the access is denied for everyone
-
-export type AuthType = 'verified' | 'unverified' | 'not logged' | 'everyone' | 'someone'
+/**
+- `verified`: logged user with a verified email
+- `unverified`: logged user with an unverified email
+- `not logged`: user that is not logged in
+- `everyone`: repeat the access for all 3 auth types and succeed if all of them succeed.
+  Use it along with `assertSucceeds` to test that the access is allowed for everyone
+- `someone`: repeat the access for all 3 auth types and succeed if any of them succeed.
+  Use it along with `assertFails` to test that the access is denied for everyone
+- `admin`: access the database without any restrictions (for setting up the database before the test)
+*/
+export type AuthType = 'verified' | 'unverified' | 'not logged' | 'everyone' | 'someone' | 'admin'
 
 
 export type TestUtilsSignature = {
@@ -54,22 +58,21 @@ export function notInitialized(): TestUtilsSignature {
 }
 
 export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignature {
-  // Context for a logged user with a verified email
-  function verifiedAuth(): firebase.firestore.Firestore {
-    return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: true }).firestore()
-  }
-  // Context for a logged user with an unverified email
-  function unverifiedAuth(): firebase.firestore.Firestore {
-    return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: false }).firestore()
-  }
-  // Context for a user that is not logged in
-  function notAuth(): firebase.firestore.Firestore {
-    return testEnv.unauthenticatedContext().firestore()
-  }
-  function getAuth(authType: AuthType): firebase.firestore.Firestore {
-    return authType === 'verified' ? verifiedAuth()
-      : authType === 'unverified' ? unverifiedAuth()
-      : notAuth()
+  function getAuth(authType: AuthType|RulesTestContext): firebase.firestore.Firestore {
+    // If authType is a RulesTestContext, use it directly
+    if (authType instanceof Object) {
+      return authType.firestore()
+    }
+    switch (authType) {
+      case 'verified':
+        return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: true }).firestore()
+      case 'unverified':
+        return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: false }).firestore()
+      case 'not logged':
+        return testEnv.unauthenticatedContext().firestore()
+      default:
+        throw new Error(`Invalid auth type: ${authType}`)
+    }
   }
   // Replacement for Promise.any()
   function tryAny<T>(promises: Promise<T>[]): Promise<T> {
@@ -79,7 +82,9 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
         promise.then(resolve).catch(() => {
           rejected++
           // assertFails() is looking for 'permission_denied', 'permission denied' or 'unauthorized'
-          if (rejected === promises.length) reject(new Error('PERMISSION_DENIED'))
+          if (rejected === promises.length) {
+            reject(new Error('PERMISSION_DENIED'))
+          }
         })
       }
     })
@@ -101,17 +106,20 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
         get('not logged', path, ...pathSegments),
       ])
     }
+    if (authType === 'admin') {
+      throw new Error('admin is not allowed for read operations')
+    }
     const document = doc(getAuth(authType), path, ...pathSegments)
     return await getDoc(document)
   }
   
-  async function query(authType: AuthType, path: string, getQuery?: (col: CollectionReference)=>Query): Promise<DocumentData|DocumentData[]> {
+  async function query(authType: AuthType, path: string, getQuery?: (col: CollectionReference)=>Query): Promise<QuerySnapshot|QuerySnapshot[]> {
     if (authType === 'everyone') {
       return Promise.all([
         query('verified', path, getQuery),
         query('unverified', path, getQuery),
         query('not logged', path, getQuery),
-      ])
+      ]) as Promise<QuerySnapshot[]>
     }
     if (authType === 'someone') {
       return tryAny([
@@ -120,13 +128,16 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
         query('not logged', path, getQuery),
       ])
     }
+    if (authType === 'admin') {
+      throw new Error('admin is not allowed for read operations')
+    }
     // If no query is provided, return all documents
     if (!getQuery) getQuery = (col) => col
     const col = getAuth(authType).collection(path)
     return await getDocs(getQuery(col))
   }
   
-  async function set(authType: AuthType, data: any, path: string, ...pathSegments: string[]): Promise<void> {
+  async function set(authType: AuthType|RulesTestContext, data: any, path: string, ...pathSegments: string[]): Promise<void> {
     if (authType === 'everyone') {
       await Promise.all([
         set('verified', data, path, ...pathSegments),
@@ -143,11 +154,15 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
       ])
       return
     }
+    if (authType === 'admin') {
+      await testEnv.withSecurityRulesDisabled(context => set(context, data, path, ...pathSegments))
+      return
+    }
     const document = doc(getAuth(authType), path, ...pathSegments)
     await setDoc(document, data)
   }
   
-  async function add<T>(authType: AuthType, data: T, path: string, ...pathSegments: string[]): Promise<DocumentData|DocumentData[]> {
+  async function add<T>(authType: AuthType|RulesTestContext, data: T, path: string, ...pathSegments: string[]): Promise<DocumentData|DocumentData[]> {
     if (authType === 'everyone') {
       return Promise.all([
         add('verified', data, path, ...pathSegments),
@@ -162,11 +177,18 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
         add('not logged', data, path, ...pathSegments),
       ])
     }
+    if (authType === 'admin') {
+      let result: DocumentData | undefined = undefined
+      await testEnv.withSecurityRulesDisabled(async context => {
+        result = add(context, data, path, ...pathSegments)
+      })
+      return result!
+    }
     const col = collection(getAuth(authType), path, ...pathSegments)
     return await addDoc(col, data)
   }
   
-  async function remove(authType: AuthType, path: string, ...pathSegments: string[]): Promise<void> {
+  async function remove(authType: AuthType|RulesTestContext, path: string, ...pathSegments: string[]): Promise<void> {
     if (authType === 'everyone') {
       await Promise.all([
         // Delete does not fail if the document does not exist
@@ -182,6 +204,10 @@ export function setupTestUtils(testEnv: RulesTestEnvironment): TestUtilsSignatur
         remove('unverified', path, ...pathSegments),
         remove('not logged', path, ...pathSegments),
       ])
+      return
+    }
+    if (authType === 'admin') {
+      await testEnv.withSecurityRulesDisabled(context => remove(context, path, ...pathSegments))
       return
     }
     const document = doc(getAuth(authType), path, ...pathSegments)
