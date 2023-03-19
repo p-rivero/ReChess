@@ -36,7 +36,6 @@ export interface UserGameDoc {
 // users/{userID}/upvotedVariants/{variantId}
 export interface UserUpvotesDoc {
   timeUpvoted: FieldValue | Timestamp
-  variantName: string
 }
 
 // variants/{variantId}

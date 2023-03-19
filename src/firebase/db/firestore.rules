@@ -146,6 +146,7 @@ service cloud.firestore {
         allow read: if isAuth(userId);
         // When creating an upvote, also increment the variant's numUpvotes
         allow create: if
+          hasCorrectFields(['timeUpvoted'], []) &&
           isAuth(userId) &&
           correctTimestamp(request.resource.data.timeUpvoted) &&
           assertUpvoteDelta(1);
