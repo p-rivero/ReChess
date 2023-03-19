@@ -10,7 +10,7 @@
     <p class="mb-3 has-text-weight-light" @click="creatorClicked">
       By <a>{{ variant.creatorDisplayName }}</a>
     </p>
-    <div class="columns is-mobile">
+    <div class="columns is-mobile mb-0">
       <div class="column is-narrow pr-0">
         <button aria-label="use as template" class="button button-square px-0" @click="useAsTemplate">
           <div class="icon-edit color-theme"></div>
@@ -28,9 +28,14 @@
         <span class="tag is-primary">Tag 1</span>
       </div> -->
       <div class="is-flex-grow-1"></div>
-      <button class="heart-button button mb-2">
+      <button class="heart-button button"
+        @click="upvoteClicked">
         <p class="mr-3">{{numUpvotes}}</p>
-        <div class="sz-icon icon-heart color-theme"></div>
+        <div class="sz-icon color-theme" :class="{
+          'icon-heart': !variant.loggedUserUpvoted,
+          'icon-heart-fill': variant.loggedUserUpvoted,
+          'animated': animateHeart,
+        }"></div>
       </button>
     </div>
   </div>
@@ -46,6 +51,7 @@
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const draftStore = useVariantDraftStore()
+  const animateHeart = ref(false)
   
   const props = defineProps<{
     variant: PublishedVariantGui
@@ -54,6 +60,7 @@
   const emit = defineEmits<{
     (event: 'play-clicked'): void
     (event: 'edit-variant'): void
+    (event: 'upvote-clicked'): void
   }>()
   
   
@@ -77,10 +84,10 @@
     }
     const nameDetails = draftStore.state.displayName ?
       ` named "${draftStore.state.displayName}"` : ''
-    showPopup('Overwrite draft?', `You can only store 1 draft at a time, 
+    showPopup('Overwrite draft?', `You can only store one draft at a time, 
       but it seems you already have a draft${nameDetails}. 
-      If you decide to continue, it will be overwritten.`,
-      'ok-cancel',
+      Do you want to overwrite it?.`,
+      'yes-no',
       () => {
         draftStore.state = clone(props.variant)
         emit('edit-variant')
@@ -90,6 +97,15 @@
   
   async function creatorClicked() {
     console.log('creator clicked', props.variant.creatorId)
+  }
+  
+  function upvoteClicked() {
+    // If this click is going to upvote, then animate the heart
+    if (!props.variant.loggedUserUpvoted) {
+      animateHeart.value = true
+      setTimeout(() => animateHeart.value = false, 500)
+    }
+    emit('upvote-clicked')
   }
   
 </script>
@@ -106,5 +122,22 @@
   }
   .heart-button {
     padding-right: 0.5rem;
+  }
+  
+  // Animation for the heart button when it's clicked
+  @keyframes heart-pulse {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .sz-icon.animated {
+    animation: heart-pulse 0.3s;
+    animation-timing-function: ease-in-out;
   }
 </style>

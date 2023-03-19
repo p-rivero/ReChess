@@ -26,7 +26,7 @@ export const useVariantStore = defineStore('variant', () => {
     // Fetch the upvotes for each variant simultaneously
     const upvotes = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.getVariantUpvotes(id)))
     // Fetch whether the user has upvoted each variant simultaneously
-    const userUpvoted = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.hasUserUpvoted(id, authStore.loggedUser?.uid)))
+    const userUpvoted = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, id)))
     // Convert each pair of documents into a PublishedVariantGui
     variantList.value = []  
     for (const [i, [doc, id]] of docsWithId.entries()) {
@@ -49,12 +49,23 @@ export const useVariantStore = defineStore('variant', () => {
     return Promise.all([
       VariantDB.getVariantById(id),
       VariantDB.getVariantUpvotes(id),
-      VariantDB.hasUserUpvoted(id, authStore.loggedUser?.uid),
+      VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, id),
     ]).then(([doc, upvotes, userUpvoted]) => {
       // Convert the documents into a PublishedVariantGui
       if (!doc || !upvotes) return undefined
       return readDocuments(doc, upvotes, userUpvoted, id)
     })
+  }
+  
+  async function upvote(id: string, upvote: boolean): Promise<void> {
+    if (!authStore.loggedUser) {
+      throw new Error('User must be logged in to upvote a variant')
+    }
+    if (upvote) {
+      await VariantDB.upvoteVariant(authStore.loggedUser.uid, id)
+    } else {
+      await VariantDB.removeUpvoteVariant(authStore.loggedUser.uid, id)
+    }
   }
   
   
@@ -85,5 +96,5 @@ export const useVariantStore = defineStore('variant', () => {
     return pvg
   }
   
-  return { refreshList, getVariant, variantList }
+  return { refreshList, getVariant, upvote, variantList }
 })

@@ -1,8 +1,10 @@
 <template>
   <div class="field is-grouped is-grouped-multiline is-align-items-center">
     <DraftCard v-if="showDraftCard" />
-    <VariantCard v-for="(state, index) of variantStore.variantList" :variant="state" :key="index"
-      @play-clicked="playClicked(state)" @edit-variant="$router.push({name: 'edit-variant'})"/>
+    <VariantCard v-for="(variant, index) of variantStore.variantList" :variant="variant" :key="index"
+      @play-clicked="playClicked(variant)"
+      @edit-variant="$router.push({name: 'edit-variant'})"
+      @upvote-clicked="upvoteClicked(variant)" />
     <PlayPopup ref="playPopup"/>
   </div>
 </template>
@@ -13,6 +15,7 @@
   import VariantCard from '@/components/ViewVariant/VariantCard.vue'
   import DraftCard from './DraftCard.vue'
   import PlayPopup from '@/components/Popup/PlayPopup.vue'
+  import { showPopup } from '@/components/Popup/popup-manager'
   import type { PublishedVariantGui } from '@/protochess/types'
   import { ref, computed } from 'vue'
   
@@ -28,10 +31,30 @@
     return authStore.loggedUser && variantStore.variantList.length > 0
   })
   
-  variantStore.refreshList()
+  variantStore.refreshList().catch(_ => {
+    showPopup(
+      'Cannot load variants',
+      'There was an error loading the variants. Please try again later.',
+      'ok'
+    )
+  })
   
   function playClicked(variant: PublishedVariantGui) {
     playPopup.value?.show(variant.uid)
+  }
+  
+  async function upvoteClicked(variant: PublishedVariantGui): Promise<void> {
+    // Update the UI optimistically
+    variant.loggedUserUpvoted = !variant.loggedUserUpvoted
+    variant.numUpvotes += variant.loggedUserUpvoted ? 1 : -1
+    try {
+      await variantStore.upvote(variant.uid, variant.loggedUserUpvoted)
+    } catch (e: any) {
+      showPopup('Cannot upvote', 'There was an error upvoting this variant. Please try again later.', 'ok')
+      // Return to the previous state
+      variant.loggedUserUpvoted = !variant.loggedUserUpvoted
+      variant.numUpvotes += variant.loggedUserUpvoted ? 1 : -1
+    }
   }
 </script>
 
