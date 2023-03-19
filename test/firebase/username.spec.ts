@@ -21,7 +21,6 @@ setupJest('username-tests', env => {
 
 
 test('anyone can read which usernames are already taken', async () => {
-  // Set up the database
   const user: UsernameDoc = { userId: '1234' }
   await set('admin', user, 'usernames', 'abc')
   
@@ -35,7 +34,6 @@ test('anyone can read which usernames are already taken', async () => {
 })
 
 test('can create a username if it is not taken', async () => {
-  // Set up the database
   const user: UserDoc = {
     name: 'new user',
     about: '',
@@ -54,7 +52,6 @@ test('can create a username if it is not taken', async () => {
 })
 
 test('cannot create a username if not authenticated', async () => {
-  // Set up the database
   const user: UserDoc = {
     name: 'new user',
     about: '',
@@ -95,7 +92,6 @@ test('cannot create a username without corresponding user', async () => {
 })
   
 test('cannot steal a taken username', async () => {
-  // Set up the database
   const username: UsernameDoc = { userId: '1234' }
   const originalUser: UserDoc = {
     name: 'cool user',
@@ -129,7 +125,6 @@ test('cannot steal a taken username', async () => {
 })
 
 test('cannot create invalid username', async () => {
-  // Set up the database
   const user: UserDoc = {
     name: 'new user',
     about: '',

@@ -20,6 +20,29 @@ setupJest('user-tests', env => {
 
 
 
+test('anyone can read created users', async () => {
+  const user: UserDoc = { 
+    name: 'my new user',
+    about: '',
+    profileImg: 'example.com/img.png',
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+    }
+  }
+  await set('admin', user, 'users', '1234')
+  
+  const snapshot = await get('not logged', 'users', '1234')
+  expect(snapshot.exists()).toBe(true)
+  expect(snapshot.data()!.name).toBe('my new user')
+  expect(snapshot.data()!.IMMUTABLE.username).toBe('my_username')
+  
+  const queryResult = await query('not logged', 'users')
+  expect(queryResult.size).toBe(1)
+  expect(queryResult.docs[0].data().name).toBe('my new user')
+})
+
+
 test('can create a user if authenticated', async () => {
   const username: UsernameDoc = { userId: MY_ID }
   const user: UserDoc = {
@@ -45,7 +68,6 @@ test('can create a user if authenticated', async () => {
 })
 
 test('cannot create a user if username is already taken', async () => {
-  // Set up the database
   await set('admin', { userId: 'another_user' }, 'usernames', 'my_username')
   
   const user: UserDoc = {
@@ -257,15 +279,4 @@ test('email must match auth token', async () => {
   await assertFails(batch.commit())
 })
 
-  
-// VARIANTS
-
-
-test('anyone can read created variants', async () => {
-  await assertSucceeds(
-    get('not logged', 'variants', '1234')
-  )
-  await assertSucceeds(
-    query('not logged', 'variants')
-  )
-})
+// TODO: Cannot edit immutable fields

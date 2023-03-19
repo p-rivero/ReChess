@@ -1,0 +1,16 @@
+{
+  "include": ["**/*.ts"],
+  "compilerOptions": {
+    "strict": true,
+    "alwaysStrict": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../src/*"]
+    },
+    "types": ["jest"]
+  }
+}

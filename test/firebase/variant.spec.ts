@@ -3,6 +3,8 @@ import { assertFails, assertSucceeds } from '@firebase/rules-unit-testing'
 import { notInitialized, setupTestUtils, type TestUtilsSignature } from './utils'
 import { setupJest } from './init'
 
+import type { UserDoc, VariantDoc } from '@/firebase/db/schema'
+
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
@@ -22,3 +24,207 @@ test('anyone can read created variants', async () => {
     query('not logged', 'variants')
   )
 })
+
+test('can create variant with display name', async () => {
+  const user: UserDoc = {
+    name: 'My name',
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+    },
+  }
+  await set('admin', user, 'users', MY_ID)
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    IMMUTABLE: {
+      creatorDisplayName: 'My name',
+      creatorId: MY_ID,
+      numUpvotes: 0,
+      initialState: '{}',
+    },
+  }
+  await assertSucceeds(
+    add('verified', variant, 'variants')
+  )
+})
+
+test('can create variant with username', async () => {
+  const user: UserDoc = {
+    name: null,
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+    },
+  }
+  await set('admin', user, 'users', MY_ID)
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    IMMUTABLE: {
+      creatorDisplayName: '@my_username',
+      creatorId: MY_ID,
+      numUpvotes: 0,
+      initialState: '{}',
+    },
+  }
+  await assertSucceeds(
+    add('verified', variant, 'variants')
+  )
+})
+
+test('cannot create variant if not verified', async () => {
+  const user: UserDoc = {
+    name: 'My name',
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+    },
+  }
+  await set('admin', user, 'users', MY_ID)
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    IMMUTABLE: {
+      creatorDisplayName: 'My name',
+      creatorId: MY_ID,
+      numUpvotes: 0,
+      initialState: '{}',
+    },
+  }
+  await assertFails(
+    add('unverified', variant, 'variants')
+  )
+})
+
+test('variant name must be trimmed', async () => {
+  const user: UserDoc = {
+    name: 'My name',
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+    },
+  }
+  await set('admin', user, 'users', MY_ID)
+  
+  const variant: VariantDoc = {
+    name: '  My variant ',
+    description: 'Variant description',
+    IMMUTABLE: {
+      creatorDisplayName: 'My name',
+      creatorId: MY_ID,
+      numUpvotes: 0,
+      initialState: '{}',
+    },
+  }
+  await assertFails(
+    add('verified', variant, 'variants')
+  )
+})
+
+test('creator id must be correct', async () => {
+  const user: UserDoc = {
+    name: 'My name',
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+    },
+  }
+  await set('admin', user, 'users', MY_ID)
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    IMMUTABLE: {
+      creatorDisplayName: 'My name',
+      creatorId: 'WRONG_ID',
+      numUpvotes: 0,
+      initialState: '{}',
+    },
+  }
+  await assertFails(
+    add('verified', variant, 'variants')
+  )
+})
+
+test('creator display name must be correct', async () => {
+  const user: UserDoc = {
+    name: 'My name',
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+    },
+  }
+  await set('admin', user, 'users', MY_ID)
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    IMMUTABLE: {
+      creatorDisplayName: 'ANOTHER NAME',
+      creatorId: MY_ID,
+      numUpvotes: 0,
+      initialState: '{}',
+    },
+  }
+  await assertFails(
+    add('verified', variant, 'variants')
+  )
+  
+  user.name = null
+  variant.IMMUTABLE.creatorDisplayName = '@wrong_username'
+  await set('admin', user, 'users', MY_ID)
+  await assertFails(
+    add('verified', variant, 'variants')
+  )
+  
+  variant.IMMUTABLE.creatorDisplayName = '@my_username'
+  await set('admin', user, 'users', MY_ID)
+  await assertSucceeds(
+    add('verified', variant, 'variants')
+  )
+})
+
+test('cannot create variant with more than 0 upvotes', async () => {
+  const user: UserDoc = {
+    name: 'My name',
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+    },
+  }
+  await set('admin', user, 'users', MY_ID)
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    IMMUTABLE: {
+      creatorDisplayName: 'My name',
+      creatorId: MY_ID,
+      numUpvotes: 1,
+      initialState: '{}',
+    },
+  }
+  await assertFails(
+    add('verified', variant, 'variants')
+  )
+})
+
+

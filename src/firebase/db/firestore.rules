@@ -114,7 +114,10 @@ service cloud.firestore {
       
       match /private/{doc} {
         allow read: if isAuth(userId);
-        allow update: if isPrivateUserDoc() && isAuth(userId) && immutableOk();
+        allow update: if 
+          immutableOk() &&
+          isPrivateUserDoc() &&
+          isAuth(userId);
           
         allow create: if
           isPrivateUserDoc() &&
@@ -134,7 +137,7 @@ service cloud.firestore {
           hasCorrectImmutableFields(['creatorDisplayName', 'creatorId', 'numUpvotes', 'initialState'], []);
       }
       function isValidVariant(variant) {
-        let userDoc = getAfter(/databases/$(database)/documents/users/$(variant.IMMUTABLE.creatorId));
+        let userDoc = get(/databases/$(database)/documents/users/$(variant.IMMUTABLE.creatorId));
         let expectedDisplayName = userDoc.data.name == null ? '@' + userDoc.data.IMMUTABLE.username : userDoc.data.name;
         return isVariantDoc() &&
           variant.name.size() >= 3 &&
@@ -148,8 +151,15 @@ service cloud.firestore {
       
       allow read;
       // Create if authenticated, update if authenticated and existing creator
-      allow create: if isValidVariant(request.resource.data);
-      allow update: if isAuth(resource.data.creatorId) && isValidVariant(request.resource.data) && immutableOk();
+      allow create: if
+        isValidVariant(request.resource.data) &&
+        // Check that there is no leading or trailing whitespace in the name
+        request.resource.data.name == request.resource.data.name.trim();
+        
+      allow update: if
+        immutableOk() &&
+        isValidVariant(request.resource.data) &&
+        isAuth(resource.data.IMMUTABLE.creatorId);
       // Disallow deleting variants
       allow delete: if false;
     }
