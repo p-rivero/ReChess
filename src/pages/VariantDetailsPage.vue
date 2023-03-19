@@ -90,8 +90,8 @@
       ` named "${draftStore.state.displayName}"` : ''
     showPopup('Overwrite draft?', `You can only store 1 draft at a time, 
       but it seems you already have a draft${nameDetails}. 
-      If you decide to continue, it will be overwritten.`,
-      'ok-cancel',
+      Do you want to overwrite it?.`,
+      'yes-no',
       () => {
         draftStore.state = clone(variant.value!)
         router.push({ name: 'edit-variant' })

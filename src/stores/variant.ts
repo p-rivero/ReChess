@@ -4,13 +4,15 @@ import { ref } from "vue"
 import type { PublishedVariant, PublishedVariantGui } from "@/protochess/types"
 import { VariantDB } from "@/firebase/db"
 import { parseVariantJson } from "@/utils/chess/variant-json"
-import type { VariantDoc } from "@/firebase/db/schema"
+import type { VariantDoc, VariantUpvotesDoc } from "@/firebase/db/schema"
 import { placementsToFen } from "@/utils/chess/fen-to-placements"
+import { useAuthStore } from "@/stores/auth-user"
 
 export const useVariantStore = defineStore('variant', () => {
   
   // Currently fetched variants
   const variantList = ref<PublishedVariantGui[]>([])
+  const authStore = useAuthStore()
   
   // Fetches the list of variants from the database
   // TODO: Add pagination and ordering
@@ -21,9 +23,16 @@ export const useVariantStore = defineStore('variant', () => {
     
     // Fetch the list of variant documents from the database
     const docsWithId = await VariantDB.getVariantList()
+    // Fetch the upvotes for each variant simultaneously
+    const upvotes = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.getVariantUpvotes(id)))
+    // Fetch whether the user has upvoted each variant simultaneously
+    const userUpvoted = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.hasUserUpvoted(id, authStore.loggedUser?.uid)))
+    // Convert each pair of documents into a PublishedVariantGui
     variantList.value = []  
-    for (const [doc, id] of docsWithId) {
-      const state = readDocument(doc, id)
+    for (const [i, [doc, id]] of docsWithId.entries()) {
+      const upvotesDoc = upvotes[i]
+      if (!upvotesDoc) continue
+      const state = readDocuments(doc, upvotesDoc, userUpvoted[i], id)
       if (state) variantList.value.push(state)
     }
   }
@@ -36,14 +45,20 @@ export const useVariantStore = defineStore('variant', () => {
       return existingVariant
     }
     
-    // Get the variant document from the database
-    const doc = await VariantDB.getVariantById(id)
-    if (!doc) return undefined
-    return readDocument(doc, id)
+    // Fetch the documents from the database simultaneously
+    return Promise.all([
+      VariantDB.getVariantById(id),
+      VariantDB.getVariantUpvotes(id),
+      VariantDB.hasUserUpvoted(id, authStore.loggedUser?.uid),
+    ]).then(([doc, upvotes, userUpvoted]) => {
+      // Convert the documents into a PublishedVariantGui
+      if (!doc || !upvotes) return undefined
+      return readDocuments(doc, upvotes, userUpvoted, id)
+    })
   }
   
   
-  function readDocument(doc: VariantDoc, id: string): PublishedVariantGui | undefined {
+  function readDocuments(doc: VariantDoc, upvotes: VariantUpvotesDoc, userUpvoted: boolean, id: string): PublishedVariantGui | undefined {
     const variant = parseVariantJson(doc.IMMUTABLE.initialState)
     if (!variant) {
       console.error('Illegal variant document', doc)
@@ -54,7 +69,8 @@ export const useVariantStore = defineStore('variant', () => {
       uid: id,
       creatorDisplayName: doc.IMMUTABLE.creatorDisplayName,
       creatorId: doc.IMMUTABLE.creatorId,
-      numUpvotes: doc.IMMUTABLE.numUpvotes,
+      numUpvotes: upvotes.numUpvotes,
+      loggedUserUpvoted: userUpvoted,
       // Overwrite the existing name and description with the ones from the document
       displayName: doc.name,
       description: doc.description,

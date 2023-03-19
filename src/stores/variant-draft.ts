@@ -26,7 +26,6 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   
   // Save every time the state changes
   watch(state, () => {
-    console.log('Saving variant draft to localStorage')
     localStorage.setItem('variantDraft', JSON.stringify(state.value))
   }, { deep: true })
   

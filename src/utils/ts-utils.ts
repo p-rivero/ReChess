@@ -44,10 +44,10 @@ export function object_equals(x: any, y: any) {
     // test there constructor.
 
   for (const p in x) {
-    if (!x.hasOwn(p)) continue;
+    if (!Object.prototype.hasOwnProperty.call(x, p)) continue;
       // other properties were tested using x.constructor === y.constructor
 
-    if (!y.hasOwn(p)) return false;
+    if (!Object.prototype.hasOwnProperty.call(y, p)) return false;
       // allows to compare x[p] and y[p] when set to undefined
 
     if (x[p] === y[p]) continue;
@@ -61,7 +61,7 @@ export function object_equals(x: any, y: any) {
   }
 
   for (const p in y)
-    if (y.hasOwn(p) && !x.hasOwn(p))
+    if (Object.prototype.hasOwnProperty.call(y, p) && !Object.prototype.hasOwnProperty.call(x, p))
       return false;
         // allows x[p] to be set to undefined
 

@@ -9,13 +9,10 @@ import { Timestamp } from 'firebase/firestore'
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
-let { get, query, set, add, remove, now, startBatch }: TestUtilsSignature = notInitialized()
+let { get, query, set, now, startBatch }: TestUtilsSignature = notInitialized()
 
-// setupJest('variant-upvotes-tests', env => {
-//   ({ get, query, set, add, remove, now, startBatch } = setupTestUtils(env, MY_ID, MY_EMAIL))
-// })
-setupJest('rechess-web', env => {
-  ({ get, query, set, add, remove, now, startBatch } = setupTestUtils(env, MY_ID, MY_EMAIL))
+setupJest('variant-upvotes-tests', env => {
+  ({ get, query, set, now, startBatch } = setupTestUtils(env, MY_ID, MY_EMAIL))
 })
 
 
@@ -41,7 +38,7 @@ async function createUserAndVariant(creatorId: string = 'some_id', addUpvote: bo
     description: 'Variant description',
     IMMUTABLE: {
       creatorDisplayName: 'Another user',
-      creatorId: MY_ID,
+      creatorId,
       initialState: '{}',
     },
   }
