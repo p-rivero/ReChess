@@ -11,8 +11,9 @@ import {
   deleteDoc,
   getDocs,
 } from "firebase/firestore"
-import type { CollectionReference, DocumentData, Query } from "@firebase/firestore-types"
-import { DocumentSnapshot, QuerySnapshot, writeBatch, WriteBatch } from "@firebase/firestore"
+import type { CollectionReference, FieldValue, Query } from "@firebase/firestore-types"
+import type { DocumentSnapshot, QuerySnapshot, WriteBatch, DocumentData, DocumentReference } from "@firebase/firestore"
+import { writeBatch, serverTimestamp } from "@firebase/firestore"
 
 /**
 - `verified`: logged user with a verified email
@@ -27,13 +28,15 @@ export type TestUtilsSignature = {
   // Get a single document
   get: (authType: AuthType, path: string, ...pathSegments: string[]) => Promise<DocumentSnapshot>
   // Perform a query on a collection
-  query: (authType: AuthType, collectionName: string, getQuery?: (col: CollectionReference)=>Query) => Promise<QuerySnapshot>
+  query: (authType: AuthType, collectionPath: string, getQuery?: (col: CollectionReference)=>Query) => Promise<QuerySnapshot>
   // Set the data of a document
   set: (authType: AuthType, data: any, path: string, ...pathSegments: string[]) => Promise<void>
   // Add a new document to a collection
   add: (authType: AuthType, data: any, path: string, ...pathSegments: string[]) => Promise<DocumentData>
   // Remove a single document
   remove: (authType: AuthType, path: string, ...pathSegments: string[]) => Promise<void>
+  // Returns the current server timestamp
+  now: () => FieldValue
   // Start a batch write
   startBatch: (authType: AuthType) => Batch
 }
@@ -64,6 +67,7 @@ export function notInitialized(): TestUtilsSignature {
     set: () => Promise.reject('Test environment not initialized'),
     add: () => Promise.reject('Test environment not initialized'),
     remove: () => Promise.reject('Test environment not initialized'),
+    now: () => {throw new Error('Test environment not initialized')},
     startBatch: () => {throw new Error('Test environment not initialized')},
   }
 }
@@ -113,11 +117,11 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
     await setDoc(document, data)
   }
   
-  async function add<T>(authType: AuthType|RulesTestContext, data: T, path: string, ...pathSegments: string[]): Promise<DocumentData> {
+  async function add(authType: AuthType|RulesTestContext, data: DocumentData, path: string, ...pathSegments: string[]): Promise<DocumentReference> {
     if (authType === 'admin') {
-      let result: DocumentData | undefined = undefined
+      let result: DocumentReference | undefined = undefined
       await testEnv.withSecurityRulesDisabled(async context => {
-        result = add(context, data, path, ...pathSegments)
+        result = await add(context, data, path, ...pathSegments)
       })
       return result!
     }
@@ -134,10 +138,14 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
     await deleteDoc(document)
   }
   
+  function now(): FieldValue {
+    return serverTimestamp()
+  }
+  
   function startBatch(authType: AuthType): Batch {
     const firestore = getAuth(authType)
     return new Batch(writeBatch(firestore), firestore)
   }
   
-  return { get, query, set, add, remove, startBatch }
+  return { get, query, set, add, remove, now, startBatch }
 }

@@ -8,10 +8,10 @@ import type { UserDoc, VariantDoc } from '@/firebase/db/schema'
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
-let { get, query, set, add, remove, startBatch }: TestUtilsSignature = notInitialized()
+let { get, query, set, add, remove }: TestUtilsSignature = notInitialized()
 
 setupJest('variant-tests', env => {
-  ({ get, query, set, add, remove, startBatch } = setupTestUtils(env, MY_ID, MY_EMAIL))
+  ({ get, query, set, add, remove } = setupTestUtils(env, MY_ID, MY_EMAIL))
 })
 
 
@@ -43,7 +43,6 @@ test('can create variant with display name', async () => {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
       creatorId: MY_ID,
-      numUpvotes: 0,
       initialState: '{}',
     },
   }
@@ -70,7 +69,6 @@ test('can create variant with username', async () => {
     IMMUTABLE: {
       creatorDisplayName: '@my_username',
       creatorId: MY_ID,
-      numUpvotes: 0,
       initialState: '{}',
     },
   }
@@ -97,7 +95,6 @@ test('cannot create variant if not verified', async () => {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
       creatorId: MY_ID,
-      numUpvotes: 0,
       initialState: '{}',
     },
   }
@@ -124,7 +121,6 @@ test('variant name must be trimmed', async () => {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
       creatorId: MY_ID,
-      numUpvotes: 0,
       initialState: '{}',
     },
   }
@@ -151,7 +147,6 @@ test('creator id must be correct', async () => {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
       creatorId: 'WRONG_ID',
-      numUpvotes: 0,
       initialState: '{}',
     },
   }
@@ -178,7 +173,6 @@ test('creator display name must be correct', async () => {
     IMMUTABLE: {
       creatorDisplayName: 'ANOTHER NAME',
       creatorId: MY_ID,
-      numUpvotes: 0,
       initialState: '{}',
     },
   }
@@ -200,7 +194,7 @@ test('creator display name must be correct', async () => {
   )
 })
 
-test('cannot create variant with more than 0 upvotes', async () => {
+test('cannot remove variant', async () => {
   const user: UserDoc = {
     name: 'My name',
     about: '',
@@ -210,21 +204,19 @@ test('cannot create variant with more than 0 upvotes', async () => {
       numWins: 0,
     },
   }
-  await set('admin', user, 'users', MY_ID)
-  
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
     IMMUTABLE: {
       creatorDisplayName: 'My name',
       creatorId: MY_ID,
-      numUpvotes: 1,
       initialState: '{}',
     },
   }
+  await set('admin', user, 'users', MY_ID)
+  await set('admin', variant, 'variants', 'variant_id')
+  
   await assertFails(
-    add('verified', variant, 'variants')
+    remove('verified', 'variants', 'variant_id')
   )
 })
-
-

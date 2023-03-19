@@ -27,6 +27,11 @@ function mapEq(mapA, mapB) {
   return mapA.diff(mapB).affectedKeys().size() == 0;
 }
 
+// Checks that a field was created with serverTimestamp()
+function correctTimestamp(field) {
+  return field == request.time;
+}
+
 // Checks that the request contains all the required fields and no extra extra fields
 function hasCorrectFields(required, optional) {
   let allowed = required.concat(optional);
@@ -43,9 +48,9 @@ function immutableOk() {
 }
 
 // Prints the input to the debug log and returns true
-function print(msg) {
-  return debug(msg) || true;
-}
+// function print(msg) {
+//   return debug(msg) || true;
+// }
 
 
 service cloud.firestore {
@@ -76,6 +81,7 @@ service cloud.firestore {
       // Disallow deleting usernames for now
       allow delete: if false;
     }
+    
     
     match /users/{userId} {
       
@@ -128,13 +134,36 @@ service cloud.firestore {
         
         allow delete: if false;
       }
+      
+      match /upvotedVariants/{variantId} {
+        function assertUpvoteDelta(delta) {
+          let docBefore = get(/databases/$(database)/documents/variants/$(variantId)/upvotes/doc);
+          let docAfter = getAfter(/databases/$(database)/documents/variants/$(variantId)/upvotes/doc);
+          return docAfter.data.numUpvotes == docBefore.data.numUpvotes + delta;
+        }
+        
+        // Other users cannot see my upvotes
+        allow read: if isAuth(userId);
+        // When creating an upvote, also increment the variant's numUpvotes
+        allow create: if
+          isAuth(userId) &&
+          correctTimestamp(request.resource.data.timeUpvoted) &&
+          assertUpvoteDelta(1);
+        // Cannot update an upvote, only delete it
+        allow update: if false;
+        // When deleting an upvote, also decrement the variant's numUpvotes
+        allow delete: if
+          isAuth(userId) &&
+          assertUpvoteDelta(-1);
+      }
     }
+    
     
     
     match /variants/{variantId} {
       function isVariantDoc() {
         return hasCorrectFields(['name', 'description', 'IMMUTABLE'], []) &&
-          hasCorrectImmutableFields(['creatorDisplayName', 'creatorId', 'numUpvotes', 'initialState'], []);
+          hasCorrectImmutableFields(['creatorDisplayName', 'creatorId', 'initialState'], []);
       }
       function isValidVariant(variant) {
         let userDoc = get(/databases/$(database)/documents/users/$(variant.IMMUTABLE.creatorId));
@@ -145,7 +174,6 @@ service cloud.firestore {
           variant.description.size() <= 500 &&
           variant.IMMUTABLE.creatorDisplayName == expectedDisplayName &&
           isAuth(variant.IMMUTABLE.creatorId) &&
-          variant.IMMUTABLE.numUpvotes == 0 &&
           variant.IMMUTABLE.initialState.size() <= 100000;
       }
       
@@ -160,8 +188,47 @@ service cloud.firestore {
         immutableOk() &&
         isValidVariant(request.resource.data) &&
         isAuth(resource.data.IMMUTABLE.creatorId);
+      
       // Disallow deleting variants
       allow delete: if false;
+      
+      
+      match /upvotes/{doc} {
+        function isVariantUpvotesDoc() {
+          return hasCorrectFields(['numUpvotes'], []);
+        }
+        function isVariantCreator() {
+          let creator = get(/databases/$(database)/documents/variants/$(variantId)).data.IMMUTABLE.creatorId;
+          return isAuth(creator);
+        }
+        function isValidUpvote() {
+          // Check that the logged user had not upvoted this variant before
+          let userId = request.auth.uid;
+          return !exists(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId)) &&
+            existsAfter(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId));
+        }
+        function isValidUnUpvote() {
+          // Check that the logged user had upvoted this variant before
+          let userId = request.auth.uid;
+          return exists(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId)) &&
+            !existsAfter(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId));
+        }
+        
+        allow read;
+        // Created once, when making the variant
+        allow create: if 
+          isVariantUpvotesDoc() &&
+          isVariantCreator() &&
+          doc == 'doc' && // Only 1 document allowed
+          request.resource.data.numUpvotes == 0;
+        // Updated when upvoted
+        allow update: if
+          // Valid increment or decrement
+          (request.resource.data.numUpvotes == resource.data.numUpvotes + 1 && isValidUpvote()) ||
+          (request.resource.data.numUpvotes == resource.data.numUpvotes - 1 && isValidUnUpvote());
+        // Disallow deleting
+        allow delete: if false;
+      }
     }
     
   }

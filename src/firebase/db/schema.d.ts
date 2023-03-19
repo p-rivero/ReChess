@@ -1,5 +1,5 @@
 
-import { Timestamp } from 'firebase/firestore'
+import { FieldValue, Timestamp } from 'firebase/firestore'
 
 // WARNING: The Firebase client requires null instead of undefined
 // Use "| null" instead of "?" for optional fields
@@ -33,12 +33,10 @@ export interface UserGameDoc {
   variantName: string
 }
 
-// userUpvotes/{userID}
+// users/{userID}/upvotedVariants/{variantId}
 export interface UserUpvotesDoc {
-  [variantId: string]: {
-    timeUpvoted: Timestamp
-    variantName: string
-  }
+  timeUpvoted: FieldValue | Timestamp
+  variantName: string
 }
 
 // variants/{variantId}
@@ -48,11 +46,15 @@ export interface VariantDoc {
   IMMUTABLE: {
     creatorDisplayName: string
     creatorId: string
-    numUpvotes: number
     // JSON string that corresponds to the GameState interface in src/protochess/types.ts
     // Validated client-side (on every fetch), since server-side validation would require importing
     // the protochess wasm module on the cloud function
     // Also, this object could be quite big and we don't want firebase to create any indexes its fields
     initialState: string
   }
+}
+
+// variants/{variantId}/upvotes/doc
+export interface VariantUpvotesDoc {
+  numUpvotes: number
 }
