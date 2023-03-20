@@ -6,13 +6,6 @@ export function clone<T>(obj: T): T {
   }
 }
 
-export function paramToInt(param: string|string[]): number {
-  // If the param is an array, return the first element
-  if (Array.isArray(param)) return paramToInt(param[0])
-  const num = Number(param)
-  return num
-}
-
 // https://gist.github.com/ca0v/73a31f57b397606c9813472f7493a940
 export function debounce<T extends Function>(cb: T, wait = 20) {
   let h: NodeJS.Timeout | undefined = undefined
@@ -22,14 +15,6 @@ export function debounce<T extends Function>(cb: T, wait = 20) {
   }
   return callable as any as T
 }
-
-// Assume the font size will not change
-let fontSz: number | undefined = undefined
-export function remToPx(rem: number): number {
-  if (fontSz === undefined) fontSz = parseFloat(getComputedStyle(document.documentElement).fontSize)
-  return rem * fontSz;
-}
-
 
 // https://stackoverflow.com/questions/1068834/object-comparison-in-javascript
 export function object_equals(x: any, y: any) {

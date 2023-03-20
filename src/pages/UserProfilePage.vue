@@ -10,10 +10,11 @@
 
 <script setup lang="ts">
 
-  import { computed, ref, watchEffect } from 'vue'
+  import { computed, ref, watchEffect, watch } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { AuthUser, useAuthStore } from '@/stores/auth-user'
   import { User, useUserStore } from '@/stores/user'
+  import { updateTitle } from '@/utils/web-utils'
   
   const router = useRouter()
   const route = useRoute()
@@ -36,6 +37,7 @@
     if (authStore.loggedUser?.username === username) {
       // User is logged in and is viewing their own profile
       user.value = authStore.loggedUser
+      updateTitle(user.value?.displayName)
       return
     }
     
@@ -46,6 +48,7 @@
       return
     }
     user.value = fetchedUser
+    updateTitle(user.value?.displayName)
   })
 
 </script>

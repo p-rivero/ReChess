@@ -195,7 +195,7 @@
   import type { PieceDefinition, Player } from '@/protochess/types'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useAuthStore } from '@/stores/auth-user'
-  import { paramToInt } from '@/utils/ts-utils'
+  import { paramToInt } from '@/utils/web-utils'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { numberToLetter, letterToNumber } from '@/utils/chess/chess-coords'
@@ -214,9 +214,9 @@
     router.push({ name: 'home' })
   }
   
-  // Incorrect piece index, redirect to edit-variant
+  // Incorrect piece index, redirect to home page
   if (Number.isNaN(pieceIndex) || pieceIndex < 0 || pieceIndex >= draftStore.state.pieceTypes.length) {
-    router.push({ name: 'edit-variant' })
+    router.push({ name: 'home' })
   } else {
     piece = draftStore.state.pieceTypes[pieceIndex]
   }

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteParams, RouteRecordRaw } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
+import { updateTitle } from '@/utils/web-utils'
 // https://github.com/mutoe/vue3-realworld-example-app/blob/master/src/router.ts
 
 export type AppRouteNames =
@@ -32,16 +33,19 @@ export const routes: RouteRecordRaw[] = [
     name: 'edit-variant',
     path: '/edit',
     component: () => import('@/pages/EditVariantPage.vue'),
+    meta: { title: 'Edit Draft' },
   },
   {
     name: 'edit-piece',
     path: '/edit/pieces/:pieceIndex',
     component: () => import('@/pages/EditPiecePage.vue'),
+    meta: { title: 'Edit Draft' },
   },
   {
     name: 'analysis',
     path: '/analysis/:variantId?',
     component: () => import('@/pages/AnalysisPage.vue'),
+    meta: { title: 'Analysis Board' },
   },
   {
     name: 'user-profile',
@@ -52,21 +56,30 @@ export const routes: RouteRecordRaw[] = [
     name: 'privacy',
     path: '/privacy',
     component: () => import('@/pages/legal/PrivacyPolicyPage.vue'),
+    meta: { title: 'Privacy Policy' },
   },
   {
     name: 'cookies',
     path: '/cookies',
     component: () => import('@/pages/legal/CookiePolicyPage.vue'),
+    meta: { title: 'Cookie Policy' },
   },
   {
     name: 'tos',
     path: '/tos',
     component: () => import('@/pages/legal/TermsOfServicePage.vue'),
+    meta: { title: 'Terms of Service' },
   },
 ]
 export const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach((to, _from, next) => {
+  const toTitle = to.meta.title as string | undefined
+  updateTitle(toTitle)
+  next()
 })
 
 export function routerPush (name: AppRouteNames, params?: RouteParams): ReturnType<typeof router.push> {

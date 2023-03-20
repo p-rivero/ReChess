@@ -28,7 +28,7 @@
   import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types';
   import { getProtochess } from '@/protochess'
   import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
-  import { remToPx } from '@/utils/ts-utils'
+  import { remToPx } from '@/utils/web-utils'
   import { onMounted, onUnmounted, ref } from 'vue';
   import ViewableChessBoard from './ViewableChessBoard.vue'
   import PromotionPopup from '@/components/GameUI/PromotionPopup.vue';
@@ -45,6 +45,7 @@
   type Result = {flag: MakeMoveFlag, winner: MakeMoveWinner}
   const emit = defineEmits<{
     (event: 'piece-moved', from?: [number, number], to?: [number, number], result?: Result): void
+    (event: 'player-changed', playerToMove: Player): void
   }>()
   
   
@@ -65,6 +66,7 @@
       await synchronizeBoardState()
       promotionPopup.value?.initState(state)
       moveHistory.initialize(state)
+      emit('player-changed', state.playerToMove === 0 ? 'white' : 'black')
     },
     
     // Move a piece from one position to another, and optionally promote it
@@ -165,6 +167,7 @@
     if (moveResult !== 'N/A') {
       moveHistory.newMove(playMoveBefore!, state, moveResult)
       emit('piece-moved', playMoveBefore!.from, playMoveBefore!.to, moveResult)
+      emit('player-changed', state.playerToMove === 0 ? 'white' : 'black')
       // Game has ended, don't continue
       if (moveResult) return
     }

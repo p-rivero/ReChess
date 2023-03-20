@@ -2,7 +2,7 @@
   <BoardWithGui
     :white="startAs === 'white' ? 'human' : 'engine'"
     :black="startAs === 'black' ? 'human' : 'engine'"
-    :has-gauge="false" @game-over="gameOver" />
+    :has-gauge="false" @game-over="gameOver" @player-changed="newMove"/>
 </template>
 
 <script setup lang="ts">
@@ -11,6 +11,7 @@
   import { getMessage } from '@/utils/chess/game-over-message'
   import { showPopupImportant } from '@/components/Popup/popup-manager';
   import type { MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
+import { updateTitle } from '@/utils/web-utils';
   
   const route = useRoute()
   const startAs: Player = chooseColor()
@@ -42,4 +43,13 @@
     showPopupImportant(title, message, 'ok')
     messageShown = true
   }
+  
+  function newMove(playerToMove: Player) {
+    if (playerToMove === startAs) {
+      updateTitle('Your turn')
+    } else {
+      updateTitle('Waiting for opponent')
+    }
+  }
+  
 </script>

@@ -19,6 +19,7 @@ export const useVariantStore = defineStore('variant', () => {
   async function refreshList() {
     // Only fetch the list if it hasn't been fetched yet
     // TODO: Check if the order has changed
+    // TODO: Check if the logged player has changed
     if (variantList.value.length > 0) return
     
     // Fetch the list of variant documents from the database

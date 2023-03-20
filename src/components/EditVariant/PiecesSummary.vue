@@ -1,10 +1,10 @@
 <template>
   <div v-for="(piece, pieceIndex) in props.state.pieceTypes" class="piece-container mb-4" :key="pieceIndex">
     <div v-if="editable">
-      <button class="button sz-3 mr-4 px-2 py-2 fit-content" @click="emit('edit-click', pieceIndex)">
+      <button class="button sz-3 mr-4 my-1 px-2 py-2 fit-content" @click="emit('edit-click', pieceIndex)">
         <div class="icon-edit color-theme"></div>
       </button>
-      <button class="button sz-3 mr-4 px-2 py-2 fit-content" @click="emit('delete-click', pieceIndex)">
+      <button class="button sz-3 mr-4 my-1 px-2 py-2 fit-content" @click="emit('delete-click', pieceIndex)">
         <div class="icon-trash color-theme"></div>
       </button>
     </div>
@@ -15,10 +15,12 @@
       <img v-if="piece.ids[1] != null && piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="sz-3 mr-4" draggable="false">
       <div v-else alt="piece image" class="sz-3 mr-4 icon-cross" :class="{'color-theme': piece.ids[1] != null}"></div>
       
-      <p class="mr-4">{{ piece.displayName }}</p>
+      <p class="mr-4 py-2">{{ piece.displayName }}</p>
       
-      <div v-if="piece.isLeader" class="star-icon-container icon-star-fill color-primary-dark mb-1 mr-1"></div>
-      <strong v-if="piece.isLeader" class="has-text-primary-dark mr-4">Leader</strong>
+      <div v-if="piece.isLeader" class="is-flex is-align-items-center py-2">
+        <div class="star-icon-container icon-star-fill color-primary-dark mb-1 mr-1 is-flex-shrink-0"></div>
+        <strong class="has-text-primary-dark mr-4">Leader</strong>
+      </div>
     </div>
   </div>
   <br>
@@ -61,8 +63,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: fit-content;
-    max-width: 80%;
+    flex-wrap: wrap;
   }
   .box p {
     overflow-wrap: anywhere;
