@@ -104,7 +104,10 @@
           <br>
           <SmartCheckbox text="Check is forbidden" class="rules-field"
             :start-value="draftStore.state.globalRules.checkIsForbidden"
-            @changed="value => draftStore.state.globalRules.checkIsForbidden = value"/>
+            @changed="value => {
+              draftStore.state.globalRules.checkIsForbidden = value
+              draftStore.state.globalRules.checksToLose = 0
+            }"/>
         </div>
         
         <div class="column">
@@ -131,6 +134,7 @@
         </div>
         <SmartNumberInput class="width-5rem" :min="0" :max="200" :default="0" placeholder="-"
           :start-value="draftStore.state.globalRules.checksToLose"
+          :disabled="draftStore.state.globalRules.checkIsForbidden"
           @changed="value => draftStore.state.globalRules.checksToLose = value"/>
         
         <div class="field-label-right">

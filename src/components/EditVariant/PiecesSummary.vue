@@ -22,7 +22,7 @@
     </div>
   </div>
   <br>
-  <button class="button" @click="emit('new-click')">
+  <button v-if="editable" class="button" @click="emit('new-click')">
     <div class="sz-icon icon-add color-theme"></div>
     <span>Add piece</span>
   </button>
