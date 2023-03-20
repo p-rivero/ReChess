@@ -28,31 +28,23 @@
         <span class="tag is-primary">Tag 1</span>
       </div> -->
       <div class="is-flex-grow-1"></div>
-      <button class="heart-button button"
-        @click="upvoteClicked">
-        <p class="mr-3">{{numUpvotes}}</p>
-        <div class="sz-icon color-theme" :class="{
-          'icon-heart': !variant.loggedUserUpvoted,
-          'icon-heart-fill': variant.loggedUserUpvoted,
-          'animated': animateHeart,
-        }"></div>
-      </button>
+      <UpvoteButton :variant="props.variant" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
   import type { PublishedVariantGui } from '@/protochess/types'
-  import { onMounted, ref, computed } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
+  import UpvoteButton from '@/components/ViewVariant/UpvoteButton.vue'
   import { showPopup } from '@/components/Popup/popup-manager'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useUserStore } from '@/stores/user'
   import { clone } from '@/utils/ts-utils'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
-  const animateHeart = ref(false)
   const draftStore = useVariantDraftStore()
   const userStore = useUserStore()
   const router = useRouter()
@@ -64,16 +56,7 @@
   const emit = defineEmits<{
     (event: 'play-clicked'): void
     (event: 'edit-variant'): void
-    (event: 'upvote-clicked'): void
   }>()
-  
-  
-  const numUpvotes = computed(() => {
-    if (props.variant.numUpvotes > 1000) {
-      return (props.variant.numUpvotes / 1000).toFixed(1) + 'k'
-    }
-    return props.variant.numUpvotes
-  })
   
   onMounted(async () => {
     board.value?.setState(props.variant)
@@ -108,15 +91,6 @@
     router.push({ name: 'user-profile', params: { username: user.username } })
   }
   
-  function upvoteClicked() {
-    // If this click is going to upvote, then animate the heart
-    if (!props.variant.loggedUserUpvoted) {
-      animateHeart.value = true
-      setTimeout(() => animateHeart.value = false, 500)
-    }
-    emit('upvote-clicked')
-  }
-  
 </script>
 
 <style scoped lang="scss">
@@ -128,25 +102,5 @@
     min-height: 7rem;
     display: flex;
     align-items: center;
-  }
-  .heart-button {
-    padding-right: 0.5rem;
-  }
-  
-  // Animation for the heart button when it's clicked
-  @keyframes heart-pulse {
-    0% {
-      transform: scale(1);
-    }
-    40% {
-      transform: scale(1.2);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
-  .sz-icon.animated {
-    animation: heart-pulse 0.3s;
-    animation-timing-function: ease-in-out;
   }
 </style>

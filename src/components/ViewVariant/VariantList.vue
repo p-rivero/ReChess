@@ -3,8 +3,7 @@
     <DraftCard v-if="showDraftCard" />
     <VariantCard v-for="(variant, index) of variantStore.variantList" :variant="variant" :key="index"
       @play-clicked="playClicked(variant)"
-      @edit-variant="$router.push({name: 'edit-variant'})"
-      @upvote-clicked="upvoteClicked(variant)" />
+      @edit-variant="$router.push({name: 'edit-variant'})" />
     <PlayPopup ref="playPopup"/>
   </div>
 </template>
@@ -41,20 +40,6 @@
   
   function playClicked(variant: PublishedVariantGui) {
     playPopup.value?.show(variant.uid)
-  }
-  
-  async function upvoteClicked(variant: PublishedVariantGui): Promise<void> {
-    // Update the UI optimistically
-    variant.loggedUserUpvoted = !variant.loggedUserUpvoted
-    variant.numUpvotes += variant.loggedUserUpvoted ? 1 : -1
-    try {
-      await variantStore.upvote(variant.uid, variant.loggedUserUpvoted)
-    } catch (e: any) {
-      showPopup('Cannot upvote', 'There was an error upvoting this variant. Please try again later.', 'ok')
-      // Return to the previous state
-      variant.loggedUserUpvoted = !variant.loggedUserUpvoted
-      variant.numUpvotes += variant.loggedUserUpvoted ? 1 : -1
-    }
   }
 </script>
 
