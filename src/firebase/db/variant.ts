@@ -51,8 +51,13 @@ export async function getVariantUpvotes(id: string): Promise<VariantUpvotesDoc |
 // Returns true if the user has upvoted the variant
 export async function hasUserUpvoted(userId: string | undefined, variantId: string): Promise<boolean> {
   if (!userId) return false
-  const document = await getDoc(doc(db, 'users', userId, 'upvotedVariants', variantId))
-  return document.exists()
+  try {
+    const document = await getDoc(doc(db, 'users', userId, 'upvotedVariants', variantId))
+    return document.exists()
+  } catch (error) {
+    console.warn('Failed to check if user has upvoted variant.', error)
+    return false
+  }
 }
 
 // Upvotes the variant for the user

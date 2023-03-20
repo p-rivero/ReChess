@@ -30,7 +30,8 @@
     return authStore.loggedUser && variantStore.variantList.length > 0
   })
   
-  variantStore.refreshList().catch(_ => {
+  variantStore.refreshList().catch(e => {
+    console.error(e)
     showPopup(
       'Cannot load variants',
       'There was an error loading the variants. Please try again later.',

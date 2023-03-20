@@ -1,5 +1,5 @@
 import { defineStore } from "pinia"
-import { ref } from "vue"
+import { ref, watch } from "vue"
 
 import type { PublishedVariant, PublishedVariantGui } from "@/protochess/types"
 import { VariantDB } from "@/firebase/db"
@@ -14,20 +14,24 @@ export const useVariantStore = defineStore('variant', () => {
   const variantList = ref<PublishedVariantGui[]>([])
   const authStore = useAuthStore()
   
+  let listUpvotesUid: string | undefined = undefined
   // Fetches the list of variants from the database
   // TODO: Add pagination and ordering
   async function refreshList() {
     // Only fetch the list if it hasn't been fetched yet
     // TODO: Check if the order has changed
-    // TODO: Check if the logged player has changed
     if (variantList.value.length > 0) return
     
     // Fetch the list of variant documents from the database
     const docsWithId = await VariantDB.getVariantList()
+    
     // Fetch the upvotes for each variant simultaneously
     const upvotes = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.getVariantUpvotes(id)))
+    
     // Fetch whether the user has upvoted each variant simultaneously
+    listUpvotesUid = authStore.loggedUser?.uid
     const userUpvoted = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, id)))
+    
     // Convert each pair of documents into a PublishedVariantGui
     variantList.value = []  
     for (const [i, [doc, id]] of docsWithId.entries()) {
@@ -37,6 +41,16 @@ export const useVariantStore = defineStore('variant', () => {
       if (state) variantList.value.push(state)
     }
   }
+  
+  watch(authStore, async () => {
+    // If the user has changed, we need to fetch the upvotes again
+    if (authStore.loggedUser?.uid !== listUpvotesUid) {
+      listUpvotesUid = authStore.loggedUser?.uid
+      variantList.value.forEach(async variant => {
+        variant.loggedUserUpvoted = await VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, variant.uid)
+      })
+    }
+  })
   
   // Gets a variant from the database, or returns undefined if it doesn't exist
   async function getVariant(id: string): Promise<PublishedVariantGui | undefined> {

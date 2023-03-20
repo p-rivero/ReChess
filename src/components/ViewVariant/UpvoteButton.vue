@@ -44,6 +44,7 @@
     try {
       await variantStore.upvote(variant.uid, variant.loggedUserUpvoted)
     } catch (e: any) {
+      console.error(e)
       showPopup('Cannot upvote', 'There was an error upvoting this variant. Please try again later.', 'ok')
       // Return to the previous state
       variant.loggedUserUpvoted = !variant.loggedUserUpvoted
