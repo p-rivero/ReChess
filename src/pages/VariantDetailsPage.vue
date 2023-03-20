@@ -6,9 +6,8 @@
         <a @click="creatorClicked">{{ variant?.creatorDisplayName }}</a>
       </p>
       <UpvoteButton v-if="variant" class="mb-5" :variant="variant" />
-      <!-- List of rules -->
       <div class="content mb-0">
-        <p>{{ variant?.description }}</p>
+        <VueMarkdown v-if="variant" class="mb-5" :source="variant.description" />
         <h4>Rules:</h4>
         <ul>
           <li v-for="rule in rules" :key="rule">
@@ -54,6 +53,8 @@
 <script setup lang="ts">
   import { computed, ref, watchEffect } from 'vue';
   import { useRouter, useRoute } from 'vue-router'
+  import VueMarkdown from 'vue-markdown-render'
+  
   import { useVariantStore } from '@/stores/variant'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useAuthStore } from '@/stores/auth-user'

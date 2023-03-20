@@ -13,6 +13,9 @@ $link-focus-border: $primary-light;
 $link-active: $primary;
 $link-active-border: $primary;
 
+$code: $grey-dark;
+$background: $grey-lightest;
+
 $shadow: 0 0.2em 1em 0 rgba(0, 0, 0, 0.3);
 
 @import "node_modules/bulma-checkbox/bulma-checkbox";

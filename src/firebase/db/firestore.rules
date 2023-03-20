@@ -172,7 +172,7 @@ service cloud.firestore {
         return isVariantDoc() &&
           variant.name.size() >= 3 &&
           variant.name.size() <= 50 &&
-          variant.description.size() <= 500 &&
+          variant.description.size() <= 1000 &&
           variant.IMMUTABLE.creatorDisplayName == expectedDisplayName &&
           isAuth(variant.IMMUTABLE.creatorId) &&
           variant.IMMUTABLE.initialState.size() <= 100000;

@@ -88,10 +88,11 @@
         :error-handler="errorMsgHandler"/>
       <br>
       <br>
-      <SmartTextInput :multiline="true" placeholder="Describe the rules of the variant and how fun it is to play!"
+      <SmartTextInput :multiline="true"
+        :placeholder="'Describe the rules of the variant and how fun it is to play!\nYou can use **Markdown** to format your text.'"
         :start-text="draftStore.state.description"
         @changed="text => draftStore.state.description = text"
-        :validator="(text) => {if (text.length > 500) return 'Variant description must be at most 500 characters long'}"
+        :validator="(text) => {if (text.length > 1000) return 'Variant description must be at most 1000 characters long'}"
         :error-handler="errorMsgHandler"/>
       <br>
       
