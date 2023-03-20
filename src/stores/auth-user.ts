@@ -11,9 +11,10 @@ import * as fb from 'firebase/auth'
 
 
 export class AuthUser extends User {
-  public uid: string
-  public email: string
-  public verified: boolean
+  public readonly uid: string
+  public readonly email: string
+  public readonly verified: boolean
+  public readonly signInProvider: 'password' | 'google.com' | 'github.com'
   
   constructor(user: fb.User, username: string) {
     if (!user.email) throw new Error('User has no email')
@@ -25,6 +26,15 @@ export class AuthUser extends User {
     this.uid = user.uid
     this.email = user.email
     this.verified = user.emailVerified
+    
+    if (user.providerData.length === 0) {
+      throw new Error('User has no provider data')
+    }
+    const p = user.providerData[0].providerId
+    if (p !== 'password' && p !== 'google.com' && p !== 'github.com') {
+      throw new Error('Unknown provider: ' + p)
+    }
+    this.signInProvider = p
   }
 }
 
@@ -119,12 +129,19 @@ export const useAuthStore = defineStore('auth-user', () => {
     })
   }
   
+  async function getProvider(email: string): Promise<string> {
+    const methods = await fb.fetchSignInMethodsForEmail(auth, email)
+    if (methods.length === 0) throw new UserNotFoundError()
+    if (methods.length > 1) throw new Error('User has multiple sign in methods')
+    return methods[0]
+  }
+  
   // Returns true if a username is available
   async function checkUsername(username: string): Promise<boolean> {
     return (await UserDB.getId(username)) === undefined
   }
 
-  return { emailLogIn, emailRegister, thirdPartyRegister, signOut, sendEmailVerification, checkUsername, updateUser, loggedUser }
+  return { emailLogIn, emailRegister, thirdPartyRegister, signOut, sendEmailVerification, getProvider, checkUsername, updateUser, loggedUser }
 })
 
 

@@ -111,6 +111,7 @@
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
   import { debounce } from '@/utils/ts-utils'
+import { RechessError } from '@/utils/errors/RechessError'
   
   
   const emailRef = ref<InstanceType<typeof SmartTextInput>>()
@@ -244,6 +245,13 @@
         toggleRegister()
         usernameRef.value?.focus()
         return
+      }
+      if (e instanceof RechessError && e.code === 'WRONG_PASSWORD') {
+        // The user might have tried to log in with a mail associated with a google account
+        const provider = await authStore.getProvider(email.value)
+        // The user has definitely entered the wrong password
+        if (provider === 'password') throw e
+        throw new RechessError('WRONG_PASSWORD_PROVIDER')
       }
       throw e
     }
