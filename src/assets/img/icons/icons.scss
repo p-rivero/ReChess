@@ -101,6 +101,14 @@
 }
 
 
+/* at.svg */
+.icon-at {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/at.svg");
+    mask-image: url("@/assets/img/icons/at.svg");
+}
+
+
 /* block.svg */
 .icon-block {
     @extend .icon-common;
@@ -149,6 +157,22 @@
 }
 
 
+/* github.svg */
+.icon-github {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/github.svg");
+    mask-image: url("@/assets/img/icons/github.svg");
+}
+
+
+/* google.svg */
+.icon-google {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/google.svg");
+    mask-image: url("@/assets/img/icons/google.svg");
+}
+
+
 /* heart-fill.svg */
 .icon-heart-fill {
     @extend .icon-common;
@@ -162,6 +186,14 @@
     @extend .icon-common;
     -webkit-mask-image: url("@/assets/img/icons/heart.svg");
     mask-image: url("@/assets/img/icons/heart.svg");
+}
+
+
+/* key.svg */
+.icon-key {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/key.svg");
+    mask-image: url("@/assets/img/icons/key.svg");
 }
 
 

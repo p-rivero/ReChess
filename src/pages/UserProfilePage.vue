@@ -1,16 +1,44 @@
 <template>
-  <!-- USER PROFILE PAGE -->
-  <div>
-    {{ user?.displayName }}
-    <div v-if="isMyProfile" @click="authStore.signOut">
-      Log out
+  <div class="columns">
+    <div class="column is-8">
+      <p class="is-size-2 mb-4">{{ user?.displayName }}</p>
+      <div class="is-flex is-align-items-center mb-4">
+        <div class="sz-2 icon-at color-theme"></div>
+        <p class="is-size-5 ml-2"> {{ user?.username }} </p>
+      </div>
+      <div v-if="myProfile(user)" class="is-flex is-align-items-center mb-4">
+        <div class="sz-2 color-theme" :class="{
+          'icon-mail': user.signInProvider === 'password',
+          'icon-google': user.signInProvider === 'google.com',
+          'icon-github': user.signInProvider === 'github.com',
+        }"></div>
+        <p class="is-size-5 ml-2 mr-3"> {{ user.email }} </p>
+        <button v-if="user.signInProvider === 'password'" class="button ml-4">
+          <div class="sz-icon icon-key color-theme"></div>
+          Change password
+        </button>
+      </div>
+      <div class="content mb-0 pt-4">
+        <h4>About:</h4>
+        <div class="about-container">
+          <p class="abo">{{ user?.about }}</p>
+        </div>
+      </div>
+      
+      <button v-if="myProfile(user)" class="button is-primary mb-4" @click="signOut">
+        <div class="sz-icon icon-logout color-white"></div>
+        Sign out
+      </button>
+    </div>
+    <div class="column is-4">
+      
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 
-  import { computed, ref, watchEffect, watch } from 'vue'
+  import { ref, watchEffect } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { AuthUser, useAuthStore } from '@/stores/auth-user'
   import { User, useUserStore } from '@/stores/user'
@@ -21,8 +49,6 @@
   const authStore = useAuthStore()
   const userStore = useUserStore()
   
-  const isMyProfile = computed(() => user.value?.uid === authStore.loggedUser?.uid)
-  // If isMyProfile is true, user will be an AuthUser
   const user = ref<User | AuthUser>()
   
   // When the route or logged user changes, update the user
@@ -50,5 +76,23 @@
     user.value = fetchedUser
     updateTitle(user.value?.displayName)
   })
+  
+  function myProfile(user: User | AuthUser | undefined): user is AuthUser {
+    if (!user) return false
+    return user.uid === authStore.loggedUser?.uid
+  }
+  
+  
+  async function signOut() {
+    authStore.signOut()
+    router.push({ name: 'home' })
+  }
 
 </script>
+
+
+<style scoped lang="scss">
+  .about-container{
+    min-height: 5rem;
+  }
+</style>

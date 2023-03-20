@@ -7,8 +7,8 @@
       <p class="mt-3 is-size-5 has-text-weight-semibold">{{ variant.displayName }}</p>
     </div>
     
-    <p class="mb-3 has-text-weight-light" @click="creatorClicked">
-      By <a>{{ variant.creatorDisplayName }}</a>
+    <p class="mb-3 has-text-weight-light">
+      By <a @click="creatorClicked">{{ variant.creatorDisplayName }}</a>
     </p>
     <div class="columns is-mobile mb-0">
       <div class="column is-narrow pr-0">
