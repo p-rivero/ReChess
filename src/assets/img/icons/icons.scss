@@ -189,6 +189,14 @@
 }
 
 
+/* info.svg */
+.icon-info {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/info.svg");
+    mask-image: url("@/assets/img/icons/info.svg");
+}
+
+
 /* key.svg */
 .icon-key {
     @extend .icon-common;

@@ -146,7 +146,7 @@
       <PiecesSummary 
         :editable="true"
         :state="draftStore.state"
-        @edit-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
+        @piece-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
         @delete-click="pieceIndex => deletePiece(pieceIndex)"
         @new-click="createNewPiece" />
     </div>
