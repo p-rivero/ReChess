@@ -41,7 +41,7 @@
           'has-text-danger': usernameStatus === 'taken',
           'has-text-success': usernameStatus === 'available',
         }" >
-        rechess.org/users/<b>{{ username }}</b>
+        rechess.org/user/<b>{{ username }}</b>
         {{ usernameStatus === 'taken' ? 'is already taken' : usernameStatus === 'available' ? 'is available' : '' }}
       </p>
     </div>

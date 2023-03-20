@@ -45,7 +45,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     name: 'user-profile',
-    path: '/users/:username',
+    path: '/user/:username',
     component: () => import('@/pages/UserProfilePage.vue'),
   },
   {
