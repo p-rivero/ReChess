@@ -181,6 +181,22 @@
 }
 
 
+/* logout.svg */
+.icon-logout {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/logout.svg");
+    mask-image: url("@/assets/img/icons/logout.svg");
+}
+
+
+/* mail.svg */
+.icon-mail {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/mail.svg");
+    mask-image: url("@/assets/img/icons/mail.svg");
+}
+
+
 /* report.svg */
 .icon-report {
     @extend .icon-common;

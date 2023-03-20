@@ -21,3 +21,9 @@ Example of a white button with a black icon:
     <span>Add piece</span>
 </button>
 ```
+
+## Tabler Icons
+
+Most of the icons are from [Tabler Icons](https://github.com/tabler/tabler-icons). Please see their [license](https://github.com/tabler/tabler-icons/blob/master/LICENSE).
+
+The other icons are my own work, and have the same license as the rest of the repository.
