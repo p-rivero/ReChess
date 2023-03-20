@@ -9,20 +9,20 @@ $scheme-invert-bis: $black-bis;
 $scheme-invert-ter: $black-ter;
 
 $primary: $brown;
-$primary-dark: $dark-brown;
-$primary-light: $light-brown;
+$primary-dark: $light-brown;
+$primary-light: $dark-brown;
 
 $text: $grey-lightest;
 $text-light: $grey-light;
 $text-strong: $white;
 
-$link: $primary-light;
-$link-visited: $primary-light;
+$link: $primary-dark;
+$link-visited: $primary-dark;
 $link-hover: $grey-lighter;
 $link-focus: $primary;
 $link-focus-border: $primary;
-$link-active: $primary-light;
-$link-active-border: $primary-light;
+$link-active: $primary-dark;
+$link-active-border: $primary-dark;
 
 $border: $grey-dark;
 $border-hover: $grey;

@@ -40,12 +40,15 @@
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import UpvoteButton from '@/components/ViewVariant/UpvoteButton.vue'
   import { showPopup } from '@/components/Popup/popup-manager'
+  import { requestSignIn } from '@/components/Auth/auth-manager'
   import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { useAuthStore } from '@/stores/auth-user'
   import { useUserStore } from '@/stores/user'
   import { clone } from '@/utils/ts-utils'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const draftStore = useVariantDraftStore()
+  const authStore = useAuthStore()
   const userStore = useUserStore()
   const router = useRouter()
   
@@ -63,6 +66,10 @@
   })
   
   function useAsTemplate() {
+    if (!authStore.loggedUser) {
+      requestSignIn()
+      return
+    }
     if (!draftStore.hasDraft()) {
       // Nothing will be lost, so just go ahead and edit
       draftStore.state = clone(props.variant)

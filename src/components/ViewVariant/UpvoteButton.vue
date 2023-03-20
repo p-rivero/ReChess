@@ -14,10 +14,13 @@
 <script setup lang="ts">
   import { computed, ref } from 'vue'
   import type { PublishedVariantGui } from '@/protochess/types'
-  import { showPopup } from '@/components/Popup/popup-manager';
+  import { showPopup } from '@/components/Popup/popup-manager'
+  import { requestSignIn } from '@/components/Auth/auth-manager'
+  import { useAuthStore } from '@/stores/auth-user'
   import { useVariantStore } from '@/stores/variant'
   
   const variantStore = useVariantStore()
+  const authStore = useAuthStore()
   const animateHeart = ref(false)
   
   const props = defineProps<{
@@ -32,6 +35,10 @@
   })
   
   async function upvoteClicked() {
+    if (!authStore.loggedUser) {
+      requestSignIn()
+      return
+    }
     const variant = props.variant
     // Update the UI optimistically. If this is an upvote, animate the heart
     variant.loggedUserUpvoted = !variant.loggedUserUpvoted

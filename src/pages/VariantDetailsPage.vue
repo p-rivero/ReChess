@@ -56,6 +56,7 @@
   import { useRouter, useRoute } from 'vue-router'
   import { useVariantStore } from '@/stores/variant'
   import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { useAuthStore } from '@/stores/auth-user'
   import { useUserStore } from '@/stores/user'
   import type { PublishedVariantGui } from '@/protochess/types'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
@@ -63,6 +64,7 @@
   import UpvoteButton from '@/components/ViewVariant/UpvoteButton.vue'
   import PiecesSummary from '@/components/EditVariant/PiecesSummary.vue'
   import { showPopup } from '@/components/Popup/popup-manager'
+  import { requestSignIn } from '@/components/Auth/auth-manager'
   import { clone } from '@/utils/ts-utils'
   import { nTimes } from '@/utils/locale'
   import { updateTitle } from '@/utils/web-utils'
@@ -72,6 +74,7 @@
   const route = useRoute()
   const variantStore = useVariantStore()
   const draftStore = useVariantDraftStore()
+  const authStore = useAuthStore()
   const userStore = useUserStore()
   
   const variant = ref<PublishedVariantGui>()
@@ -152,6 +155,10 @@
   })
   
   function useAsTemplate() {
+    if (!authStore.loggedUser) {
+      requestSignIn()
+      return
+    }
     if (!draftStore.hasDraft()) {
       // Nothing will be lost, so just go ahead and edit
       draftStore.state = clone(variant.value!)
