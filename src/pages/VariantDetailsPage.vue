@@ -2,7 +2,9 @@
   <div class="columns">
     <div class="column is-5">
       <p class="is-size-2 mb-2">{{ variant?.displayName }}</p>
-      <p class="is-size-5 has-text-weight-semibold mb-5">Created by <a>{{ variant?.creatorDisplayName }}</a></p>
+      <p class="is-size-5 has-text-weight-semibold mb-5">Created by 
+        <a @click="creatorClicked">{{ variant?.creatorDisplayName }}</a>
+      </p>
       <p>{{ variant?.description }}</p>
     </div>
     
@@ -40,10 +42,11 @@
   import { useRouter, useRoute } from 'vue-router'
   import { useVariantStore } from '@/stores/variant'
   import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { useUserStore } from '@/stores/user'
   import type { PublishedVariantGui } from '@/protochess/types'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import PlayPopup from '@/components/Popup/PlayPopup.vue'
-  import { showPopup } from '@/components/Popup/popup-manager';
+  import { showPopup } from '@/components/Popup/popup-manager'
   import { clone } from '@/utils/ts-utils'
   
 
@@ -51,6 +54,7 @@
   const route = useRoute()
   const variantStore = useVariantStore()
   const draftStore = useVariantDraftStore()
+  const userStore = useUserStore()
   
   const variant = ref<PublishedVariantGui>()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
@@ -97,6 +101,15 @@
         router.push({ name: 'edit-variant' })
       }
     )
+  }
+  
+  async function creatorClicked() {
+    // Get the username of the creator
+    const user = await userStore.getUserById(variant.value!.creatorId)
+    if (!user) {
+      throw new Error('Could not find user with id ' + variant.value!.creatorId)
+    }
+    router.push({ name: 'user-profile', params: { username: user.username } })
   }
   
 </script>

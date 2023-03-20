@@ -44,14 +44,18 @@
 <script setup lang="ts">
   import type { PublishedVariantGui } from '@/protochess/types'
   import { onMounted, ref, computed } from 'vue'
+  import { useRouter } from 'vue-router'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import { showPopup } from '@/components/Popup/popup-manager'
   import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { useUserStore } from '@/stores/user'
   import { clone } from '@/utils/ts-utils'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
-  const draftStore = useVariantDraftStore()
   const animateHeart = ref(false)
+  const draftStore = useVariantDraftStore()
+  const userStore = useUserStore()
+  const router = useRouter()
   
   const props = defineProps<{
     variant: PublishedVariantGui
@@ -96,7 +100,12 @@
   }
   
   async function creatorClicked() {
-    console.log('creator clicked', props.variant.creatorId)
+    // Get the username of the creator
+    const user = await userStore.getUserById(props.variant.creatorId)
+    if (!user) {
+      throw new Error('Could not find user with id ' + props.variant.creatorId)
+    }
+    router.push({ name: 'user-profile', params: { username: user.username } })
   }
   
   function upvoteClicked() {

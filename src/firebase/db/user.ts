@@ -48,13 +48,6 @@ export async function getUserById(uid: string): Promise<UserDoc | undefined> {
   return document.data() as UserDoc
 }
 
-// username -> UserDoc
-export async function getUserByUsername(username: string): Promise<UserDoc | undefined> {
-  const userId = await getId(username)
-  if (!userId) return undefined
-  return getUserById(userId)
-}
-
 // userId -> username
 export async function getUsername(uid: string): Promise<string> {
   const user = await getUserById(uid)

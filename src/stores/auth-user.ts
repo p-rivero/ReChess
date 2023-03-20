@@ -20,7 +20,7 @@ export class AuthUser extends User {
     
     const displayName = user.displayName ?? undefined // null -> undefined
     const photoURL = user.photoURL ?? undefined // null -> undefined
-    super(username, displayName, undefined, photoURL)
+    super(user.uid, username, displayName, undefined, photoURL)
     
     this.uid = user.uid
     this.email = user.email

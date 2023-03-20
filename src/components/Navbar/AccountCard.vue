@@ -17,13 +17,13 @@
 <script setup lang="ts">
   import { useAuthStore } from '@/stores/auth-user'
   import { requestSignIn } from '@/components/Auth/auth-manager'
+  import { useRouter } from 'vue-router'
   
   const authStore = useAuthStore()
+  const router = useRouter()
     
   async function onAccountClick() {
-    // TODO: Go to account page instead
-    authStore.signOut()
-    window.location.reload()
+    router.push({ name: 'user-profile', params: { username: authStore.loggedUser?.username } })
   }
 </script>
 

@@ -44,6 +44,11 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/AnalysisPage.vue'),
   },
   {
+    name: 'user-profile',
+    path: '/users/:username',
+    component: () => import('@/pages/UserProfilePage.vue'),
+  },
+  {
     name: 'privacy',
     path: '/privacy',
     component: () => import('@/pages/legal/PrivacyPolicyPage.vue'),
