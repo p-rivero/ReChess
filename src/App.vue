@@ -4,7 +4,7 @@
   
   <NavbarComponent />
   <div class="page-container is-flex is-flex-direction-row is-justify-content-center">
-    <div class="page-content w-100 px-4 py-4">
+    <div class="page-content w-100 mx-4 my-4">
       <RouterView />
     </div>
   </div>

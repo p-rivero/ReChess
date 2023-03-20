@@ -1,14 +1,14 @@
 <template>
   <div class="columns">
-    <div class="column is-5">
+    <div class="column is-6">
       <p class="is-size-2 mb-2">{{ variant?.displayName }}</p>
-      <p class="is-size-5 has-text-weight-semibold mb-5">Created by 
+      <p class="is-size-5 has-text-weight-semibold mb-4">Created by 
         <a @click="creatorClicked">{{ variant?.creatorDisplayName }}</a>
       </p>
       <p>{{ variant?.description }}</p>
     </div>
     
-    <div class="column is-6 columns reverse-columns">
+    <div class="column is-6 columns reverse-columns px-0">
       <div class="column mt-2 is-5 is-narrow">
         <button class="button is-primary is-fullwidth mb-4" @click="playPopup?.show(variant?.uid)">
           <div class="sz-icon icon-knight color-white"></div>
@@ -28,7 +28,7 @@
         </button>
       </div>
       
-      <div class="column mt-2 is-8">
+      <div class="column mt-2 is-7 px-0">
         <ViewableChessBoard ref="board" class="not-clickable" :white-pov="true" :view-only="true" :show-coordinates="true" :capture-wheel-events="false" />
       </div>
     </div>
