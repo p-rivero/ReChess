@@ -22,7 +22,7 @@
     <div id="navbarMenu" class="navbar-menu">
       <div class="navbar-start">
         <a class="navbar-item" href="/">
-          <img src="@/assets/img/logo.svg" class="logo" alt="ReChess: Chess reinvented by you">
+          <div class="logo"></div>
         </a>
         <a class="navbar-item" href="/">Browse</a>
         <a class="navbar-item" @click="create">Create</a>
@@ -81,7 +81,17 @@
     max-height: 2rem;
   }
   .logo {
-    width: 12rem;
+    // Prevent jump when loading the logo
+    width: 10.4rem;
+    height: 2rem;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  [data-theme="light"] .logo {
+    background-image: url('@/assets/img/logo-light.svg');
+  }
+  [data-theme="dark"] .logo {
+    background-image: url('@/assets/img/logo-dark.svg');
   }
   .navbar-item {
     height: 4rem;
