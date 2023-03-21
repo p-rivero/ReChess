@@ -11,19 +11,18 @@ export class User {
   public readonly profileImg?: string
   public readonly displayName: string
   
-  constructor(uid: string, username: string, name?: string, about?: string, profileImg?: string) {
-    this.uid = uid
-    this.username = username
+  constructor(id: string, doc?: UserDoc) {
+    const name = doc?.name ?? undefined // null -> undefined
+    const profileImg = doc?.profileImg ?? undefined
+    
+    // If the user has logged in with a third-party provider, the document
+    // doesn't exist until they choose a username. Store '' temporarily until the user chooses a username.
+    this.uid = id
+    this.username = doc?.IMMUTABLE.username ?? ''
     this.name = name
-    this.about = about
+    this.about = doc?.about
     this.profileImg = profileImg
-    this.displayName = name ?? `@${username}`
-  }
-  
-  static fromDoc(id: string, doc: UserDoc): User {
-    const name = doc.name ?? undefined
-    const profileImg = doc.profileImg ?? undefined
-    return new User(id, doc.IMMUTABLE.username, name, doc.about, profileImg)
+    this.displayName = name ?? `@${this.username}`    
   }
 }
 
@@ -35,7 +34,7 @@ export const useUserStore = defineStore('user', () => {
     
     const doc = await UserDB.getUserById(id)
     if (!doc) return undefined
-    lastUserCache.value = User.fromDoc(id, doc)
+    lastUserCache.value = new User(id, doc)
     return lastUserCache.value
   }
   
@@ -48,7 +47,7 @@ export const useUserStore = defineStore('user', () => {
     if (!id) return undefined
     const doc = await UserDB.getUserById(id)
     if (!doc) return undefined
-    lastUserCache.value = User.fromDoc(id, doc)
+    lastUserCache.value = new User(id, doc)
     return lastUserCache.value
   }
   

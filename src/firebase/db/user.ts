@@ -5,7 +5,7 @@ import { doc, getDoc, writeBatch } from 'firebase/firestore'
 import type { User } from '@firebase/auth'
 
 // Creates a new user in the database (public data + private data + username)
-export async function createUser(user: User, username: string) {
+export async function createUser(user: User, username: string): Promise<UserDoc> {
   const batch = writeBatch(db)
   const newPublicData: UserDoc = {
     name: user.displayName,
@@ -31,6 +31,8 @@ export async function createUser(user: User, username: string) {
   batch.set(doc(db, "usernames", username), newUsername)
   
   await batch.commit()
+  
+  return newPublicData
 }
 
 // username -> userId
@@ -47,13 +49,3 @@ export async function getUserById(uid: string): Promise<UserDoc | undefined> {
   if (!document.exists()) return undefined
   return document.data() as UserDoc
 }
-
-// userId -> username
-export async function getUsername(uid: string): Promise<string> {
-  const user = await getUserById(uid)
-  // If the user has logged in with a third-party provider, the document
-  // doesn't exist until they choose a username.
-  if (!user) return ''
-  return user.IMMUTABLE.username
-}
-

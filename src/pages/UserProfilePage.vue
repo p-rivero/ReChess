@@ -13,15 +13,16 @@
           'icon-github': user.signInProvider === 'github.com',
         }"></div>
         <p class="is-size-5 ml-2 mr-3"> {{ user.email }} </p>
-        <button v-if="user.signInProvider === 'password'" class="button ml-4">
+        <button v-if="user.signInProvider === 'password'" class="button ml-4" @click="resetPassword">
           <div class="sz-icon icon-key color-theme"></div>
           Change password
         </button>
       </div>
       <div class="content mb-0 pt-4">
         <h4>About:</h4>
-        <div class="about-container">
-          <p class="abo">{{ user?.about }}</p>
+        <p v-if="!user?.about" class="is-italic mb-6">No description</p>
+        <div v-else class="content mb-6">
+          <VueMarkdown :source="user.about" />
         </div>
       </div>
       
@@ -43,6 +44,8 @@
   import { AuthUser, useAuthStore } from '@/stores/auth-user'
   import { User, useUserStore } from '@/stores/user'
   import { updateTitle } from '@/utils/web-utils'
+  import VueMarkdown from 'vue-markdown-render'
+import { showPopup } from '@/components/Popup/popup-manager'
   
   const router = useRouter()
   const route = useRoute()
@@ -82,6 +85,12 @@
     return user.uid === authStore.loggedUser?.uid
   }
   
+  
+  async function resetPassword() {
+    console.log('reset password')
+    await authStore.sendResetPasswordEmail()
+    showPopup('Change password', 'We have sent you an email to reset your password.', 'ok')
+  }
   
   async function signOut() {
     authStore.signOut()
