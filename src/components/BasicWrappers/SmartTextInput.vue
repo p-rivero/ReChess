@@ -2,11 +2,13 @@
   <input v-if="!multiline" class="input" :type="type" ref="textInput"
     :class="{'is-danger': isError}"
     :placeholder="props.placeholder"
-    @input="inputChanged">
+    @input="inputChanged"
+    @keydown.enter="emit('enter-pressed')">
   <textarea v-else class="textarea" ref="textInput" 
     :class="{'is-danger': isError}" :type="type"
     :placeholder="props.placeholder"
-    @input="inputChanged">
+    @input="inputChanged"
+    @keydown.enter="emit('enter-pressed')">
   </textarea>
 </template>
 
@@ -31,6 +33,7 @@
   
   const emit = defineEmits<{
     (event: 'changed', text: string): void
+    (event: 'enter-pressed'): void
   }>()
   
   

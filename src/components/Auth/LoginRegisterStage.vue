@@ -58,7 +58,8 @@
         }"
         :emit-changed-when-error="true"
         :start-text="password"
-        @changed="text => password = text"/>
+        @changed="text => password = text"
+        @enter-pressed="signInClick"/>
     </div>
     
     <div v-show="isRegister" class="mb-5">
@@ -72,7 +73,8 @@
           if (text.length < 6 || text !== password) return 'Passwords must match and be at least 6 characters long'
         }"
         :start-text="passwordRepeat"
-        @changed="text => passwordRepeat = text"/>
+        @changed="text => passwordRepeat = text"
+        @enter-pressed="signInClick"/>
     </div>
     
     <SmartErrorMessage class="mb-4" v-show="hasError" :handler="errorHandler" />
@@ -83,7 +85,7 @@
     
     <div class="pb-2 is-flex is-justify-content-space-between is-align-items-center">
       <button class="button is-primary mr-4" @click="signInClick"
-        :class="{'is-loading': loading}" :disabled="hasError || loading || (isRegister && usernameStatus !== 'available')">
+        :class="{'is-loading': loading}" :disabled="submitDisabled">
         {{ isRegister ? 'Register' : 'Sign in' }}
       </button>
       <a v-if="!isRegister" @click="toggleRegister">Don't have an account?</a>
@@ -101,7 +103,7 @@
   import { GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth'
   import type { UserCredential } from '@firebase/auth'
   
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useAuthStore } from '@/stores/auth-user'
   import { authUI } from '@/firebase'
   import { UserDB } from '@/firebase/db'
@@ -111,7 +113,7 @@
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
   import { debounce } from '@/utils/ts-utils'
-import { RechessError } from '@/utils/errors/RechessError'
+  import { RechessError } from '@/utils/errors/RechessError'
   
   
   const emailRef = ref<InstanceType<typeof SmartTextInput>>()
@@ -129,6 +131,10 @@ import { RechessError } from '@/utils/errors/RechessError'
   const usernameStatus = ref<'available' | 'taken' | 'unknown'>('unknown')
   const hasError = ref(false)
   const errorHandler = new ErrorMessageHandler(hasError)
+  
+  const submitDisabled = computed(() => {
+    return hasError.value || loading.value || (isRegister.value && usernameStatus.value !== 'available')
+  })
   
   
   const firebaseuiSettings: firebaseui.auth.Config = {
@@ -204,6 +210,7 @@ import { RechessError } from '@/utils/errors/RechessError'
   }, 1000)
   
   async function signInClick() {
+    if (submitDisabled.value) return
     loading.value = true
     try {
       if (isRegister.value) await register()

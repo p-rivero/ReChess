@@ -15,7 +15,8 @@
           if (!(/^[a-zA-Z0-9_]+$/).test(text)) return 'Username can only contain letters, numbers, and underscores'
         }"
         :start-text="username"
-        @changed="updateUsername"/>
+        @changed="updateUsername"
+        @enter-pressed="submit"/>
       <p class="help" v-show="username !== ''"
         :class="{
           'has-text-danger': usernameStatus === 'taken',
@@ -33,8 +34,7 @@
     </p>
     
     <div class="is-flex">
-      <button class="button is-primary" @click="submit" :class="{'is-loading': loading}"
-        :disabled="hasError || loading || !username || usernameStatus !== 'available'">
+      <button class="button is-primary" @click="submit" :class="{'is-loading': loading}" :disabled="submitDisabled">
         Submit
       </button>
     </div>
@@ -50,7 +50,7 @@
 
 <script setup lang="ts">  
   import { useAuthStore } from '@/stores/auth-user'
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import SmartTextInput from '../BasicWrappers/SmartTextInput.vue'
   import SmartErrorMessage from '../BasicWrappers/SmartErrorMessage.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
@@ -62,6 +62,10 @@
   const hasError = ref(false)
   const loading = ref(false)
   const errorHandler = new ErrorMessageHandler(hasError)
+  
+  const submitDisabled = computed(() => {
+    return hasError.value || loading.value || !username.value || usernameStatus.value !== 'available'
+  })
   
   defineExpose({
     init() {
@@ -99,6 +103,7 @@
   }, 1000)
   
   async function submit() {
+    if (submitDisabled.value) return
     loading.value = true
     try {
       await authStore.thirdPartyRegister(username.value)
