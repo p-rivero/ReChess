@@ -139,14 +139,17 @@
   
   const firebaseuiSettings: firebaseui.auth.Config = {
     signInFlow: 'popup',
-    signInSuccessUrl: '/',
+    signInSuccessUrl: 'rechess.org',
     signInOptions: [
       GoogleAuthProvider.PROVIDER_ID,
       GithubAuthProvider.PROVIDER_ID,
     ],
+    tosUrl: 'rechess.org/tos',
+    privacyPolicyUrl: 'rechess.org/privacy',
     callbacks: {
       signInSuccessWithAuthResult: (authResult: UserCredential) => {
         loading.value = true
+        console.log('User updated', authResult)
         authStore.updateUser(authResult.user).then(async () => {
           const user = await UserDB.getUserById(authResult.user.uid)
           if (user) {
@@ -162,6 +165,9 @@
       uiShown: () => {
         loadingSocialSignin.value = false
       },
+      signInFailure: (error: firebaseui.auth.AuthUIError) => {
+        console.error('Sign in failed', error)
+      }
     }
   }
   
