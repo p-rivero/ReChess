@@ -144,8 +144,6 @@
       GoogleAuthProvider.PROVIDER_ID,
       GithubAuthProvider.PROVIDER_ID,
     ],
-    tosUrl: 'rechess.org/tos',
-    privacyPolicyUrl: 'rechess.org/privacy',
     callbacks: {
       signInSuccessWithAuthResult: (authResult: UserCredential) => {
         loading.value = true
