@@ -7,8 +7,9 @@ export class User {
   public readonly uid: string
   public readonly username: string
   public readonly name?: string
-  public readonly about?: string
+  public about: string
   public readonly profileImg?: string
+  public readonly numWins: number
   public readonly displayName: string
   
   constructor(id: string, doc?: UserDoc) {
@@ -20,8 +21,9 @@ export class User {
     this.uid = id
     this.username = doc?.IMMUTABLE.username ?? ''
     this.name = name
-    this.about = doc?.about
+    this.about = doc?.about ?? ''
     this.profileImg = profileImg
+    this.numWins = doc?.IMMUTABLE.numWins ?? 0
     this.displayName = name ?? `@${this.username}`    
   }
 }
@@ -29,6 +31,7 @@ export class User {
 export const useUserStore = defineStore('user', () => {
   const lastUserCache = ref<User | undefined>(undefined)
   
+  // userId -> User
   async function getUserById(id: string): Promise<User | undefined> {
     if (lastUserCache.value?.uid === id) return lastUserCache.value
     
@@ -38,6 +41,7 @@ export const useUserStore = defineStore('user', () => {
     return lastUserCache.value
   }
   
+  // username -> User
   async function getUserByUsername(username: string): Promise<User | undefined> {
     if (lastUserCache.value?.username === username) {
       return lastUserCache.value
@@ -51,5 +55,19 @@ export const useUserStore = defineStore('user', () => {
     return lastUserCache.value
   }
   
-  return { getUserById, getUserByUsername }
+  // Store a user in the database
+  async function storeUser(user: User): Promise<void> {
+    const doc: UserDoc = {
+      name: user.name ?? null,
+      about: user.about,
+      profileImg: user.profileImg ?? null,
+      IMMUTABLE: {
+        username: user.username,
+        numWins: user.numWins
+      }
+    }
+    await UserDB.updateUser(user.uid, doc)
+  }
+  
+  return { getUserById, getUserByUsername, storeUser }
 })

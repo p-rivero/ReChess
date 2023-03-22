@@ -45,9 +45,11 @@
       } else if (buttons === 'yes-no') {
         primaryButtonText.value = 'Yes'
         secondaryButtonText.value = 'No'
-      } else {
+      } else if (buttons === 'ok') {
         primaryButtonText.value = 'OK'
         secondaryButtonText.value = null
+      } else {
+        throw new Error('Invalid button type')
       }
       popup.value?.classList.add('is-active')
       document.documentElement.classList.add('is-clipped')

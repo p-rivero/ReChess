@@ -7,8 +7,7 @@
   <textarea v-else class="textarea" ref="textInput" 
     :class="{'is-danger': isError}" :type="type"
     :placeholder="props.placeholder"
-    @input="inputChanged"
-    @keydown.enter="emit('enter-pressed')">
+    @input="inputChanged">
   </textarea>
 </template>
 
@@ -41,7 +40,12 @@
     focus() {
       if (!textInput.value) throw new Error('Text input is null')
       nextTick(() => textInput.value!.focus())
-    }
+    },
+    setText(text: string) {
+      if (!textInput.value) throw new Error('Text input is null')
+      textInput.value!.value = text
+      validate(text)
+    },
   })
   
   

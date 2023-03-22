@@ -88,7 +88,7 @@ service cloud.firestore {
       function isUserDoc() {
         return hasCorrectFields(['about', 'IMMUTABLE'], ['name', 'profileImg']) &&
           hasCorrectImmutableFields(['username', 'numWins'], []) &&
-          request.resource.data.about.size() <= 200 &&
+          request.resource.data.about.size() <= 1000 &&
           (request.resource.data.name == null ||
             (request.resource.data.name.size() <= 50 && request.resource.data.name.size() > 0)) &&
           (request.resource.data.profileImg == null ||

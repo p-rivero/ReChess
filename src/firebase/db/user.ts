@@ -1,7 +1,7 @@
 import { db } from '@/firebase'
 import type { UserDoc, UsernameDoc, UserPrivateDoc } from '@/firebase/db/schema'
 
-import { doc, getDoc, writeBatch } from 'firebase/firestore'
+import { doc, getDoc, setDoc, writeBatch } from 'firebase/firestore'
 import type { User } from '@firebase/auth'
 
 // Creates a new user in the database (public data + private data + username)
@@ -48,4 +48,9 @@ export async function getUserById(uid: string): Promise<UserDoc | undefined> {
   const document = await getDoc(doc(db, "users", uid))
   if (!document.exists()) return undefined
   return document.data() as UserDoc
+}
+
+// Store a user in the database
+export async function updateUser(uid: string, user: UserDoc): Promise<void> {
+  setDoc(doc(db, "users", uid), user)
 }
