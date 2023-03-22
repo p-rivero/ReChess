@@ -42,7 +42,7 @@ jobs:
             ~/.cargo
             ~/.rustup
             **/node_modules
-          key: ${{ runner.os }}-node-${{ steps.node.outputs.version }}-${{ hashFiles('**/Cargo.lock') }}__wasm-pack-${{ hashFiles('**/protochess-engine/**/*') }}
+          key: ${{ runner.os }}-node-${{ steps.node.outputs.version }}-${{ hashFiles('**/package-lock.json') }}__wasm-pack-${{ hashFiles('**/protochess-engine/**/*') }}
           
       - run: npm install
       
