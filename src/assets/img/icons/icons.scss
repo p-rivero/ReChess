@@ -253,6 +253,14 @@
 }
 
 
+/* save.svg */
+.icon-save {
+    @extend .icon-common;
+    -webkit-mask-image: url("@/assets/img/icons/save.svg");
+    mask-image: url("@/assets/img/icons/save.svg");
+}
+
+
 /* search.svg */
 .icon-search {
     @extend .icon-common;

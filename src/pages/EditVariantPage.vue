@@ -88,13 +88,12 @@
         :error-handler="errorMsgHandler"/>
       <br>
       <br>
-      <SmartTextInput :multiline="true"
-        :placeholder="'Describe the rules of the variant and how fun it is to play!\nYou can use **Markdown** to format your text.'"
-        :start-text="draftStore.state.description"
-        @changed="text => draftStore.state.description = text"
-        :validator="(text) => {if (text.length > 1000) return 'Variant description must be at most 1000 characters long'}"
-        :error-handler="errorMsgHandler"/>
-      <br>
+      <EditableMarkdown class="mb-5"
+          :text="draftStore.state.description"
+          :placeholder="'Describe the rules of the variant and how fun it is to play!\nYou can use **Markdown** to format your text.'"
+          :editable="true" :error-handler="errorMsgHandler"
+          :validator="text => text.length > 1000 ? 'The variant description must be at most 1000 characters long' : undefined"
+          @save="text => draftStore.state.description = text" />
       
       <label class="label">Rules:</label>
       <div class="columns is-mobile">
@@ -166,6 +165,7 @@
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import SmartDropdown from '@/components/BasicWrappers/SmartDropdown.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
+  import EditableMarkdown from '@/components/BasicWrappers/EditableMarkdown.vue'
   import PopupOverlay from '@/components/PopupMsg/PopupOverlay.vue'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'

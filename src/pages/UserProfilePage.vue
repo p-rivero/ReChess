@@ -1,10 +1,10 @@
 <template>
-  <div class="columns">
+  <div v-if="user" class="columns">
     <div class="column is-8">
-      <p class="is-size-2 mb-4">{{ user?.displayName }}</p>
+      <p class="is-size-2 mb-4">{{ user.displayName }}</p>
       <div class="is-flex is-align-items-center mb-4">
         <div class="sz-2 icon-at color-theme"></div>
-        <p class="is-size-5 ml-2"> {{ user?.username }} </p>
+        <p class="is-size-5 ml-2"> {{ user.username }} </p>
       </div>
       <div v-if="myProfile(user)" class="is-flex is-align-items-center mb-4">
         <div class="sz-2 color-theme" :class="{
@@ -22,13 +22,17 @@
       </div>
       <div class="content mb-0 pt-4">
         <h4>About:</h4>
-        <p v-if="!user?.about" class="is-italic mb-6">No description</p>
-        <div v-else class="content mb-6">
-          <VueMarkdown :source="user.about" />
-        </div>
+        <EditableMarkdown
+          :text="user.about"
+          :placeholder="'Tell us about yourself!\nYou can use **Markdown** to format your text.'"
+          :editable="myProfile(user)" :error-handler="errorHandler"
+          :validator="text => text.length > 1000 ? 'The About section must be at most 1000 characters long' : undefined"
+          @save="text => { user!.about = text; userStore.storeUser(user!) }"/>
       </div>
       
-      <button v-if="myProfile(user)" class="button is-primary mb-4" @click="signOut">
+      <SmartErrorMessage class="mt-4" v-show="hasError && myProfile(user)" :handler="errorHandler" />
+      
+      <button v-if="myProfile(user)" class="button is-primary mt-6" @click="signOut">
         <div class="sz-icon icon-logout color-white"></div>
         Sign out
       </button>
@@ -43,11 +47,14 @@
 
   import { ref, watchEffect } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
+  
   import { AuthUser, useAuthStore } from '@/stores/auth-user'
   import { User, useUserStore } from '@/stores/user'
   import { updateTitle } from '@/utils/web-utils'
-  import VueMarkdown from 'vue-markdown-render'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import EditableMarkdown from '@/components/BasicWrappers/EditableMarkdown.vue'
+  import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
+  import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   
   const router = useRouter()
   const route = useRoute()
@@ -55,7 +62,10 @@
   const userStore = useUserStore()
   
   const user = ref<User | AuthUser>()
+  const hasError = ref(false)
   const sendingResetPasswordEmail = ref(false)
+  
+  const errorHandler = new ErrorMessageHandler(hasError)
   
   // When the route or logged user changes, update the user
   watchEffect(async () => {
@@ -69,7 +79,7 @@
     if (authStore.loggedUser?.username === username) {
       // User is logged in and is viewing their own profile
       user.value = authStore.loggedUser
-      updateTitle(user.value?.displayName)
+      updateTitle(authStore.loggedUser.displayName)
       return
     }
     
@@ -80,11 +90,10 @@
       return
     }
     user.value = fetchedUser
-    updateTitle(user.value?.displayName)
+    updateTitle(fetchedUser.displayName)
   })
   
-  function myProfile(user: User | AuthUser | undefined): user is AuthUser {
-    if (!user) return false
+  function myProfile(user: User | AuthUser): user is AuthUser {
     return user.uid === authStore.loggedUser?.uid
   }
   
@@ -105,8 +114,10 @@
   }
   
   async function signOut() {
-    authStore.signOut()
-    router.push({ name: 'home' })
+    showPopup('Sign out', 'Do you want to log out of your account?', 'yes-no', async () => {
+      await authStore.signOut()
+      router.push({ name: 'home' })
+    })
   }
 
 </script>
