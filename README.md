@@ -33,15 +33,20 @@ npm install
 
 ### Using a Firebase backend
 
-1. Create a Firebase project. Make sure to enable App Check (with reCAPTCHA), Firestore, Hosting and Storage.
+1. Create a Firebase project. Make sure to enable App Check (with reCAPTCHA), Firestore, Hosting, Storage and Functions.
+   > Most of the development is done using a local emulator, but you may want to test the deployed production build
+   on a real backend without messing up your production data. In that case, I recommend creating a second Firebase project for development.
 
-2. Go to [Google Cloud credentials](https://console.cloud.google.com/apis/credentials) and create 2 API Keys (you may already have one):
-   - Browser Key for production (restrict it to your domain)
-   - Private Key for development (restrict it to `localhost`)
+2. Go to [Google Cloud credentials](https://console.cloud.google.com/apis/credentials) and get your api keys:
+   - **Browser Key for production**: The one that was created when you made your Firebase project. Restrict it to your domain.
+   - **Private Key for development**: If you made a second project for development, use its key. Otherwise, create a new key and restrict it to `localhost`.
    
-   From the project root, run `echo VITE_RECHESS_FIREBASE_API_KEY=[your private key] >> .config/.env.local`. Keep it secret!
+   From the project root, run `echo VITE_RECHESS_FIREBASE_API_KEY=[your private dev key] >> .config/.env.local`. Keep it secret!
    
    Configure GitHub Actions (or the system you use) to do the same with the production key when deploying to production.
+   
+   > Note: Remember that the browser key will be exposed to the client, so anyone can see and use it.
+   Make sure to restrict it to your domain and set up App Check properly.
 
 3. Update `src/firebase/credentials.ts` with your Firebase credentials. The `CAPTCHA_V3_PUBLIC_KEY` is the one you created for App Check.
    
@@ -73,6 +78,8 @@ npm run lint
 ```
 
 ### Build and Deploy to Firebase
+
+> Note: You shouldn't do this directly. Push to `main` and GitHub Actions will take care of it.
 
 ```sh
 firebase login

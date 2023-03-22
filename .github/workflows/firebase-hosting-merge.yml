@@ -24,18 +24,35 @@ jobs:
         with:
           node-version: 16.x
           
+      - name: Get node version
+        id: node
+        run: echo "::set-output name=version::$(node -v)"
+        
       - name: Install wasm-pack
         uses: jetli/wasm-pack-action@v0.4.0
         with:
           version: 'latest'
           
+      - name: Get cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+            ~/.cargo
+            ~/.rustup
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ steps.node.outputs.version }}-${{ hashFiles('**/Cargo.lock') }}__wasm-pack-${{ hashFiles('**/protochess-engine/**/*') }}
+          
       - run: npm install
       
-      - run: npm run build
+      - name: Build
+        run: npm run build
       
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_RECHESS_WEB }}'
-          channelId: live
-          projectId: rechess-web
+          args: deploy --project rechess-web
+        env:
+          GCP_SA_KEY: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_RECHESS_WEB }}'
+          PROJECT_ID: rechess-web
