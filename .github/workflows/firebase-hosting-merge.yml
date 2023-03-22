@@ -19,10 +19,10 @@ jobs:
         run: |
           echo "VITE_RECHESS_FIREBASE_API_KEY=${{ secrets.RECHESS_FIREBASE_API_KEY }}" >> .config/.env.local
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 16
           
       - name: Get node version
         id: node
