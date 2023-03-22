@@ -26,7 +26,7 @@ jobs:
           
       - name: Get node version
         id: node
-        run: echo "::set-output name=version::$(node -v)"
+        run: echo "version=$(node -v)" >> $GITHUB_OUTPUT
         
       - name: Install wasm-pack
         uses: jetli/wasm-pack-action@v0.4.0
