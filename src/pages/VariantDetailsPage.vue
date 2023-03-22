@@ -16,7 +16,7 @@
         </ul>
         <h4>Pieces:</h4>
       </div>
-      <PiecesSummary v-if="variant" :state="variant" :editable="false" />
+      <PiecesSummary v-if="variant" :state="variant" :editable="false" @piece-click="i => pieceDetailsPopup?.show(i)"/>
     </div>
     
     <div class="column is-6 columns reverse-columns board-column">
@@ -47,6 +47,7 @@
     </div>
   </div>
   <PlayPopup ref="playPopup" />
+  <PieceDetailsPopup v-if="variant" ref="pieceDetailsPopup" :variant="variant" />
 </template>
 
 
@@ -62,6 +63,7 @@
   import type { PublishedVariantGui } from '@/protochess/types'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
+  import PieceDetailsPopup from '@/components/ViewVariant/PieceDetailsPopup.vue'
   import UpvoteButton from '@/components/ViewVariant/UpvoteButton.vue'
   import PiecesSummary from '@/components/EditVariant/PiecesSummary.vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
@@ -81,6 +83,7 @@
   const variant = ref<PublishedVariantGui>()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const playPopup = ref<InstanceType<typeof PlayPopup>>()
+  const pieceDetailsPopup = ref<InstanceType<typeof PieceDetailsPopup>>()
     
   watchEffect(async () => {
     if (!route.params.variantId || typeof route.params.variantId !== 'string') {
