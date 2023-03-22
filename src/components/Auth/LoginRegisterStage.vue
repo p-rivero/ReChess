@@ -77,7 +77,11 @@
         @enter-pressed="signInClick"/>
     </div>
     
-    <SmartErrorMessage class="mb-4" v-show="hasError" :handler="errorHandler" />
+    <div class="mb-4 is-flex">
+      <SmartErrorMessage class="mr-5" v-show="hasError" :handler="errorHandler" />
+      <a v-show="resetPasswordHint === 'shown'" class="has-text-danger" @click="resetPassword">Reset password?</a>
+      <p v-show="resetPasswordHint === 'sending'">Sending...</p>
+    </div>
     
     <p v-if="isRegister" class="help mb-4">
       By creating an account, you agree to the <a href="/tos">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
@@ -103,13 +107,14 @@
   import { GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth'
   import type { UserCredential } from '@firebase/auth'
   
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useAuthStore } from '@/stores/auth-user'
   import { authUI } from '@/firebase'
   import { UserDB } from '@/firebase/db'
   
   import SmartTextInput from '../BasicWrappers/SmartTextInput.vue'
   import SmartErrorMessage from '../BasicWrappers/SmartErrorMessage.vue'
+  import { showPopup } from '../Popup/popup-manager'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
   import { debounce } from '@/utils/ts-utils'
@@ -130,6 +135,7 @@
   const authStore = useAuthStore()
   const usernameStatus = ref<'available' | 'taken' | 'unknown'>('unknown')
   const hasError = ref(false)
+  const resetPasswordHint = ref<'hidden' | 'shown' | 'sending'>('hidden')
   const errorHandler = new ErrorMessageHandler(hasError)
   
   const submitDisabled = computed(() => {
@@ -184,6 +190,7 @@
       isStrict.value = false
       isRegister.value = false
       loading.value = false
+      resetPasswordHint.value = 'hidden'
       username.value = ''
       passwordRepeat.value = ''
       usernameStatus.value = 'unknown'
@@ -215,6 +222,7 @@
   
   async function signInClick() {
     if (submitDisabled.value) return
+    resetPasswordHint.value = 'hidden'
     loading.value = true
     try {
       if (isRegister.value) await register()
@@ -260,8 +268,11 @@
       if (e instanceof RechessError && e.code === 'WRONG_PASSWORD') {
         // The user might have tried to log in with a mail associated with a google account
         const provider = await authStore.getProvider(email.value)
-        // The user has definitely entered the wrong password
-        if (provider === 'password') throw e
+        // The user has definitely entered the wrong password, throw the error and show hint
+        if (provider === 'password') {
+          resetPasswordHint.value = 'shown'
+          throw e
+        }
         throw new RechessError('WRONG_PASSWORD_PROVIDER')
       }
       throw e
@@ -273,4 +284,20 @@
     isStrict.value = false
     errorHandler.clear()
   }
+  
+  async function resetPassword() {
+    resetPasswordHint.value = 'sending'
+    try {
+      await authStore.sendPasswordResetEmail(email.value)
+      showPopup('Reset password', `We have sent ${email.value} an email to reset your password.`, 'ok')
+    } catch (e) {
+      console.error(e)
+      showPopup('Reset password', `Could not send email to ${email.value}. Make sure the address is correct.`, 'ok')
+    }
+    resetPasswordHint.value = 'hidden'
+  }
+  // Hide the reset password hint if the user changes anything
+  watch([email, username, password, passwordRepeat], () => {
+    resetPasswordHint.value = 'hidden'
+  })
 </script>

@@ -13,7 +13,9 @@
           'icon-github': user.signInProvider === 'github.com',
         }"></div>
         <p class="is-size-5 ml-2 mr-3"> {{ user.email }} </p>
-        <button v-if="user.signInProvider === 'password'" class="button ml-4" @click="resetPassword">
+        <button v-if="user.signInProvider === 'password'" class="button ml-4" @click="resetPassword"
+          :class="{ 'is-loading': sendingResetPasswordEmail }" :disabled="sendingResetPasswordEmail"
+        >
           <div class="sz-icon icon-key color-theme"></div>
           Change password
         </button>
@@ -45,7 +47,7 @@
   import { User, useUserStore } from '@/stores/user'
   import { updateTitle } from '@/utils/web-utils'
   import VueMarkdown from 'vue-markdown-render'
-import { showPopup } from '@/components/Popup/popup-manager'
+  import { showPopup } from '@/components/Popup/popup-manager'
   
   const router = useRouter()
   const route = useRoute()
@@ -53,6 +55,7 @@ import { showPopup } from '@/components/Popup/popup-manager'
   const userStore = useUserStore()
   
   const user = ref<User | AuthUser>()
+  const sendingResetPasswordEmail = ref(false)
   
   // When the route or logged user changes, update the user
   watchEffect(async () => {
@@ -87,9 +90,18 @@ import { showPopup } from '@/components/Popup/popup-manager'
   
   
   async function resetPassword() {
-    console.log('reset password')
-    await authStore.sendResetPasswordEmail()
-    showPopup('Change password', 'We have sent you an email to reset your password.', 'ok')
+    if (!authStore.loggedUser) {
+      throw new Error('User must be logged in to reset password')
+    }
+    sendingResetPasswordEmail.value = true
+    try {
+      await authStore.sendPasswordResetEmail(authStore.loggedUser.email)
+      showPopup('Change password', `We have sent ${authStore.loggedUser.email} an email to reset your password.`, 'ok')
+    } catch (e) {
+      console.error(e)
+      showPopup('Unable to change password at the moment', 'Please try again later.', 'ok')
+    }
+    sendingResetPasswordEmail.value = false
   }
   
   async function signOut() {
