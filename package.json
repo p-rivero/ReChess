@@ -10,13 +10,14 @@
     "test": "jest --config .config/jest.config.js",
     "pre-compile": "run-p build-wasm generate-type-guard generate-icons",
     "generate-type-guard": "ts-auto-guard ./src/protochess/types.ts && sed -i 's/import {/import type {/g' ./src/protochess/types.guard.ts",
-    "generate-icons": "chmod +x ./src/assets/img/icons/generate-icons.sh && ./src/assets/img/icons/generate-icons.sh",
+    "generate-icons": "./src/assets/img/icons/generate-icons.sh",
     "build-wasm": "make all use-pathname --directory protochess-engine/protochess-engine-wasm",
     "type-check": "vue-tsc --noEmit",
     "build-only": "vite build --config .config/vite.config.ts",
     "dev-only": "vite --config .config/vite.config.ts",
     "start-emulator": "firebase emulators:start --project rechess-web",
-    "deploy-only": "firebase deploy --project rechess-web"
+    "deploy-only": "firebase deploy --project rechess-web",
+    "postinstall": "chmod +x ./src/assets/img/icons/generate-icons.sh && (cd functions && npm i)"
   },
   "dependencies": {
     "bulma": "^0.9.4",
