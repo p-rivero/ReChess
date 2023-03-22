@@ -112,9 +112,9 @@
   import { authUI } from '@/firebase'
   import { UserDB } from '@/firebase/db'
   
-  import SmartTextInput from '../BasicWrappers/SmartTextInput.vue'
-  import SmartErrorMessage from '../BasicWrappers/SmartErrorMessage.vue'
-  import { showPopup } from '../Popup/popup-manager'
+  import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
+  import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
   import { debounce } from '@/utils/ts-utils'

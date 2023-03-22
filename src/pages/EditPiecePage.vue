@@ -191,7 +191,7 @@
   import CoordPillList from '@/components/EditVariant/CoordPillList.vue'
   import AddRemoveButtons from '@/components/EditVariant/AddRemoveButtons.vue'
   import PieceImageEdit from '@/components/EditVariant/PieceImageEdit.vue'
-  import PopupOverlay from '@/components/Popup/PopupOverlay.vue'
+  import PopupOverlay from '@/components/PopupMsg/PopupOverlay.vue'
   import type { PieceDefinition, Player } from '@/protochess/types'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useAuthStore } from '@/stores/auth-user'
@@ -200,7 +200,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { numberToLetter, letterToNumber } from '@/utils/chess/chess-coords'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
-  import { showPopup } from '@/components/Popup/popup-manager'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
   
   const router = useRouter(); 
   const route = useRoute()

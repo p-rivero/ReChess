@@ -41,7 +41,7 @@
   import { useVariantDraftStore } from '@/stores/variant-draft';
   import type { GameStateGui } from '@/protochess/types';
   import { placementsToFen } from '@/utils/chess/fen-to-placements';
-  import { showPopup } from '@/components/Popup/popup-manager';
+  import { showPopup } from '@/components/PopupMsg/popup-manager';
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const draftStore = useVariantDraftStore()

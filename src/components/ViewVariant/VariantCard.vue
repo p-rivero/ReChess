@@ -39,7 +39,7 @@
   import { useRouter } from 'vue-router'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import UpvoteButton from '@/components/ViewVariant/UpvoteButton.vue'
-  import { showPopup } from '@/components/Popup/popup-manager'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useAuthStore } from '@/stores/auth-user'

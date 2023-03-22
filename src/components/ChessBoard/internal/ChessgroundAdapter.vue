@@ -19,7 +19,7 @@
 <!-- TODO: Make pieceImages and width/height updatable without redrawing entire component -->
 
 <script setup lang="ts">
-  import { chessboardSvg } from './boardBackgroudSvg'
+  import { chessboardSvg } from './chessboard-svg'
   import { Chessground } from 'chessgroundx'
   import type * as cg from 'chessgroundx/types'
   import type { Api } from 'chessgroundx/api'

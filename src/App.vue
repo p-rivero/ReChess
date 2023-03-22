@@ -13,10 +13,10 @@
 <script setup lang="ts">
   import NavbarComponent from '@/components/Navbar/NavbarComponent.vue'
   import { ref, onMounted } from 'vue'
-  import SignInPopup from '@/components/Popup/SignInPopup.vue'
-  import PopupMessage from '@/components/Popup/PopupMessage.vue'
+  import SignInPopup from '@/components/Auth/SignInPopup.vue'
+  import PopupMessage from '@/components/PopupMsg/PopupMessage.vue'
   import { setSignInPopup, signInRefresh } from '@/components/Auth/auth-manager'
-  import { setMessagePopup } from '@/components/Popup/popup-manager'
+  import { setMessagePopup } from '@/components/PopupMsg/popup-manager'
   
   const signInPopup = ref<InstanceType<typeof SignInPopup>>()
   const messagePopup = ref<InstanceType<typeof PopupMessage>>()

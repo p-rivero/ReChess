@@ -47,7 +47,7 @@
   import { User, useUserStore } from '@/stores/user'
   import { updateTitle } from '@/utils/web-utils'
   import VueMarkdown from 'vue-markdown-render'
-  import { showPopup } from '@/components/Popup/popup-manager'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
   
   const router = useRouter()
   const route = useRoute()

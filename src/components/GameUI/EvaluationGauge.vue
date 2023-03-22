@@ -27,7 +27,7 @@
 <script setup lang="ts">
   import type { MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
   import { getMessage } from '@/utils/chess/game-over-message'
-  import { showPopup } from '@/components/Popup/popup-manager';
+  import { showPopup } from '@/components/PopupMsg/popup-manager';
   import { ref } from 'vue'
   
   defineProps<{

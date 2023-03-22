@@ -13,8 +13,8 @@
   import { useAuthStore } from '@/stores/auth-user'
   import VariantCard from '@/components/ViewVariant/VariantCard.vue'
   import DraftCard from './DraftCard.vue'
-  import PlayPopup from '@/components/Popup/PlayPopup.vue'
-  import { showPopup } from '@/components/Popup/popup-manager'
+  import PlayPopup from '@/components/GameUI/PlayPopup.vue'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import type { PublishedVariantGui } from '@/protochess/types'
   import { ref, computed } from 'vue'
   

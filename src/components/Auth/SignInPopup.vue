@@ -20,10 +20,10 @@
 <script setup lang="ts">
 
   import { ref } from 'vue'
-  import { checkEmailVerified } from '@/components/Auth/auth-manager';
-  import LoginRegisterStage from '@/components/Auth/LoginRegisterStage.vue'
-  import ChooseUsernameStage from '../Auth/ChooseUsernameStage.vue'
-  import VerifyEmailStage from '@/components/Auth/VerifyEmailStage.vue'
+  import { checkEmailVerified } from './auth-manager';
+  import LoginRegisterStage from './LoginRegisterStage.vue'
+  import ChooseUsernameStage from './ChooseUsernameStage.vue'
+  import VerifyEmailStage from './VerifyEmailStage.vue'
   
   const popup = ref<HTMLElement>()
   const loginRegisterStage = ref<InstanceType<typeof LoginRegisterStage>>()
