@@ -38,9 +38,9 @@ jobs:
         with:
           path: |
             ~/.npm
-            ~/.cache
             ~/.cargo
             ~/.rustup
+            ./protochess-engine/protochess-engine-wasm/target
           key: ${{ runner.os }}-general
       
       - name: node_modules cache
