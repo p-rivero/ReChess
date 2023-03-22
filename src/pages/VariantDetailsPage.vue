@@ -33,7 +33,7 @@
           <div class="sz-icon icon-edit color-theme"></div>
           Use as template
         </button>
-        <button class="button is-fullwidth mb-4">
+        <button v-if="authStore.loggedUser && variant?.creatorId !== authStore.loggedUser.uid" class="button is-fullwidth mb-4">
           <div class="sz-icon icon-report color-theme"></div>
           Report
         </button>
