@@ -13,6 +13,6 @@
     handler: ErrorMessageHandler
   }>()
   
-  props.handler.registerText({show: (error: string) => { errorMessage.value = error }})
+  props.handler.registerText({ show: (error: string) => { errorMessage.value = error } })
   
 </script>

@@ -61,14 +61,14 @@
   
   const ZOOM_BUTTONS: {width: number, height: number, position: Position, icon: string}[][] = [
     [
-      {width: 7, height: 7, position: 'center', icon: 'icon-zoom1'},
-      {width: 15, height: 15, position: 'center', icon: 'icon-zoom2'},
+      { width: 7, height: 7, position: 'center', icon: 'icon-zoom1' },
+      { width: 15, height: 15, position: 'center', icon: 'icon-zoom2' },
     ],
     [
-      {width: 15, height: 15, position: 'top-left', icon: 'icon-zoom3'},
-      {width: 15, height: 15, position: 'top-right', icon: 'icon-zoom4'},
-      {width: 15, height: 15, position: 'bottom-left', icon: 'icon-zoom5'},
-      {width: 15, height: 15, position: 'bottom-right', icon: 'icon-zoom6'},
+      { width: 15, height: 15, position: 'top-left', icon: 'icon-zoom3' },
+      { width: 15, height: 15, position: 'top-right', icon: 'icon-zoom4' },
+      { width: 15, height: 15, position: 'bottom-left', icon: 'icon-zoom5' },
+      { width: 15, height: 15, position: 'bottom-right', icon: 'icon-zoom6' },
     ],
   ]
   

@@ -199,7 +199,7 @@
     // Show effect for exploded squares
     board.value?.explode(result.exploded)
     if (result.flag === 'Ok') return undefined
-    return {flag: result.flag, winner: result.winner}
+    return { flag: result.flag, winner: result.winner }
   }
   
   

@@ -144,7 +144,7 @@
       if (promotion !== undefined) {
         const role = idToRole(promotion.id)
         const piecesDiff: Map<cg.Key, cg.Piece> = new Map()
-        piecesDiff.set(toKey, {color: promotion.color, role, promoted: true})
+        piecesDiff.set(toKey, { color: promotion.color, role, promoted: true })
         board.value?.setPieces(piecesDiff)
       }
     },

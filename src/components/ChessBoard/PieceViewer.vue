@@ -141,16 +141,16 @@
     
     const shapes: DrawShape[] = []
     for (const key of keysMove) {
-      shapes.push({orig: key, customSvg: generateCircleSvg('green')})
+      shapes.push({ orig: key, customSvg: generateCircleSvg('green') })
     }
     for (const key of keysCapture) {
-      shapes.push({orig: key, customSvg: generateCircleSvg('red')})
+      shapes.push({ orig: key, customSvg: generateCircleSvg('red') })
     }
     for (const key of keysBoth) {
-      shapes.push({orig: key, customSvg: generateCircleSvg('purple')})
+      shapes.push({ orig: key, customSvg: generateCircleSvg('purple') })
     }
     for (const key of keysExplosion) {
-      shapes.push({orig: key, customSvg: generateCrossSvg('orange')})
+      shapes.push({ orig: key, customSvg: generateCrossSvg('orange') })
     }
     
     // Slides
@@ -240,21 +240,21 @@
   }
   function arrowShape(dir: 'left' | 'right' | 'up' | 'down' | 'upleft' | 'upright' | 'downleft' | 'downright', brush: string): DrawShape {
     if (dir === 'left') {
-      return {orig: positionToKey(piece_coords), dest:positionToKey([0, piece_coords[1]]), brush}
+      return { orig: positionToKey(piece_coords), dest:positionToKey([0, piece_coords[1]]), brush }
     } else if (dir === 'right') {
-      return {orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, piece_coords[1]]), brush}
+      return { orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, piece_coords[1]]), brush }
     } else if (dir === 'up') {
-      return {orig: positionToKey(piece_coords), dest:positionToKey([piece_coords[0], props.height-1]), brush}
+      return { orig: positionToKey(piece_coords), dest:positionToKey([piece_coords[0], props.height-1]), brush }
     } else if (dir === 'down') {
-      return {orig: positionToKey(piece_coords), dest:positionToKey([piece_coords[0], 0]), brush}
+      return { orig: positionToKey(piece_coords), dest:positionToKey([piece_coords[0], 0]), brush }
     } else if (dir === 'upleft') {
-      return {orig: positionToKey(piece_coords), dest:positionToKey([0, props.height-1]), brush}
+      return { orig: positionToKey(piece_coords), dest:positionToKey([0, props.height-1]), brush }
     } else if (dir === 'upright') {
-      return {orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, props.height-1]), brush}
+      return { orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, props.height-1]), brush }
     } else if (dir === 'downleft') {
-      return {orig: positionToKey(piece_coords), dest:positionToKey([0, 0]), brush}
+      return { orig: positionToKey(piece_coords), dest:positionToKey([0, 0]), brush }
     } else if (dir === 'downright') {
-      return {orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, 0]), brush}
+      return { orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, 0]), brush }
     } else {
       throw new Error('Invalid direction')
     }

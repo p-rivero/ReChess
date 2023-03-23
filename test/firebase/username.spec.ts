@@ -74,7 +74,7 @@ test('cannot create a username without corresponding user', async () => {
   await setupUser('A_DIFFERENT_ID')
   
   await assertFails(
-    set('verified', {userId: MY_ID}, 'usernames', 'new_username')
+    set('verified', { userId: MY_ID }, 'usernames', 'new_username')
   )
 })
   
@@ -85,7 +85,7 @@ test('cannot steal a taken username', async () => {
   
   await assertFails(
     // Try to steal cool_username for my own user
-    set('verified', {userId: MY_ID}, 'usernames', 'cool_username')
+    set('verified', { userId: MY_ID }, 'usernames', 'cool_username')
   )
   await assertFails(
     remove('verified', 'usernames', 'cool_username')
