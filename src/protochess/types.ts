@@ -37,6 +37,7 @@ export type MakeMoveFlag =
   
 export type MakeMoveWinner = Player | 'none'
 
+/** @see {isMakeMoveResult} ts-auto-guard:type-guard */
 export interface MakeMoveResult {
   flag: MakeMoveFlag,
   winner: MakeMoveWinner,
@@ -46,6 +47,7 @@ export interface MakeMoveResultWithDepth extends MakeMoveResult {
   depth: number,
 }
 
+/** @see {isMoveInfo} ts-auto-guard:type-guard */
 export interface MoveInfo {
   // x, y coordinates between 0 and 15
   // (0, 0 is the bottom left corner)
@@ -60,6 +62,7 @@ export interface MoveInfoWithEval extends MoveInfo {
 export interface MoveInfoWithEvalDepth extends MoveInfoWithEval {
   depth: number,
 }
+/** @see {isMoveList} ts-auto-guard:type-guard */
 export interface MoveList {
   x: number,
   y: number,
@@ -161,23 +164,49 @@ export interface IWasmModule {
   init(): Promise<void>,
   supportsThreads: Promise<boolean>,
   wasmObject: {
-    toString(): Promise<any>,
-    playerToMove(): Promise<any>,
-    validatePosition(): Promise<any>,
-    playBestMove(depth: number): Promise<any>,
-    playBestMoveTimeout(time: number): Promise<any>,
-    makeMove(move: MoveInfo): Promise<any>,
-    makeMoveStr(moveStr: string): Promise<any>,
-    getBestMove(depth: number): Promise<any>,
-    getBestMoveTimeout(time: number): Promise<any>,
-    toMoveInCheck(): Promise<any>,
-    setState(state: GameState): Promise<any>,
-    getState(): Promise<any>,
-    loadFen(fen: string): Promise<any>,
-    movesFrom(x: number, y: number): Promise<any>,
-    legalMoves(): Promise<any>,
-    possiblePromotions(fromX: number, fromY: number, toX: number, toY: number): Promise<any>,
-    getMaxThreads(): Promise<any>,
-    setNumThreads(threads: number): Promise<any>,
+    toString(): Promise<unknown>,
+    playerToMove(): Promise<unknown>,
+    validatePosition(): Promise<unknown>,
+    playBestMove(depth: number): Promise<unknown>,
+    playBestMoveTimeout(time: number): Promise<unknown>,
+    makeMove(move: MoveInfo): Promise<unknown>,
+    makeMoveStr(moveStr: string): Promise<unknown>,
+    getBestMove(depth: number): Promise<unknown>,
+    getBestMoveTimeout(time: number): Promise<unknown>,
+    toMoveInCheck(): Promise<unknown>,
+    setState(state: GameState): Promise<unknown>,
+    getState(): Promise<unknown>,
+    loadFen(fen: string): Promise<unknown>,
+    movesFrom(x: number, y: number): Promise<unknown>,
+    legalMoves(): Promise<unknown>,
+    possiblePromotions(fromX: number, fromY: number, toX: number, toY: number): Promise<unknown>,
+    getMaxThreads(): Promise<unknown>,
+    setNumThreads(threads: number): Promise<unknown>,
   }
+}
+
+/** @see {isPlayBestMoveTimeoutResult} ts-auto-guard:type-guard */
+export interface PlayBestMoveTimeoutResult {
+  makeMoveResult: MakeMoveResult,
+  depth: number,
+}
+
+/** @see {isGetBestMoveResult} ts-auto-guard:type-guard */
+export interface GetBestMoveResult {
+  moveInfo: MoveInfo,
+  evaluation: number,
+}
+
+/** @see {isGetBestMoveTimeoutResult} ts-auto-guard:type-guard */
+export interface GetBestMoveTimeoutResult {
+  moveInfo: MoveInfo,
+  evaluation: number,
+  depth: number,
+}
+
+/** @see {isGetStateResult} ts-auto-guard:type-guard */
+export interface GetStateResult {
+  state: GameState,
+  fen: string,
+  inCheck: boolean,
 }

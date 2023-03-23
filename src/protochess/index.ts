@@ -13,7 +13,17 @@ import type {
   GameStateGui,
   MoveList,
   Player,
+  GetBestMoveResult,
 } from './types'
+import {
+  isMakeMoveResult,
+  isMoveInfo,
+  isMoveList,
+  isPlayBestMoveTimeoutResult,
+  isGetBestMoveResult,
+  isGetBestMoveTimeoutResult,
+  isGetStateResult,
+} from './types.guard'
 
 // Call this at the start of the app to initialize the wasm module
 let protochess: Protochess | null = null
@@ -57,75 +67,152 @@ async function init(): Promise<Protochess> {
   
   return {
     async toString(): Promise<string> {
-      return wasm.wasmObject.toString()
+      const str = await wasm.wasmObject.toString()
+      if (typeof str !== 'string') {
+        throw new Error(`Expected string, got ${str}`)
+      }
+      return str
     },
+    
     async playerToMove(): Promise<Player> {
-      const player: 0|1 = await wasm.wasmObject.playerToMove()
+      const player = await wasm.wasmObject.playerToMove()
+      if (typeof player !== 'number' || !(player === 0 || player === 1)) {
+        throw new Error(`Expected 0 or 1, got ${player}`)
+      }
       return player === 0 ? 'white' : 'black'
     },
+    
     async validatePosition(): Promise<void> {
-      await wasm.wasmObject.validatePosition()
+      const ret = await wasm.wasmObject.validatePosition()
+      if (typeof ret !== 'undefined') {
+        throw new Error(`Unexpected return value: ${ret}`)
+      }
     },
+    
     async playBestMove(depth: number): Promise<MakeMoveResult> {
-      return wasm.wasmObject.playBestMove(depth)
+      const result = await wasm.wasmObject.playBestMove(depth)
+      if (!isMakeMoveResult(result)) {
+        throw new Error(`Expected MakeMoveResult, got ${result}`)
+      }
+      return result
     },
+    
     async playBestMoveTimeout(time: number): Promise<MakeMoveResultWithDepth> {
-      return adaptMakeMoveResultWithDepth(await wasm.wasmObject.playBestMoveTimeout(time))
+      const result = await wasm.wasmObject.playBestMoveTimeout(time)
+      if (!isPlayBestMoveTimeoutResult(result)) {
+        throw new Error(`Expected MakeMoveResultWithDepth, got ${result}`)
+      }
+      return { ...result.makeMoveResult, depth: result.depth }
     },
+    
     async makeMove(move: MoveInfo): Promise<MakeMoveResult> {
-      return wasm.wasmObject.makeMove(move)
+      const result = await wasm.wasmObject.makeMove(move)
+      if (!isMakeMoveResult(result)) {
+        throw new Error(`Expected MakeMoveResult, got ${result}`)
+      }
+      return result
     },
+    
     async makeMoveStr(moveStr: string): Promise<MakeMoveResult> {
-      return wasm.wasmObject.makeMoveStr(moveStr)
+      const result = await wasm.wasmObject.makeMoveStr(moveStr)
+      if (!isMakeMoveResult(result)) {
+        throw new Error(`Expected MakeMoveResult, got ${result}`)
+      }
+      return result
     },
+    
     async getBestMove(depth: number): Promise<MoveInfoWithEval> {
-      return adaptMoveInfoWithEval(await wasm.wasmObject.getBestMove(depth))
+      const result = await wasm.wasmObject.getBestMove(depth)
+      if (!isGetBestMoveResult(result)) {
+        throw new Error(`Expected GetBestMoveResult, got ${result}`)
+      }
+      return adaptMoveInfoWithEval(result)
     },
+    
     async getBestMoveTimeout(time: number): Promise<MoveInfoWithEvalDepth> {
-      return adaptMoveInfoWithEvalDepth(await wasm.wasmObject.getBestMoveTimeout(time))
+      const result = await wasm.wasmObject.getBestMoveTimeout(time)
+      if (!isGetBestMoveTimeoutResult(result)) {
+        throw new Error(`Expected PlayBestMoveTimeoutResult, got ${result}`)
+      }
+      const moveEval = adaptMoveInfoWithEval(result)
+      return { ...moveEval, depth: result.depth }
     },
+    
     async isInCheck(): Promise<boolean> {
-      return wasm.wasmObject.toMoveInCheck()
+      const ret = await wasm.wasmObject.toMoveInCheck()
+      if (typeof ret !== 'boolean') {
+        throw new Error(`Expected boolean, got ${ret}`)
+      }
+      return ret
     },
+    
     async setState(state: GameState): Promise<void> {
       // Clone the state object manually to avoid errors when passing it to wasm
       const stateClone = clone(state)
-      return wasm.wasmObject.setState(stateClone)
+      const ret = await wasm.wasmObject.setState(stateClone)
+      if (typeof ret !== 'undefined') {
+        throw new Error(`Unexpected return value: ${ret}`)
+      }
     },
+    
     async getState(): Promise<GameStateGui> {
-      return adaptGameStateGui(await wasm.wasmObject.getState())
+      const result = await wasm.wasmObject.getState()
+      if (!isGetStateResult(result)) {
+        throw new Error(`Expected GetStateResult, got ${result}`)
+      }
+      return { ...result.state, fen: result.fen, inCheck: result.inCheck }
     },
+    
     async loadFen(fen: string): Promise<void> {
-      return wasm.wasmObject.loadFen(fen)
+      const ret = await wasm.wasmObject.loadFen(fen)
+      if (typeof ret !== 'undefined') {
+        throw new Error(`Unexpected return value: ${ret}`)
+      }
     },
+    
     async movesFrom(x: number, y: number): Promise<MoveInfo[]> {
-      return wasm.wasmObject.movesFrom(x, y)
+      const moves = await wasm.wasmObject.movesFrom(x, y)
+      if (!Array.isArray(moves) || !moves.every(isMoveInfo)) {
+        throw new Error(`Expected array, got ${moves}`)
+      }
+      return moves
     },
+    
     async legalMoves(): Promise<MoveList[]> {
-      return wasm.wasmObject.legalMoves()
+      const moves = await wasm.wasmObject.legalMoves()
+      if (!Array.isArray(moves) || !moves.every(isMoveList)) {
+        throw new Error(`Expected array, got ${moves}`)
+      }
+      return moves
     },
+    
     async possiblePromotions(fromX: number, fromY: number, toX: number, toY: number): Promise<string[]> {
-      return wasm.wasmObject.possiblePromotions(fromX, fromY, toX, toY)
+      const promotions = await wasm.wasmObject.possiblePromotions(fromX, fromY, toX, toY)
+      if (!isStringArray(promotions)) {
+        throw new Error(`Expected array, got ${promotions}`)
+      }
+      return promotions
     },
+    
     async getMaxThreads(): Promise<number> {
-      return wasm.wasmObject.getMaxThreads()
+      const maxThreads = await wasm.wasmObject.getMaxThreads()
+      if (typeof maxThreads !== 'number') {
+        throw new Error(`Expected number, got ${maxThreads}`)
+      }
+      return maxThreads
     },
+    
     async setNumThreads(threads: number): Promise<void> {
-      return wasm.wasmObject.setNumThreads(threads)
+      const ret = await wasm.wasmObject.setNumThreads(threads)
+      if (typeof ret !== 'undefined') {
+        throw new Error(`Unexpected return value: ${ret}`)
+      }
     },
   }
 }
 
 
-// ADAPTERS
-
-function adaptMakeMoveResultWithDepth(makeMoveRes: any): MakeMoveResultWithDepth {
-  const makeMoveResult: MakeMoveResult = makeMoveRes.makeMoveResult
-  const depth: number = makeMoveRes.depth
-  return { ...makeMoveResult, depth }
-}
-
-function adaptMoveInfoWithEval(moveInfoEval: any): MoveInfoWithEval {
+function adaptMoveInfoWithEval(moveInfoEval: GetBestMoveResult): MoveInfoWithEval {
   // Engine constants
   const MATE_VALUE = 1_000_000
   const MAX_DEPTH = 256 // Actually 127, but this is a safe upper bound
@@ -143,15 +230,6 @@ function adaptMoveInfoWithEval(moveInfoEval: any): MoveInfoWithEval {
   return { ...moveInfo, evaluation }
 }
 
-function adaptMoveInfoWithEvalDepth(moveInfoEval: any): MoveInfoWithEvalDepth {
-  const moveEval: MoveInfoWithEval = adaptMoveInfoWithEval(moveInfoEval)
-  const depth: number = moveInfoEval.depth
-  return { ...moveEval, depth }
-}
-
-function adaptGameStateGui(gameStateGui: any): GameStateGui {
-  const gameState: GameState = gameStateGui.state
-  const fen: string = gameStateGui.fen
-  const inCheck: boolean = gameStateGui.inCheck
-  return { ...gameState, fen, inCheck }
+function isStringArray(arr: unknown): arr is string[] {
+  return Array.isArray(arr) && arr.every(e => typeof e === 'string')
 }
