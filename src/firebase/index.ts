@@ -45,7 +45,7 @@ if (!import.meta.env.DEV) {
 
 initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider(CAPTCHA_V3_PUBLIC_KEY),
-  isTokenAutoRefreshEnabled: true
+  isTokenAutoRefreshEnabled: true,
 })
 
 

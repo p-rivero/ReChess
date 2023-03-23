@@ -14,14 +14,14 @@ export async function createUser(user: User, username: string): Promise<UserDoc>
     IMMUTABLE: {
       username: username,
       numWins: 0,
-    }
+    },
   }
   if (!user.email) throw new Error('User must have an email')
   const newPrivateData: UserPrivateDoc = {
     IMMUTABLE: {
       email: user.email,
       banned: false,
-    }
+    },
   }
   const newUsername: UsernameDoc = {
     userId: user.uid,

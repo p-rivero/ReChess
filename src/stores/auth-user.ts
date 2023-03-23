@@ -133,14 +133,14 @@ export const useAuthStore = defineStore('auth-user', () => {
     if (!auth.currentUser) throw new Error('User is not logged in')
     await fb.sendEmailVerification(auth.currentUser, {
       url: window.location.origin,
-      handleCodeInApp: true
+      handleCodeInApp: true,
     })
   }
   
   async function sendPasswordResetEmail(address: string) {
     await fb.sendPasswordResetEmail(auth, address, {
       url: window.location.origin,
-      handleCodeInApp: true
+      handleCodeInApp: true,
     })
   }
   
@@ -159,7 +159,7 @@ export const useAuthStore = defineStore('auth-user', () => {
   return {
     emailLogIn, emailRegister, thirdPartyRegister, signOut,
     sendEmailVerification, sendPasswordResetEmail, getProvider, checkUsername, updateUser,
-    loggedUser
+    loggedUser,
   }
 })
 

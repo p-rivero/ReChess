@@ -41,7 +41,7 @@ test('can create a username if it is not taken', async () => {
     IMMUTABLE: {
       username: 'new_username',
       numWins: 0,
-    }
+    },
   }
   await set('admin', user, 'users', MY_ID)
   
@@ -59,7 +59,7 @@ test('cannot create a username if not authenticated', async () => {
     IMMUTABLE: {
       username: 'new_username',
       numWins: 0,
-    }
+    },
   }
   await set('admin', user, 'users', MY_ID)
   
@@ -82,7 +82,7 @@ test('cannot create a username without corresponding user', async () => {
     IMMUTABLE: {
       username: 'new_username',
       numWins: 0,
-    }
+    },
   }
   await set('admin', user, 'users', 'A_DIFFERENT_ID')
   
@@ -100,7 +100,7 @@ test('cannot steal a taken username', async () => {
     IMMUTABLE: {
       username: 'cool_username',
       numWins: 0,
-    }
+    },
   }
   const maliciousUser: UserDoc = {
     name: 'malicious user',
@@ -109,7 +109,7 @@ test('cannot steal a taken username', async () => {
     IMMUTABLE: {
       username: 'cool_username', // I'm trying to steal this username
       numWins: 0,
-    }
+    },
   }
   await set('admin', username, 'usernames', 'cool_username')
   await set('admin', originalUser, 'users', '1234')
@@ -132,7 +132,7 @@ test('cannot create invalid username', async () => {
     IMMUTABLE: {
       username: '[fill in username]',
       numWins: 0,
-    }
+    },
   }
   
   user.IMMUTABLE.username = 'a'

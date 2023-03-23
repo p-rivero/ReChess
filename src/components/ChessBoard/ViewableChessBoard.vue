@@ -61,8 +61,8 @@
     },
     movable: {
       events: {
-        after: (from, to, _) => emit('user-moved', keyToPosition(from), keyToPosition(to))
-      }
+        after: (from, to, _) => emit('user-moved', keyToPosition(from), keyToPosition(to)),
+      },
     },
     premovable: {
       enabled: false,
@@ -77,7 +77,7 @@
           opacity: 0.5,
           lineWidth: 15,
         },
-      }
+      },
     },
   }
   let pieceImages: PieceImages = { white: [], black: [] }
@@ -130,7 +130,7 @@
           color: white && black ? 'both' : white ? 'white' : black ? 'black' : 'none' as cg.Color,
           free: false,
           dests,
-        }
+        },
       }
       incrementalUpdateConfig(newConfig)
     },

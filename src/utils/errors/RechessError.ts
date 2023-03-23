@@ -36,6 +36,6 @@ const LOCALES: Record<ErrorLocale, Record<ErrorToken, string>> = {
     'EMAIL_ALREADY_IN_USE': 'This email is already in use, please use a different one',
     'CANNOT_CREATE_USER': 'Could not create the user profile, try again later',
     'WRONG_PASSWORD': 'The password is incorrect',
-    'WRONG_PASSWORD_PROVIDER': 'This account is linked to a Google or GitHub account, please use the buttons below to sign in'
+    'WRONG_PASSWORD_PROVIDER': 'This account is linked to a Google or GitHub account, please use the buttons below to sign in',
   },
 }

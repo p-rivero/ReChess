@@ -29,7 +29,7 @@
     },
     cleanup() {
       sentMessage.value = ''
-    }
+    },
   })
   
   const emit = defineEmits<{

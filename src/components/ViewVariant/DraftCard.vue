@@ -69,7 +69,7 @@
       'Discard draft?',
       'This will delete your draft and you will not be able to recover it.',
       'ok-cancel',
-      () => draftStore.discardDraft(),
+      () => draftStore.discardDraft()
     )
   }
   
@@ -79,7 +79,7 @@
       'You can always create a new variant from scratch by clicking the "Create" button\
         in the top navigation bar. You can also use any existing variant as a template to create your own.',
       'ok-cancel',
-      draftStore.hideCreateHint,
+      draftStore.hideCreateHint
     )
   }
   

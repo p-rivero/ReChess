@@ -22,5 +22,6 @@ module.exports = {
     'vue/script-indent': ['warn', 2, { baseIndent: 1 }],
     'vue/html-indent': ['warn', 2, { baseIndent: 1 }],
     'no-trailing-spaces': ['warn', { skipBlankLines: true }],
+    'comma-dangle': ['warn', { functions: 'never', arrays: 'always-multiline', objects: 'always-multiline', imports: 'always-multiline', exports: 'always-multiline' }],
   }
 }

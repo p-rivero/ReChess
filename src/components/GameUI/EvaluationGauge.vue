@@ -75,7 +75,7 @@
       }
       depthText.value = 'Game over'
       explainText.value = getMessage(flag, playerToMove)
-    }
+    },
   })
   
   function explain() {

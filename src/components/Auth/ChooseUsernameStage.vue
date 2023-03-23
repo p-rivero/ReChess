@@ -81,7 +81,7 @@
       usernameStatus.value = 'unknown'
       hasError.value = false
       loading.value = false
-    }
+    },
   })
   
   const emit = defineEmits<{

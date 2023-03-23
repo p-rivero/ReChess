@@ -63,8 +63,8 @@ export const useUserStore = defineStore('user', () => {
       profileImg: user.profileImg ?? null,
       IMMUTABLE: {
         username: user.username,
-        numWins: user.numWins
-      }
+        numWins: user.numWins,
+      },
     }
     await UserDB.updateUser(user.uid, doc)
   }

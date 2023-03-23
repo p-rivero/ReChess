@@ -16,7 +16,7 @@ export function setupJest(projectId: string, onInit: (testEnv: RulesTestEnvironm
         firestore: {
           host: 'localhost',
           port: 8080,
-        }
+        },
       })
     } catch (e) {
       // Cannot connect to emulator

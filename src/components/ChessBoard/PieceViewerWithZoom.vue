@@ -59,7 +59,7 @@
       {width: 15, height: 15, position: 'top-right', icon: 'icon-zoom4'},
       {width: 15, height: 15, position: 'bottom-left', icon: 'icon-zoom5'},
       {width: 15, height: 15, position: 'bottom-right', icon: 'icon-zoom6'},
-    ]
+    ],
   ]
   
 </script>

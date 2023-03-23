@@ -182,8 +182,8 @@
       },
       signInFailure: (error: firebaseui.auth.AuthUIError) => {
         console.error('Sign in failed', error)
-      }
-    }
+      },
+    },
   }
   
   defineExpose({
@@ -205,7 +205,7 @@
       username.value = ''
       passwordRepeat.value = ''
       usernameStatus.value = 'unknown'
-    }
+    },
   })
   
   const emit = defineEmits<{
