@@ -1,6 +1,7 @@
 {
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": [".config/env.d.ts", "src/**/*", "src/**/*.vue"],
+  "exclude": ["src/firebase/functions"],
   "compilerOptions": {
     "strict": true,
     "alwaysStrict": true,

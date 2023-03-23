@@ -29,11 +29,14 @@ module.exports = {
     'quotes': ['error', 'single'],
     'indent': ['error', 2],
     'semi': ['warn', 'never'],
-    'no-trailing-spaces': ['warn', {skipBlankLines: true}],
+    'no-trailing-spaces': ['warn', { skipBlankLines: true }],
     'no-unused-vars': ['warn', {
       argsIgnorePattern: '^_',
       varsIgnorePattern: '^_',
     }],
+    'valid-jsdoc': ['warn', { requireReturn: false }],
+    'max-len': ['warn', { code: 120 }],
+    'object-curly-spacing': ['warn', 'always'],
     'comma-dangle': ['warn', {
       functions: 'never',
       arrays: 'always-multiline',

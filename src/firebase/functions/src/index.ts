@@ -1,12 +1,13 @@
-import * as functions from 'firebase-functions'
+import { region } from 'firebase-functions'
+import { callFunction } from './helpers'
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+// Lazy load each cloud function to reduce cold start time
+// (dynamic imoprts are only loaded once per process, not on each function call)
 
-export const helloWorld = functions
-  .region('europe-west1')
-  .https
-  .onRequest((request, response) => {
-    functions.logger.info('Hello logs!', {structuredData: true})
-    response.send('Hello from Firebase!!')
-  })
+export const renameUser =
+  region('europe-west1')
+    .firestore
+    .document('users/{userId}')
+    .onUpdate((change, context) => {
+      return callFunction(import('./rename-user'), change, context)
+    })
