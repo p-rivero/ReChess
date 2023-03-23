@@ -1,6 +1,5 @@
 
-import { assertFails } from '@firebase/rules-unit-testing'
-import { notInitialized, setupTestUtils, type TestUtilsSignature } from './utils'
+import { notInitialized, setupTestUtils, assertFails, type TestUtilsSignature } from './utils'
 import { setupJest } from './init'
 
 const MY_ID = 'my_id'

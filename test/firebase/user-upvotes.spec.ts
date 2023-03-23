@@ -1,6 +1,5 @@
 
-import { assertFails, assertSucceeds } from '@firebase/rules-unit-testing'
-import { notInitialized, setupTestUtils, type TestUtilsSignature } from './utils'
+import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from './utils'
 import { setupJest } from './init'
 
 import type { UserDoc, UserUpvotesDoc, VariantDoc, VariantUpvotesDoc } from '@/firebase/db/schema'

@@ -1,6 +1,5 @@
 
-import { assertFails, assertSucceeds } from '@firebase/rules-unit-testing'
-import { notInitialized, setupTestUtils, type TestUtilsSignature } from './utils'
+import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from './utils'
 import { setupJest } from './init'
 
 import type {
@@ -12,11 +11,34 @@ import type {
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
-let { get, query, set, startBatch }: TestUtilsSignature = notInitialized()
+let { get, query, set, update, startBatch }: TestUtilsSignature = notInitialized()
 
 setupJest('user-tests', env => {
-  ({ get, query, set, startBatch } = setupTestUtils(env, MY_ID, MY_EMAIL))
+  ({ get, query, set, update, startBatch } = setupTestUtils(env, MY_ID, MY_EMAIL))
 })
+
+
+async function createUserAsAdmin() {
+  const username: UsernameDoc = { userId: MY_ID }
+  const user: UserDoc = {
+    name: null,
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+    },
+  }
+  const userPrivate: UserPrivateDoc = {
+    IMMUTABLE: {
+      email: MY_EMAIL,
+      banned: false,
+    },
+  }
+  await set('admin', username, 'usernames', 'my_username')
+  await set('admin', user, 'users', MY_ID)
+  await set('admin', userPrivate, 'users', MY_ID, 'private', 'doc')
+}
 
 
 
@@ -281,4 +303,47 @@ test('email must match auth token', async () => {
   await assertFails(batch.commit())
 })
 
-// TODO: Cannot edit immutable fields
+
+test('can edit display name', async () => {
+  await createUserAsAdmin()
+    
+  await assertSucceeds(
+    update('verified', { name: 'this is my new name' }, 'users', MY_ID)
+  )
+  const user = await get('verified', 'users', MY_ID)
+  if (!user.exists()) throw new Error('user not found')
+  expect(user.data().name).toEqual('this is my new name')
+})
+
+test('can edit about field', async () => {
+  await createUserAsAdmin()
+    
+  await assertSucceeds(
+    update('verified', { about: 'this is my description' }, 'users', MY_ID)
+  )
+  const user = await get('verified', 'users', MY_ID)
+  if (!user.exists()) throw new Error('user not found')
+  expect(user.data().about).toEqual('this is my description')
+})
+
+test('can edit image', async () => {
+  await createUserAsAdmin()
+    
+  await assertSucceeds(
+    update('verified', { profileImg: 'another.png' }, 'users', MY_ID)
+  )
+  const user = await get('verified', 'users', MY_ID)
+  if (!user.exists()) throw new Error('user not found')
+  expect(user.data().profileImg).toEqual('another.png')
+})
+
+test('cannot edit immutable fields', async () => {
+  createUserAsAdmin()
+  
+  await assertFails(
+    update('verified', { IMMUTABLE: { username: 'new_username' } }, 'users', MY_ID)
+  )
+  await assertFails(
+    update('verified', { IMMUTABLE: { numWins: 10 } }, 'users', MY_ID)
+  )
+})

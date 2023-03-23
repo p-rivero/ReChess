@@ -12,7 +12,7 @@ import {
   getDocs,
 } from 'firebase/firestore'
 import type { CollectionReference, FieldValue, Query } from '@firebase/firestore-types'
-import type { DocumentSnapshot, QuerySnapshot, WriteBatch, DocumentData, DocumentReference } from '@firebase/firestore'
+import { DocumentSnapshot, QuerySnapshot, WriteBatch, type DocumentData, DocumentReference, updateDoc } from '@firebase/firestore'
 import { writeBatch, serverTimestamp } from '@firebase/firestore'
 
 /**
@@ -31,6 +31,8 @@ export type TestUtilsSignature = {
   query: (authType: AuthType, collectionPath: string, getQuery?: (col: CollectionReference)=>Query) => Promise<QuerySnapshot>
   // Set the data of a document
   set: (authType: AuthType, data: DocumentData, path: string, ...pathSegments: string[]) => Promise<void>
+  // Updates the data of a document (fails if the document does not exist)
+  update: (authType: AuthType, data: DocumentData, path: string, ...pathSegments: string[]) => Promise<void>
   // Add a new document to a collection
   add: (authType: AuthType, data: DocumentData, path: string, ...pathSegments: string[]) => Promise<DocumentData>
   // Remove a single document
@@ -65,6 +67,7 @@ export function notInitialized(): TestUtilsSignature {
     get: () => Promise.reject('Test environment not initialized'),
     query: () => Promise.reject('Test environment not initialized'),
     set: () => Promise.reject('Test environment not initialized'),
+    update: () => Promise.reject('Test environment not initialized'),
     add: () => Promise.reject('Test environment not initialized'),
     remove: () => Promise.reject('Test environment not initialized'),
     now: () => {throw new Error('Test environment not initialized')},
@@ -117,6 +120,15 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
     await setDoc(document, data)
   }
   
+  async function update(authType: AuthType|RulesTestContext, data: DocumentData, path: string, ...pathSegments: string[]): Promise<void> {
+    if (authType === 'admin') {
+      await testEnv.withSecurityRulesDisabled(context => update(context, data, path, ...pathSegments))
+      return
+    }
+    const document = doc(getAuth(authType), path, ...pathSegments)
+    await updateDoc(document, data)
+  }
+  
   async function add(authType: AuthType|RulesTestContext, data: DocumentData, path: string, ...pathSegments: string[]): Promise<DocumentReference> {
     if (authType === 'admin') {
       let result: DocumentReference | undefined = undefined
@@ -148,5 +160,17 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
     return new Batch(writeBatch(firestore), firestore)
   }
   
-  return { get, query, set, add, remove, now, startBatch }
+  return { get, query, set, update, add, remove, now, startBatch }
 }
+
+
+// Redefine assertSucceeds to throw a new error. This improves linting when using the Jest VSCode extension
+import { assertSucceeds as originalAssertSucceeds } from '@firebase/rules-unit-testing'
+export async function assertSucceeds<T>(pr: Promise<T>): Promise<T> {
+  try {
+    return await originalAssertSucceeds(pr)
+  } catch (e) {
+    throw new Error('Call failed: ' + e)
+  }
+}
+export { assertFails } from '@firebase/rules-unit-testing'
