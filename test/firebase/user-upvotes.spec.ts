@@ -23,6 +23,7 @@ async function createUserAndVariant(creatorId = 'some_id', addUpvote = true) {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const variant: VariantDoc = {

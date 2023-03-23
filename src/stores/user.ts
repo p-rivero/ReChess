@@ -1,29 +1,31 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import { UserDB } from '@/firebase/db'
 import type { UserDoc } from '@/firebase/db/schema'
-import { ref } from 'vue'
+import type { Timestamp } from '@firebase/firestore'
 
 export class User {
   public readonly uid: string
+  public readonly displayName: string
   public readonly username: string
   public readonly name?: string
   public about: string
   public readonly profileImg?: string
   public readonly numWins: number
-  public readonly displayName: string
+  public readonly renameAllowedAt: Timestamp | null
   
-  constructor(id: string, doc?: UserDoc) {
-    const name = doc?.name ?? undefined // null -> undefined
-    const profileImg = doc?.profileImg ?? undefined
+  constructor(id: string, doc: UserDoc) {
+    const name = doc.name ?? undefined // null -> undefined
+    const profileImg = doc.profileImg ?? undefined
     
-    // If the user has logged in with a third-party provider, the document
-    // doesn't exist until they choose a username. Store '' temporarily until the user chooses a username.
     this.uid = id
-    this.username = doc?.IMMUTABLE.username ?? ''
+    this.username = doc.IMMUTABLE.username
     this.name = name
-    this.about = doc?.about ?? ''
+    this.about = doc.about
     this.profileImg = profileImg
-    this.numWins = doc?.IMMUTABLE.numWins ?? 0
+    this.numWins = doc.IMMUTABLE.numWins
+    this.renameAllowedAt = doc.IMMUTABLE.renameAllowedAt
+    
     this.displayName = name ?? `@${this.username}`
   }
 }
@@ -64,6 +66,7 @@ export const useUserStore = defineStore('user', () => {
       IMMUTABLE: {
         username: user.username,
         numWins: user.numWins,
+        renameAllowedAt: user.renameAllowedAt,
       },
     }
     await UserDB.updateUser(user.uid, doc)

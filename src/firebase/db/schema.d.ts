@@ -17,6 +17,7 @@ export interface UserDoc {
   IMMUTABLE: {
     username: string
     numWins: number
+    renameAllowedAt: Timestamp | null
   }
 }
 // users/{userId}/private/doc

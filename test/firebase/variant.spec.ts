@@ -14,6 +14,20 @@ setupJest('variant-tests', env => {
 })
 
 
+async function setupUser(name: string | null = 'My name') {
+  const user: UserDoc = {
+    name,
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+      renameAllowedAt: null,
+    },
+  }
+  await set('admin', user, 'users', MY_ID)
+}
+
 
 test('anyone can read created variants', async () => {
   await assertSucceeds(
@@ -25,16 +39,7 @@ test('anyone can read created variants', async () => {
 })
 
 test('can create variant with display name', async () => {
-  const user: UserDoc = {
-    name: 'My name',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'my_username',
-      numWins: 0,
-    },
-  }
-  await set('admin', user, 'users', MY_ID)
+  await setupUser()
   
   const variant: VariantDoc = {
     name: 'My variant',
@@ -51,16 +56,7 @@ test('can create variant with display name', async () => {
 })
 
 test('can create variant with username', async () => {
-  const user: UserDoc = {
-    name: null,
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'my_username',
-      numWins: 0,
-    },
-  }
-  await set('admin', user, 'users', MY_ID)
+  await setupUser(null)
   
   const variant: VariantDoc = {
     name: 'My variant',
@@ -77,16 +73,7 @@ test('can create variant with username', async () => {
 })
 
 test('cannot create variant if not verified', async () => {
-  const user: UserDoc = {
-    name: 'My name',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'my_username',
-      numWins: 0,
-    },
-  }
-  await set('admin', user, 'users', MY_ID)
+  await setupUser()
   
   const variant: VariantDoc = {
     name: 'My variant',
@@ -103,16 +90,7 @@ test('cannot create variant if not verified', async () => {
 })
 
 test('variant name must be trimmed', async () => {
-  const user: UserDoc = {
-    name: 'My name',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'my_username',
-      numWins: 0,
-    },
-  }
-  await set('admin', user, 'users', MY_ID)
+  await setupUser()
   
   const variant: VariantDoc = {
     name: '  My variant ',
@@ -129,16 +107,7 @@ test('variant name must be trimmed', async () => {
 })
 
 test('creator id must be correct', async () => {
-  const user: UserDoc = {
-    name: 'My name',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'my_username',
-      numWins: 0,
-    },
-  }
-  await set('admin', user, 'users', MY_ID)
+  await setupUser()
   
   const variant: VariantDoc = {
     name: 'My variant',
@@ -155,16 +124,7 @@ test('creator id must be correct', async () => {
 })
 
 test('creator display name must be correct', async () => {
-  const user: UserDoc = {
-    name: 'My name',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'my_username',
-      numWins: 0,
-    },
-  }
-  await set('admin', user, 'users', MY_ID)
+  await setupUser()
   
   const variant: VariantDoc = {
     name: 'My variant',
@@ -179,30 +139,20 @@ test('creator display name must be correct', async () => {
     add('verified', variant, 'variants')
   )
   
-  user.name = null
+  await setupUser(null)
+  
   variant.IMMUTABLE.creatorDisplayName = '@wrong_username'
-  await set('admin', user, 'users', MY_ID)
   await assertFails(
     add('verified', variant, 'variants')
   )
-  
   variant.IMMUTABLE.creatorDisplayName = '@my_username'
-  await set('admin', user, 'users', MY_ID)
   await assertSucceeds(
     add('verified', variant, 'variants')
   )
 })
 
 test('cannot remove variant', async () => {
-  const user: UserDoc = {
-    name: 'My name',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'my_username',
-      numWins: 0,
-    },
-  }
+  await setupUser()
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
@@ -212,7 +162,6 @@ test('cannot remove variant', async () => {
       initialState: '{}',
     },
   }
-  await set('admin', user, 'users', MY_ID)
   await set('admin', variant, 'variants', 'variant_id')
   
   await assertFails(

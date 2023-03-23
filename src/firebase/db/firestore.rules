@@ -87,7 +87,7 @@ service cloud.firestore {
       
       function isUserDoc() {
         return hasCorrectFields(['about', 'IMMUTABLE'], ['name', 'profileImg']) &&
-          hasCorrectImmutableFields(['username', 'numWins'], []) &&
+          hasCorrectImmutableFields(['username', 'numWins'], ['renameAllowedAt']) &&
           request.resource.data.about.size() <= 1000 &&
           (request.resource.data.name == null ||
             (request.resource.data.name.size() <= 50 && request.resource.data.name.size() > 0)) &&
@@ -99,8 +99,23 @@ service cloud.firestore {
           hasCorrectImmutableFields(['email', 'banned'], []) &&
           request.resource.data.IMMUTABLE.email.size() <= 200;
       }
+      function invalidNameChange() {
+        return // The name change is invalid if
+          // The name changed
+          request.resource.data.name != resource.data.name &&
+          // renameAllowedAt is set (the user has already changed their name once)
+          request.resource.data.IMMUTABLE.renameAllowedAt != null &&
+          // renameAllowedAt is in the future (the user cannot change their name yet)
+          request.resource.data.IMMUTABLE.renameAllowedAt > request.time;
+      }
+      
+      
       allow read;
-      allow update: if isUserDoc() && isAuth(userId) && immutableOk();
+      allow update: if 
+        isUserDoc() &&
+        isAuth(userId) &&
+        immutableOk() &&
+        !invalidNameChange();
       
       allow create: if
         isUserDoc() &&
@@ -109,6 +124,7 @@ service cloud.firestore {
         isValidUsername(request.resource.data.IMMUTABLE.username) &&
         !usernameIsTaken(request.resource.data.IMMUTABLE.username) &&
         request.resource.data.IMMUTABLE.numWins == 0 &&
+        request.resource.data.IMMUTABLE.renameAllowedAt == null &&
         // User must be created in a batch with a username document
         getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.IMMUTABLE.username)).data.userId == userId &&
         // User must be created in a batch with a private document

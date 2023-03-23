@@ -17,11 +17,24 @@ setupJest('username-tests', env => {
 })
 
 
+async function setupUser(id: string, username = 'new_username') {
+  const user: UserDoc = {
+    name: 'new user',
+    about: '',
+    profileImg: null,
+    IMMUTABLE: {
+      username,
+      numWins: 0,
+      renameAllowedAt: null,
+    },
+  }
+  await set('admin', user, 'users', id)
+}
 
 
 test('anyone can read which usernames are already taken', async () => {
-  const user: UsernameDoc = { userId: '1234' }
-  await set('admin', user, 'usernames', 'abc')
+  const username: UsernameDoc = { userId: '1234' }
+  await set('admin', username, 'usernames', 'abc')
   
   const snapshot = await get('not logged', 'usernames', 'abc')
   if (!snapshot.exists()) {
@@ -35,16 +48,7 @@ test('anyone can read which usernames are already taken', async () => {
 })
 
 test('can create a username if it is not taken', async () => {
-  const user: UserDoc = {
-    name: 'new user',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'new_username',
-      numWins: 0,
-    },
-  }
-  await set('admin', user, 'users', MY_ID)
+  await setupUser(MY_ID)
   
   const username: UsernameDoc = { userId: MY_ID }
   await assertSucceeds(
@@ -53,16 +57,7 @@ test('can create a username if it is not taken', async () => {
 })
 
 test('cannot create a username if not authenticated', async () => {
-  const user: UserDoc = {
-    name: 'new user',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'new_username',
-      numWins: 0,
-    },
-  }
-  await set('admin', user, 'users', MY_ID)
+  await setupUser(MY_ID)
   
   await assertFails(
     set('not logged', { userId: MY_ID }, 'usernames', 'new_username')
@@ -76,16 +71,7 @@ test('cannot create a username if not authenticated', async () => {
 })
 
 test('cannot create a username without corresponding user', async () => {
-  const user: UserDoc = {
-    name: 'new user',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'new_username',
-      numWins: 0,
-    },
-  }
-  await set('admin', user, 'users', 'A_DIFFERENT_ID')
+  await setupUser('A_DIFFERENT_ID')
   
   await assertFails(
     set('verified', {userId: MY_ID}, 'usernames', 'new_username')
@@ -93,31 +79,12 @@ test('cannot create a username without corresponding user', async () => {
 })
   
 test('cannot steal a taken username', async () => {
-  const username: UsernameDoc = { userId: '1234' }
-  const originalUser: UserDoc = {
-    name: 'cool user',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'cool_username',
-      numWins: 0,
-    },
-  }
-  const maliciousUser: UserDoc = {
-    name: 'malicious user',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'cool_username', // I'm trying to steal this username
-      numWins: 0,
-    },
-  }
-  await set('admin', username, 'usernames', 'cool_username')
-  await set('admin', originalUser, 'users', '1234')
-  await set('admin', maliciousUser, 'users', MY_ID)
+  await set('admin', { userId: '1234' }, 'usernames', 'cool_username')
+  setupUser('1234', 'cool_username')
+  setupUser(MY_ID, 'cool_username') // I'm trying to steal this username
   
   await assertFails(
-    // Try to steal this username for my own user
+    // Try to steal cool_username for my own user
     set('verified', {userId: MY_ID}, 'usernames', 'cool_username')
   )
   await assertFails(
@@ -126,43 +93,28 @@ test('cannot steal a taken username', async () => {
 })
 
 test('cannot create invalid username', async () => {
-  const user: UserDoc = {
-    name: 'new user',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: '[fill in username]',
-      numWins: 0,
-    },
-  }
-  
-  user.IMMUTABLE.username = 'a'
-  await set('admin', user, 'users', MY_ID)
+  await setupUser(MY_ID, 'a')
   await assertFails(
     set('unverified', { userId: MY_ID }, 'usernames', 'a')
   )
   
-  user.IMMUTABLE.username = 'a'.repeat(26)
-  await set('admin', user, 'users', MY_ID)
+  await setupUser(MY_ID, 'a'.repeat(26))
   await assertFails(
     set('unverified', { userId: MY_ID }, 'usernames', 'a'.repeat(26))
   )
   
-  user.IMMUTABLE.username = 'a space'
-  await set('admin', user, 'users', MY_ID)
+  await setupUser(MY_ID, 'a space')
   await assertFails(
     set('unverified', { userId: MY_ID }, 'usernames', 'a space')
   )
   
-  user.IMMUTABLE.username = 'a'.repeat(25)
-  await set('admin', user, 'users', MY_ID)
+  await setupUser(MY_ID, 'a'.repeat(25))
   await assertSucceeds(
     set('unverified', { userId: MY_ID }, 'usernames', 'a'.repeat(25))
   )
-  
   await remove('admin', 'usernames', 'a'.repeat(25))
-  user.IMMUTABLE.username = 'a'.repeat(3)
-  await set('admin', user, 'users', MY_ID)
+  
+  await setupUser(MY_ID, 'a'.repeat(3))
   await assertSucceeds(
     set('unverified', { userId: MY_ID }, 'usernames', 'a'.repeat(3))
   )

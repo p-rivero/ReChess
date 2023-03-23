@@ -11,14 +11,14 @@ import type {
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
-let { get, query, set, update, startBatch }: TestUtilsSignature = notInitialized()
+let { get, query, set, update, now, afterSeconds, startBatch }: TestUtilsSignature = notInitialized()
 
 setupJest('user-tests', env => {
-  ({ get, query, set, update, startBatch } = setupTestUtils(env, MY_ID, MY_EMAIL))
+  ({ get, query, set, update, now, afterSeconds, startBatch } = setupTestUtils(env, MY_ID, MY_EMAIL))
 })
 
 
-async function createUserAsAdmin() {
+async function setupUser() {
   const username: UsernameDoc = { userId: MY_ID }
   const user: UserDoc = {
     name: null,
@@ -27,6 +27,7 @@ async function createUserAsAdmin() {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -50,6 +51,7 @@ test('anyone can read created users', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   await set('admin', user, 'users', '1234')
@@ -76,6 +78,7 @@ test('can create a user if authenticated', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -101,6 +104,7 @@ test('cannot create a user if username is already taken', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -128,6 +132,7 @@ test('cannot create a user if not authenticated', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -152,6 +157,7 @@ test('cannot create a user with more than 0 wins', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 1,
+      renameAllowedAt: null,
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -176,6 +182,7 @@ test('cannot create a banned user', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -200,6 +207,7 @@ test('can create a user without name or profileImg', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -223,6 +231,7 @@ test('cannot create a user without also creating username', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -246,6 +255,7 @@ test('cannot create a user without also creating private doc', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const batch = startBatch('unverified')
@@ -263,6 +273,7 @@ test('cannot create more than one private doc', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -288,6 +299,7 @@ test('email must match auth token', async () => {
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -303,12 +315,60 @@ test('email must match auth token', async () => {
   await assertFails(batch.commit())
 })
 
+test('renameAllowedAt must be null', async () => {
+  const username: UsernameDoc = { userId: MY_ID }
+  const user: UserDoc = {
+    name: 'my new user',
+    about: '',
+    profileImg: 'example.com/img.png',
+    IMMUTABLE: {
+      username: 'my_username',
+      numWins: 0,
+      renameAllowedAt: afterSeconds(10),
+    },
+  }
+  const userPrivate: UserPrivateDoc = {
+    IMMUTABLE: {
+      email: MY_EMAIL,
+      banned: false,
+    },
+  }
+  const batch = startBatch('unverified')
+  batch.set(username, 'usernames', 'my_username')
+  batch.set(user, 'users', MY_ID)
+  batch.set(userPrivate, 'users', MY_ID, 'private', 'doc')
+  await assertFails(batch.commit())
+})
 
-test('can edit display name', async () => {
-  await createUserAsAdmin()
+
+
+test('can edit display name after creating user', async () => {
+  await setupUser()
     
   await assertSucceeds(
-    update('verified', { name: 'this is my new name' }, 'users', MY_ID)
+    update('verified', 'name', 'this is my new name', 'users', MY_ID)
+  )
+  const user = await get('verified', 'users', MY_ID)
+  if (!user.exists()) throw new Error('user not found')
+  expect(user.data().name).toEqual('this is my new name')
+})
+
+test('cannot edit display name before renameAllowedAt', async () => {
+  await setupUser()
+  await update('admin', 'IMMUTABLE.renameAllowedAt', afterSeconds(100), 'users', MY_ID )
+    
+  await assertFails(
+    update('verified', 'name', 'this is my new name', 'users', MY_ID)
+  )
+})
+
+test('can edit display name after renameAllowedAt', async () => {
+  await setupUser()
+  await update('admin', 'IMMUTABLE.renameAllowedAt', now(), 'users', MY_ID )
+  await new Promise(resolve => setTimeout(resolve, 500))
+    
+  await assertSucceeds(
+    update('verified', 'name', 'this is my new name', 'users', MY_ID)
   )
   const user = await get('verified', 'users', MY_ID)
   if (!user.exists()) throw new Error('user not found')
@@ -316,10 +376,10 @@ test('can edit display name', async () => {
 })
 
 test('can edit about field', async () => {
-  await createUserAsAdmin()
+  await setupUser()
     
   await assertSucceeds(
-    update('verified', { about: 'this is my description' }, 'users', MY_ID)
+    update('verified', 'about', 'this is my description', 'users', MY_ID)
   )
   const user = await get('verified', 'users', MY_ID)
   if (!user.exists()) throw new Error('user not found')
@@ -327,10 +387,10 @@ test('can edit about field', async () => {
 })
 
 test('can edit image', async () => {
-  await createUserAsAdmin()
+  await setupUser()
     
   await assertSucceeds(
-    update('verified', { profileImg: 'another.png' }, 'users', MY_ID)
+    update('verified', 'profileImg', 'another.png', 'users', MY_ID)
   )
   const user = await get('verified', 'users', MY_ID)
   if (!user.exists()) throw new Error('user not found')
@@ -338,12 +398,15 @@ test('can edit image', async () => {
 })
 
 test('cannot edit immutable fields', async () => {
-  createUserAsAdmin()
+  await setupUser()
   
   await assertFails(
-    update('verified', { IMMUTABLE: { username: 'new_username' } }, 'users', MY_ID)
+    update('verified', 'IMMUTABLE.username', 'new_username', 'users', MY_ID)
   )
   await assertFails(
-    update('verified', { IMMUTABLE: { numWins: 10 } }, 'users', MY_ID)
+    update('verified', 'IMMUTABLE.numWins', 10, 'users', MY_ID)
+  )
+  await assertFails(
+    update('verified', 'IMMUTABLE.renameAllowedAt', afterSeconds(2), 'users', MY_ID)
   )
 })

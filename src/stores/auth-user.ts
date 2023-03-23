@@ -21,7 +21,19 @@ export class AuthUser extends User {
   
   constructor(authUser: fb.User, dbUser: UserDoc | undefined) {
     if (!authUser.email) throw new Error('User has no email')
-    super(authUser.uid, dbUser)
+    // If the user has logged in with a third-party provider, the document
+    // doesn't exist until they choose a username.
+    const DEFAULT_DOC: UserDoc = {
+      name: 'New User',
+      about: '',
+      profileImg: null,
+      IMMUTABLE: {
+        username: '',
+        numWins: 0,
+        renameAllowedAt: null,
+      },
+    }
+    super(authUser.uid, dbUser ?? DEFAULT_DOC)
     
     this.email = authUser.email
     this.verified = authUser.emailVerified

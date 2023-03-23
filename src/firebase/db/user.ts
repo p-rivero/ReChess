@@ -14,6 +14,7 @@ export async function createUser(user: User, username: string): Promise<UserDoc>
     IMMUTABLE: {
       username: username,
       numWins: 0,
+      renameAllowedAt: null,
     },
   }
   if (!user.email) throw new Error('User must have an email')
