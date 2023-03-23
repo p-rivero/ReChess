@@ -17,7 +17,7 @@
     "dev-only": "vite --config .config/vite.config.ts",
     "start-emulator": "firebase emulators:start --project rechess-web",
     "deploy-only": "firebase deploy --project rechess-web",
-    "postinstall": "chmod +x ./src/assets/img/icons/generate-icons.sh && (cd functions && npm i)"
+    "postinstall": "chmod +x ./src/assets/img/icons/generate-icons.sh"
   },
   "dependencies": {
     "bulma": "^0.9.4",

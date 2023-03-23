@@ -15,7 +15,7 @@ module.exports = {
   },
   // Ignore the submodule directories
   // Also ignore the functions directory and any file that ends with .guard.ts
-  ignorePatterns: ['protochess-engine', 'chessgroundx', 'functions', '**/*.guard.ts'],
+  ignorePatterns: ['protochess-engine', 'chessgroundx', 'functions', '*.guard.ts'],
   rules: {
     // Use '_' as a prefix for unused variables
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],

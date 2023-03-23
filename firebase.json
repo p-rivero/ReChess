@@ -34,7 +34,7 @@
   },
   "functions": [
     {
-      "source": "functions",
+      "source": "src/firebase/functions",
       "codebase": "default",
       "ignore": [
         "node_modules",
@@ -43,6 +43,7 @@
         "firebase-debug.*.log"
       ],
       "predeploy": [
+        "npm install",
         "npm --prefix \"$RESOURCE_DIR\" run lint",
         "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
