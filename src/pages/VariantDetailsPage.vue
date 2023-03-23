@@ -206,8 +206,9 @@
       return
     }
     if (!draftStore.hasDraft()) {
+      if (!variant.value) throw new Error('variant is null')
       // Nothing will be lost, so just go ahead and edit
-      draftStore.state = clone(variant.value!)
+      draftStore.state = clone(variant.value)
       router.push({ name: 'edit-variant' })
       return
     }
@@ -220,7 +221,8 @@
       Do you want to overwrite it?.`,
       'yes-no',
       () => {
-        draftStore.state = clone(variant.value!)
+        if (!variant.value) throw new Error('variant is null')
+        draftStore.state = clone(variant.value)
         router.push({ name: 'edit-variant' })
       }
     )
@@ -228,9 +230,10 @@
   
   async function creatorClicked() {
     // Get the username of the creator
-    const user = await userStore.getUserById(variant.value!.creatorId)
+    if (!variant.value) throw new Error('variant is null')
+    const user = await userStore.getUserById(variant.value.creatorId)
     if (!user) {
-      throw new Error('Could not find user with id ' + variant.value!.creatorId)
+      throw new Error('Could not find user with id ' + variant.value.creatorId)
     }
     router.push({ name: 'user-profile', params: { username: user.username } })
   }

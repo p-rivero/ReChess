@@ -185,6 +185,10 @@ export interface IWasmModule {
   }
 }
 
+export interface IWasmModuleConstructor {
+  new(): Promise<IWasmModule>,
+}
+
 /** @see {isPlayBestMoveTimeoutResult} ts-auto-guard:type-guard */
 export interface PlayBestMoveTimeoutResult {
   makeMoveResult: MakeMoveResult,

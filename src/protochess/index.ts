@@ -14,6 +14,7 @@ import type {
   MoveList,
   Player,
   GetBestMoveResult,
+IWasmModuleConstructor,
 } from './types'
 import {
   isMakeMoveResult,
@@ -51,9 +52,8 @@ export async function protochessSupportsThreads(): Promise<boolean> {
 
 async function init(): Promise<Protochess> {
   // Create a separate thread from wasm-worker.js and get a proxy to its handler
-  const WasmModule = Comlink.wrap(new Worker(new URL('./wasm-worker.js', import.meta.url), { type: 'module' }))
+  const WasmModule = Comlink.wrap(new Worker(new URL('./wasm-worker.js', import.meta.url), { type: 'module' })) as unknown as IWasmModuleConstructor
   // WasmModule is a proxy to a class, so it's constructable even though tsc disagrees
-  // @ts-ignore
   const wasm: IWasmModule = await new WasmModule()
   // wasm is an object that lives in the worker thread, but appears to be local
   await wasm.init()

@@ -15,8 +15,7 @@ export function debounce<T extends Function>(cb: T, wait = 20) {
     clearTimeout(h)
     h = setTimeout(() => cb(...args), wait)
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return callable as any as T
+  return callable as unknown as T
 }
 
 // https://stackoverflow.com/questions/1068834/object-comparison-in-javascript

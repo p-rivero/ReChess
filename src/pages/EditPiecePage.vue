@@ -344,15 +344,16 @@
   const castleFileKingside = ref(piece?.castleFiles?.[1] || 6)
   
   function castlingDropdownChanged(item: string) {
+    if (!piece) throw new Error('Piece is null')
     if (item === 'No') {
-      piece!.castleFiles = undefined
-      piece!.isCastleRook = false
+      piece.castleFiles = undefined
+      piece.isCastleRook = false
     } else if (item === 'As king') {
-      piece!.castleFiles = [castleFileQueenside.value, castleFileKingside.value]
-      piece!.isCastleRook = false
+      piece.castleFiles = [castleFileQueenside.value, castleFileKingside.value]
+      piece.isCastleRook = false
     } else if (item === 'As rook') {
-      piece!.castleFiles = undefined
-      piece!.isCastleRook = true
+      piece.castleFiles = undefined
+      piece.isCastleRook = true
     } else {
       throw new Error('Invalid castling dropdown item')
     }
@@ -366,15 +367,16 @@
   }
   
   function enabledCheckboxChanged(enabled: boolean, color: Player) {
+    if (!piece) throw new Error('Piece is null')
     const textBoxVal = color === 'white' ? pieceIdWhite.value : pieceIdBlack.value
     const enabledId = textBoxVal ?? ''
     const newId = enabled ? enabledId : null
     const i = color === 'white' ? 0 : 1
     // Remove placements of the piece
-    const oldId = piece!.ids[i] ?? ''
+    const oldId = piece.ids[i] ?? ''
     draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== oldId)
     // Set the new id
-    piece!.ids[i] = newId
+    piece.ids[i] = newId
     // Remove error message if the piece id was invalid before
     setTimeout(() => errorMsgHandler.clear())
   }
@@ -399,16 +401,17 @@
   }
   
   function updatePieceId(newId: string, color: Player) {
+    if (!piece) throw new Error('Piece is null')
     // Remove all existing placements of this piece
-    const oldId = color === 'white' ? piece!.ids[0] : piece!.ids[1]
+    const oldId = color === 'white' ? piece.ids[0] : piece.ids[1]
     draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== oldId)
     // Update the piece id
     if (color === 'white') {
       pieceIdWhite.value = newId
-      piece!.ids[0] = newId
+      piece.ids[0] = newId
     } else {
       pieceIdBlack.value = newId
-      piece!.ids[1] = newId
+      piece.ids[1] = newId
     }
   }
   

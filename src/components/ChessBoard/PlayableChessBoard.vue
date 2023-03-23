@@ -169,8 +169,9 @@
     
     // Move was played, emit piece-moved and store history
     if (moveResult !== 'N/A') {
-      moveHistory.newMove(playMoveBefore!, state, moveResult)
-      emit('piece-moved', playMoveBefore!.from, playMoveBefore!.to, moveResult)
+      if (!playMoveBefore) throw new Error('playMoveBefore is undefined')
+      moveHistory.newMove(playMoveBefore, state, moveResult)
+      emit('piece-moved', playMoveBefore.from, playMoveBefore.to, moveResult)
       emit('player-changed', state.playerToMove === 0 ? 'white' : 'black')
       // Game has ended, don't continue
       if (moveResult) return

@@ -249,7 +249,7 @@
     }
   }
   // TODO: Remove
-  function isPlainObject(o: any) {
+  function isPlainObject(o: unknown) {
     if (typeof o !== 'object' || o === null)
       return false
     const proto = Object.getPrototypeOf(o)

@@ -47,12 +47,14 @@
   
   defineExpose({
     focus() {
-      if (!textInput.value) throw new Error('Text input is null')
-      nextTick(() => textInput.value!.focus())
+      nextTick(() => {
+        if (!textInput.value) throw new Error('Text input is null')
+        textInput.value.focus()
+      })
     },
     setText(text: string) {
       if (!textInput.value) throw new Error('Text input is null')
-      textInput.value!.value = text
+      textInput.value.value = text
       validate(text)
     },
   })

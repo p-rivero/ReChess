@@ -87,14 +87,14 @@
   
   // Expose a subset of the chessground API to the parent component
   defineExpose({
-    setConfig(config: Config){ chessgroundApi!.set(config) },
-    toggleOrientation(){ chessgroundApi!.toggleOrientation() },
-    movePiece(from: cg.Key, to: cg.Key){ chessgroundApi!.move(from, to) },
-    setPieces(diff: cg.PiecesDiff){ chessgroundApi!.setPieces(diff) },
-    explode(keys: cg.Key[]){ chessgroundApi!.explode(keys) },
-    getShapes(){ return clone(chessgroundApi!.state.drawable.shapes) as DrawShape[] },
-    setShapes(shapes: DrawShape[]){ chessgroundApi!.setAutoShapes(shapes) },
-    redrawAll(){ chessgroundApi!.redrawAll() },
+    setConfig(config: Config){ chessgroundApi?.set(config) },
+    toggleOrientation(){ chessgroundApi?.toggleOrientation() },
+    movePiece(from: cg.Key, to: cg.Key){ chessgroundApi?.move(from, to) },
+    setPieces(diff: cg.PiecesDiff){ chessgroundApi?.setPieces(diff) },
+    explode(keys: cg.Key[]){ chessgroundApi?.explode(keys) },
+    getShapes(){ return clone(chessgroundApi?.state.drawable.shapes) as DrawShape[] },
+    setShapes(shapes: DrawShape[]){ chessgroundApi?.setAutoShapes(shapes) },
+    redrawAll(){ chessgroundApi?.redrawAll() },
   })
   
   

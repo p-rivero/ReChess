@@ -44,7 +44,7 @@ export class ErrorMessageHandler {
   }
   
   // Show an exception
-  showException(exception: unknown, priority: number = 0) {
+  showException(exception: unknown, priority = 0) {
     if (exception instanceof RechessError) {
       this.show(exception.localizedMessage, priority)
     } else if (exception instanceof Error) {

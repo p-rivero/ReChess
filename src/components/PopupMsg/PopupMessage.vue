@@ -63,8 +63,8 @@
       titleText.value = title
       messageText.value = message
       isImportant = important
-      acceptCallback = accept ?? (() => {})
-      cancelCallback = cancel ?? (() => {})
+      acceptCallback = accept ?? (() => { /* No callback set, do nothing */ })
+      cancelCallback = cancel ?? (() => { /* No callback set, do nothing */ })
       if (buttons === 'ok-cancel') {
         primaryButtonText.value = 'OK'
         secondaryButtonText.value = 'Cancel'
