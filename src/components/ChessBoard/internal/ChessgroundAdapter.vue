@@ -70,8 +70,9 @@
   const sizePercentPerSquare = 100 / Math.max(props.width, props.height)
   const componentHeightPercent = props.height * sizePercentPerSquare
   const componentWidthPercent = props.width * sizePercentPerSquare
+  // Don't compare with 100% because of floating point errors
   const [wrapWidth, wrapHeight] =
-    (componentWidthPercent === 100) ?
+    (componentWidthPercent > 99.9) ?
       ['100%', `${componentHeightPercent}%`] :
       [`${componentWidthPercent}%`, '100%']
   
