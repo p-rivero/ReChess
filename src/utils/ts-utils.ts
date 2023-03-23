@@ -55,3 +55,21 @@ export function object_equals(x: any, y: any) {
 
   return true
 }
+
+// Add all properties of the extend object to the base object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function deepMerge(base: any, extend: any): void {
+  for (const key in extend) {
+    if (Object.prototype.hasOwnProperty.call(extend, key)) {
+      if (Object.prototype.hasOwnProperty.call(base, key) && isPlainObject(base[key]) && isPlainObject(extend[key]))
+        deepMerge(base[key], extend[key])
+      else base[key] = extend[key]
+    }
+  }
+}
+function isPlainObject(o: unknown) {
+  if (typeof o !== 'object' || o === null)
+    return false
+  const proto = Object.getPrototypeOf(o)
+  return proto === Object.prototype || proto === null
+}

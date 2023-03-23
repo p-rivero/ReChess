@@ -30,6 +30,7 @@
   import type { Config } from 'chessgroundx/config'
   import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue'
   import { ref } from 'vue'
+  import { deepMerge } from '@/utils/ts-utils'
 
   const props = defineProps<{
     whitePov: boolean
@@ -237,23 +238,6 @@
   function incrementalUpdateConfig(newConfig: Config) {
     deepMerge(currentBoardConfig, newConfig)
     board.value?.setConfig(currentBoardConfig)
-  }
-  function deepMerge(base: any, extend: any): void {
-    for (const key in extend) {
-      // TODO: Call directly
-      if (Object.prototype.hasOwnProperty.call(extend, key)) {
-        if (Object.prototype.hasOwnProperty.call(base, key) && isPlainObject(base[key]) && isPlainObject(extend[key]))
-          deepMerge(base[key], extend[key])
-        else base[key] = extend[key]
-      }
-    }
-  }
-  // TODO: Remove
-  function isPlainObject(o: unknown) {
-    if (typeof o !== 'object' || o === null)
-      return false
-    const proto = Object.getPrototypeOf(o)
-    return proto === Object.prototype || proto === null
   }
 
 </script>
