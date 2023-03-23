@@ -1,15 +1,22 @@
 <template>
   <nav class="navbar is-fixed-top">
     <div class="navbar-brand">
-      
-      <div class="navbar-burger ml-0 mr-auto" data-target="navbarMenu" @click="navBarBurgerClick">
-        <span></span>
-        <span></span>
-        <span></span>
+      <div
+        class="navbar-burger ml-0 mr-auto"
+        data-target="navbarMenu"
+        @click="navBarBurgerClick"
+      >
+        <span />
+        <span />
+        <span />
       </div>
       <div class="navbar-end">
         <div class="navbar-item is-hidden-desktop">
-          <button aria-label="toggle theme" class="button sz-2 icon-theme color-theme" @click="toggleTheme"></button>
+          <button
+            aria-label="toggle theme"
+            class="button sz-2 icon-theme color-theme"
+            @click="toggleTheme"
+          />
         </div>
       </div>
       <div class="navbar-end">
@@ -19,17 +26,33 @@
       </div>
     </div>
 
-    <div id="navbarMenu" class="navbar-menu">
+    <div
+      id="navbarMenu"
+      class="navbar-menu"
+    >
       <div class="navbar-start">
-        <a class="navbar-item" href="/">
-          <div class="logo"></div>
+        <a
+          class="navbar-item"
+          href="/"
+        >
+          <div class="logo" />
         </a>
-        <a class="navbar-item" href="/">Browse</a>
-        <a class="navbar-item" @click="create">Create</a>
+        <a
+          class="navbar-item"
+          href="/"
+        >Browse</a>
+        <a
+          class="navbar-item"
+          @click="create"
+        >Create</a>
       </div>
       <div class="navbar-end">
         <div class="navbar-item is-hidden-touch">
-          <button aria-label="toggle theme" class="button sz-2 icon-theme color-theme" @click="toggleTheme"></button>
+          <button
+            aria-label="toggle theme"
+            class="button sz-2 icon-theme color-theme"
+            @click="toggleTheme"
+          />
         </div>
         <div class="navbar-item is-hidden-touch">
           <AccountCard />

@@ -8,19 +8,23 @@
 
 <template>
   <!-- Important: The container element must have INLINE style="width: 100%" -->
-  <div class="board-container" style="width: 100%" ref="container">
+  <div
+    ref="container"
+    class="board-container"
+    style="width: 100%"
+  >
     <ViewableChessBoard
+      ref="board"
       class="board"
       :white-pov="whitePov"
       :view-only="false"
       :show-coordinates="true"
       :capture-wheel-events="true"
       @user-moved="userMovedCallback"
-      @wheel="onWheel"
       
-      ref="board"
+      @wheel="onWheel"
     />
-    <PromotionPopup ref="promotionPopup"/>
+    <PromotionPopup ref="promotionPopup" />
   </div>
 </template>
 

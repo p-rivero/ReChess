@@ -1,16 +1,31 @@
 <template>
   <button
-    class="button is-outlined mr-4 px-1 py-1 fit-content" @click="click"
+    class="button is-outlined mr-4 px-1 py-1 fit-content"
     :class="{'is-danger': error}"
+    @click="click"
   >
-    <div v-if="loading" class="button piece-container is-loading is-white is-large"></div>
-    <div v-else-if="imageUrl" class="piece-container" >
-      <img class="piece-image" alt="Image of this piece" draggable="false" :src="imageUrl" />
+    <div
+      v-if="loading"
+      class="button piece-container is-loading is-white is-large"
+    />
+    <div
+      v-else-if="imageUrl"
+      class="piece-container"
+    >
+      <img
+        class="piece-image"
+        alt="Image of this piece"
+        draggable="false"
+        :src="imageUrl"
+      >
     </div>
-    <div v-else class="piece-container">
-      <div class="icon-cross color-black"></div>
+    <div
+      v-else
+      class="piece-container"
+    >
+      <div class="icon-cross color-black" />
     </div>
-    <div class="icon-edit color-theme sz-2"></div>
+    <div class="icon-edit color-theme sz-2" />
   </button>
 </template>
 

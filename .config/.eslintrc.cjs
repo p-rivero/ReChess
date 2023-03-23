@@ -4,7 +4,7 @@ require('@rushstack/eslint-patch/modern-module-resolution')
 module.exports = {
   root: true,
   'extends': [
-    'plugin:vue/vue3-essential',
+    'plugin:vue/vue3-recommended',
     'eslint:recommended',
     '@vue/eslint-config-typescript'
   ],
@@ -12,7 +12,8 @@ module.exports = {
     ecmaVersion: 'latest'
   },
   // Ignore the submodule directories
-  ignorePatterns: ['protochess-engine', 'chessgroundx', 'functions'],
+  // Also ignore the functions directory and any file that ends with .guard.ts
+  ignorePatterns: ['protochess-engine', 'chessgroundx', 'functions', '**/*.guard.ts'],
   rules: {
     // Use '_' as a prefix for unused variables
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],

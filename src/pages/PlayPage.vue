@@ -2,7 +2,10 @@
   <BoardWithGui
     :white="startAs === 'white' ? 'human' : 'engine'"
     :black="startAs === 'black' ? 'human' : 'engine'"
-    :has-gauge="false" @game-over="gameOver" @player-changed="newMove"/>
+    :has-gauge="false"
+    @game-over="gameOver"
+    @player-changed="newMove"
+  />
 </template>
 
 <script setup lang="ts">

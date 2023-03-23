@@ -1,14 +1,31 @@
 <template>
   <div>
-    <p v-if="!isRegister" class="modal-card-title mb-3">Welcome to ReChess!</p>
-    <p v-else class="modal-card-title mb-5">Create account</p>
+    <p
+      v-if="!isRegister"
+      class="modal-card-title mb-3"
+    >
+      Welcome to ReChess!
+    </p>
+    <p
+      v-else
+      class="modal-card-title mb-5"
+    >
+      Create account
+    </p>
     
-    <p v-if="!isRegister" class="mb-5">Log in or make an account to start reinventing chess in your own way</p>
+    <p
+      v-if="!isRegister"
+      class="mb-5"
+    >
+      Log in or make an account to start reinventing chess in your own way
+    </p>
     
     <div class="mb-5">
       <label class="label">Email</label>
       <SmartTextInput
-        ref="emailRef" type="email" placeholder="Email"
+        ref="emailRef"
+        type="email"
+        placeholder="Email"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -18,13 +35,19 @@
             return 'The email has an invalid format'
         }"
         :start-text="email"
-        @changed="text => email = text"/>
+        @changed="text => email = text"
+      />
     </div>
     
-    <div v-show="isRegister" class="mb-5">
+    <div
+      v-show="isRegister"
+      class="mb-5"
+    >
       <label class="label">Username</label>
       <SmartTextInput
-        class="mb-2" ref="usernameRef" placeholder="your_username"
+        ref="usernameRef"
+        class="mb-2"
+        placeholder="your_username"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -54,7 +77,8 @@
     <div class="mb-5">
       <label class="label">Password</label>
       <SmartTextInput
-        type="password" placeholder="Password"
+        type="password"
+        placeholder="Password"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -69,10 +93,14 @@
       />
     </div>
     
-    <div v-show="isRegister" class="mb-5">
+    <div
+      v-show="isRegister"
+      class="mb-5"
+    >
       <label class="label">Repeat password</label>
       <SmartTextInput
-        type="password" placeholder="Password"
+        type="password"
+        placeholder="Password"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -87,27 +115,50 @@
     </div>
     
     <div class="mb-4 is-flex">
-      <SmartErrorMessage class="mr-5" v-show="hasError" :handler="errorHandler" />
-      <a v-show="resetPasswordHint === 'shown'" class="has-text-danger" @click="resetPassword">Reset password?</a>
-      <p v-show="resetPasswordHint === 'sending'">Sending...</p>
+      <SmartErrorMessage
+        v-show="hasError"
+        class="mr-5"
+        :handler="errorHandler"
+      />
+      <a
+        v-show="resetPasswordHint === 'shown'"
+        class="has-text-danger"
+        @click="resetPassword"
+      >Reset password?</a>
+      <p v-show="resetPasswordHint === 'sending'">
+        Sending...
+      </p>
     </div>
     
-    <p v-if="isRegister" class="help mb-4">
+    <p
+      v-if="isRegister"
+      class="help mb-4"
+    >
       By creating an account, you agree to the <a href="/tos">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
     </p>
     
     <div class="pb-2 is-flex is-justify-content-space-between is-align-items-center">
       <button
-        class="button is-primary mr-4" @click="signInClick"
-        :class="{'is-loading': loading}" :disabled="submitDisabled"
+        class="button is-primary mr-4"
+        :class="{'is-loading': loading}"
+        :disabled="submitDisabled"
+        @click="signInClick"
       >
         {{ isRegister ? 'Register' : 'Sign in' }}
       </button>
-      <a v-if="!isRegister" @click="toggleRegister">Don't have an account?</a>
+      <a
+        v-if="!isRegister"
+        @click="toggleRegister"
+      >Don't have an account?</a>
     </div>
     
-    <div id="firebaseui-auth-container"></div>
-    <div class="is-align-self-center pt-5" v-if="loadingSocialSignin">Loading other sign in options...</div>
+    <div id="firebaseui-auth-container" />
+    <div
+      v-if="loadingSocialSignin"
+      class="is-align-self-center pt-5"
+    >
+      Loading other sign in options...
+    </div>
   </div>
 </template>
 

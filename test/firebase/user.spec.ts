@@ -33,9 +33,11 @@ test('anyone can read created users', async () => {
   await set('admin', user, 'users', '1234')
   
   const snapshot = await get('not logged', 'users', '1234')
-  expect(snapshot.exists()).toBe(true)
-  expect(snapshot.data()!.name).toBe('my new user')
-  expect(snapshot.data()!.IMMUTABLE.username).toBe('my_username')
+  if (!snapshot.exists()) {
+    throw new Error('Document does not exist')
+  }
+  expect(snapshot.data().name).toBe('my new user')
+  expect(snapshot.data().IMMUTABLE.username).toBe('my_username')
   
   const queryResult = await query('not logged', 'users')
   expect(queryResult.size).toBe(1)

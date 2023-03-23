@@ -2,30 +2,52 @@
   <div>
     <div v-show="editing && editable">
       <SmartTextInput
-        ref="textBox" :multiline="true"
-        :placeholder="placeholder" :error-handler="errorHandler"
+        ref="textBox"
+        :multiline="true"
+        :placeholder="placeholder"
+        :error-handler="errorHandler"
         :validator="validatorProxy"
         @changed="text => currentText = text"
         @enter-pressed="save"
       />
       <div class="is-flex">
-        <button class="button is-primary mt-2 mr-2" :disabled="hasError" @click="save">
-          <div class="sz-icon icon-save color-white"></div>
+        <button
+          class="button is-primary mt-2 mr-2"
+          :disabled="hasError"
+          @click="save"
+        >
+          <div class="sz-icon icon-save color-white" />
           Done
         </button>
-        <button v-if="editable" class="button mt-2" @click="toggleEdit(false)">
-          <div class="sz-icon icon-cross color-theme"></div>
+        <button
+          v-if="editable"
+          class="button mt-2"
+          @click="toggleEdit(false)"
+        >
+          <div class="sz-icon icon-cross color-theme" />
           Cancel
         </button>
       </div>
     </div>
     <div v-show="!editing || !editable">
-      <p v-if="!text" class="is-italic">No description</p>
-      <div v-else class="content mb-3">
+      <p
+        v-if="!text"
+        class="is-italic"
+      >
+        No description
+      </p>
+      <div
+        v-else
+        class="content mb-3"
+      >
         <VueMarkdown :source="text" />
       </div>
-      <button v-if="editable" class="button mt-2" @click="toggleEdit(true)">
-        <div class="sz-icon icon-edit color-theme"></div>
+      <button
+        v-if="editable"
+        class="button mt-2"
+        @click="toggleEdit(true)"
+      >
+        <div class="sz-icon icon-edit color-theme" />
         Edit description
       </button>
     </div>

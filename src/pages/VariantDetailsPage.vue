@@ -1,53 +1,95 @@
 <template>
   <div class="columns">
     <div class="column is-6">
-      <p class="is-size-2 mb-2">{{ variant?.displayName }}</p>
-      <p class="is-size-5 has-text-weight-semibold mb-4">Created by
+      <p class="is-size-2 mb-2">
+        {{ variant?.displayName }}
+      </p>
+      <p class="is-size-5 has-text-weight-semibold mb-4">
+        Created by
         <a @click="creatorClicked">{{ variant?.creatorDisplayName }}</a>
       </p>
-      <UpvoteButton v-if="variant" class="mb-5" :variant="variant" />
+      <UpvoteButton
+        v-if="variant"
+        class="mb-5"
+        :variant="variant"
+      />
       <div class="content mb-0">
-        <VueMarkdown v-if="variant" class="mb-5" :source="variant.description" />
+        <VueMarkdown
+          v-if="variant"
+          class="mb-5"
+          :source="variant.description"
+        />
         <h4>Rules:</h4>
         <ul>
-          <li v-for="rule in rules" :key="rule">
+          <li
+            v-for="rule in rules"
+            :key="rule"
+          >
             {{ rule }}
           </li>
         </ul>
         <h4>Pieces:</h4>
       </div>
-      <PiecesSummary v-if="variant" :state="variant" :editable="false" @piece-click="i => pieceDetailsPopup?.show(i)"/>
+      <PiecesSummary
+        v-if="variant"
+        :state="variant"
+        :editable="false"
+        @piece-click="i => pieceDetailsPopup?.show(i)"
+      />
     </div>
     
     <div class="column is-6 columns reverse-columns board-column">
       <div class="column mt-2 is-5 is-narrow">
-        <button class="button is-primary is-fullwidth mb-4" @click="playPopup?.show(variant?.uid)">
-          <div class="sz-icon icon-knight color-white"></div>
+        <button
+          class="button is-primary is-fullwidth mb-4"
+          @click="playPopup?.show(variant?.uid)"
+        >
+          <div class="sz-icon icon-knight color-white" />
           Play
         </button>
-        <button class="button is-fullwidth mb-4" @click="$router.push({ name: 'analysis', params: {variantId: variant?.uid} })">
-          <div class="sz-icon icon-analysis color-theme"></div>
+        <button
+          class="button is-fullwidth mb-4"
+          @click="$router.push({ name: 'analysis', params: {variantId: variant?.uid} })"
+        >
+          <div class="sz-icon icon-analysis color-theme" />
           Analysis board
         </button>
-        <button class="button is-fullwidth mb-4" @click="useAsTemplate">
-          <div class="sz-icon icon-edit color-theme"></div>
+        <button
+          class="button is-fullwidth mb-4"
+          @click="useAsTemplate"
+        >
+          <div class="sz-icon icon-edit color-theme" />
           Use as template
         </button>
-        <button v-if="authStore.loggedUser && variant?.creatorId !== authStore.loggedUser.uid" class="button is-fullwidth mb-4">
-          <div class="sz-icon icon-report color-theme"></div>
+        <button
+          v-if="authStore.loggedUser && variant?.creatorId !== authStore.loggedUser.uid"
+          class="button is-fullwidth mb-4"
+        >
+          <div class="sz-icon icon-report color-theme" />
           Report
         </button>
       </div>
       
       <div class="column mt-2 is-7 board-column">
         <div class="w-100">
-          <ViewableChessBoard ref="board" class="not-clickable" :white-pov="true" :view-only="true" :show-coordinates="true" :capture-wheel-events="false" />
+          <ViewableChessBoard
+            ref="board"
+            class="not-clickable"
+            :white-pov="true"
+            :view-only="true"
+            :show-coordinates="true"
+            :capture-wheel-events="false"
+          />
         </div>
       </div>
     </div>
   </div>
   <PlayPopup ref="playPopup" />
-  <PieceDetailsPopup v-if="variant" ref="pieceDetailsPopup" :variant="variant" />
+  <PieceDetailsPopup
+    v-if="variant"
+    ref="pieceDetailsPopup"
+    :variant="variant"
+  />
 </template>
 
 

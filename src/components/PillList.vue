@@ -10,35 +10,49 @@
 <template>
   <div class="pill-row field is-grouped is-grouped-multiline">
     <span
+      v-for="(pill, pillIndex) in pills"
+      :key="pillIndex"
       class="pill tag"
       :class="{
         'is-primary': !pill.error,
         'is-danger': pill.error,
         'non-editable': !editable,
       }"
-      v-for="(pill, pillIndex) in pills"
-      :key="pillIndex"
       @click="onPillClick(pill)"
     >
-      <div class="pill-text ml-2 px-1 py-0" v-if="!pill.editing">
+      <div
+        v-if="!pill.editing"
+        class="pill-text ml-2 px-1 py-0"
+      >
         {{ pill.text }}
       </div>
       <input
         v-else
+        ref="pillInput"
+        v-autowidth
         class="pill-input ml-2 px-1 py-0"
         type="text"
-        v-autowidth
-        ref="pillInput"
         :value="pill.text"
         @input="onPillInput(pill, $event)"
         @blur="finishEdit(pill)"
         @keydown.enter="finishEdit(pill)"
         @keydown.esc="cancelEdit(pill)"
+      >
+      <button
+        v-if="editable"
+        aria-label="remove"
+        class="delete mr-2"
+        @click="removePill(pill)"
       />
-      <button aria-label="remove" class="delete mr-2" v-if="editable" @click="removePill(pill)"></button>
     </span>
-    <div class="pill tag is-primary" v-if="editable" @click="onAddPillClick()">
-      <div class="add-button sz-2">+</div>
+    <div
+      v-if="editable"
+      class="pill tag is-primary"
+      @click="onAddPillClick()"
+    >
+      <div class="add-button sz-2">
+        +
+      </div>
     </div>
   </div>
 </template>

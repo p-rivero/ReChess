@@ -1,17 +1,43 @@
 <template>
-  <div class="modal" ref="popup">
-    <div class="modal-background" @click="backgroundClick"></div>
+  <div
+    ref="popup"
+    class="modal"
+  >
+    <div
+      class="modal-background"
+      @click="backgroundClick"
+    />
     <div class="modal-card">
       <header class="modal-card-head">
-        <p class="modal-card-title">{{ titleText }}</p>
-        <button class="delete is-large" aria-label="close" @click="cancel"></button>
+        <p class="modal-card-title">
+          {{ titleText }}
+        </p>
+        <button
+          class="delete is-large"
+          aria-label="close"
+          @click="cancel"
+        />
       </header>
       <section class="modal-card-body">
         {{ messageText }}
       </section>
       <footer class="modal-card-foot">
-        <button ref="primaryButton" class="button is-primary" @click="accept" @keydown.esc="cancel">{{ primaryButtonText }}</button>
-        <button v-if="secondaryButtonText" class="button" @click="cancel" @keydown.esc="cancel">{{ secondaryButtonText }}</button>
+        <button
+          ref="primaryButton"
+          class="button is-primary"
+          @click="accept"
+          @keydown.esc="cancel"
+        >
+          {{ primaryButtonText }}
+        </button>
+        <button
+          v-if="secondaryButtonText"
+          class="button"
+          @click="cancel"
+          @keydown.esc="cancel"
+        >
+          {{ secondaryButtonText }}
+        </button>
       </footer>
     </div>
   </div>

@@ -1,7 +1,16 @@
 <template>
   <div class="select">
-    <select ref="selectDropdown" @change="selectChanged($event.target)">
-      <option v-for="item in props.items" :key="item" :value="item">{{ item }}</option>
+    <select
+      ref="selectDropdown"
+      @change="selectChanged($event.target)"
+    >
+      <option
+        v-for="item in props.items"
+        :key="item"
+        :value="item"
+      >
+        {{ item }}
+      </option>
     </select>
   </div>
 </template>

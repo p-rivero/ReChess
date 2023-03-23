@@ -1,6 +1,5 @@
 <template>
   <div class="content has-text-justified">
-
     <h1><strong>COOKIE POLICY</strong></h1>
     <p><strong>Last updated March 13, 2023</strong></p>
 

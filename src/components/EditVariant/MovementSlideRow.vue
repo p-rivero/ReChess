@@ -4,20 +4,30 @@
       <label>Infinite slide:</label>
     </div>
     <div class="field is-grouped is-grouped-multiline">
-      <div class="control" v-for="(selected, index) in selectedDirections" :key="index">
-        <button class="button arrow-button" :class="{'is-primary': selected}" @click="arrowClicked(index)">
-          <div :class="{
-            'icon-arrow-left': index === 0,
-            'icon-arrow-right': index === 1,
-            'icon-arrow-up': index === 2,
-            'icon-arrow-down': index === 3,
-            'icon-arrow-up-left': index === 4,
-            'icon-arrow-up-right': index === 5,
-            'icon-arrow-down-left': index === 6,
-            'icon-arrow-down-right': index === 7,
-            'color-white': selected,
-            'color-theme': !selected
-          }"></div>
+      <div
+        v-for="(selected, index) in selectedDirections"
+        :key="index"
+        class="control"
+      >
+        <button
+          class="button arrow-button"
+          :class="{'is-primary': selected}"
+          @click="arrowClicked(index)"
+        >
+          <div
+            :class="{
+              'icon-arrow-left': index === 0,
+              'icon-arrow-right': index === 1,
+              'icon-arrow-up': index === 2,
+              'icon-arrow-down': index === 3,
+              'icon-arrow-up-left': index === 4,
+              'icon-arrow-up-right': index === 5,
+              'icon-arrow-down-left': index === 6,
+              'icon-arrow-down-right': index === 7,
+              'color-white': selected,
+              'color-theme': !selected
+            }"
+          />
         </button>
       </div>
     </div>

@@ -3,19 +3,36 @@
     <div class="field-label mr-4">
       <label>{{ props.text }}</label>
     </div>
-    <div class="field-body" :style="{ zIndex }">
-      <button class="button mr-4" :class="{ 'is-primary': addSelected }" @click="addClick">
-        <div class="sz-icon icon-add" :class="{
-          'color-theme': !addSelected,
-          'color-white': addSelected
-        }"></div>
+    <div
+      class="field-body"
+      :style="{ zIndex }"
+    >
+      <button
+        class="button mr-4"
+        :class="{ 'is-primary': addSelected }"
+        @click="addClick"
+      >
+        <div
+          class="sz-icon icon-add"
+          :class="{
+            'color-theme': !addSelected,
+            'color-white': addSelected
+          }"
+        />
         <span>Add</span>
       </button>
-      <button class="button" :class="{ 'is-primary': removeSelected }" @click="removeClick">
-        <div class="sz-icon icon-trash" :class="{
-          'color-theme': !removeSelected,
-          'color-white': removeSelected
-        }"></div>
+      <button
+        class="button"
+        :class="{ 'is-primary': removeSelected }"
+        @click="removeClick"
+      >
+        <div
+          class="sz-icon icon-trash"
+          :class="{
+            'color-theme': !removeSelected,
+            'color-white': removeSelected
+          }"
+        />
         <span>Remove</span>
       </button>
     </div>

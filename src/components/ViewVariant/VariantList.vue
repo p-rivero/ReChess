@@ -2,11 +2,13 @@
   <div class="field is-grouped is-grouped-multiline is-align-items-center">
     <DraftCard v-if="showDraftCard" />
     <VariantCard
-      v-for="(variant, index) of variantStore.variantList" :variant="variant" :key="index"
+      v-for="(variant, index) of variantStore.variantList"
+      :key="index"
+      :variant="variant"
       @play-clicked="playClicked(variant)"
       @edit-variant="$router.push({name: 'edit-variant'})"
     />
-    <PlayPopup ref="playPopup"/>
+    <PlayPopup ref="playPopup" />
   </div>
 </template>
 

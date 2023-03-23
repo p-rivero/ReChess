@@ -8,13 +8,16 @@
 <template>
   <div class="chessboard w-100 h-100">
     <div
-      ref="board" class="cg-board-wrap"
+      ref="board"
+      class="cg-board-wrap"
       @click="e => onClick(e)"
-      @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseout="endDrag"
+      @mousedown="startDrag"
+      @mousemove="onDrag"
+      @mouseup="endDrag"
+      @mouseout="endDrag"
       @touchstart="onTap"
       @wheel="onWheel"
-    >
-    </div>
+    />
   </div>
 </template>
 

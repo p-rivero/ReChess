@@ -1,18 +1,23 @@
 <template>
   <input
-    v-if="!multiline" class="input" :type="type" ref="textInput"
+    v-if="!multiline"
+    ref="textInput"
+    class="input"
+    :type="type"
     :class="{'is-danger': isError}"
     :placeholder="props.placeholder"
     @input="inputChanged"
     @keydown.enter="emit('enter-pressed')"
   >
   <textarea
-    v-else class="textarea" ref="textInput"
-    :class="{'is-danger': isError}" :type="type"
+    v-else
+    ref="textInput"
+    class="textarea"
+    :class="{'is-danger': isError}"
+    :type="type"
     :placeholder="props.placeholder"
     @input="inputChanged"
-  >
-  </textarea>
+  />
 </template>
 
 <script setup lang="ts">

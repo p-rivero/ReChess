@@ -1,10 +1,24 @@
 <template>
   <div class="card px-2 py-2 mx-3 my-4">
-    <div class="is-clickable" @click="$router.push({ name: 'variant-details', params: { variantId: variant.uid } })">
-      <div class="board-container" ref="container">
-        <ViewableChessBoard ref="board" :white-pov="true" :view-only="true" :show-coordinates="false" :capture-wheel-events="false" />
+    <div
+      class="is-clickable"
+      @click="$router.push({ name: 'variant-details', params: { variantId: variant.uid } })"
+    >
+      <div
+        ref="container"
+        class="board-container"
+      >
+        <ViewableChessBoard
+          ref="board"
+          :white-pov="true"
+          :view-only="true"
+          :show-coordinates="false"
+          :capture-wheel-events="false"
+        />
       </div>
-      <p class="mt-3 is-size-5 has-text-weight-semibold">{{ variant.displayName }}</p>
+      <p class="mt-3 is-size-5 has-text-weight-semibold">
+        {{ variant.displayName }}
+      </p>
     </div>
     
     <p class="mb-3 has-text-weight-light">
@@ -12,13 +26,20 @@
     </p>
     <div class="columns is-mobile mb-0">
       <div class="column is-narrow pr-0">
-        <button aria-label="use as template" class="button button-square px-0" @click="useAsTemplate">
-          <div class="icon-edit color-theme"></div>
+        <button
+          aria-label="use as template"
+          class="button button-square px-0"
+          @click="useAsTemplate"
+        >
+          <div class="icon-edit color-theme" />
         </button>
       </div>
       <div class="column">
-        <button class="button is-fullwidth" @click="emit('play-clicked')">
-          <div class="sz-icon icon-knight color-theme"></div>
+        <button
+          class="button is-fullwidth"
+          @click="emit('play-clicked')"
+        >
+          <div class="sz-icon icon-knight color-theme" />
           Play
         </button>
       </div>
@@ -27,7 +48,7 @@
       <!-- <div class="tags mr-4 mb-0">
         <span class="tag is-primary">Tag 1</span>
       </div> -->
-      <div class="is-flex-grow-1"></div>
+      <div class="is-flex-grow-1" />
       <UpvoteButton :variant="props.variant" />
     </div>
   </div>

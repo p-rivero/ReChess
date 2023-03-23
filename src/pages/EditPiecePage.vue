@@ -7,18 +7,26 @@
 <template>
   <div class="columns is-desktop reverse-columns">
     <div class="column is-narrow left-column">
-      
       <div class="is-flex is-justify-content-center mb-4">
         <PieceViewerWithZoom
-          v-if="piece" :piece="piece" style="z-index: 11;"
+          v-if="piece"
+          :piece="piece"
+          style="z-index: 11;"
           @clicked="editDelta"
         />
       </div>
       
       <br>
-      <SmartErrorMessage v-show="hasError" class="mb-4" :handler="errorMsgHandler" />
-      <button class="button is-primary bottom-button" @click="$router.push({name: 'edit-variant'})">
-        <div class="sz-icon icon-check color-white"></div>
+      <SmartErrorMessage
+        v-show="hasError"
+        class="mb-4"
+        :handler="errorMsgHandler"
+      />
+      <button
+        class="button is-primary bottom-button"
+        @click="$router.push({name: 'edit-variant'})"
+      >
+        <div class="sz-icon icon-check color-white" />
         <span>Done</span>
       </button>
     </div>
@@ -27,7 +35,9 @@
     
     <div class="column">
       <SmartTextInput
-        class="is-large" placeholder="Piece name" :start-text="piece?.displayName"
+        class="is-large"
+        placeholder="Piece name"
+        :start-text="piece?.displayName"
         :error-handler="errorMsgHandler"
         :error-priority="2"
         :validator="text => {
@@ -43,16 +53,21 @@
         <div class="column">
           <div class="horizontal-field">
             <SmartCheckbox
-              text="White" class="mr-4" :start-value="!whiteInvisible"
+              text="White"
+              class="mr-4"
+              :start-value="!whiteInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'white')"
             />
             <PieceImageEdit
-              :imageUrl="piece?.imageUrls[0]" :class="{ invisible: whiteInvisible }"
+              :image-url="piece?.imageUrls[0]"
+              :class="{ invisible: whiteInvisible }"
               @image-changed="url => { piece!.imageUrls[0] = url; errorMsgHandler.clear() }"
               @upload-error="imageUploadFailed"
             />
             <SmartTextInput
-              class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
+              class="width-3rem"
+              :class="{ invisible: whiteInvisible }"
+              placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
               :error-handler="errorMsgHandler"
               :error-priority="1"
@@ -71,16 +86,21 @@
         <div class="column">
           <div class="horizontal-field">
             <SmartCheckbox
-              text="Black" class="mr-4" :start-value="!blackInvisible"
+              text="Black"
+              class="mr-4"
+              :start-value="!blackInvisible"
               @changed="enabled => enabledCheckboxChanged(enabled, 'black')"
             />
             <PieceImageEdit
-              :imageUrl="piece?.imageUrls[1]" :class="{ invisible: blackInvisible }"
+              :image-url="piece?.imageUrls[1]"
+              :class="{ invisible: blackInvisible }"
               @image-changed="url => { piece!.imageUrls[1] = url; errorMsgHandler.clear() }"
               @upload-error="imageUploadFailed"
             />
             <SmartTextInput
-              class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
+              class="width-3rem"
+              :class="{ invisible: blackInvisible }"
+              placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :error-handler="errorMsgHandler"
               :validator="text => {
@@ -97,8 +117,9 @@
       
       <label class="label">Behavior:</label>
       <SmartCheckbox
-        text="Leader (can be checked/checkmated)" class="rules-field"
-        :startValue="piece?.isLeader"
+        text="Leader (can be checked/checkmated)"
+        class="rules-field"
+        :start-value="piece?.isLeader"
         @changed="value => piece!.isLeader = value"
       />
       
@@ -108,15 +129,19 @@
         </div>
         <SmartDropdown
           :items="['No', 'As king', 'As rook']"
-          :startItem="piece?.isCastleRook ? 'As rook' : piece?.castleFiles ? 'As king' : 'No'"
-          :onChanged="item =>castlingDropdownChanged(item)"
+          :start-item="piece?.isCastleRook ? 'As rook' : piece?.castleFiles ? 'As king' : 'No'"
+          :on-changed="item =>castlingDropdownChanged(item)"
         />
-        <div v-show="piece?.castleFiles" class="is-flex-not-important is-flex-direction-row is-align-items-center">
+        <div
+          v-show="piece?.castleFiles"
+          class="is-flex-not-important is-flex-direction-row is-align-items-center"
+        >
           <div class="field-label-both">
             <label>Queenside file</label>
           </div>
           <SmartTextInput
-            class="width-3rem" placeholder="c"
+            class="width-3rem"
+            placeholder="c"
             :start-text="numberToLetter(piece?.castleFiles?.[0])"
             :error-handler="errorMsgHandler"
             :validator="text => validateCastlingFile(text, 'Queenside')"
@@ -126,7 +151,8 @@
             <label>Kingside file</label>
           </div>
           <SmartTextInput
-            class="width-3rem" placeholder="g"
+            class="width-3rem"
+            placeholder="g"
             :start-text="numberToLetter(piece?.castleFiles?.[1])"
             :error-handler="errorMsgHandler"
             :validator="text => validateCastlingFile(text, 'Kingside')"
@@ -137,20 +163,32 @@
       
       <label>Win instantly when standing on:</label>
       <CoordPillList
-        :editable="true" class="mb-5" :allow-repeat="false"
+        :editable="true"
+        class="mb-5"
+        :allow-repeat="false"
         :starting-coords="piece?.winSquares"
         @changed="coords => piece!.winSquares = coords"
       />
       <br>
       <label class="label">Movement:</label>
       <AddRemoveButtons
-        text="Jumps:" :z-index="11" type="move"
-        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta"
+        text="Jumps:"
+        :z-index="11"
+        type="move"
+        :selected-delta="selectedDelta"
+        @update-delta="delta => selectedDelta=delta"
       />
-      <div class="mb-4"> <MovementSlideRow :piece-index="pieceIndex" type="move"/> </div>
+      <div class="mb-4">
+        <MovementSlideRow
+          :piece-index="pieceIndex"
+          type="move"
+        />
+      </div>
       <label>Double jump when standing on:</label>
       <CoordPillList
-        :editable="true" class="mb-5" :allow-repeat="false"
+        :editable="true"
+        class="mb-5"
+        :allow-repeat="false"
         :starting-coords="piece?.doubleJumpSquares"
         @changed="coords => piece!.doubleJumpSquares = coords"
       />
@@ -158,35 +196,52 @@
       <br>
       <label class="label">Capture:</label>
       <AddRemoveButtons
-        text="Jumps:" :z-index="11" type="capture"
-        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta"
+        text="Jumps:"
+        :z-index="11"
+        type="capture"
+        :selected-delta="selectedDelta"
+        @update-delta="delta => selectedDelta=delta"
       />
-      <div class="mb-5"> <MovementSlideRow :piece-index="pieceIndex" type="capture"/> </div>
+      <div class="mb-5">
+        <MovementSlideRow
+          :piece-index="pieceIndex"
+          type="capture"
+        />
+      </div>
       
       <br>
       <label class="label">Promote:</label>
       <label>Promote when landing on:</label>
       <CoordPillList
-        :editable="true" :allow-repeat="false"
+        :editable="true"
+        :allow-repeat="false"
         :starting-coords="piece?.promotionSquares"
         @changed="coords => piece!.promotionSquares = coords"
       />
       <br>
         
       <div class="columns">
-        <div v-if="!whiteInvisible" class="column">
+        <div
+          v-if="!whiteInvisible"
+          class="column"
+        >
           <label>(White) Promote to:</label>
           <CharPillList
-            :editable="true" :allow-repeat="false"
+            :editable="true"
+            :allow-repeat="false"
             :starting-pills="piece?.promoVals[0]"
             @changed="promos => piece!.promoVals[0] = promos"
           />
         </div>
         
-        <div v-if="!blackInvisible" class="column">
+        <div
+          v-if="!blackInvisible"
+          class="column"
+        >
           <label>(Black) Promote to:</label>
           <CharPillList
-            :editable="true" :allow-repeat="false"
+            :editable="true"
+            :allow-repeat="false"
             :starting-pills="piece?.promoVals[1]"
             @changed="promos => piece!.promoVals[1] = promos"
           />
@@ -198,28 +253,36 @@
       <div class="columns">
         <div class="column ">
           <SmartCheckbox
-            text="Explode when capturing" class="rules-field"
-            :startValue="piece?.explodes"
+            text="Explode when capturing"
+            class="rules-field"
+            :start-value="piece?.explodes"
             @changed="value => piece!.explodes = value"
           />
         </div>
         <div class="column">
           <SmartCheckbox
-            text="Immune to other explosions" class="rules-field"
-            :startValue="piece?.immuneToExplosion"
+            text="Immune to other explosions"
+            class="rules-field"
+            :start-value="piece?.immuneToExplosion"
             @changed="value => piece!.immuneToExplosion = value"
           />
         </div>
       </div>
       <AddRemoveButtons
-        text="Explosion squares:" :z-index="11" type="explosion"
         v-show="piece?.explodes"
-        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta"
+        text="Explosion squares:"
+        :z-index="11"
+        type="explosion"
+        :selected-delta="selectedDelta"
+        @update-delta="delta => selectedDelta=delta"
       />
-      
     </div>
   </div>
-  <PopupOverlay v-if="selectedDelta[0] !== 'none'" :z-index="10" @click="selectedDelta[0] = 'none'" />
+  <PopupOverlay
+    v-if="selectedDelta[0] !== 'none'"
+    :z-index="10"
+    @click="selectedDelta[0] = 'none'"
+  />
 </template>
 
 

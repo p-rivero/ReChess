@@ -3,9 +3,12 @@
     <div class="is-flex is-flex-direction-row is-justify-content-center">
       <div class="box">
         <p class="control has-icons-left has-icons-right">
-          <SmartTextInput class="is-medium" placeholder="Search variants..." />
+          <SmartTextInput
+            class="is-medium"
+            placeholder="Search variants..."
+          />
           <span class="icon is-small is-left px-3 py-3">
-            <div class="icon-search color-theme"></div>
+            <div class="icon-search color-theme" />
           </span>
         </p>
       </div>

@@ -25,8 +25,10 @@ test('anyone can read which usernames are already taken', async () => {
   await set('admin', user, 'usernames', 'abc')
   
   const snapshot = await get('not logged', 'usernames', 'abc')
-  expect(snapshot.exists()).toBe(true)
-  expect(snapshot.data()!.userId).toBe('1234')
+  if (!snapshot.exists()) {
+    throw new Error('Document does not exist')
+  }
+  expect(snapshot.data().userId).toBe('1234')
   
   const queryResult = await query('not logged', 'usernames')
   expect(queryResult.size).toBe(1)

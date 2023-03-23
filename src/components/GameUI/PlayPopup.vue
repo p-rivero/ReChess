@@ -1,26 +1,56 @@
 <template>
-  <div class="modal" ref="popup">
-    <div class="modal-background" @click="closePopup"></div>
+  <div
+    ref="popup"
+    class="modal"
+  >
+    <div
+      class="modal-background"
+      @click="closePopup"
+    />
     <div class="modal-card">
       <header class="modal-card-head">
-        <p class="modal-card-title">Play</p>
-        <button class="delete is-large" aria-label="close" @click="closePopup"></button>
+        <p class="modal-card-title">
+          Play
+        </p>
+        <button
+          class="delete is-large"
+          aria-label="close"
+          @click="closePopup"
+        />
       </header>
       <footer class="modal-card-foot is-flex is-justify-content-center">
         <div class="columns w-100">
-          <div class="column is-clickable" @click="play('white')">
-            <button aria-label="play as white" class="button px-0 py-0 mr-0 is-white">
-              <span class="icon-king color-black"></span>
+          <div
+            class="column is-clickable"
+            @click="play('white')"
+          >
+            <button
+              aria-label="play as white"
+              class="button px-0 py-0 mr-0 is-white"
+            >
+              <span class="icon-king color-black" />
             </button>
             <p>As White</p>
           </div>
-          <div class="column is-clickable" @click="play('random')">
-            <button aria-label="play as random side" class="button random-side px-0 py-0 mr-0"></button>
+          <div
+            class="column is-clickable"
+            @click="play('random')"
+          >
+            <button
+              aria-label="play as random side"
+              class="button random-side px-0 py-0 mr-0"
+            />
             <p>Random side</p>
           </div>
-          <div class="column is-clickable" @click="play('black')">
-            <button aria-label="play as black" class="button px-0 py-0 mr-0 is-black">
-              <span class="icon-king color-white"></span>
+          <div
+            class="column is-clickable"
+            @click="play('black')"
+          >
+            <button
+              aria-label="play as black"
+              class="button px-0 py-0 mr-0 is-black"
+            >
+              <span class="icon-king color-white" />
             </button>
             <p>As Black</p>
           </div>

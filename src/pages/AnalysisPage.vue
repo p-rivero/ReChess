@@ -1,5 +1,9 @@
 <template>
-  <BoardWithGui :white="'human'" :black="'human'" :has-gauge="true" />
+  <BoardWithGui
+    :white="'human'"
+    :black="'human'"
+    :has-gauge="true"
+  />
 </template>
 
 <script setup lang="ts">

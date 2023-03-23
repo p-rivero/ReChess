@@ -1,23 +1,32 @@
 <template>
-  <div class="modal" ref="popup">
-    <div class="modal-background" @click="closePopup(true)"></div>
+  <div
+    ref="popup"
+    class="modal"
+  >
+    <div
+      class="modal-background"
+      @click="closePopup(true)"
+    />
     <div class="box modal-card scrollable signin-card">
-      
       <LoginRegisterStage
-        v-show="currentStage === 'loginRegister'" ref="loginRegisterStage"
-        @check-verify="checkVerify" @choose-username="chooseUsername"
+        v-show="currentStage === 'loginRegister'"
+        ref="loginRegisterStage"
+        @check-verify="checkVerify"
+        @choose-username="chooseUsername"
       />
         
       <ChooseUsernameStage
-        v-show="currentStage === 'chooseUsername'" ref="chooseUsernameStage"
-        @check-verify="checkVerify" @close-popup="closePopup"
+        v-show="currentStage === 'chooseUsername'"
+        ref="chooseUsernameStage"
+        @check-verify="checkVerify"
+        @close-popup="closePopup"
       />
         
       <VerifyEmailStage
-        v-show="currentStage === 'verifyEmail'" ref="verifyEmailStage"
+        v-show="currentStage === 'verifyEmail'"
+        ref="verifyEmailStage"
         @close-popup="closePopup"
       />
-      
     </div>
   </div>
 </template>

@@ -1,14 +1,25 @@
 <template>
-  <a v-if="authStore.loggedUser" class="card-header" @click="onAccountClick">
+  <a
+    v-if="authStore.loggedUser"
+    class="card-header"
+    @click="onAccountClick"
+  >
     <span class="card-header-icon py-0 pl-3 pr-0">
-      <div class="account-icon sz-2 icon-account color-theme" style="border-radius: 50%;"></div>
+      <div
+        class="account-icon sz-2 icon-account color-theme"
+        style="border-radius: 50%;"
+      />
     </span>
     <p class="card-header-title">
       {{ authStore.loggedUser.displayName }}
     </p>
   </a>
-  <button v-else class="button is-primary" @click="requestSignIn">
-    <div class="sz-icon icon-user color-white"></div>
+  <button
+    v-else
+    class="button is-primary"
+    @click="requestSignIn"
+  >
+    <div class="sz-icon icon-user color-white" />
     Sign in
   </button>
 </template>

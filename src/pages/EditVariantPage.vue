@@ -6,19 +6,27 @@
 <template>
   <div class="columns is-desktop reverse-columns">
     <div class="column is-narrow left-column">
-      
       <div class="is-flex is-justify-content-center mb-4 board-container">
         <ViewableChessBoard
-          ref="board" style="z-index: 20"
-          :white-pov="true" :view-only="true" :show-coordinates="true" :capture-wheel-events="false"
+          ref="board"
+          style="z-index: 20"
+          :white-pov="true"
+          :view-only="true"
+          :show-coordinates="true"
+          :capture-wheel-events="false"
           @clicked="coords => placePiece(coords)"
         />
       </div>
       
       <div class="horizontal-field">
-        <div class="field-label"><label>Board size:</label></div>
+        <div class="field-label">
+          <label>Board size:</label>
+        </div>
         <SmartNumberInput
-          class="width-5rem" :min="2" :max="16" :default="8"
+          class="width-5rem"
+          :min="2"
+          :max="16"
+          :default="8"
           :start-value="draftStore.state.boardHeight"
           @changed="draftStore.setHeight"
         />
@@ -26,7 +34,10 @@
           <label>x</label>
         </div>
         <SmartNumberInput
-          class="width-5rem" :min="2" :max="16" :default="8"
+          class="width-5rem"
+          :min="2"
+          :max="16"
+          :default="8"
           :start-value="draftStore.state.boardWidth"
           @changed="draftStore.setWidth"
         />
@@ -48,50 +59,73 @@
       <div class="field">
         <label class="label">Place piece:</label>
         <PiecePlacementButtons
-          ref="pieceSelector" :z-index="11" :state="draftStore.state"
+          ref="pieceSelector"
           :key="JSON.stringify(draftStore.state.pieceTypes)"
+          :z-index="11"
+          :state="draftStore.state"
           @piece-selected="id => selectedPieceId = id"
           @piece-deselected="selectedPieceId = 'none'"
         />
       </div>
       <br>
       
-      <SmartErrorMessage v-show="hasError" class="my-4" :handler="errorMsgHandler" />
-      <button class="button bottom-button" @click="$router.push({name: 'analysis'})" :disabled="hasError || loading">
-        <div class="sz-icon icon-analysis color-theme"></div>
+      <SmartErrorMessage
+        v-show="hasError"
+        class="my-4"
+        :handler="errorMsgHandler"
+      />
+      <button
+        class="button bottom-button"
+        :disabled="hasError || loading"
+        @click="$router.push({name: 'analysis'})"
+      >
+        <div class="sz-icon icon-analysis color-theme" />
         <span>Analysis board</span>
       </button>
-      <button class="button bottom-button" @click="playPopup?.show()" :disabled="hasError || loading">
-        <div class="sz-icon icon-cpu color-theme"></div>
+      <button
+        class="button bottom-button"
+        :disabled="hasError || loading"
+        @click="playPopup?.show()"
+      >
+        <div class="sz-icon icon-cpu color-theme" />
         <span>Play vs. engine</span>
       </button>
       <br>
-      <button class="button is-primary bottom-button" :disabled="hasError || loading" @click="publish">
-        <div class="sz-icon icon-rocket color-white"></div>
+      <button
+        class="button is-primary bottom-button"
+        :disabled="hasError || loading"
+        @click="publish"
+      >
+        <div class="sz-icon icon-rocket color-white" />
         <span>Publish variant</span>
       </button>
       <br>
       <br>
-      <button class="button bottom-button" @click="draftStore.backupFile">
-        <div class="sz-icon icon-download color-theme"></div>
+      <button
+        class="button bottom-button"
+        @click="draftStore.backupFile"
+      >
+        <div class="sz-icon icon-download color-theme" />
         <span>Back up</span>
       </button>
-      <button class="button bottom-button" @click="uploadFile">
-        <div class="sz-icon icon-upload color-theme"></div>
+      <button
+        class="button bottom-button"
+        @click="uploadFile"
+      >
+        <div class="sz-icon icon-upload color-theme" />
         <span>Upload</span>
       </button>
       <br>
       <p>* Your draft is saved automatically, you can close this page and come back later to continue editing.</p>
-      
     </div>
     
     
     
     <div class="column">
       <SmartTextInput
-        class="is-large" placeholder="Variant name"
+        class="is-large"
+        placeholder="Variant name"
         :start-text="draftStore.state.displayName"
-        @changed="name => draftStore.state.displayName = name"
         :validator="(text) => {
           if (text.length === 0) return 'Please enter the name of this variant'
           if (text.length > 50) return 'Variant name must be at most 50 characters long'
@@ -99,6 +133,7 @@
         }"
         :emit-changed-when-error="true"
         :error-handler="errorMsgHandler"
+        @changed="name => draftStore.state.displayName = name"
       />
       <br>
       <br>
@@ -106,7 +141,8 @@
         class="mb-5"
         :text="draftStore.state.description"
         :placeholder="'Describe the rules of the variant and how fun it is to play!\nYou can use **Markdown** to format your text.'"
-        :editable="true" :error-handler="errorMsgHandler"
+        :editable="true"
+        :error-handler="errorMsgHandler"
         :validator="text => text.length > 1000 ? 'The variant description must be at most 1000 characters long' : undefined"
         @save="text => draftStore.state.description = text"
       />
@@ -115,13 +151,15 @@
       <div class="columns is-mobile">
         <div class="column ">
           <SmartCheckbox
-            text="Capturing is forced" class="rules-field"
+            text="Capturing is forced"
+            class="rules-field"
             :start-value="draftStore.state.globalRules.capturingIsForced"
             @changed="value => draftStore.state.globalRules.capturingIsForced = value"
           />
           <br>
           <SmartCheckbox
-            text="Check is forbidden" class="rules-field"
+            text="Check is forbidden"
+            class="rules-field"
             :start-value="draftStore.state.globalRules.checkIsForbidden"
             @changed="value => {
               draftStore.state.globalRules.checkIsForbidden = value
@@ -132,13 +170,15 @@
         
         <div class="column">
           <SmartCheckbox
-            text="Stalemated player loses" class="rules-field"
+            text="Stalemated player loses"
+            class="rules-field"
             :start-value="draftStore.state.globalRules.stalematedPlayerLoses"
             @changed="value => draftStore.state.globalRules.stalematedPlayerLoses = value"
           />
           <br>
           <SmartCheckbox
-            text="Invert ALL win conditions" class="rules-field"
+            text="Invert ALL win conditions"
+            class="rules-field"
             :start-value="draftStore.state.globalRules.invertWinConditions"
             @changed="value => draftStore.state.globalRules.invertWinConditions = value"
           />
@@ -149,7 +189,10 @@
           <label>Repetitions for draw:</label>
         </div>
         <SmartNumberInput
-          class="width-5rem" :min="0" :max="200" :default="3"
+          class="width-5rem"
+          :min="0"
+          :max="200"
+          :default="3"
           :start-value="draftStore.state.globalRules.repetitionsDraw"
           @changed="value => draftStore.state.globalRules.repetitionsDraw = value"
         />
@@ -159,7 +202,11 @@
           <label>Lose when put in check</label>
         </div>
         <SmartNumberInput
-          class="width-5rem" :min="0" :max="200" :default="0" placeholder="-"
+          class="width-5rem"
+          :min="0"
+          :max="200"
+          :default="0"
+          placeholder="-"
           :start-value="draftStore.state.globalRules.checksToLose"
           :disabled="draftStore.state.globalRules.checkIsForbidden"
           @changed="value => draftStore.state.globalRules.checksToLose = value"
@@ -181,7 +228,11 @@
     </div>
   </div>
   
-  <PopupOverlay v-if="selectedPieceId !== 'none'" :z-index="10" @click="pieceSelector?.cancelPlacement()" />
+  <PopupOverlay
+    v-if="selectedPieceId !== 'none'"
+    :z-index="10"
+    @click="pieceSelector?.cancelPlacement()"
+  />
   <PlayPopup ref="playPopup" />
 </template>
 

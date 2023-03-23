@@ -4,20 +4,52 @@
  
 <template>
   <div class="is-flex">
-    <div class="eval-gauge" :class="{'reverse': !whitePov}">
-      <div class="black-bar"></div>
-      <div class="marker" style="height: 12.5%"></div>
-      <div class="marker" style="height: 25%"></div>
-      <div class="marker" style="height: 37.5%"></div>
-      <div class="center-line" style="height: 50%"></div>
-      <div class="marker" style="height: 62.5%"></div>
-      <div class="marker" style="height: 75%"></div>
-      <div class="marker" style="height: 87.5%"></div>
+    <div
+      class="eval-gauge"
+      :class="{'reverse': !whitePov}"
+    >
+      <div class="black-bar" />
+      <div
+        class="marker"
+        style="height: 12.5%"
+      />
+      <div
+        class="marker"
+        style="height: 25%"
+      />
+      <div
+        class="marker"
+        style="height: 37.5%"
+      />
+      <div
+        class="center-line"
+        style="height: 50%"
+      />
+      <div
+        class="marker"
+        style="height: 62.5%"
+      />
+      <div
+        class="marker"
+        style="height: 75%"
+      />
+      <div
+        class="marker"
+        style="height: 87.5%"
+      />
     </div>
     <div>
-      <div class="ml-2 eval-text">{{ evalText }}</div>
-      <div class="ml-2 mb-2">{{ depthText }}</div>
-      <a v-if="explainText" class="ml-2 is-size-5" @click="explain">
+      <div class="ml-2 eval-text">
+        {{ evalText }}
+      </div>
+      <div class="ml-2 mb-2">
+        {{ depthText }}
+      </div>
+      <a
+        v-if="explainText"
+        class="ml-2 is-size-5"
+        @click="explain"
+      >
         Why?</a>
     </div>
   </div>

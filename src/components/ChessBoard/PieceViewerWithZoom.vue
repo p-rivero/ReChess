@@ -1,28 +1,38 @@
 <template>
   <div class="w-100 h-100">
     <PieceViewer
+      :key="`${width}-${height}-${position}`"
       :piece="piece"
       :width="width"
       :height="height"
       :position="position"
-      @clicked="delta => emit('clicked', delta)"
       
-      :key="`${width}-${height}-${position}`"
+      @clicked="delta => emit('clicked', delta)"
     />
     
     <br>
     <label class="label">View:</label>
-    <div class="field is-grouped is-grouped-multiline" v-for="(group, groupIndex) of ZOOM_BUTTONS" :key="groupIndex">
-      <div class="control" v-for="(button, buttonIndex) of group" :key="buttonIndex">
+    <div
+      v-for="(group, groupIndex) of ZOOM_BUTTONS"
+      :key="groupIndex"
+      class="field is-grouped is-grouped-multiline"
+    >
+      <div
+        v-for="(button, buttonIndex) of group"
+        :key="buttonIndex"
+        class="control"
+      >
         <button
           class="button view-button px-1 py-1"
           :class="{'is-active': width === button.width && height === button.height && position === button.position}"
           @click="width = button.width; height = button.height; position = button.position"
         >
-          <span :class="[
-            button.icon,
-            (width === button.width && height === button.height && position === button.position) ? 'color-primary' : 'color-theme',
-          ]"></span>
+          <span
+            :class="[
+              button.icon,
+              (width === button.width && height === button.height && position === button.position) ? 'color-primary' : 'color-theme',
+            ]"
+          />
         </button>
       </div>
     </div>

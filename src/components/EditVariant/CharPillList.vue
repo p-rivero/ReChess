@@ -3,10 +3,13 @@
  -->
 
 <template>
-  <PillList :editable="$props.editable" :validator="validator"
-            :starting-pills="$props.startingChars"
-            :allow-repeat="$props.allowRepeat"
-            @changed="pills => emit('changed', pills)"/>
+  <PillList
+    :editable="$props.editable"
+    :validator="validator"
+    :starting-pills="$props.startingChars"
+    :allow-repeat="$props.allowRepeat"
+    @changed="pills => emit('changed', pills)"
+  />
 </template>
 
 <script setup lang="ts">

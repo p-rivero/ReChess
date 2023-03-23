@@ -1,8 +1,15 @@
 <template>
-  <div v-for="(piece, pieceIndex) of props.state.pieceTypes" class="piece-container mb-5" :key="pieceIndex">
+  <div
+    v-for="(piece, pieceIndex) of props.state.pieceTypes"
+    :key="pieceIndex"
+    class="piece-container mb-5"
+  >
     <div v-if="editable">
-      <button class="button sz-3 mr-4 my-1 px-2 fit-content" @click="emit('delete-click', pieceIndex)">
-        <div class="icon-trash color-theme"></div>
+      <button
+        class="button sz-3 mr-4 my-1 px-2 fit-content"
+        @click="emit('delete-click', pieceIndex)"
+      >
+        <div class="icon-trash color-theme" />
       </button>
     </div>
     <div
@@ -11,49 +18,97 @@
       @mouseenter="hovered = pieceIndex"
       @mouseleave="hovered = -1"
     >
-    
       <div class="box-row">
-        <div class="sz-2 ml-2 mr-4" :class="{
-          'icon-edit': editable,
-          'icon-info': !editable,
-          'color-primary-dark': hovered === pieceIndex,
-          'color-theme': hovered !== pieceIndex,
-        }"></div>
+        <div
+          class="sz-2 ml-2 mr-4"
+          :class="{
+            'icon-edit': editable,
+            'icon-info': !editable,
+            'color-primary-dark': hovered === pieceIndex,
+            'color-theme': hovered !== pieceIndex,
+          }"
+        />
         
-        <img v-if="piece.ids[0] != null && piece.imageUrls[0]" :src="piece.imageUrls[0]" alt="piece image" class="sz-3 mr-4" draggable="false">
-        <div v-else alt="piece image" class="sz-3 mr-4 icon-cross" :class="{'color-theme': piece.ids[0] != null}"></div>
+        <img
+          v-if="piece.ids[0] != null && piece.imageUrls[0]"
+          :src="piece.imageUrls[0]"
+          alt="piece image"
+          class="sz-3 mr-4"
+          draggable="false"
+        >
+        <div
+          v-else
+          alt="piece image"
+          class="sz-3 mr-4 icon-cross"
+          :class="{'color-theme': piece.ids[0] != null}"
+        />
         
-        <img v-if="piece.ids[1] != null && piece.imageUrls[1]" :src="piece.imageUrls[1]" alt="piece image" class="sz-3 mr-4" draggable="false">
-        <div v-else alt="piece image" class="sz-3 mr-4 icon-cross" :class="{'color-theme': piece.ids[1] != null}"></div>
+        <img
+          v-if="piece.ids[1] != null && piece.imageUrls[1]"
+          :src="piece.imageUrls[1]"
+          alt="piece image"
+          class="sz-3 mr-4"
+          draggable="false"
+        >
+        <div
+          v-else
+          alt="piece image"
+          class="sz-3 mr-4 icon-cross"
+          :class="{'color-theme': piece.ids[1] != null}"
+        />
         
-        <p class="mr-4 py-2">{{ piece.displayName }}</p>
+        <p class="mr-4 py-2">
+          {{ piece.displayName }}
+        </p>
         
-        <div v-if="piece.isLeader" class="is-flex is-align-items-center py-2">
-          <div class="star-icon-container icon-star-fill color-primary-dark mb-1 mr-1 is-flex-shrink-0"></div>
+        <div
+          v-if="piece.isLeader"
+          class="is-flex is-align-items-center py-2"
+        >
+          <div class="star-icon-container icon-star-fill color-primary-dark mb-1 mr-1 is-flex-shrink-0" />
           <strong class="has-text-primary-dark mr-4">Leader</strong>
         </div>
       </div>
-      <div v-if="piece.promoVals[0].length > 0" class="box-row mt-4">
-        <p class="is-size-7 mr-4">(White) Promote to:</p>
+      <div
+        v-if="piece.promoVals[0].length > 0"
+        class="box-row mt-4"
+      >
+        <p class="is-size-7 mr-4">
+          (White) Promote to:
+        </p>
         <img
-          v-for="(sym, i) of piece.promoVals[0].filter(sym => symbolImg(0, sym))" :key="i"
-          :src="symbolImg(0, sym)" :alt="`${sym}`"
-          class="sz-2 mr-4" draggable="false"
+          v-for="(sym, i) of piece.promoVals[0].filter(sym => symbolImg(0, sym))"
+          :key="i"
+          :src="symbolImg(0, sym)"
+          :alt="`${sym}`"
+          class="sz-2 mr-4"
+          draggable="false"
         >
       </div>
-      <div v-if="piece.promoVals[1].length > 0" class="box-row mt-4">
-        <p class="is-size-7 mr-4">(Black) Promote to:</p>
+      <div
+        v-if="piece.promoVals[1].length > 0"
+        class="box-row mt-4"
+      >
+        <p class="is-size-7 mr-4">
+          (Black) Promote to:
+        </p>
         <img
-          v-for="(sym, i) of piece.promoVals[1].filter(sym => symbolImg(1, sym))" :key="i"
-          :src="symbolImg(1, sym)" :alt="`piece ${sym}`"
-          class="sz-2 mr-4" draggable="false"
+          v-for="(sym, i) of piece.promoVals[1].filter(sym => symbolImg(1, sym))"
+          :key="i"
+          :src="symbolImg(1, sym)"
+          :alt="`piece ${sym}`"
+          class="sz-2 mr-4"
+          draggable="false"
         >
       </div>
     </div>
-    
   </div>
-  <button v-if="editable" class="button" @click="emit('new-click')">
-    <div class="sz-icon icon-add color-theme"></div>
+  <button
+    v-if="editable"
+    class="button"
+    @click="emit('new-click')"
+  >
+    <div class="sz-icon icon-add color-theme" />
     <span>Add piece</span>
   </button>
 </template>

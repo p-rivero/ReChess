@@ -30,9 +30,9 @@ export type TestUtilsSignature = {
   // Perform a query on a collection
   query: (authType: AuthType, collectionPath: string, getQuery?: (col: CollectionReference)=>Query) => Promise<QuerySnapshot>
   // Set the data of a document
-  set: (authType: AuthType, data: any, path: string, ...pathSegments: string[]) => Promise<void>
+  set: (authType: AuthType, data: DocumentData, path: string, ...pathSegments: string[]) => Promise<void>
   // Add a new document to a collection
-  add: (authType: AuthType, data: any, path: string, ...pathSegments: string[]) => Promise<DocumentData>
+  add: (authType: AuthType, data: DocumentData, path: string, ...pathSegments: string[]) => Promise<DocumentData>
   // Remove a single document
   remove: (authType: AuthType, path: string, ...pathSegments: string[]) => Promise<void>
   // Returns the current server timestamp
@@ -48,7 +48,7 @@ export class Batch {
     this.batch = batch
     this.db = db
   }
-  set(data: any, path: string, ...pathSegments: string[]) {
+  set(data: DocumentData, path: string, ...pathSegments: string[]) {
     this.batch.set(doc(this.db, path, ...pathSegments), data)
   }
   remove(path: string, ...pathSegments: string[]) {
@@ -108,7 +108,7 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
     return await getDocs(getQuery(col))
   }
   
-  async function set(authType: AuthType|RulesTestContext, data: any, path: string, ...pathSegments: string[]): Promise<void> {
+  async function set(authType: AuthType|RulesTestContext, data: DocumentData, path: string, ...pathSegments: string[]): Promise<void> {
     if (authType === 'admin') {
       await testEnv.withSecurityRulesDisabled(context => set(context, data, path, ...pathSegments))
       return
@@ -123,7 +123,8 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
       await testEnv.withSecurityRulesDisabled(async context => {
         result = await add(context, data, path, ...pathSegments)
       })
-      return result!
+      if (!result) throw new Error('add() returned undefined')
+      return result
     }
     const col = collection(getAuth(authType), path, ...pathSegments)
     return await addDoc(col, data)

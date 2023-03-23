@@ -1,7 +1,12 @@
 <template>
   <label class="b-checkbox checkbox">
-    <input type="checkbox" value="false" ref="checkboxInput" @change="checkboxChanged($event.target)" />
-    <span class="check"></span>
+    <input
+      ref="checkboxInput"
+      type="checkbox"
+      value="false"
+      @change="checkboxChanged($event.target)"
+    >
+    <span class="check" />
     <span class="control-label">{{ text }}</span>
   </label>
 </template>

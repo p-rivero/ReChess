@@ -23,7 +23,7 @@ export function setupJest(projectId: string, onInit: (testEnv: RulesTestEnvironm
       process.exit(1)
     }
     // Supress console warnings
-    jest.spyOn(console, 'warn').mockImplementation(() => {})
+    jest.spyOn(console, 'warn').mockImplementation(() => { /* suppress warnings */ })
     onInit(testEnv)
   })
   

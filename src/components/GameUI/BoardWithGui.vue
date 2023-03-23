@@ -2,10 +2,18 @@
   <div class="is-flex is-flex-direction-column is-align-items-center">
     <div class="is-flex h-100 w-100">
       <PlayableChessBoard
-        ref='board' :white="white" :black="black"
-        @piece-moved="pieceMoved" @player-changed="p => emit('player-changed', p)"
+        ref="board"
+        :white="white"
+        :black="black"
+        @piece-moved="pieceMoved"
+        @player-changed="p => emit('player-changed', p)"
       />
-      <EvaluationGauge v-if="hasGauge" class="ml-2" ref="gauge" :white-pov="true" />
+      <EvaluationGauge
+        v-if="hasGauge"
+        ref="gauge"
+        class="ml-2"
+        :white-pov="true"
+      />
     </div>
   </div>
 </template>

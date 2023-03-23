@@ -8,6 +8,7 @@ import { RechessError } from '@/utils/errors/RechessError'
 import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
 
 import * as fb from 'firebase/auth'
+import { FirebaseError } from '@firebase/util'
 import type { UserDoc } from '@/firebase/db/schema'
 
 const AUTH_USER_KEY = 'loggedUser'
@@ -69,7 +70,8 @@ export const useAuthStore = defineStore('auth-user', () => {
     try {
       const credential = await fb.signInWithEmailAndPassword(auth, email, password)
       await updateUser(credential.user)
-    } catch (e: any) {
+    } catch (e) {
+      if (!(e instanceof FirebaseError)) throw e
       switch (e.code) {
       case 'auth/user-not-found':
         throw new UserNotFoundError()
@@ -88,7 +90,8 @@ export const useAuthStore = defineStore('auth-user', () => {
     let credential: fb.UserCredential
     try {
       credential = await fb.createUserWithEmailAndPassword(auth, email, password)
-    } catch (e: any) {
+    } catch (e) {
+      if (!(e instanceof FirebaseError)) throw e
       switch (e.code) {
       case 'auth/email-already-in-use':
         throw new RechessError('EMAIL_ALREADY_IN_USE')

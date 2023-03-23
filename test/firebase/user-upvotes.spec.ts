@@ -16,7 +16,7 @@ setupJest('variant-upvotes-tests', env => {
 })
 
 
-async function createUserAndVariant(creatorId: string = 'some_id', addUpvote: boolean = true) {
+async function createUserAndVariant(creatorId = 'some_id', addUpvote = true) {
   const user: UserDoc = {
     name: 'My user',
     about: '',

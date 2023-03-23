@@ -1,34 +1,65 @@
 <template>
-  <div v-if="draftStore.hasDraft()" class="card draft-card px-2 py-2 mx-3 my-4">
-    <div class="is-clickable" @click="editDraft">
-      <div class="board-container" ref="container">
-        <ViewableChessBoard ref="board" :white-pov="true" :view-only="true" :show-coordinates="false" :capture-wheel-events="false" />
+  <div
+    v-if="draftStore.hasDraft()"
+    class="card draft-card px-2 py-2 mx-3 my-4"
+  >
+    <div
+      class="is-clickable"
+      @click="editDraft"
+    >
+      <div
+        ref="container"
+        class="board-container"
+      >
+        <ViewableChessBoard
+          ref="board"
+          :white-pov="true"
+          :view-only="true"
+          :show-coordinates="false"
+          :capture-wheel-events="false"
+        />
       </div>
-      <p class="mt-3 is-size-5 has-text-weight-semibold">{{ draftStore.state.displayName }}</p>
+      <p class="mt-3 is-size-5 has-text-weight-semibold">
+        {{ draftStore.state.displayName }}
+      </p>
     </div>
     <p class="mb-3 has-text-weight-light is-italic">
       Your private draft
     </p>
     <div class="columns is-mobile">
       <div class="column is-narrow pr-0">
-        <button aria-label="edit variant" class="button button-square px-0" @click="discardDraft">
-          <div class="icon-trash color-theme"></div>
+        <button
+          aria-label="edit variant"
+          class="button button-square px-0"
+          @click="discardDraft"
+        >
+          <div class="icon-trash color-theme" />
         </button>
       </div>
       <div class="column">
-        <button class="button is-fullwidth" @click="editDraft">
-          <div class="sz-icon icon-edit color-theme"></div>
+        <button
+          class="button is-fullwidth"
+          @click="editDraft"
+        >
+          <div class="sz-icon icon-edit color-theme" />
           Edit draft
         </button>
       </div>
     </div>
   </div>
-  <div v-else-if="draftStore.seeCreateHint" class="draft-card outline px-2 py-2 mx-3 my-4 is-clickable" @click="editDraft">
+  <div
+    v-else-if="draftStore.seeCreateHint"
+    class="draft-card outline px-2 py-2 mx-3 my-4 is-clickable"
+    @click="editDraft"
+  >
     <p class="has-text-weight-light my-6">
       Create your own!
     </p>
-    <button class="button is-small" @click.stop="hideCreateHint">
-      <div class="sz-icon icon-cross color-theme"></div>
+    <button
+      class="button is-small"
+      @click.stop="hideCreateHint"
+    >
+      <div class="sz-icon icon-cross color-theme" />
       Hide
     </button>
   </div>

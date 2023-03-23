@@ -7,16 +7,20 @@ export function clone<T>(obj: T): T {
 }
 
 // https://gist.github.com/ca0v/73a31f57b397606c9813472f7493a940
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function debounce<T extends Function>(cb: T, wait = 20) {
   let h: NodeJS.Timeout | undefined = undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const callable = (...args: any) => {
     clearTimeout(h)
     h = setTimeout(() => cb(...args), wait)
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return callable as any as T
 }
 
 // https://stackoverflow.com/questions/1068834/object-comparison-in-javascript
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function object_equals(x: any, y: any) {
   if (x === y) return true
   // if both x and y are null or undefined and exactly the same

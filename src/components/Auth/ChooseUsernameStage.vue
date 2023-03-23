@@ -1,13 +1,17 @@
 <template>
   <div>
-    <p class="modal-card-title mb-3">Enter a username</p>
+    <p class="modal-card-title mb-3">
+      Enter a username
+    </p>
     
-    <p class="mb-3">It cannot be changed later, so choose wisely!</p>
+    <p class="mb-3">
+      It cannot be changed later, so choose wisely!
+    </p>
     
     <div class="mb-5">
       <SmartTextInput
-        class="mb-2"
         ref="usernameRef"
+        class="mb-2"
         placeholder="your_username"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
@@ -22,33 +26,45 @@
         @enter-pressed="submit"
       />
       <p
-        class="help" v-show="username !== ''"
+        v-show="username !== ''"
+        class="help"
         :class="{
           'has-text-danger': usernameStatus === 'taken',
           'has-text-success': usernameStatus === 'available',
-        }" >
+        }"
+      >
         rechess.org/user/<b>{{ username }}</b>
         {{ usernameStatus === 'taken' ? 'is already taken' : usernameStatus === 'available' ? 'is available' : '' }}
       </p>
     </div>
     
-    <SmartErrorMessage class="mb-4" v-show="hasError" :handler="errorHandler" />
+    <SmartErrorMessage
+      v-show="hasError"
+      class="mb-4"
+      :handler="errorHandler"
+    />
     
     <p class="help mb-4">
       By creating an account, you agree to the <a href="/tos">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
     </p>
     
     <div class="is-flex">
-      <button class="button is-primary" @click="submit" :class="{'is-loading': loading}" :disabled="submitDisabled">
+      <button
+        class="button is-primary"
+        :class="{'is-loading': loading}"
+        :disabled="submitDisabled"
+        @click="submit"
+      >
         Submit
       </button>
     </div>
     
     <div class="is-flex mt-5">
-      <p class="mr-3">Changed your mind?</p>
+      <p class="mr-3">
+        Changed your mind?
+      </p>
       <a @click="logout">Logout</a>
     </div>
-    
   </div>
 </template>
 

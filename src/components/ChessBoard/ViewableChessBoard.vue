@@ -8,17 +8,17 @@
 
 <template>
   <ChessgroundAdapter
+    :key="boardUpdateKey"
+    ref="board"
     :width="currentWidth"
     :height="currentHeight"
     :white-pov="whitePov"
     :initial-config="currentBoardConfig"
     :piece-images="pieceImages"
     :capture-wheel-events="captureWheelEvents"
+    
     @clicked="key => emit('clicked', keyToPosition(key))"
     @wheel="up => emit('wheel', up)"
-    
-    :key="boardUpdateKey"
-    ref="board"
   />
 </template>
 

@@ -1,23 +1,41 @@
 <template>
-  <div v-if="user" class="columns">
+  <div
+    v-if="user"
+    class="columns"
+  >
     <div class="column is-8">
-      <p class="is-size-2 mb-4">{{ user.displayName }}</p>
+      <p class="is-size-2 mb-4">
+        {{ user.displayName }}
+      </p>
       <div class="is-flex is-align-items-center mb-4">
-        <div class="sz-2 icon-at color-theme"></div>
-        <p class="is-size-5 ml-2"> {{ user.username }} </p>
+        <div class="sz-2 icon-at color-theme" />
+        <p class="is-size-5 ml-2">
+          {{ user.username }}
+        </p>
       </div>
-      <div v-if="myProfile(user)" class="is-flex is-align-items-center mb-4">
-        <div class="sz-2 color-theme" :class="{
-          'icon-mail': user.signInProvider === 'password',
-          'icon-google': user.signInProvider === 'google.com',
-          'icon-github': user.signInProvider === 'github.com',
-        }"></div>
-        <p class="is-size-5 ml-2 mr-3"> {{ user.email }} </p>
+      <div
+        v-if="myProfile(user)"
+        class="is-flex is-align-items-center mb-4"
+      >
+        <div
+          class="sz-2 color-theme"
+          :class="{
+            'icon-mail': user.signInProvider === 'password',
+            'icon-google': user.signInProvider === 'google.com',
+            'icon-github': user.signInProvider === 'github.com',
+          }"
+        />
+        <p class="is-size-5 ml-2 mr-3">
+          {{ user.email }}
+        </p>
         <button
-          v-if="user.signInProvider === 'password'" class="button ml-4" @click="resetPassword"
-          :class="{ 'is-loading': sendingResetPasswordEmail }" :disabled="sendingResetPasswordEmail"
+          v-if="user.signInProvider === 'password'"
+          class="button ml-4"
+          :class="{ 'is-loading': sendingResetPasswordEmail }"
+          :disabled="sendingResetPasswordEmail"
+          @click="resetPassword"
         >
-          <div class="sz-icon icon-key color-theme"></div>
+          <div class="sz-icon icon-key color-theme" />
           Change password
         </button>
       </div>
@@ -26,21 +44,29 @@
         <EditableMarkdown
           :text="user.about"
           :placeholder="'Tell us about yourself!\nYou can use **Markdown** to format your text.'"
-          :editable="myProfile(user)" :error-handler="errorHandler"
+          :editable="myProfile(user)"
+          :error-handler="errorHandler"
           :validator="text => text.length > 1000 ? 'The About section must be at most 1000 characters long' : undefined"
-          @save="text => { user!.about = text; userStore.storeUser(user!) }"/>
+          @save="text => { user!.about = text; userStore.storeUser(user!) }"
+        />
       </div>
       
-      <SmartErrorMessage class="mt-4" v-show="hasError && myProfile(user)" :handler="errorHandler" />
+      <SmartErrorMessage
+        v-show="hasError && myProfile(user)"
+        class="mt-4"
+        :handler="errorHandler"
+      />
       
-      <button v-if="myProfile(user)" class="button is-primary mt-6" @click="signOut">
-        <div class="sz-icon icon-logout color-white"></div>
+      <button
+        v-if="myProfile(user)"
+        class="button is-primary mt-6"
+        @click="signOut"
+      >
+        <div class="sz-icon icon-logout color-white" />
         Sign out
       </button>
     </div>
-    <div class="column is-4">
-      
-    </div>
+    <div class="column is-4" />
   </div>
 </template>
 

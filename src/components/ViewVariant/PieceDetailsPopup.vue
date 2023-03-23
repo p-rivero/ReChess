@@ -1,18 +1,41 @@
 <template>
-  <div class="modal" ref="popup">
-    <div class="modal-background" @click="closePopup"></div>
+  <div
+    ref="popup"
+    class="modal"
+  >
+    <div
+      class="modal-background"
+      @click="closePopup"
+    />
     <div class="modal-card">
       <header class="modal-card-head">
-        <p class="modal-card-title">{{ piece?.displayName }}</p>
-        <button class="delete is-large" aria-label="close" @click="closePopup"></button>
+        <p class="modal-card-title">
+          {{ piece?.displayName }}
+        </p>
+        <button
+          class="delete is-large"
+          aria-label="close"
+          @click="closePopup"
+        />
       </header>
       <section class="modal-card-body">
         <div>
-          <PieceViewerWithZoom v-if="piece" :piece="piece" :key="pieceIndex"/>
+          <PieceViewerWithZoom
+            v-if="piece"
+            :key="pieceIndex"
+            :piece="piece"
+          />
         </div>
       </section>
       <footer class="modal-card-foot">
-        <button ref="buttonClose" class="button is-primary" @click="closePopup" @keydown.esc="closePopup">Close</button>
+        <button
+          ref="buttonClose"
+          class="button is-primary"
+          @click="closePopup"
+          @keydown.esc="closePopup"
+        >
+          Close
+        </button>
       </footer>
     </div>
   </div>

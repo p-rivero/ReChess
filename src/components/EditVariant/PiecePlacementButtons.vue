@@ -1,34 +1,50 @@
 <template>
   <div class="field is-grouped is-grouped-multiline">
-    <div v-for="(piece, index) in pieceList" :key="index" class="control" :style="{zIndex}">
+    <div
+      v-for="(piece, index) in pieceList"
+      :key="index"
+      class="control"
+      :style="{zIndex}"
+    >
       <img
         class="button sz-3 px-1 py-1"
         draggable="false"
         :src="piece.url"
         :alt="`Select ${piece.id}`"
         :class="{'is-primary': selectedId === piece.id}"
-        @click="onPieceClick(piece.id)"/>
+        @click="onPieceClick(piece.id)"
+      >
     </div>
     <div class="control">
-      <button class="button sz-3 px-2 py-2" :class="{'is-primary': selectedId === 'wall'}" :style="{zIndex}" @click="onPieceClick('wall')">
+      <button
+        class="button sz-3 px-2 py-2"
+        :class="{'is-primary': selectedId === 'wall'}"
+        :style="{zIndex}"
+        @click="onPieceClick('wall')"
+      >
         <span
           class="icon-block"
           :class="{
             'color-theme': selectedId !== 'wall',
             'color-white': selectedId === 'wall',
-          }">
-        </span>
+          }"
+        />
       </button>
     </div>
     <div class="control">
-      <button class="button sz-3 px-2 py-2" :class="{'is-primary': selectedId === 'delete'}" :style="{zIndex}" @click="onPieceClick('delete')">
+      <button
+        class="button sz-3 px-2 py-2"
+        :class="{'is-primary': selectedId === 'delete'}"
+        :style="{zIndex}"
+        @click="onPieceClick('delete')"
+      >
         <span
           class="icon-trash"
           :class="{
             'color-theme': selectedId !== 'delete',
             'color-white': selectedId === 'delete',
-          }">
-        </span>
+          }"
+        />
       </button>
     </div>
   </div>

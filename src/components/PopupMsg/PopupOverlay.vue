@@ -4,7 +4,10 @@
  -->
  
 <template>
-  <div class="overlay w-100 h-100" @click="emit('click')"></div>
+  <div
+    class="overlay w-100 h-100"
+    @click="emit('click')"
+  />
 </template>
 
 <script setup lang="ts">
