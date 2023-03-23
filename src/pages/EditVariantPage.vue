@@ -1,5 +1,5 @@
-<!-- 
-  This page is used to edit the variant that is currently stored in LocalStorage (through the use of the draftVariantStore)  
+<!--
+  This page is used to edit the variant that is currently stored in LocalStorage (through the use of the draftVariantStore)
   
 -->
 
@@ -143,7 +143,7 @@
       </div>
       <br>
       <label class="label">Pieces:</label>
-      <PiecesSummary 
+      <PiecesSummary
         :editable="true"
         :state="draftStore.state"
         @piece-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
@@ -239,7 +239,7 @@
     // If the piece is already placed here, do nothing
     if (existingIndex !== -1 && draftStore.state.pieces[existingIndex].pieceId === selectedPieceId.value) return
     // Remove old placement, if any
-    if (existingIndex !== -1) draftStore.state.pieces.splice(existingIndex, 1)    
+    if (existingIndex !== -1) draftStore.state.pieces.splice(existingIndex, 1)
     // Remove existing wall, if any
     draftStore.state.invalidSquares = draftStore.state.invalidSquares.filter(square => square[0] !== coords[0] || square[1] !== coords[1])
     // Add wall

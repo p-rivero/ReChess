@@ -1,4 +1,4 @@
-<!-- 
+<!--
   When this component is shown, it covers the entire screen with a semi-transparent black overlay at a given z-index.
   The user cannot interact with anything behind that z-index.
  -->

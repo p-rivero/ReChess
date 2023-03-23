@@ -7,7 +7,7 @@
     
     <div class="mb-5">
       <label class="label">Email</label>
-      <SmartTextInput ref="emailRef" type="email" placeholder="Email" 
+      <SmartTextInput ref="emailRef" type="email" placeholder="Email"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -22,7 +22,7 @@
     
     <div v-show="isRegister" class="mb-5">
       <label class="label">Username</label>
-      <SmartTextInput class="mb-2" ref="usernameRef" placeholder="your_username" 
+      <SmartTextInput class="mb-2" ref="usernameRef" placeholder="your_username"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -48,7 +48,7 @@
     
     <div class="mb-5">
       <label class="label">Password</label>
-      <SmartTextInput type="password" placeholder="Password" 
+      <SmartTextInput type="password" placeholder="Password"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {

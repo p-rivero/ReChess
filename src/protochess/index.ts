@@ -13,7 +13,7 @@ import type {
   GameStateGui,
   MoveList,
   Player,
-} from "./types"
+} from './types'
 
 // Call this at the start of the app to initialize the wasm module
 let protochess: Protochess | null = null

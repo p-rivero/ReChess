@@ -24,11 +24,11 @@
 
 
 <script setup lang="ts">
-  import type { GameStateGui, MoveList, Player } from '@/protochess/types';
-  import type * as cg from 'chessgroundx/types';
-  import { positionToKey, keyToPosition } from '@/utils/chess/chess-coords';
-  import type { Config } from 'chessgroundx/config';
-  import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue';
+  import type { GameStateGui, MoveList, Player } from '@/protochess/types'
+  import type * as cg from 'chessgroundx/types'
+  import { positionToKey, keyToPosition } from '@/utils/chess/chess-coords'
+  import type { Config } from 'chessgroundx/config'
+  import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue'
   import { ref } from 'vue'
 
   const props = defineProps<{
@@ -56,7 +56,7 @@
     blockTouchScroll: true,
     coordinates: props.showCoordinates,
     dimensions: {
-      width: currentWidth, 
+      width: currentWidth,
       height: currentHeight,
     },
     movable: {
@@ -83,7 +83,7 @@
   let pieceImages: PieceImages = { white: [], black: [] }
   
   // Ref to the board, and a key that is incremented every time the board is re-rendered
-  const boardUpdateKey = ref(0);
+  const boardUpdateKey = ref(0)
   const board = ref<InstanceType<typeof ChessgroundAdapter>>()
   
   defineExpose({
@@ -243,17 +243,17 @@
       // TODO: Call directly
       if (Object.prototype.hasOwnProperty.call(extend, key)) {
         if (Object.prototype.hasOwnProperty.call(base, key) && isPlainObject(base[key]) && isPlainObject(extend[key]))
-          deepMerge(base[key], extend[key]);
-        else base[key] = extend[key];
+          deepMerge(base[key], extend[key])
+        else base[key] = extend[key]
       }
     }
   }
   // TODO: Remove
   function isPlainObject(o: any) {
     if (typeof o !== 'object' || o === null)
-      return false;
-    const proto = Object.getPrototypeOf(o);
-    return proto === Object.prototype || proto === null;
+      return false
+    const proto = Object.getPrototypeOf(o)
+    return proto === Object.prototype || proto === null
   }
 
 </script>

@@ -24,7 +24,7 @@ export class User {
     this.about = doc?.about ?? ''
     this.profileImg = profileImg
     this.numWins = doc?.IMMUTABLE.numWins ?? 0
-    this.displayName = name ?? `@${this.username}`    
+    this.displayName = name ?? `@${this.username}`
   }
 }
 

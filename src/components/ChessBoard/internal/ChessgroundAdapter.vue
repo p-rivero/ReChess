@@ -57,8 +57,8 @@
   })
   
   // Board appearance
-  const LIGHT_COLOR = '#f0d9b5';
-  const DARK_COLOR = '#b58863';
+  const LIGHT_COLOR = '#f0d9b5'
+  const DARK_COLOR = '#b58863'
   const backgroundSvg = chessboardSvg(props.width, props.height, LIGHT_COLOR, DARK_COLOR)
   const boardBackground = 'url("data:image/svg+xml;utf8,' + backgroundSvg + '")'
   const squareWidthPercent = 100 / props.width + '%'
@@ -67,7 +67,7 @@
   const sizePercentPerSquare = 100 / Math.max(props.width, props.height)
   const componentHeightPercent = props.height * sizePercentPerSquare
   const componentWidthPercent = props.width * sizePercentPerSquare
-  const [wrapWidth, wrapHeight] = 
+  const [wrapWidth, wrapHeight] =
     (componentWidthPercent === 100) ?
     ['100%', `${componentHeightPercent}%`] :
     [`${componentWidthPercent}%`, '100%']

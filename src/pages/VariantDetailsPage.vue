@@ -2,7 +2,7 @@
   <div class="columns">
     <div class="column is-6">
       <p class="is-size-2 mb-2">{{ variant?.displayName }}</p>
-      <p class="is-size-5 has-text-weight-semibold mb-4">Created by 
+      <p class="is-size-5 has-text-weight-semibold mb-4">Created by
         <a @click="creatorClicked">{{ variant?.creatorDisplayName }}</a>
       </p>
       <UpvoteButton v-if="variant" class="mb-5" :variant="variant" />
@@ -52,7 +52,7 @@
 
 
 <script setup lang="ts">
-  import { computed, ref, watchEffect } from 'vue';
+  import { computed, ref, watchEffect } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import VueMarkdown from 'vue-markdown-render'
   
@@ -111,11 +111,11 @@
     const gameOverResult = variant.value.globalRules.invertWinConditions ? 'lose' : 'win'
     
     if (playerHasExplodingPieces(0) && playerHasExplodingPieces(1)) {
-      r.push(`Watch out! Some pieces explode when they capture another piece.`)
+      r.push('Watch out! Some pieces explode when they capture another piece.')
     } else if (playerHasExplodingPieces(0)) {
-      r.push(`Watch out! Some of White's pieces explode when they capture another piece.`)
+      r.push('Watch out! Some of White\'s pieces explode when they capture another piece.')
     } else if (playerHasExplodingPieces(1)) {
-      r.push(`Watch out! Some of Black's pieces explode when they capture another piece.`)
+      r.push('Watch out! Some of Black\'s pieces explode when they capture another piece.')
     }
     
     if (playerHasLeader(0) && playerHasLeader(1)) {

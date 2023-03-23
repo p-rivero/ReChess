@@ -9,7 +9,7 @@
 <template>
   <!-- Important: The container element must have INLINE style="width: 100%" -->
   <div class="board-container" style="width: 100%" ref="container">
-    <ViewableChessBoard 
+    <ViewableChessBoard
       class="board"
       :white-pov="whitePov"
       :view-only="false"
@@ -25,13 +25,13 @@
 </template>
 
 <script setup lang="ts">
-  import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types';
+  import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
   import { getProtochess } from '@/protochess'
   import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
   import { remToPx } from '@/utils/web-utils'
-  import { onMounted, onUnmounted, ref } from 'vue';
+  import { onMounted, onUnmounted, ref } from 'vue'
   import ViewableChessBoard from './ViewableChessBoard.vue'
-  import PromotionPopup from '@/components/GameUI/PromotionPopup.vue';
+  import PromotionPopup from '@/components/GameUI/PromotionPopup.vue'
   
   export interface CustomMoveCallback {
     (playerToMove: Player): Promise<MoveInfo>

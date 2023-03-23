@@ -12,10 +12,13 @@ module.exports = {
     ecmaVersion: 'latest'
   },
   // Ignore the submodule directories
-  ignorePatterns: ['protochess-engine', 'chessgroundx'],
+  ignorePatterns: ['protochess-engine', 'chessgroundx', 'functions'],
   rules: {
     // Use '_' as a prefix for unused variables
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    'quotes': ['warn', 'single'],
+    'semi': ['warn', 'never'],
+    'no-trailing-spaces': ['warn', { skipBlankLines: true }],
   }
 }

@@ -1,4 +1,4 @@
-import type { MakeMoveFlag, Player } from "@/protochess/types"
+import type { MakeMoveFlag, Player } from '@/protochess/types'
 
 export function getMessage(flag: MakeMoveFlag, playerToMove: Player): string {
   const playerUpper = playerToMove === 'white' ? 'White' : 'Black'
@@ -23,7 +23,7 @@ export function getMessage(flag: MakeMoveFlag, playerToMove: Player): string {
     return `${playerUpper} has been in check too many times.`
   }
   if (flag === 'Repetition') {
-    return `The same position has been repeated too many times.`
+    return 'The same position has been repeated too many times.'
   }
   return ''
 }

@@ -218,6 +218,6 @@ test('cannot see upvotes of another user', async () => {
     get('verified', 'users', 'ANOTHER_ID', 'upvotedVariants', '1234')
   )
   assertFails(
-    query('verified', `users/ANOTHER_ID/upvotedVariants`)
+    query('verified', 'users/ANOTHER_ID/upvotedVariants')
   )
 })

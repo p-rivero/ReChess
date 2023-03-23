@@ -16,7 +16,7 @@
 </template>
 
 
-<script setup lang="ts">  
+<script setup lang="ts">
   import { useAuthStore } from '@/stores/auth-user'
   import { ref } from 'vue'
   

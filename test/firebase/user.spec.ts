@@ -21,7 +21,7 @@ setupJest('user-tests', env => {
 
 
 test('anyone can read created users', async () => {
-  const user: UserDoc = { 
+  const user: UserDoc = {
     name: 'my new user',
     about: '',
     profileImg: 'example.com/img.png',

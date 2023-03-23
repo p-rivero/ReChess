@@ -67,7 +67,7 @@ function stringsToPills(list: string[]): Pill[] {
 
 
 <script setup lang="ts">
-  import { ref } from "vue"
+  import { ref } from 'vue'
 
 
   const props = defineProps<{
@@ -143,10 +143,10 @@ function stringsToPills(list: string[]): Pill[] {
 
   function onAddPillClick() {
     const pill: Pill = {
-      text: "",
+      text: '',
       editing: true,
       error: false,
-      originalText: "",
+      originalText: '',
     }
     pills.value.push(pill)
     focusPillInput()

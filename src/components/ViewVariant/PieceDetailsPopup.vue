@@ -22,7 +22,7 @@
 <script setup lang="ts">
   import { computed, ref } from 'vue'
   import PieceViewerWithZoom from '@/components/ChessBoard/PieceViewerWithZoom.vue'
-  import type { Variant } from '@/protochess/types';
+  import type { Variant } from '@/protochess/types'
   
   const popup = ref<HTMLElement>()
   const buttonClose = ref<HTMLButtonElement>()

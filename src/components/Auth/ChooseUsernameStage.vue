@@ -5,7 +5,7 @@
     <p class="mb-3">It cannot be changed later, so choose wisely!</p>
     
     <div class="mb-5">
-      <SmartTextInput class="mb-2" ref="usernameRef" placeholder="your_username" 
+      <SmartTextInput class="mb-2" ref="usernameRef" placeholder="your_username"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -48,7 +48,7 @@
 </template>
 
 
-<script setup lang="ts">  
+<script setup lang="ts">
   import { useAuthStore } from '@/stores/auth-user'
   import { computed, ref } from 'vue'
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'

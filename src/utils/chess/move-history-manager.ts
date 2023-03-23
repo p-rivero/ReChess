@@ -1,6 +1,6 @@
 
-import type { GameState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from "@/protochess/types"
-import { clone } from "@/utils/ts-utils"
+import type { GameState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from '@/protochess/types'
+import { clone } from '@/utils/ts-utils'
 
 type MoveHistoryEntry = {
   // The state that was reached by the move
@@ -37,7 +37,7 @@ export class MoveHistoryManager {
     const stateCopy = clone(newState)
     if (this.currentIndex !== this.history.length - 1) {
       // Create new branch
-      if (!this.branchingAllowed) throw new Error("Move branching not allowed")
+      if (!this.branchingAllowed) throw new Error('Move branching not allowed')
       // TODO
       return
     }

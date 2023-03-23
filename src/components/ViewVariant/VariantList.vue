@@ -25,7 +25,7 @@
   const showDraftCard = computed(() => {
     // Do not show draft card if user is not logged in
     // Also wait until the variant list is fetched to avoid distracting pop-in
-    // This means that if the server still has no variants, the draft card will 
+    // This means that if the server still has no variants, the draft card will
     // not show, but that will never happen in production
     return authStore.loggedUser && variantStore.variantList.length > 0
   })

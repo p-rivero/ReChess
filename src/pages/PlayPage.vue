@@ -9,9 +9,9 @@
   import BoardWithGui from '@/components/GameUI/BoardWithGui.vue'
   import { useRoute } from 'vue-router'
   import { getMessage } from '@/utils/chess/game-over-message'
-  import { showPopupImportant } from '@/components/PopupMsg/popup-manager';
+  import { showPopupImportant } from '@/components/PopupMsg/popup-manager'
   import type { MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
-import { updateTitle } from '@/utils/web-utils';
+import { updateTitle } from '@/utils/web-utils'
   
   const route = useRoute()
   const startAs: Player = chooseColor()

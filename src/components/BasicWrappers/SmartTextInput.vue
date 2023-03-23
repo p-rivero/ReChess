@@ -4,7 +4,7 @@
     :placeholder="props.placeholder"
     @input="inputChanged"
     @keydown.enter="emit('enter-pressed')">
-  <textarea v-else class="textarea" ref="textInput" 
+  <textarea v-else class="textarea" ref="textInput"
     :class="{'is-danger': isError}" :type="type"
     :placeholder="props.placeholder"
     @input="inputChanged">
@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-  import { nextTick, onMounted, ref } from "vue"
-  import type { ErrorMessageHandler, ErrorHandlerUser } from "@/utils/errors/error-message-handler"
+  import { nextTick, onMounted, ref } from 'vue'
+  import type { ErrorMessageHandler, ErrorHandlerUser } from '@/utils/errors/error-message-handler'
   
   const textInput = ref<HTMLInputElement>()
   const isError = ref<boolean>(false)

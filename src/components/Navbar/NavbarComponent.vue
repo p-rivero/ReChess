@@ -42,7 +42,7 @@
 <script setup lang="ts">
   import { useRouter } from 'vue-router'
   import AccountCard from '@/components/Navbar/AccountCard.vue'
-  import { requestSignIn } from '@/components/Auth/auth-manager';
+  import { requestSignIn } from '@/components/Auth/auth-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { toggleTheme } from '@/utils/theme'
   

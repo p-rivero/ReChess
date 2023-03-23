@@ -46,7 +46,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   
   function backupFile() {
     const file = new Blob([JSON.stringify(state.value)], { type: 'application/json' })
-    let fileName = `Unnamed variant.json`
+    let fileName = 'Unnamed variant.json'
     if (state.value.displayName) {
       const sanitizedName = sanitizeFilename(state.value.displayName)
       if (sanitizedName.length > 0 && sanitizedName !== 'Variant name') {

@@ -1,5 +1,5 @@
-import type { Ref } from "vue"
-import { RechessError } from "./RechessError"
+import type { Ref } from 'vue'
+import { RechessError } from './RechessError'
 
 export interface ErrorHandlerText {
   show: (message: string) => void

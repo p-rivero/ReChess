@@ -1,7 +1,7 @@
 // UTILITIES FOR WRITING SHORTER TESTS
 
-import type firebase from "firebase/compat"
-import type { RulesTestContext, RulesTestEnvironment } from "@firebase/rules-unit-testing"
+import type firebase from 'firebase/compat'
+import type { RulesTestContext, RulesTestEnvironment } from '@firebase/rules-unit-testing'
 import {
   doc,
   collection,
@@ -10,10 +10,10 @@ import {
   setDoc,
   deleteDoc,
   getDocs,
-} from "firebase/firestore"
-import type { CollectionReference, FieldValue, Query } from "@firebase/firestore-types"
-import type { DocumentSnapshot, QuerySnapshot, WriteBatch, DocumentData, DocumentReference } from "@firebase/firestore"
-import { writeBatch, serverTimestamp } from "@firebase/firestore"
+} from 'firebase/firestore'
+import type { CollectionReference, FieldValue, Query } from '@firebase/firestore-types'
+import type { DocumentSnapshot, QuerySnapshot, WriteBatch, DocumentData, DocumentReference } from '@firebase/firestore'
+import { writeBatch, serverTimestamp } from '@firebase/firestore'
 
 /**
 - `verified`: logged user with a verified email

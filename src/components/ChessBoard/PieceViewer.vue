@@ -40,7 +40,7 @@
   watch(props.piece, () => board.value?.setShapes(getShapes()))
   onMounted(() => board.value?.setShapes(getShapes()))
   
-  let piece_coords: [number, number] 
+  let piece_coords: [number, number]
   if (props.position === 'center') {
     piece_coords = [Math.floor(props.width/2), Math.floor(props.height/2)]
   } else if (props.position === 'top-left') {
@@ -65,7 +65,7 @@
     blockTouchScroll: true,
     coordinates: false,
     dimensions: {
-      width: props.width, 
+      width: props.width,
       height: props.height,
     },
     drawable: {

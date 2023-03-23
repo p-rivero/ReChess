@@ -1,4 +1,4 @@
-<!-- 
+<!--
   PillList component that only allows one unicode character per pill.
  -->
 
@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-  import PillList from "@/components/PillList.vue"
+  import PillList from '@/components/PillList.vue'
 
   defineProps<{
     editable: boolean

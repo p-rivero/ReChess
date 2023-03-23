@@ -10,7 +10,7 @@ export function paramToInt(param: string|string[]): number {
 let fontSz: number | undefined = undefined
 export function remToPx(rem: number): number {
   if (fontSz === undefined) fontSz = parseFloat(getComputedStyle(document.documentElement).fontSize)
-  return rem * fontSz;
+  return rem * fontSz
 }
 
 export function updateTitle(title?: string) {

@@ -1,7 +1,7 @@
-import { storage } from "@/firebase"
-import { useAuthStore } from "@/stores/auth-user"
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
-import type { UploadMetadata, UploadResult } from "firebase/storage"
+import { storage } from '@/firebase'
+import { useAuthStore } from '@/stores/auth-user'
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
+import type { UploadMetadata, UploadResult } from 'firebase/storage'
 
 export async function uploadBlob(file: Blob, filePath: string): Promise<UploadResult> {
   const authStore = useAuthStore()

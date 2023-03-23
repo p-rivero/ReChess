@@ -103,7 +103,7 @@
 <style scoped lang="scss">
   .card {
     width: 17rem;
-    height: fit-content; 
+    height: fit-content;
   }
   .board-container {
     min-height: 7rem;

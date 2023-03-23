@@ -1,12 +1,12 @@
-import { defineStore } from "pinia"
-import { ref, watch } from "vue"
+import { defineStore } from 'pinia'
+import { ref, watch } from 'vue'
 
-import type { PublishedVariant, PublishedVariantGui } from "@/protochess/types"
-import { VariantDB } from "@/firebase/db"
-import { parseVariantJson } from "@/utils/chess/variant-json"
-import type { VariantDoc, VariantUpvotesDoc } from "@/firebase/db/schema"
-import { placementsToFen } from "@/utils/chess/fen-to-placements"
-import { useAuthStore } from "@/stores/auth-user"
+import type { PublishedVariant, PublishedVariantGui } from '@/protochess/types'
+import { VariantDB } from '@/firebase/db'
+import { parseVariantJson } from '@/utils/chess/variant-json'
+import type { VariantDoc, VariantUpvotesDoc } from '@/firebase/db/schema'
+import { placementsToFen } from '@/utils/chess/fen-to-placements'
+import { useAuthStore } from '@/stores/auth-user'
 
 export const useVariantStore = defineStore('variant', () => {
   
@@ -33,7 +33,7 @@ export const useVariantStore = defineStore('variant', () => {
     const userUpvoted = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, id)))
     
     // Convert each pair of documents into a PublishedVariantGui
-    variantList.value = []  
+    variantList.value = []
     for (const [i, [doc, id]] of docsWithId.entries()) {
       const upvotesDoc = upvotes[i]
       if (!upvotesDoc) continue

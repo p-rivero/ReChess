@@ -1,5 +1,5 @@
 
-<!-- 
+<!--
   This page is used to edit one of the pieces of the Variant that is currently stored in LocalStorage.
   The index of the piece to edit is passed in as a parameter.
 -->
@@ -202,7 +202,7 @@
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   
-  const router = useRouter(); 
+  const router = useRouter()
   const route = useRoute()
   const draftStore = useVariantDraftStore()
   const authStore = useAuthStore()
@@ -298,11 +298,11 @@
     draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== oldId)
     // Update the piece id
     if (color === 'white') {
-      pieceIdWhite.value = newId;
-      piece!.ids[0] = newId;
+      pieceIdWhite.value = newId
+      piece!.ids[0] = newId
     } else {
-      pieceIdBlack.value = newId;
-      piece!.ids[1] = newId;
+      pieceIdBlack.value = newId
+      piece!.ids[1] = newId
     }
   }
   

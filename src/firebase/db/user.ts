@@ -26,9 +26,9 @@ export async function createUser(user: User, username: string): Promise<UserDoc>
   const newUsername: UsernameDoc = {
     userId: user.uid,
   }
-  batch.set(doc(db, "users", user.uid), newPublicData)
-  batch.set(doc(db, "users", user.uid, "private", "doc"), newPrivateData)
-  batch.set(doc(db, "usernames", username), newUsername)
+  batch.set(doc(db, 'users', user.uid), newPublicData)
+  batch.set(doc(db, 'users', user.uid, 'private', 'doc'), newPrivateData)
+  batch.set(doc(db, 'usernames', username), newUsername)
   
   await batch.commit()
   
@@ -37,7 +37,7 @@ export async function createUser(user: User, username: string): Promise<UserDoc>
 
 // username -> userId
 export async function getId(username: string): Promise<string | undefined> {
-  const document = await getDoc(doc(db, "usernames", username))
+  const document = await getDoc(doc(db, 'usernames', username))
   if (!document.exists()) return undefined
   const data = document.data() as UsernameDoc
   return data.userId
@@ -45,12 +45,12 @@ export async function getId(username: string): Promise<string | undefined> {
 
 // userId -> UserDoc
 export async function getUserById(uid: string): Promise<UserDoc | undefined> {
-  const document = await getDoc(doc(db, "users", uid))
+  const document = await getDoc(doc(db, 'users', uid))
   if (!document.exists()) return undefined
   return document.data() as UserDoc
 }
 
 // Store a user in the database
 export async function updateUser(uid: string, user: UserDoc): Promise<void> {
-  setDoc(doc(db, "users", uid), user)
+  setDoc(doc(db, 'users', uid), user)
 }

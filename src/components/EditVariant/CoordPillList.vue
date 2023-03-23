@@ -1,4 +1,4 @@
-<!-- 
+<!--
   PillList component that only allows board coordinates as pills. Example: "a1", "c2", "a11", "p16"
  -->
 
@@ -10,8 +10,8 @@
 </template>
 
 <script setup lang="ts">
-  import PillList from "@/components/PillList.vue"
-  import { isCoords, coordsToPair, pairToCoords } from "@/utils/chess/chess-coords"
+  import PillList from '@/components/PillList.vue'
+  import { isCoords, coordsToPair, pairToCoords } from '@/utils/chess/chess-coords'
 
   const props = defineProps<{
     editable: boolean

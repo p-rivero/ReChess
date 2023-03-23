@@ -9,7 +9,7 @@
       <ChooseUsernameStage v-show="currentStage === 'chooseUsername'" ref="chooseUsernameStage"
         @check-verify="checkVerify" @close-popup="closePopup"/>
         
-      <VerifyEmailStage v-show="currentStage === 'verifyEmail'" ref="verifyEmailStage" 
+      <VerifyEmailStage v-show="currentStage === 'verifyEmail'" ref="verifyEmailStage"
         @close-popup="closePopup"/>
       
     </div>
@@ -20,7 +20,7 @@
 <script setup lang="ts">
 
   import { ref } from 'vue'
-  import { checkEmailVerified } from './auth-manager';
+  import { checkEmailVerified } from './auth-manager'
   import LoginRegisterStage from './LoginRegisterStage.vue'
   import ChooseUsernameStage from './ChooseUsernameStage.vue'
   import VerifyEmailStage from './VerifyEmailStage.vue'
