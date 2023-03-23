@@ -1,6 +1,5 @@
 <template>
-  <button class="heart-button button"
-    @click="upvoteClicked">
+  <button class="heart-button button" @click="upvoteClicked">
     <p class="mr-3">{{numUpvotes}}</p>
     <div class="sz-icon color-theme" :class="{
       'icon-heart': !variant.loggedUserUpvoted,

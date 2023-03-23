@@ -11,20 +11,24 @@
     </div>
     <div class="control">
       <button class="button sz-3 px-2 py-2" :class="{'is-primary': selectedId === 'wall'}" :style="{zIndex}" @click="onPieceClick('wall')">
-        <span class="icon-block"
-        :class="{
-          'color-theme': selectedId !== 'wall',
-          'color-white': selectedId === 'wall',
-        }"></span>
+        <span
+          class="icon-block"
+          :class="{
+            'color-theme': selectedId !== 'wall',
+            'color-white': selectedId === 'wall',
+          }">
+        </span>
       </button>
     </div>
     <div class="control">
       <button class="button sz-3 px-2 py-2" :class="{'is-primary': selectedId === 'delete'}" :style="{zIndex}" @click="onPieceClick('delete')">
-        <span class="icon-trash"
-        :class="{
-          'color-theme': selectedId !== 'delete',
-          'color-white': selectedId === 'delete',
-        }"></span>
+        <span
+          class="icon-trash"
+          :class="{
+            'color-theme': selectedId !== 'delete',
+            'color-white': selectedId === 'delete',
+          }">
+        </span>
       </button>
     </div>
   </div>

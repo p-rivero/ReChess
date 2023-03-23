@@ -7,7 +7,8 @@
     
     <div class="mb-5">
       <label class="label">Email</label>
-      <SmartTextInput ref="emailRef" type="email" placeholder="Email"
+      <SmartTextInput
+        ref="emailRef" type="email" placeholder="Email"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -22,7 +23,8 @@
     
     <div v-show="isRegister" class="mb-5">
       <label class="label">Username</label>
-      <SmartTextInput class="mb-2" ref="usernameRef" placeholder="your_username"
+      <SmartTextInput
+        class="mb-2" ref="usernameRef" placeholder="your_username"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -34,13 +36,16 @@
           if (!(/^[a-zA-Z0-9_]+$/).test(text)) return 'Username can only contain letters, numbers, and underscores'
         }"
         :start-text="username"
-        @changed="updateUsername"/>
-      <p class="help"
+        @changed="updateUsername"
+      />
+      <p
+        class="help"
         :style="{visibility: username ? 'visible' : 'hidden'}"
         :class="{
           'has-text-danger': usernameStatus === 'taken',
           'has-text-success': usernameStatus === 'available',
-        }" >
+        }"
+      >
         rechess.org/user/<b>{{ username }}</b>
         {{ usernameStatus === 'taken' ? 'is already taken' : usernameStatus === 'available' ? 'is available' : '' }}
       </p>
@@ -48,7 +53,8 @@
     
     <div class="mb-5">
       <label class="label">Password</label>
-      <SmartTextInput type="password" placeholder="Password"
+      <SmartTextInput
+        type="password" placeholder="Password"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -59,12 +65,14 @@
         :emit-changed-when-error="true"
         :start-text="password"
         @changed="text => password = text"
-        @enter-pressed="signInClick"/>
+        @enter-pressed="signInClick"
+      />
     </div>
     
     <div v-show="isRegister" class="mb-5">
       <label class="label">Repeat password</label>
-      <SmartTextInput type="password" placeholder="Password"
+      <SmartTextInput
+        type="password" placeholder="Password"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -74,7 +82,8 @@
         }"
         :start-text="passwordRepeat"
         @changed="text => passwordRepeat = text"
-        @enter-pressed="signInClick"/>
+        @enter-pressed="signInClick"
+      />
     </div>
     
     <div class="mb-4 is-flex">
@@ -88,8 +97,10 @@
     </p>
     
     <div class="pb-2 is-flex is-justify-content-space-between is-align-items-center">
-      <button class="button is-primary mr-4" @click="signInClick"
-        :class="{'is-loading': loading}" :disabled="submitDisabled">
+      <button
+        class="button is-primary mr-4" @click="signInClick"
+        :class="{'is-loading': loading}" :disabled="submitDisabled"
+      >
         {{ isRegister ? 'Register' : 'Sign in' }}
       </button>
       <a v-if="!isRegister" @click="toggleRegister">Don't have an account?</a>

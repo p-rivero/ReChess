@@ -71,13 +71,13 @@ export const useAuthStore = defineStore('auth-user', () => {
       await updateUser(credential.user)
     } catch (e: any) {
       switch (e.code) {
-        case 'auth/user-not-found':
-          throw new UserNotFoundError()
-        case 'auth/wrong-password':
-          throw new RechessError('WRONG_PASSWORD')
-        default:
-          console.error('Unknown error while logging in with email and password', e)
-          throw e
+      case 'auth/user-not-found':
+        throw new UserNotFoundError()
+      case 'auth/wrong-password':
+        throw new RechessError('WRONG_PASSWORD')
+      default:
+        console.error('Unknown error while logging in with email and password', e)
+        throw e
       }
     }
   }
@@ -90,10 +90,10 @@ export const useAuthStore = defineStore('auth-user', () => {
       credential = await fb.createUserWithEmailAndPassword(auth, email, password)
     } catch (e: any) {
       switch (e.code) {
-        case 'auth/email-already-in-use':
-          throw new RechessError('EMAIL_ALREADY_IN_USE')
-        default:
-          throw e
+      case 'auth/email-already-in-use':
+        throw new RechessError('EMAIL_ALREADY_IN_USE')
+      default:
+        throw e
       }
     }
     

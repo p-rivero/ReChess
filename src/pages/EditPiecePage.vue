@@ -9,8 +9,10 @@
     <div class="column is-narrow left-column">
       
       <div class="is-flex is-justify-content-center mb-4">
-        <PieceViewerWithZoom v-if="piece" :piece="piece" style="z-index: 11;"
-          @clicked="editDelta"/>
+        <PieceViewerWithZoom
+          v-if="piece" :piece="piece" style="z-index: 11;"
+          @clicked="editDelta"
+        />
       </div>
       
       <br>
@@ -24,7 +26,8 @@
     
     
     <div class="column">
-      <SmartTextInput class="is-large" placeholder="Piece name" :start-text="piece?.displayName"
+      <SmartTextInput
+        class="is-large" placeholder="Piece name" :start-text="piece?.displayName"
         :error-handler="errorMsgHandler"
         :error-priority="2"
         :validator="text => {
@@ -32,18 +35,24 @@
           if (text.length > 40) return 'Piece name must be at most 40 characters long'
           if (text.length < 3) return 'Piece name must be at least 3 characters long'
         }"
-        @changed="name => piece!.displayName = name"/>
+        @changed="name => piece!.displayName = name"
+      />
       <br>
       <br>
       <div class="columns">
         <div class="column">
           <div class="horizontal-field">
-            <SmartCheckbox text="White" class="mr-4" :start-value="!whiteInvisible"
-              @changed="enabled => enabledCheckboxChanged(enabled, 'white')"/>
-            <PieceImageEdit :imageUrl="piece?.imageUrls[0]" :class="{ invisible: whiteInvisible }"
+            <SmartCheckbox
+              text="White" class="mr-4" :start-value="!whiteInvisible"
+              @changed="enabled => enabledCheckboxChanged(enabled, 'white')"
+            />
+            <PieceImageEdit
+              :imageUrl="piece?.imageUrls[0]" :class="{ invisible: whiteInvisible }"
               @image-changed="url => { piece!.imageUrls[0] = url; errorMsgHandler.clear() }"
-              @upload-error="imageUploadFailed"/>
-            <SmartTextInput class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
+              @upload-error="imageUploadFailed"
+            />
+            <SmartTextInput
+              class="width-3rem" :class="{ invisible: whiteInvisible }" placeholder="A"
               :start-text="pieceIdWhite ?? undefined"
               :error-handler="errorMsgHandler"
               :error-priority="1"
@@ -54,18 +63,24 @@
                 if (text === piece?.ids[1]) return 'The piece symbol for White and Black must be different'
                 if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
               }"
-              @changed="text => updatePieceId(text, 'white')"/>
+              @changed="text => updatePieceId(text, 'white')"
+            />
           </div>
         </div>
         
         <div class="column">
           <div class="horizontal-field">
-            <SmartCheckbox text="Black" class="mr-4" :start-value="!blackInvisible"
-              @changed="enabled => enabledCheckboxChanged(enabled, 'black')"/>
-            <PieceImageEdit :imageUrl="piece?.imageUrls[1]" :class="{ invisible: blackInvisible }"
+            <SmartCheckbox
+              text="Black" class="mr-4" :start-value="!blackInvisible"
+              @changed="enabled => enabledCheckboxChanged(enabled, 'black')"
+            />
+            <PieceImageEdit
+              :imageUrl="piece?.imageUrls[1]" :class="{ invisible: blackInvisible }"
               @image-changed="url => { piece!.imageUrls[1] = url; errorMsgHandler.clear() }"
-              @upload-error="imageUploadFailed"/>
-            <SmartTextInput class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
+              @upload-error="imageUploadFailed"
+            />
+            <SmartTextInput
+              class="width-3rem" :class="{ invisible: blackInvisible }" placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :error-handler="errorMsgHandler"
               :validator="text => {
@@ -74,85 +89,107 @@
                 if (text === piece?.ids[0]) return 'The piece symbol for White and Black must be different'
                 if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
               }"
-              @changed="text => updatePieceId(text, 'black')"/>
+              @changed="text => updatePieceId(text, 'black')"
+            />
           </div>
         </div>
       </div>
       
       <label class="label">Behavior:</label>
-      <SmartCheckbox text="Leader (can be checked/checkmated)" class="rules-field"
+      <SmartCheckbox
+        text="Leader (can be checked/checkmated)" class="rules-field"
         :startValue="piece?.isLeader"
-        @changed="value => piece!.isLeader = value"/>
+        @changed="value => piece!.isLeader = value"
+      />
       
       <div class="horizontal-field">
         <div class="field-label">
           <label>Castling</label>
         </div>
-        <SmartDropdown :items="['No', 'As king', 'As rook']"
+        <SmartDropdown
+          :items="['No', 'As king', 'As rook']"
           :startItem="piece?.isCastleRook ? 'As rook' : piece?.castleFiles ? 'As king' : 'No'"
-          :onChanged="item =>castlingDropdownChanged(item)"/>
+          :onChanged="item =>castlingDropdownChanged(item)"
+        />
         <div v-show="piece?.castleFiles" class="is-flex-not-important is-flex-direction-row is-align-items-center">
           <div class="field-label-both">
             <label>Queenside file</label>
           </div>
-          <SmartTextInput class="width-3rem" placeholder="c"
+          <SmartTextInput
+            class="width-3rem" placeholder="c"
             :start-text="numberToLetter(piece?.castleFiles?.[0])"
             :error-handler="errorMsgHandler"
             :validator="text => validateCastlingFile(text, 'Queenside')"
-            @changed="text => { castleFileQueenside = letterToNumber(text); piece!.castleFiles![0] = castleFileQueenside }"/>
+            @changed="text => { castleFileQueenside = letterToNumber(text); piece!.castleFiles![0] = castleFileQueenside }"
+          />
           <div class="field-label-both">
             <label>Kingside file</label>
           </div>
-          <SmartTextInput class="width-3rem" placeholder="g"
+          <SmartTextInput
+            class="width-3rem" placeholder="g"
             :start-text="numberToLetter(piece?.castleFiles?.[1])"
             :error-handler="errorMsgHandler"
             :validator="text => validateCastlingFile(text, 'Kingside')"
-            @changed="text => { castleFileKingside = letterToNumber(text); piece!.castleFiles![1] = castleFileKingside }"/>
+            @changed="text => { castleFileKingside = letterToNumber(text); piece!.castleFiles![1] = castleFileKingside }"
+          />
         </div>
       </div>
       
       <label>Win instantly when standing on:</label>
-      <CoordPillList :editable="true" class="mb-5" :allow-repeat="false"
+      <CoordPillList
+        :editable="true" class="mb-5" :allow-repeat="false"
         :starting-coords="piece?.winSquares"
-        @changed="coords => piece!.winSquares = coords"/>
-      
+        @changed="coords => piece!.winSquares = coords"
+      />
       <br>
       <label class="label">Movement:</label>
-      <AddRemoveButtons text="Jumps:" :z-index="11" type="move"
-        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta" />
+      <AddRemoveButtons
+        text="Jumps:" :z-index="11" type="move"
+        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta"
+      />
       <div class="mb-4"> <MovementSlideRow :piece-index="pieceIndex" type="move"/> </div>
       <label>Double jump when standing on:</label>
-      <CoordPillList :editable="true" class="mb-5" :allow-repeat="false"
+      <CoordPillList
+        :editable="true" class="mb-5" :allow-repeat="false"
         :starting-coords="piece?.doubleJumpSquares"
-        @changed="coords => piece!.doubleJumpSquares = coords"/>
+        @changed="coords => piece!.doubleJumpSquares = coords"
+      />
         
       <br>
       <label class="label">Capture:</label>
-      <AddRemoveButtons text="Jumps:" :z-index="11" type="capture"
-        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta" />
+      <AddRemoveButtons
+        text="Jumps:" :z-index="11" type="capture"
+        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta"
+      />
       <div class="mb-5"> <MovementSlideRow :piece-index="pieceIndex" type="capture"/> </div>
       
       <br>
       <label class="label">Promote:</label>
       <label>Promote when landing on:</label>
-      <CoordPillList :editable="true" :allow-repeat="false"
+      <CoordPillList
+        :editable="true" :allow-repeat="false"
         :starting-coords="piece?.promotionSquares"
-        @changed="coords => piece!.promotionSquares = coords"/>
+        @changed="coords => piece!.promotionSquares = coords"
+      />
       <br>
         
       <div class="columns">
         <div v-if="!whiteInvisible" class="column">
           <label>(White) Promote to:</label>
-          <CharPillList :editable="true" :allow-repeat="false"
+          <CharPillList
+            :editable="true" :allow-repeat="false"
             :starting-pills="piece?.promoVals[0]"
-            @changed="promos => piece!.promoVals[0] = promos"/>
+            @changed="promos => piece!.promoVals[0] = promos"
+          />
         </div>
         
         <div v-if="!blackInvisible" class="column">
           <label>(Black) Promote to:</label>
-          <CharPillList :editable="true" :allow-repeat="false"
+          <CharPillList
+            :editable="true" :allow-repeat="false"
             :starting-pills="piece?.promoVals[1]"
-            @changed="promos => piece!.promoVals[1] = promos"/>
+            @changed="promos => piece!.promoVals[1] = promos"
+          />
         </div>
       </div>
       
@@ -160,19 +197,25 @@
       <label class="label">Explode:</label>
       <div class="columns">
         <div class="column ">
-          <SmartCheckbox text="Explode when capturing" class="rules-field"
+          <SmartCheckbox
+            text="Explode when capturing" class="rules-field"
             :startValue="piece?.explodes"
-            @changed="value => piece!.explodes = value"/>
+            @changed="value => piece!.explodes = value"
+          />
         </div>
         <div class="column">
-          <SmartCheckbox text="Immune to other explosions" class="rules-field"
+          <SmartCheckbox
+            text="Immune to other explosions" class="rules-field"
             :startValue="piece?.immuneToExplosion"
-            @changed="value => piece!.immuneToExplosion = value"/>
+            @changed="value => piece!.immuneToExplosion = value"
+          />
         </div>
       </div>
-      <AddRemoveButtons text="Explosion squares:" :z-index="11" type="explosion"
+      <AddRemoveButtons
+        text="Explosion squares:" :z-index="11" type="explosion"
         v-show="piece?.explodes"
-        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta" />
+        :selected-delta="selectedDelta" @update-delta="delta => selectedDelta=delta"
+      />
       
     </div>
   </div>

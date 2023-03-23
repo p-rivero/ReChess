@@ -138,8 +138,7 @@ test('cannot remove upvote if not upvoted first', async () => {
   await createUserAndVariant()
   const batch = startBatch('verified')
   batch.remove('users', MY_ID, 'upvotedVariants', '1234')
-  batch.set({ numUpvotes: 9 }, 'variants', '1234',
-  'upvotes', 'doc')
+  batch.set({ numUpvotes: 9 }, 'variants', '1234', 'upvotes', 'doc')
   await assertFails(batch.commit())
   
   assertFails(

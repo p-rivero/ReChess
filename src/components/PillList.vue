@@ -46,23 +46,23 @@
 
 <script lang="ts">
 // Internal type for representing a pill
-type Pill = {
-  text: string
-  editing: boolean
-  error: boolean
-  originalText: string
-}
+  type Pill = {
+    text: string
+    editing: boolean
+    error: boolean
+    originalText: string
+  }
 
-function stringsToPills(list: string[]): Pill[] {
-  return list.map((text) => {
-    return {
-      text: text,
-      editing: false,
-      error: false,
-      originalText: text,
-    }
-  })
-}
+  function stringsToPills(list: string[]): Pill[] {
+    return list.map((text) => {
+      return {
+        text: text,
+        editing: false,
+        error: false,
+        originalText: text,
+      }
+    })
+  }
 </script>
 
 

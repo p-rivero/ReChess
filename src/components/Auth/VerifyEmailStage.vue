@@ -25,7 +25,7 @@
   
   defineExpose({
     init() {
-      // Nothing to do at the moment
+    // Nothing to do at the moment
     },
     cleanup() {
       sentMessage.value = ''

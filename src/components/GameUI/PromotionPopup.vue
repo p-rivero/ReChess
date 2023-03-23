@@ -1,8 +1,12 @@
 <template>
   <div v-show="active" class="promotion-overlay" @click="active = false">
     <div class="promotion-picker">
-      <div v-for="(url, index) of promotionUrls" class="promotion-option"
-        :style="{backgroundImage: `url(${url})`}" :key="index" @click="selectedIndex = index; active = false">
+      <div
+        v-for="(url, index) of promotionUrls" :key="index"
+        class="promotion-option"
+        :style="{backgroundImage: `url(${url})`}"
+        @click="selectedIndex = index; active = false"
+      >
       </div>
     </div>
   </div>

@@ -1,7 +1,8 @@
 <template>
   <div>
     <div v-show="editing && editable">
-      <SmartTextInput ref="textBox" :multiline="true"
+      <SmartTextInput
+        ref="textBox" :multiline="true"
         :placeholder="placeholder" :error-handler="errorHandler"
         :validator="validatorProxy"
         @changed="text => currentText = text"

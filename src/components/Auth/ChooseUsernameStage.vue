@@ -5,7 +5,10 @@
     <p class="mb-3">It cannot be changed later, so choose wisely!</p>
     
     <div class="mb-5">
-      <SmartTextInput class="mb-2" ref="usernameRef" placeholder="your_username"
+      <SmartTextInput
+        class="mb-2"
+        ref="usernameRef"
+        placeholder="your_username"
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
@@ -16,8 +19,10 @@
         }"
         :start-text="username"
         @changed="updateUsername"
-        @enter-pressed="submit"/>
-      <p class="help" v-show="username !== ''"
+        @enter-pressed="submit"
+      />
+      <p
+        class="help" v-show="username !== ''"
         :class="{
           'has-text-danger': usernameStatus === 'taken',
           'has-text-success': usernameStatus === 'available',
@@ -69,7 +74,7 @@
   
   defineExpose({
     init() {
-      // Nothing to do at the moment
+    // Nothing to do at the moment
     },
     cleanup() {
       username.value = ''

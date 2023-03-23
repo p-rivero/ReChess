@@ -171,7 +171,9 @@
     }
     const nameDetails = draftStore.state.displayName ?
       ` named "${draftStore.state.displayName}"` : ''
-    showPopup('Overwrite draft?', `You can only store one draft at a time, 
+    showPopup(
+      'Overwrite draft?',
+      `You can only store one draft at a time, 
       but it seems you already have a draft${nameDetails}. 
       Do you want to overwrite it?.`,
       'yes-no',

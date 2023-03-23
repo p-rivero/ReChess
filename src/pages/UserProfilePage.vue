@@ -13,7 +13,8 @@
           'icon-github': user.signInProvider === 'github.com',
         }"></div>
         <p class="is-size-5 ml-2 mr-3"> {{ user.email }} </p>
-        <button v-if="user.signInProvider === 'password'" class="button ml-4" @click="resetPassword"
+        <button
+          v-if="user.signInProvider === 'password'" class="button ml-4" @click="resetPassword"
           :class="{ 'is-loading': sendingResetPasswordEmail }" :disabled="sendingResetPasswordEmail"
         >
           <div class="sz-icon icon-key color-theme"></div>

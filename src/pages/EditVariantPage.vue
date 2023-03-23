@@ -8,20 +8,28 @@
     <div class="column is-narrow left-column">
       
       <div class="is-flex is-justify-content-center mb-4 board-container">
-        <ViewableChessBoard ref="board" style="z-index: 20"
+        <ViewableChessBoard
+          ref="board" style="z-index: 20"
           :white-pov="true" :view-only="true" :show-coordinates="true" :capture-wheel-events="false"
-          @clicked="coords => placePiece(coords)"/>
+          @clicked="coords => placePiece(coords)"
+        />
       </div>
       
       <div class="horizontal-field">
         <div class="field-label"><label>Board size:</label></div>
-        <SmartNumberInput class="width-5rem" :min="2" :max="16" :default="8"
+        <SmartNumberInput
+          class="width-5rem" :min="2" :max="16" :default="8"
           :start-value="draftStore.state.boardHeight"
-          @changed="draftStore.setHeight"/>
-        <div class="field-label-both"><label>x</label></div>
-        <SmartNumberInput class="width-5rem" :min="2" :max="16" :default="8"
+          @changed="draftStore.setHeight"
+        />
+        <div class="field-label-both">
+          <label>x</label>
+        </div>
+        <SmartNumberInput
+          class="width-5rem" :min="2" :max="16" :default="8"
           :start-value="draftStore.state.boardWidth"
-          @changed="draftStore.setWidth"/>
+          @changed="draftStore.setWidth"
+        />
       </div>
       
       <div class="horizontal-field">
@@ -29,18 +37,22 @@
           <label>First player to move:</label>
         </div>
         <div class="field-body">
-          <SmartDropdown :items="['White', 'Black']"
+          <SmartDropdown
+            :items="['White', 'Black']"
             :start-item="draftStore.state.playerToMove === 0 ? 'White' : 'Black'"
-            @changed="item => draftStore.state.playerToMove = item === 'White' ? 0 : 1"/>
+            @changed="item => draftStore.state.playerToMove = item === 'White' ? 0 : 1"
+          />
         </div>
       </div>
       
       <div class="field">
         <label class="label">Place piece:</label>
-        <PiecePlacementButtons ref="pieceSelector" :z-index="11" :state="draftStore.state"
-        :key="JSON.stringify(draftStore.state.pieceTypes)"
+        <PiecePlacementButtons
+          ref="pieceSelector" :z-index="11" :state="draftStore.state"
+          :key="JSON.stringify(draftStore.state.pieceTypes)"
           @piece-selected="id => selectedPieceId = id"
-          @piece-deselected="selectedPieceId = 'none'"/>
+          @piece-deselected="selectedPieceId = 'none'"
+        />
       </div>
       <br>
       
@@ -76,7 +88,8 @@
     
     
     <div class="column">
-      <SmartTextInput class="is-large" placeholder="Variant name"
+      <SmartTextInput
+        class="is-large" placeholder="Variant name"
         :start-text="draftStore.state.displayName"
         @changed="name => draftStore.state.displayName = name"
         :validator="(text) => {
@@ -85,57 +98,72 @@
           if (text.length < 3) return 'Variant name must be at least 3 characters long'
         }"
         :emit-changed-when-error="true"
-        :error-handler="errorMsgHandler"/>
+        :error-handler="errorMsgHandler"
+      />
       <br>
       <br>
-      <EditableMarkdown class="mb-5"
-          :text="draftStore.state.description"
-          :placeholder="'Describe the rules of the variant and how fun it is to play!\nYou can use **Markdown** to format your text.'"
-          :editable="true" :error-handler="errorMsgHandler"
-          :validator="text => text.length > 1000 ? 'The variant description must be at most 1000 characters long' : undefined"
-          @save="text => draftStore.state.description = text" />
+      <EditableMarkdown
+        class="mb-5"
+        :text="draftStore.state.description"
+        :placeholder="'Describe the rules of the variant and how fun it is to play!\nYou can use **Markdown** to format your text.'"
+        :editable="true" :error-handler="errorMsgHandler"
+        :validator="text => text.length > 1000 ? 'The variant description must be at most 1000 characters long' : undefined"
+        @save="text => draftStore.state.description = text"
+      />
       
       <label class="label">Rules:</label>
       <div class="columns is-mobile">
         <div class="column ">
-          <SmartCheckbox text="Capturing is forced" class="rules-field"
+          <SmartCheckbox
+            text="Capturing is forced" class="rules-field"
             :start-value="draftStore.state.globalRules.capturingIsForced"
-            @changed="value => draftStore.state.globalRules.capturingIsForced = value"/>
+            @changed="value => draftStore.state.globalRules.capturingIsForced = value"
+          />
           <br>
-          <SmartCheckbox text="Check is forbidden" class="rules-field"
+          <SmartCheckbox
+            text="Check is forbidden" class="rules-field"
             :start-value="draftStore.state.globalRules.checkIsForbidden"
             @changed="value => {
               draftStore.state.globalRules.checkIsForbidden = value
               draftStore.state.globalRules.checksToLose = 0
-            }"/>
+            }"
+          />
         </div>
         
         <div class="column">
-          <SmartCheckbox text="Stalemated player loses" class="rules-field"
+          <SmartCheckbox
+            text="Stalemated player loses" class="rules-field"
             :start-value="draftStore.state.globalRules.stalematedPlayerLoses"
-            @changed="value => draftStore.state.globalRules.stalematedPlayerLoses = value"/>
+            @changed="value => draftStore.state.globalRules.stalematedPlayerLoses = value"
+          />
           <br>
-          <SmartCheckbox text="Invert ALL win conditions" class="rules-field"
+          <SmartCheckbox
+            text="Invert ALL win conditions" class="rules-field"
             :start-value="draftStore.state.globalRules.invertWinConditions"
-            @changed="value => draftStore.state.globalRules.invertWinConditions = value"/>
+            @changed="value => draftStore.state.globalRules.invertWinConditions = value"
+          />
         </div>
       </div>
       <div class="horizontal-field">
         <div class="field-label">
           <label>Repetitions for draw:</label>
         </div>
-        <SmartNumberInput class="width-5rem" :min="0" :max="200" :default="3"
+        <SmartNumberInput
+          class="width-5rem" :min="0" :max="200" :default="3"
           :start-value="draftStore.state.globalRules.repetitionsDraw"
-          @changed="value => draftStore.state.globalRules.repetitionsDraw = value"/>
+          @changed="value => draftStore.state.globalRules.repetitionsDraw = value"
+        />
       </div>
       <div class="horizontal-field">
         <div class="field-label">
           <label>Lose when put in check</label>
         </div>
-        <SmartNumberInput class="width-5rem" :min="0" :max="200" :default="0" placeholder="-"
+        <SmartNumberInput
+          class="width-5rem" :min="0" :max="200" :default="0" placeholder="-"
           :start-value="draftStore.state.globalRules.checksToLose"
           :disabled="draftStore.state.globalRules.checkIsForbidden"
-          @changed="value => draftStore.state.globalRules.checksToLose = value"/>
+          @changed="value => draftStore.state.globalRules.checksToLose = value"
+        />
         
         <div class="field-label-right">
           <label>times</label>
@@ -148,7 +176,8 @@
         :state="draftStore.state"
         @piece-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
         @delete-click="pieceIndex => deletePiece(pieceIndex)"
-        @new-click="createNewPiece" />
+        @new-click="createNewPiece"
+      />
     </div>
   </div>
   

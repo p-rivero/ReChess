@@ -72,27 +72,27 @@
     const ref = draftStore.state.pieceTypes[props.pieceIndex]
     if (props.type === 'move') {
       switch (buttonIndex) {
-        case 0: ref.translateWest = !ref.translateWest; break
-        case 1: ref.translateEast = !ref.translateEast; break
-        case 2: ref.translateNorth = !ref.translateNorth; break
-        case 3: ref.translateSouth = !ref.translateSouth; break
-        case 4: ref.translateNorthwest = !ref.translateNorthwest; break
-        case 5: ref.translateNortheast = !ref.translateNortheast; break
-        case 6: ref.translateSouthwest = !ref.translateSouthwest; break
-        case 7: ref.translateSoutheast = !ref.translateSoutheast; break
-        default: throw new Error('Invalid button index')
+      case 0: ref.translateWest = !ref.translateWest; break
+      case 1: ref.translateEast = !ref.translateEast; break
+      case 2: ref.translateNorth = !ref.translateNorth; break
+      case 3: ref.translateSouth = !ref.translateSouth; break
+      case 4: ref.translateNorthwest = !ref.translateNorthwest; break
+      case 5: ref.translateNortheast = !ref.translateNortheast; break
+      case 6: ref.translateSouthwest = !ref.translateSouthwest; break
+      case 7: ref.translateSoutheast = !ref.translateSoutheast; break
+      default: throw new Error('Invalid button index')
       }
     } else if (props.type === 'capture') {
       switch (buttonIndex) {
-        case 0: ref.attackWest = !ref.attackWest; break
-        case 1: ref.attackEast = !ref.attackEast; break
-        case 2: ref.attackNorth = !ref.attackNorth; break
-        case 3: ref.attackSouth = !ref.attackSouth; break
-        case 4: ref.attackNorthwest = !ref.attackNorthwest; break
-        case 5: ref.attackNortheast = !ref.attackNortheast; break
-        case 6: ref.attackSouthwest = !ref.attackSouthwest; break
-        case 7: ref.attackSoutheast = !ref.attackSoutheast; break
-        default: throw new Error('Invalid button index')
+      case 0: ref.attackWest = !ref.attackWest; break
+      case 1: ref.attackEast = !ref.attackEast; break
+      case 2: ref.attackNorth = !ref.attackNorth; break
+      case 3: ref.attackSouth = !ref.attackSouth; break
+      case 4: ref.attackNorthwest = !ref.attackNorthwest; break
+      case 5: ref.attackNortheast = !ref.attackNortheast; break
+      case 6: ref.attackSouthwest = !ref.attackSouthwest; break
+      case 7: ref.attackSoutheast = !ref.attackSoutheast; break
+      default: throw new Error('Invalid button index')
       }
     }
   }

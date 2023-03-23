@@ -5,7 +5,8 @@
         <div class="icon-trash color-theme"></div>
       </button>
     </div>
-    <div class="box py-2 px-2 is-clickable"
+    <div
+      class="box py-2 px-2 is-clickable"
       @click="emit('piece-click', pieceIndex)"
       @mouseenter="hovered = pieceIndex"
       @mouseleave="hovered = -1"
@@ -34,14 +35,16 @@
       </div>
       <div v-if="piece.promoVals[0].length > 0" class="box-row mt-4">
         <p class="is-size-7 mr-4">(White) Promote to:</p>
-        <img v-for="(sym, i) of piece.promoVals[0].filter(sym => symbolImg(0, sym))" :key="i"
+        <img
+          v-for="(sym, i) of piece.promoVals[0].filter(sym => symbolImg(0, sym))" :key="i"
           :src="symbolImg(0, sym)" :alt="`${sym}`"
           class="sz-2 mr-4" draggable="false"
         >
       </div>
       <div v-if="piece.promoVals[1].length > 0" class="box-row mt-4">
         <p class="is-size-7 mr-4">(Black) Promote to:</p>
-        <img v-for="(sym, i) of piece.promoVals[1].filter(sym => symbolImg(1, sym))" :key="i"
+        <img
+          v-for="(sym, i) of piece.promoVals[1].filter(sym => symbolImg(1, sym))" :key="i"
           :src="symbolImg(1, sym)" :alt="`piece ${sym}`"
           class="sz-2 mr-4" draggable="false"
         >

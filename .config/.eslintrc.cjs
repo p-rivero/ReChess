@@ -19,6 +19,8 @@ module.exports = {
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     'quotes': ['warn', 'single'],
     'semi': ['warn', 'never'],
+    'vue/script-indent': ['warn', 2, { baseIndent: 1 }],
+    'vue/html-indent': ['warn', 2, { baseIndent: 1 }],
     'no-trailing-spaces': ['warn', { skipBlankLines: true }],
   }
 }

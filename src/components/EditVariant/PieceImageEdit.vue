@@ -1,6 +1,8 @@
 <template>
-  <button class="button is-outlined mr-4 px-1 py-1 fit-content" @click="click"
-    :class="{'is-danger': error}">
+  <button
+    class="button is-outlined mr-4 px-1 py-1 fit-content" @click="click"
+    :class="{'is-danger': error}"
+  >
     <div v-if="loading" class="button piece-container is-loading is-white is-large"></div>
     <div v-else-if="imageUrl" class="piece-container" >
       <img class="piece-image" alt="Image of this piece" draggable="false" :src="imageUrl" />

@@ -7,11 +7,13 @@
 
 <template>
   <div class="chessboard w-100 h-100">
-    <div ref="board" class="cg-board-wrap"
+    <div
+      ref="board" class="cg-board-wrap"
       @click="e => onClick(e)"
       @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseout="endDrag"
       @touchstart="onTap"
-      @wheel="onWheel">
+      @wheel="onWheel"
+    >
     </div>
   </div>
 </template>
@@ -69,8 +71,8 @@
   const componentWidthPercent = props.width * sizePercentPerSquare
   const [wrapWidth, wrapHeight] =
     (componentWidthPercent === 100) ?
-    ['100%', `${componentHeightPercent}%`] :
-    [`${componentWidthPercent}%`, '100%']
+      ['100%', `${componentHeightPercent}%`] :
+      [`${componentWidthPercent}%`, '100%']
   
   // Coordinates text colors
   const bottomLeftTextColor = props.height % 2 === 0 ? LIGHT_COLOR : DARK_COLOR

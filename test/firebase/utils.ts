@@ -79,14 +79,14 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
       return authType.firestore()
     }
     switch (authType) {
-      case 'verified':
-        return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: true }).firestore()
-      case 'unverified':
-        return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: false }).firestore()
-      case 'not logged':
-        return testEnv.unauthenticatedContext().firestore()
-      default:
-        throw new Error(`Invalid auth type: ${authType}`)
+    case 'verified':
+      return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: true }).firestore()
+    case 'unverified':
+      return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: false }).firestore()
+    case 'not logged':
+      return testEnv.unauthenticatedContext().firestore()
+    default:
+      throw new Error(`Invalid auth type: ${authType}`)
     }
   }
   

@@ -3,14 +3,20 @@
     <div class="modal-background" @click="closePopup(true)"></div>
     <div class="box modal-card scrollable signin-card">
       
-      <LoginRegisterStage v-show="currentStage === 'loginRegister'" ref="loginRegisterStage"
-        @check-verify="checkVerify" @choose-username="chooseUsername"/>
+      <LoginRegisterStage
+        v-show="currentStage === 'loginRegister'" ref="loginRegisterStage"
+        @check-verify="checkVerify" @choose-username="chooseUsername"
+      />
         
-      <ChooseUsernameStage v-show="currentStage === 'chooseUsername'" ref="chooseUsernameStage"
-        @check-verify="checkVerify" @close-popup="closePopup"/>
+      <ChooseUsernameStage
+        v-show="currentStage === 'chooseUsername'" ref="chooseUsernameStage"
+        @check-verify="checkVerify" @close-popup="closePopup"
+      />
         
-      <VerifyEmailStage v-show="currentStage === 'verifyEmail'" ref="verifyEmailStage"
-        @close-popup="closePopup"/>
+      <VerifyEmailStage
+        v-show="currentStage === 'verifyEmail'" ref="verifyEmailStage"
+        @close-popup="closePopup"
+      />
       
     </div>
   </div>
@@ -49,28 +55,28 @@
   
   function initCurrentStage() {
     switch (currentStage.value) {
-      case 'loginRegister':
-        loginRegisterStage.value?.init()
-        break
-      case 'chooseUsername':
-        chooseUsernameStage.value?.init()
-        break
-      case 'verifyEmail':
-        verifyEmailStage.value?.init()
-        break
+    case 'loginRegister':
+      loginRegisterStage.value?.init()
+      break
+    case 'chooseUsername':
+      chooseUsernameStage.value?.init()
+      break
+    case 'verifyEmail':
+      verifyEmailStage.value?.init()
+      break
     }
   }
   function cleanupCurrentStage() {
     switch (currentStage.value) {
-      case 'loginRegister':
-        loginRegisterStage.value?.cleanup()
-        break
-      case 'chooseUsername':
-        chooseUsernameStage.value?.cleanup()
-        break
-      case 'verifyEmail':
-        verifyEmailStage.value?.cleanup()
-        break
+    case 'loginRegister':
+      loginRegisterStage.value?.cleanup()
+      break
+    case 'chooseUsername':
+      chooseUsernameStage.value?.cleanup()
+      break
+    case 'verifyEmail':
+      verifyEmailStage.value?.cleanup()
+      break
     }
     currentStage.value = undefined
   }
