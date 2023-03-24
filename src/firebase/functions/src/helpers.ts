@@ -1,4 +1,9 @@
 
+// Each transaction or batch of writes can write to a maximum of 500 documents
+// https://firebase.google.com/docs/firestore/manage-data/transactions
+const MAX_BATCH_SIZE = 500
+
+
 // True if the admin SDK has been initialized for this cloud function instance
 let adminInitialized = false
 
@@ -17,6 +22,7 @@ export async function useAdmin(): Promise<typeof admin> {
   return admin
 }
 
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
@@ -30,8 +36,40 @@ export async function useAdmin(): Promise<typeof admin> {
  * @return {Promise<ReturnType<F>>} A promise of the return value of the function
  *
 */
-export async function callFunction< F extends(..._args: any[]) => Promise<any> >
+export async function callFunction< F extends(...args: any[]) => Promise<any> >
 (modulePromise: Promise<{ default: F }>, ...args: Parameters<F>): Promise<ReturnType<F>> {
   const mod = await modulePromise
   return mod.default(...args)
+}
+
+
+type BatchCallback = (batch: FirebaseFirestore.WriteBatch, ref: FirebaseFirestore.DocumentReference) => void
+type Firestore = FirebaseFirestore.Firestore
+type QuerySnapshot = FirebaseFirestore.QuerySnapshot
+
+/**
+ * Generic function to perform a batched update of possibly more than 500 documents.
+ *
+ * @param {FirebaseFirestore.Firestore} db The Firestore database to use
+ *
+ * @param {FirebaseFirestore.QuerySnapshot} input A query snapshot of the documents to update
+ *
+ * @param {BatchCallback} operation A function that is called for each document in the snapshot.
+ * It should add the required update to the batch.
+ *
+ * @return {Promise<void>} A promise that resolves when all the batches have been committed
+ *
+*/
+export async function batchedUpdate(db: Firestore, input: QuerySnapshot, operation: BatchCallback): Promise<void> {
+  const numDocs = input.size
+  const numBatches = Math.ceil(numDocs / MAX_BATCH_SIZE)
+  for (let nBatch = 0; nBatch < numBatches; nBatch++) {
+    const batch = db.batch()
+    for (let i = 0; i < MAX_BATCH_SIZE; i++) {
+      const doc = input.docs[nBatch * MAX_BATCH_SIZE + i]
+      if (!doc) break
+      operation(batch, doc.ref)
+    }
+    await batch.commit()
+  }
 }

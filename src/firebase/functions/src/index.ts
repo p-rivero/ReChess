@@ -11,3 +11,12 @@ export const renameUser =
     .onUpdate((change, context) => {
       return callFunction(import('./rename-user'), change, context)
     })
+
+export const deleteUser =
+  region('europe-west1')
+    .auth
+    .user()
+    .onDelete((user) => {
+      return callFunction(import('./delete-user'), user)
+    })
+  
