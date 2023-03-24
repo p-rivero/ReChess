@@ -143,7 +143,8 @@ export function isPublishedVariant(obj: unknown): obj is PublishedVariant {
         isVariant(typedObj) as boolean &&
         typeof typedObj["uid"] === "string" &&
         typeof typedObj["creatorDisplayName"] === "string" &&
-        typeof typedObj["creatorId"] === "string" &&
+        (typeof typedObj["creatorId"] === "undefined" ||
+            typeof typedObj["creatorId"] === "string") &&
         typeof typedObj["numUpvotes"] === "number" &&
         typeof typedObj["loggedUserUpvoted"] === "boolean"
     )

@@ -4,15 +4,21 @@
       <p class="is-size-2 mb-2">
         {{ variant?.displayName }}
       </p>
-      <p class="is-size-5 has-text-weight-semibold mb-4">
+      
+      <p
+        v-if="variant?.creatorId"
+        class="is-size-5 has-text-weight-semibold mb-4"
+      >
         Created by
         <a @click="creatorClicked">{{ variant?.creatorDisplayName }}</a>
       </p>
+      
       <UpvoteButton
         v-if="variant"
         class="mb-5"
         :variant="variant"
       />
+      
       <div class="content mb-0">
         <VueMarkdown
           v-if="variant"
@@ -229,8 +235,13 @@
   }
   
   async function creatorClicked() {
+    if (!variant.value) {
+      throw new Error('variant is null')
+    }
+    if (!variant.value.creatorId) {
+      throw new Error('Creator should not be clickable if user has been deleted')
+    }
     // Get the username of the creator
-    if (!variant.value) throw new Error('variant is null')
     const user = await userStore.getUserById(variant.value.creatorId)
     if (!user) {
       throw new Error('Could not find user with id ' + variant.value.creatorId)

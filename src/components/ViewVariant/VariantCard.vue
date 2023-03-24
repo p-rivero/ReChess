@@ -21,10 +21,13 @@
       </p>
     </div>
     
-    <p class="mb-3 has-text-weight-light">
+    <p
+      v-if="variant.creatorId"
+      class="mb-0 has-text-weight-light"
+    >
       By <a @click="creatorClicked">{{ variant.creatorDisplayName }}</a>
     </p>
-    <div class="columns is-mobile mb-0">
+    <div class="columns is-mobile mb-0 mt-0">
       <div class="column is-narrow pr-0">
         <button
           aria-label="use as template"
@@ -112,6 +115,9 @@
   }
   
   async function creatorClicked() {
+    if (!props.variant.creatorId) {
+      throw new Error('Creator should not be clickable if user has been deleted')
+    }
     // Get the username of the creator
     const user = await userStore.getUserById(props.variant.creatorId)
     if (!user) {

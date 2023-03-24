@@ -114,10 +114,29 @@ test('creator id must be correct', async () => {
     description: 'Variant description',
     IMMUTABLE: {
       creatorDisplayName: 'My name',
-      creatorId: 'WRONG_ID',
+      creatorId: 'WRONG_ID', // Trying to impersonate another user
       initialState: '{}',
     },
   }
+  await assertFails(
+    add('verified', variant, 'variants')
+  )
+})
+
+test('creator must id must mot be null', async () => {
+  await setupUser()
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    IMMUTABLE: {
+      creatorDisplayName: 'My name',
+      creatorId: null,
+      initialState: '{}',
+    },
+  }
+  // Creator id can be null if the user has been deleted,
+  // but when creating a variant, the user must still exist
   await assertFails(
     add('verified', variant, 'variants')
   )
