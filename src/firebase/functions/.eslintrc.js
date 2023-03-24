@@ -31,7 +31,7 @@ module.exports = {
     'semi': ['warn', 'never'],
     'no-trailing-spaces': ['warn', { skipBlankLines: true }],
     'no-unused-vars': ['warn', {
-      argsIgnorePattern: '^_',
+      args: 'none',
       varsIgnorePattern: '^_',
     }],
     'valid-jsdoc': ['warn', { requireReturn: false }],

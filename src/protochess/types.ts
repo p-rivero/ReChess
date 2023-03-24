@@ -95,7 +95,7 @@ export interface Variant extends GameState {
 export interface PublishedVariant extends Variant {
   uid: string,
   creatorDisplayName: string,
-  creatorId: string,
+  creatorId?: string,
   numUpvotes: number,
   loggedUserUpvoted: boolean,
 }

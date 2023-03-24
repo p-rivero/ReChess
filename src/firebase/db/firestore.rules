@@ -180,9 +180,9 @@ service cloud.firestore {
     match /variants/{variantId} {
       function isVariantDoc() {
         return hasCorrectFields(['name', 'description', 'IMMUTABLE'], []) &&
-          hasCorrectImmutableFields(['creatorDisplayName', 'creatorId', 'initialState'], []);
+          hasCorrectImmutableFields(['creatorDisplayName', 'initialState'], ['creatorId']);
       }
-      function isValidVariant(variant) {
+      function isValidVariantEdit(variant) {
         let userDoc = get(/databases/$(database)/documents/users/$(variant.IMMUTABLE.creatorId));
         let expectedDisplayName = userDoc.data.name == null ? '@' + userDoc.data.IMMUTABLE.username : userDoc.data.name;
         return isVariantDoc() &&
@@ -190,6 +190,8 @@ service cloud.firestore {
           variant.name.size() <= 50 &&
           variant.description.size() <= 1000 &&
           variant.IMMUTABLE.creatorDisplayName == expectedDisplayName &&
+          // Creator can be null if their account has been deleted (not when creating the variant)
+          variant.IMMUTABLE.creatorId != null &&
           isAuth(variant.IMMUTABLE.creatorId) &&
           variant.IMMUTABLE.initialState.size() <= 100000;
       }
@@ -197,13 +199,13 @@ service cloud.firestore {
       allow read;
       // Create if authenticated, update if authenticated and existing creator
       allow create: if
-        isValidVariant(request.resource.data) &&
+        isValidVariantEdit(request.resource.data) &&
         // Check that there is no leading or trailing whitespace in the name
         request.resource.data.name == request.resource.data.name.trim();
         
       allow update: if
         immutableOk() &&
-        isValidVariant(request.resource.data) &&
+        isValidVariantEdit(request.resource.data) &&
         isAuth(resource.data.IMMUTABLE.creatorId);
       
       // Disallow deleting variants

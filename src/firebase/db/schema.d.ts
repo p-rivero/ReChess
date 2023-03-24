@@ -4,10 +4,12 @@ import { FieldValue, Timestamp } from 'firebase/firestore'
 // WARNING: The Firebase client requires null instead of undefined
 // Use "| null" instead of "?" for optional fields
 
+
 // usernames/{username}
 export interface UsernameDoc {
   userId: string
 }
+
 
 // users/{userId}
 export interface UserDoc {
@@ -20,6 +22,7 @@ export interface UserDoc {
     renameAllowedAt: Timestamp | null
   }
 }
+
 // users/{userId}/private/doc
 export interface UserPrivateDoc {
   IMMUTABLE: {
@@ -27,17 +30,12 @@ export interface UserPrivateDoc {
     banned: boolean
   }
 }
-// users/{userId}/games/{gameId}
-export interface UserGameDoc {
-  timePlayed: Timestamp
-  result: 'win' | 'lose' | 'draw'
-  variantName: string
-}
 
 // users/{userID}/upvotedVariants/{variantId}
 export interface UserUpvotesDoc {
   timeUpvoted: FieldValue | Timestamp
 }
+
 
 // variants/{variantId}
 export interface VariantDoc {
@@ -45,7 +43,7 @@ export interface VariantDoc {
   description: string
   IMMUTABLE: {
     creatorDisplayName: string
-    creatorId: string
+    creatorId: string | null
     // JSON string that corresponds to the GameState interface in src/protochess/types.ts
     // Validated client-side (on every fetch), since server-side validation would require importing
     // the protochess wasm module on the cloud function
@@ -57,4 +55,19 @@ export interface VariantDoc {
 // variants/{variantId}/upvotes/doc
 export interface VariantUpvotesDoc {
   numUpvotes: number
+}
+
+
+// games/{gameId}
+export interface GameDoc {
+  IMMUTABLE: {
+    timePlayed: Timestamp
+    winner: 'white' | 'black' | 'draw'
+    variantName: string
+    variantId: string
+    whiteDisplayName: string
+    whiteId: string | null
+    blackDisplayName: string
+    blackId: string | null
+  }
 }
