@@ -5,7 +5,6 @@
     "dev": "run-p pre-compile start-emulator dev-only",
     "build": "run-s pre-compile type-check build-only",
     "preview": "vite preview --port 4173 --config .config/vite.config.ts",
-    "deploy": "run-s build deploy-only",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --config .config/.eslintrc.cjs",
     "test": "jest --config .config/jest.config.js",
     "pre-compile": "run-p build-wasm generate-type-guard generate-icons",
@@ -16,7 +15,6 @@
     "build-only": "vite build --config .config/vite.config.ts",
     "dev-only": "vite --config .config/vite.config.ts",
     "start-emulator": "firebase emulators:start --project rechess-web",
-    "deploy-only": "firebase deploy --project rechess-web",
     "postinstall": "chmod +x ./src/assets/img/icons/generate-icons.sh"
   },
   "dependencies": {

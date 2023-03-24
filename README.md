@@ -31,6 +31,8 @@ Make sure you also have `cargo`, `wasm-pack` and `rustup` installed. The first c
 npm install
 ```
 
+If you use VSCode, install the [Vue Language extension](https://marketplace.visualstudio.com/items?itemName=Vue.volar).
+
 ### Using a Firebase backend
 
 1. Create a Firebase project. Make sure to enable App Check (with reCAPTCHA), Firestore, Hosting, Storage and Functions.
@@ -63,6 +65,18 @@ npm install
 npm run dev
 ```
 
+### Run unit tests
+
+```sh
+npm run test
+```
+
+If you use VSCode, I recommend installing the [Jest extension](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest) and adding the following to your `settings.json`:
+
+```json
+"jest.jestCommandLine": "npx jest --config .config/jest.config.js",
+```
+
 ### Type-Check, Compile and Minify for Production
 
 ```sh
@@ -77,21 +91,33 @@ Then you can preview the production build with `npm run preview`.
 npm run lint
 ```
 
+If you use VSCode, I recommend installing the [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and adding the following to your `settings.json`:
+
+```json
+"editor.codeActionsOnSave": {
+   "source.fixAll": true
+},
+"eslint.options": {
+   "overrideConfigFile": ".config/.eslintrc.cjs"
+},
+```
+
 ### Build and Deploy to Firebase
 
-> Note: You shouldn't do this directly. Push to `main` and GitHub Actions will take care of it.
+> Note: Do not deploy directly, since that will expose your private development API key. Instead, push to `main` and GitHub Actions will take care of it.
 
 ```sh
 firebase login
-npm run deploy
+npm run build
+firebase deploy --project rechess-web
 ```
 
 ---
 
 ## About the license 📜
 
-All files in this repository are licensed under the [MIT License](LICENSE). However, the `protochess-engine` submodule is licensed under the [GNU General Public License v3.0](https://github.com/p-rivero/protochess-engine/blob/master/LICENSE), since it's a fork of [raytran/protochess](https://github.com/raytran/protochess) (which is licensed under the GPL v3.0).
+All files in this repository (submodules not included) are licensed under the [MIT License](LICENSE). The `protochess-engine` and `chessgroundx` submodules are licensed under the [GNU General Public License v3.0](https://github.com/p-rivero/protochess-engine/blob/master/LICENSE), since those are forks of [raytran/protochess](https://github.com/raytran/protochess) and [gbtami/chessgroundx](https://github.com/gbtami/chessgroundx) (both licensed under the GPL v3.0).
 
 This means that, technically, the project as a whole is licensed under the GPL v3.0, but some parts (namely, the code in this repository) are licensed under the MIT License, which is [GPL-compatible](https://www.gnu.org/licenses/license-list.en.html#Expat). See [this document](https://softwarefreedom.org/resources/2007/gpl-non-gpl-collaboration.html) for more information.
 
-You are free to use the files in this repository under the terms of the MIT License, but if you also clone and use the `protochess-engine` submodule, you must comply with the terms of the GPL v3.0.
+You are free to use the files in this repository under the terms of the MIT License, but if you also clone and use the `protochess-engine` submodule or the `chessgroundx` submodule, you must comply with the terms of the GPL v3.0.
