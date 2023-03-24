@@ -6,9 +6,8 @@ import type { Timestamp } from '@firebase/firestore'
 
 export class User {
   public readonly uid: string
-  public readonly displayName: string
   public readonly username: string
-  public readonly name?: string
+  public name?: string
   public about: string
   public readonly profileImg?: string
   public readonly numWins: number
@@ -25,8 +24,10 @@ export class User {
     this.profileImg = profileImg
     this.numWins = doc.IMMUTABLE.numWins
     this.renameAllowedAt = doc.IMMUTABLE.renameAllowedAt
-    
-    this.displayName = name ?? `@${this.username}`
+  }
+  
+  public get displayName(): string {
+    return this.name ?? `@${this.username}`
   }
 }
 
@@ -60,7 +61,7 @@ export const useUserStore = defineStore('user', () => {
   // Store a user in the database
   async function storeUser(user: User): Promise<void> {
     const doc: UserDoc = {
-      name: user.name ?? null,
+      name: user.name || null, // undefined | "" -> null
       about: user.about,
       profileImg: user.profileImg ?? null,
       IMMUTABLE: {

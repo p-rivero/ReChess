@@ -53,5 +53,5 @@ export async function getUserById(uid: string): Promise<UserDoc | undefined> {
 
 // Store a user in the database
 export async function updateUser(uid: string, user: UserDoc): Promise<void> {
-  setDoc(doc(db, 'users', uid), user)
+  await setDoc(doc(db, 'users', uid), user)
 }

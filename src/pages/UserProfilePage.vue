@@ -4,9 +4,16 @@
     class="columns"
   >
     <div class="column is-8">
-      <p class="is-size-2 mb-4">
-        {{ user.displayName }}
-      </p>
+      <EditableTitle
+        class="mb-5"
+        :edit-button-text="'Edit display name'"
+        :text="user.displayName ?? ''"
+        :placeholder="`@${user.username}`"
+        :editable="myProfile(user)"
+        :error-handler="errorHandler"
+        :validator="text => text.length > 50 ? 'The display name must be at most 50 characters long' : undefined"
+        @save="updateName"
+      />
       <div class="is-flex is-align-items-center mb-4">
         <div class="sz-2 icon-at color-theme" />
         <p class="is-size-5 ml-2">
@@ -80,6 +87,7 @@
   import { updateTitle } from '@/utils/web-utils'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import EditableMarkdown from '@/components/BasicWrappers/EditableMarkdown.vue'
+  import EditableTitle from '@/components/BasicWrappers/EditableTitle.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   
@@ -125,6 +133,30 @@
   }
   
   
+  async function updateName(name: string) {
+    if (!user.value) {
+      throw new Error('User is undefined')
+    }
+    const oldName = user.value.name
+    if (!name || name === `@${user.value.username}`) {
+      // No name provided, reset to default
+      user.value.name = undefined
+    } else {
+      user.value.name = name
+    }
+    try {
+      await userStore.storeUser(user.value)
+    } catch (e) {
+      console.error(e)
+      user.value.name = oldName
+      showPopup(
+        'Cannot edit display name',
+        'To prevent spam, you can only change your display name once every 60 minutes. Please try again later.',
+        'ok'
+      )
+    }
+  }
+  
   async function resetPassword() {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to reset password')
@@ -135,7 +167,7 @@
       showPopup('Change password', `We have sent ${authStore.loggedUser.email} an email to reset your password.`, 'ok')
     } catch (e) {
       console.error(e)
-      showPopup('Unable to change password at the moment', 'Please try again later.', 'ok')
+      showPopup('Cannot change password at the moment', 'Please try again later.', 'ok')
     }
     sendingResetPasswordEmail.value = false
   }

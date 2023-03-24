@@ -18,7 +18,7 @@ export default async function renameUser(
   change: Change<QueryDocumentSnapshot>,
   context: EventContext<{ userId: string }>
 ): Promise<void> {
-  const TIMEOUT_SECONDS = 3600 * 24 // 1 day
+  const TIMEOUT_SECONDS = 3600 // 1 hour
   
   const admin = await useAdmin()
   const db = admin.firestore()
@@ -38,7 +38,7 @@ export default async function renameUser(
   const timeoutDate = new Date(timeout)
   const timeoutTimestamp = Timestamp.fromDate(timeoutDate)
   // This will trigger renameUser again, but the name won't have changed
-  db.collection('users').doc(userId).update({ renameAllowedAt: timeoutTimestamp })
+  db.collection('users').doc(userId).update({ "IMMUTABLE.renameAllowedAt": timeoutTimestamp })
 }
 
 

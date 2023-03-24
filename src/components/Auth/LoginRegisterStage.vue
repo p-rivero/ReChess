@@ -215,7 +215,6 @@
     callbacks: {
       signInSuccessWithAuthResult: (authResult: UserCredential) => {
         loading.value = true
-        console.log('User updated', authResult)
         authStore.updateUser(authResult.user).then(async () => {
           const user = await UserDB.getUserById(authResult.user.uid)
           if (user) {
