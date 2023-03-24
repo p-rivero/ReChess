@@ -107,8 +107,8 @@
   function hideCreateHint() {
     showPopup(
       'This hint won\'t be shown again',
-      'You can always create a new variant from scratch by clicking the "Create" button\
-        in the top navigation bar. You can also use any existing variant as a template to create your own.',
+      'You can always create a new variant from scratch by clicking the **Create** button in the top navigation bar. \
+      \n\nYou can also use any existing variant as a template to create your own.',
       'ok-cancel',
       draftStore.hideCreateHint
     )

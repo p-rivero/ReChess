@@ -125,6 +125,22 @@
 }
 
 
+/* chevron-down.svg */
+.icon-chevron-down {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/chevron-down.svg");
+  mask-image: url("@/assets/img/icons/chevron-down.svg");
+}
+
+
+/* chevron-up.svg */
+.icon-chevron-up {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/chevron-up.svg");
+  mask-image: url("@/assets/img/icons/chevron-up.svg");
+}
+
+
 /* cpu.svg */
 .icon-cpu {
   @extend .icon-common;

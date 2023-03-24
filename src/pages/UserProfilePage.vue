@@ -72,6 +72,37 @@
         <div class="sz-icon icon-logout color-white" />
         Sign out
       </button>
+      
+      <div
+        v-show="myProfile(user)"
+        class="is-flex"
+      >
+        <div
+          class="is-flex is-align-items-center mt-6 px-1 py-2 is-clickable"
+          @click="showDangerZone = !showDangerZone"
+        >
+          <p class="has-text-danger unselectable">
+            Danger zone
+          </p>
+          <div
+            class="ml-1 sz-chevron color-danger"
+            :class="{ 'icon-chevron-down': !showDangerZone, 'icon-chevron-up': showDangerZone }"
+          />
+        </div>
+      </div>
+      
+      <div
+        v-show="showDangerZone && myProfile(user)"
+        class="mt-2 danger-zone-container"
+      >
+        <button
+          class="button is-danger"
+          @click="deleteAccount"
+        >
+          <div class="sz-icon icon-trash color-white" />
+          Delete account
+        </button>
+      </div>
     </div>
     <div class="column is-4" />
   </div>
@@ -98,6 +129,7 @@
   
   const user = ref<User | AuthUser>()
   const hasError = ref(false)
+  const showDangerZone = ref(false)
   const sendingResetPasswordEmail = ref(false)
   
   const errorHandler = new ErrorMessageHandler(hasError)
@@ -151,9 +183,49 @@
       user.value.name = oldName
       showPopup(
         'Cannot edit display name',
-        'To prevent spam, you can only change your display name once every 60 minutes. Please try again later.',
+        'To prevent spam, you can only change your display name once every **60 minutes**. Please try again later.',
         'ok'
       )
+    }
+  }
+  
+  async function deleteAccount() {
+    showPopup(
+      'Delete account',
+      '**Your profile data will be deleted immediately, this action cannot be undone.** \
+      \n\nThe variants you have created will still be available for other players, but your name will \
+      be removed from them (anonymous author). \
+      \n\nYour username `' + authStore.loggedUser?.username + '` will become available for anyone to use. \
+      \n\nAre you sure you want to delete your account?',
+      'yes-no',
+      deleteAccountConfirmed
+    )
+  }
+  async function deleteAccountConfirmed() {
+    try {
+      await authStore.deleteUser()
+      router.push({ name: 'home' })
+      showPopup(
+        'Account deleted',
+        'Your account has been deleted successfully. We are sorry to see you go! \
+        \n\nIf you have any feedback, please [open an issue on GitHub](https://github.com/p-rivero/ReChess/issues).',
+        'ok'
+      )
+    } catch (e) {
+      console.error(e)
+      showPopup(
+        'Account deletion failed',
+        'This usually happens because it\'s been a long time since you last logged in. \
+        \n\nPlease sign out and in again, and try again. If the problem persists, please \
+        [open an issue on GitHub](https://github.com/p-rivero/ReChess/issues). \
+        \n\nDo you want to log out now?',
+        'yes-no',
+        async () => {
+          await authStore.signOut()
+          router.push({ name: 'home' })
+        }
+      )
+      return
     }
   }
   
@@ -183,7 +255,14 @@
 
 
 <style scoped lang="scss">
-  .about-container{
-    min-height: 5rem;
+  @import '@/assets/style/variables.scss';
+  .sz-chevron{
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .danger-zone-container{
+    border-left: 1px solid $danger;
+    border-width: 0.2rem;
+    padding: 1rem;
   }
 </style>

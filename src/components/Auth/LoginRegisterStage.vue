@@ -350,10 +350,10 @@
     resetPasswordHint.value = 'sending'
     try {
       await authStore.sendPasswordResetEmail(email.value)
-      showPopup('Reset password', `We have sent ${email.value} an email to reset your password.`, 'ok')
+      showPopup('Reset password', `We have sent \`${email.value}\` an email to reset your password.`, 'ok')
     } catch (e) {
       console.error(e)
-      showPopup('Reset password', `Could not send email to ${email.value}. Make sure the address is correct.`, 'ok')
+      showPopup('Reset password', `Could not send email to \`${email.value}\`. Make sure the address is correct.`, 'ok')
     }
     resetPasswordHint.value = 'hidden'
   }

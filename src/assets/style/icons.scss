@@ -18,6 +18,9 @@
 .color-theme {
     background-color: $text;
 }
+.color-danger {
+    background-color: $danger;
+}
 
 button:focus .color-theme {
     background-color: $link-focus;

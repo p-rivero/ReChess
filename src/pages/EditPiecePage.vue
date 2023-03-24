@@ -418,7 +418,10 @@
   function imageUploadFailed() {
     showPopup(
       'Could not upload image',
-      'Make sure you uploaded a valid image file. Keep in mind that the maximum upload size is 200kB, so SVG files are recommended.',
+      'Make sure you uploaded a valid image file and the file size is **200kB** or less. \
+      \n\nFor the best visual results, I recommend using SVG files. You can use a \
+      [free online SVG converter](https://www.pngtosvg.com/) to convert your image. \
+      \n\n> Keep in mind that, for very complex images, the SVG file could be larger than the original.',
       'ok'
     )
   }

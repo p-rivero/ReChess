@@ -144,6 +144,12 @@ export const useAuthStore = defineStore('auth-user', () => {
     await auth.signOut()
   }
   
+  // Removes the user auth. This triggers a cloud function that deletes the user documents.
+  async function deleteUser(): Promise<void> {
+    if (!auth.currentUser) throw new Error('User is not logged in')
+    await auth.currentUser.delete()
+  }
+  
   async function sendEmailVerification() {
     if (!auth.currentUser) throw new Error('User is not logged in')
     await fb.sendEmailVerification(auth.currentUser, {
@@ -172,7 +178,7 @@ export const useAuthStore = defineStore('auth-user', () => {
   }
 
   return {
-    emailLogIn, emailRegister, thirdPartyRegister, signOut,
+    emailLogIn, emailRegister, thirdPartyRegister, signOut, deleteUser,
     sendEmailVerification, sendPasswordResetEmail, getProvider, checkUsername, updateUser,
     loggedUser,
   }

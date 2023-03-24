@@ -18,8 +18,8 @@
           @click="cancel"
         />
       </header>
-      <section class="modal-card-body">
-        {{ messageText }}
+      <section class="modal-card-body content mb-0">
+        <VueMarkdown :source="messageText" />
       </section>
       <footer class="modal-card-foot">
         <button
@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
+  import VueMarkdown from 'vue-markdown-render'
   
   const popup = ref<HTMLElement>()
   const titleText = ref('')

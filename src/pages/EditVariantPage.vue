@@ -305,7 +305,7 @@
   function createNewPiece() {
     // Limit to 26 pieces for now, since IDs are internally encoded as a single lowercase letter
     if (draftStore.state.pieceTypes.length >= 26) {
-      showPopup('Cannot add new piece', 'For now, the maximum number of pieces is 26.', 'ok')
+      showPopup('Cannot add new piece', 'For now, the maximum number of pieces is **26**.', 'ok')
       return
     }
     draftStore.addPiece()
@@ -345,7 +345,7 @@
     if (success) router.go(0)
     else showPopup(
       'Could not import file',
-      'Make sure that the file is a .json with the correct format',
+      'Make sure that the file is a `.json` with the correct format.',
       'ok'
     )
   }
@@ -362,7 +362,8 @@
         if (id) router.push({ name: 'variant-details', params: { variantId: id } })
         else showPopup(
           'Could not publish variant',
-          'Please try again later. If the problem persists, back up your variant and open an issue in GitHub.',
+          'Please try again later. If the problem persists, back up your variant and \
+          [open an issue on GitHub](https://github.com/p-rivero/ReChess/issues).',
           'ok'
         )
       }
