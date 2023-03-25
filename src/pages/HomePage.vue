@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-  import VariantList from '@/components/ViewVariant/VariantList.vue'
+  import VariantList from '@/components/Variant/View/VariantList.vue'
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import { onMounted } from 'vue'
   import { updateTitle } from '@/utils/web-utils'

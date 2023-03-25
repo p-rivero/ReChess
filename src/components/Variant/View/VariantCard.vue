@@ -62,7 +62,7 @@
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
-  import UpvoteButton from '@/components/ViewVariant/UpvoteButton.vue'
+  import UpvoteButton from '@/components/Variant/View/UpvoteButton.vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { useVariantDraftStore } from '@/stores/variant-draft'

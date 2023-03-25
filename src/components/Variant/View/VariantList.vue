@@ -15,7 +15,7 @@
 <script setup lang="ts">
   import { useVariantStore } from '@/stores/variant'
   import { useAuthStore } from '@/stores/auth-user'
-  import VariantCard from '@/components/ViewVariant/VariantCard.vue'
+  import VariantCard from '@/components/Variant/View/VariantCard.vue'
   import DraftCard from './DraftCard.vue'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'

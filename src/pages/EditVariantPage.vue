@@ -245,7 +245,7 @@
 
 <script setup lang="ts">
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
-  import PiecesSummary from '@/components/EditVariant/PiecesSummary.vue'
+  import PiecesSummary from '@/components/Variant/PiecesSummary.vue'
   import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'
   import SmartNumberInput from '@/components/BasicWrappers/SmartNumberInput.vue'
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
@@ -254,8 +254,8 @@
   import EditableMarkdown from '@/components/BasicWrappers/EditableMarkdown.vue'
   import PopupOverlay from '@/components/PopupMsg/PopupOverlay.vue'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
-  import PiecePlacementButtons from '@/components/EditVariant/PiecePlacementButtons.vue'
-  import { checkState } from '@/components/EditVariant/check-state'
+  import PiecePlacementButtons from '@/components/Variant/Edit/PiecePlacementButtons.vue'
+  import { checkState } from '@/components/Variant/Edit/check-state'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { onMounted, ref, watch } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'

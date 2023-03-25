@@ -66,7 +66,7 @@ export const useAuthStore = defineStore('auth-user', () => {
     
     // If the user has just verified their email, the popup may already be showing.
     // If needed, hide it.
-    if (loggedUser.value?.verified) {
+    if (user && loggedUser.value?.verified) {
       hideSignInPopup()
     }
   }
