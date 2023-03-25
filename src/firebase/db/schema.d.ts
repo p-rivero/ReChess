@@ -57,6 +57,14 @@ export interface VariantUpvotesDoc {
   numUpvotes: number
 }
 
+// variantIndex/doc
+export interface VariantIndexDoc {
+  // Read-only summary of all variants, in a single document
+  // Each line (NL separated) is a variant with the following format:
+  // `${variantId}\t${name}\t${description[0:100]}`
+  index: string
+}
+
 
 // games/{gameId}
 export interface GameDoc {

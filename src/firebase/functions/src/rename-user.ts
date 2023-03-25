@@ -10,8 +10,8 @@ import type { UserDoc } from 'db/schema'
 /**
  * Called when a user document changes. Checks if the name has changed and,
  * if so, updates the name also in the denormalized fields.
- * @param {Change<QueryDocumentSnapshot>} change The change object
- * @param {EventContext<Params>} context The event context
+ * @param {Change<QueryDocumentSnapshot>} change The cloud function change object
+ * @param {EventContext<Params>} context The cloud function event context
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function renameUser(

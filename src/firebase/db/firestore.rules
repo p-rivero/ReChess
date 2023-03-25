@@ -250,5 +250,10 @@ service cloud.firestore {
       }
     }
     
+    // Read-only access to variantIndex
+    match /variantIndex/{doc} {
+      allow read;
+      allow write: if false;
+    }
   }
 }

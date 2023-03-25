@@ -16,7 +16,14 @@ export const deleteUser =
   region('europe-west1')
     .auth
     .user()
-    .onDelete((user) => {
+    .onDelete(user => {
       return callFunction(import('./delete-user'), user)
     })
-  
+
+export const updateVariantIndex =
+  region('europe-west1')
+    .firestore
+    .document('variants/{variantId}')
+    .onCreate(snap => {
+      return callFunction(import('./update-variant-index'), snap)
+    })

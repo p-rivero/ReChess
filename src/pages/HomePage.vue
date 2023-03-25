@@ -6,6 +6,7 @@
           <SmartTextInput
             class="is-medium"
             placeholder="Search variants..."
+            @changed="search"
           />
           <span class="icon is-small is-left px-3 py-3">
             <div class="icon-search color-theme" />
@@ -22,7 +23,13 @@
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import { onMounted } from 'vue'
   import { updateTitle } from '@/utils/web-utils'
+  import { searchVariants } from '@/utils/chess/variant-search'
+  
   onMounted(() => updateTitle())
+  
+  async function search(text: string) {
+    console.log(await searchVariants(text))
+  }
 </script>
 
 <style lang="scss" scoped>

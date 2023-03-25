@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import type { UserUpvotesDoc, VariantDoc, VariantUpvotesDoc } from '@/firebase/db/schema'
+import type { UserUpvotesDoc, VariantDoc, VariantIndexDoc, VariantUpvotesDoc } from '@/firebase/db/schema'
 import type { Variant } from '@/protochess/types'
 
 import { collection, addDoc, getDoc, doc, getDocs, setDoc, deleteDoc, writeBatch, increment, serverTimestamp } from 'firebase/firestore'
@@ -12,7 +12,7 @@ export async function createVariant(userId: string, displayName: string, variant
   // Create the variant document
   const document: VariantDoc = {
     // May not match the initial state. When fetching the state, the name and description are overwritten with this fields
-    name: variant.displayName,
+    name: variant.displayName.trim(),
     description: variant.description,
     IMMUTABLE: {
       creatorDisplayName: displayName,
@@ -32,6 +32,13 @@ export async function createVariant(userId: string, displayName: string, variant
     throw error
   }
   return variantId
+}
+
+// Fetches the variant index from the database
+export async function getVariantIndex(): Promise<VariantIndexDoc> {
+  const document = await getDoc(doc(db, 'variantIndex', 'doc'))
+  if (!document.exists()) throw new Error('Variant index does not exist.')
+  return document.data() as VariantIndexDoc
 }
 
 // id -> VariantDoc
