@@ -56,9 +56,18 @@
     // Generate a file name for the image, based on its SHA-256 hash
     const hash = await hashBlob(file)
     const filePath = `piece-images/${hash}`
+    
     try {
+      // First check if the image already exists
+      const existingUrl = await getUrl(filePath)
+      if (existingUrl) {
+        emit('image-changed', existingUrl)
+        return
+      }
+      // Otherwise, upload the image
       await uploadBlob(file, filePath)
       const url = await getUrl(filePath)
+      if (!url) throw new Error('Failed to get URL for image that was just uploaded')
       emit('image-changed', url)
     } catch (e) {
       error.value = true

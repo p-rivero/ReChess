@@ -5,25 +5,33 @@ import { callFunction } from './helpers'
 // (dynamic imoprts are only loaded once per process, not on each function call)
 
 export const renameUser =
-  region('europe-west1')
-    .firestore
-    .document('users/{userId}')
-    .onUpdate((change, context) => {
-      return callFunction(import('./rename-user'), change, context)
-    })
+region('europe-west1')
+.firestore
+.document('users/{userId}')
+.onUpdate((change, context) => {
+  return callFunction(import('./rename-user'), change, context)
+})
 
 export const deleteUser =
-  region('europe-west1')
-    .auth
-    .user()
-    .onDelete(user => {
-      return callFunction(import('./delete-user'), user)
-    })
+region('europe-west1')
+.auth
+.user()
+.onDelete(user => {
+  return callFunction(import('./delete-user'), user)
+})
 
 export const updateVariantIndex =
-  region('europe-west1')
-    .firestore
-    .document('variants/{variantId}')
-    .onCreate(snap => {
-      return callFunction(import('./update-variant-index'), snap)
-    })
+region('europe-west1')
+.firestore
+.document('variants/{variantId}')
+.onCreate(snap => {
+  return callFunction(import('./update-variant-index'), snap)
+})
+
+export const checkPieceHash =
+region('europe-west1')
+.storage
+.object()
+.onFinalize(async object => {
+  return callFunction(import('./check-piece-hash'), object)
+})

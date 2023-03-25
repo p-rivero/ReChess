@@ -15,11 +15,23 @@ function isImage() {
 
 service firebase.storage {
   match /b/{bucket}/o {
-    match /piece-images/{pieceId} {
+    match /piece-images/{imageName} {
+      // Anyone can see the images
       allow read;
-      allow create, update: if authMetadata() && sizeKb(200) && isImage();
-      // Cannot delete a created image, since other variants may reference it.
-      allow delete: if false;
+      
+      // Only allow uploading images of 200 KiB or less.
+      // The client sets the file name to the SHA-256 hash of the file contents, so
+      // collisions are very unlikely.
+      // Storage rules seems to be unable to access the file's bytes, so we can't
+      // check the hash here. See the checkPieceHash cloud function for that.
+      allow create: if
+        authMetadata() &&
+        sizeKb(200) &&
+        isImage() &&
+        resource == null;
+        
+      // Cannot edit the metadata of an image or delete it, since other variants may reference it.
+      allow update, delete: if false;
     }
   }
 }
