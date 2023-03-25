@@ -7,11 +7,12 @@ import type { Timestamp } from '@firebase/firestore'
 export class User {
   public readonly uid: string
   public readonly username: string
+  public readonly numWins: number
   public name?: string
   public about: string
-  public readonly profileImg?: string
-  public readonly numWins: number
+  public profileImg?: string
   public renameAllowedAt: Timestamp | null
+  public displayName: string
   
   constructor(id: string, doc: UserDoc) {
     const name = doc.name ?? undefined // null -> undefined
@@ -24,10 +25,12 @@ export class User {
     this.profileImg = profileImg
     this.numWins = doc.IMMUTABLE.numWins
     this.renameAllowedAt = doc.IMMUTABLE.renameAllowedAt
+    
+    this.displayName = this.name ?? `@${this.username}`
   }
   
-  public get displayName(): string {
-    return this.name ?? `@${this.username}`
+  public updateDisplayName() {
+    this.displayName = this.name ?? `@${this.username}`
   }
 }
 

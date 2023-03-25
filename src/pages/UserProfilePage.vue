@@ -196,8 +196,12 @@
     } else {
       user.value.name = name
     }
+    user.value.updateDisplayName()
+    
     try {
       await userStore.storeUser(user.value)
+      // Update the timestamp to prevent 2 consecutive edits
+      user.value.renameAllowedAt = Timestamp.fromMillis(Date.now() + 30 * 60 * 1000)
     } catch (e) {
       console.error(e)
       user.value.name = oldName
@@ -207,8 +211,6 @@
         'ok'
       )
     }
-    // Update the timestamp to prevent 2 consecutive edits
-    user.value.renameAllowedAt = Timestamp.fromMillis(Date.now() + 30 * 60 * 1000)
   }
   
   async function deleteAccount() {

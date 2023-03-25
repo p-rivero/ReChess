@@ -143,6 +143,10 @@ export const useAuthStore = defineStore('auth-user', () => {
       console.error('Failed to create user in database', e)
       throw new RechessError('CANNOT_CREATE_USER')
     }
+    // If this provider is not trusted, send an email verification
+    if (!auth.currentUser.emailVerified) {
+      await sendEmailVerification()
+    }
   }
   
   
