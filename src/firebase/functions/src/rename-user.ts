@@ -18,7 +18,7 @@ export default async function renameUser(
   change: Change<QueryDocumentSnapshot>,
   context: EventContext<{ userId: string }>
 ): Promise<void> {
-  const TIMEOUT_SECONDS = 3600 // 1 hour
+  const TIMEOUT_SECONDS = 30 * 60 // 30 minutes
   
   const admin = await useAdmin()
   const db = admin.firestore()

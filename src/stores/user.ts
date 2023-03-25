@@ -11,7 +11,7 @@ export class User {
   public about: string
   public readonly profileImg?: string
   public readonly numWins: number
-  public readonly renameAllowedAt: Timestamp | null
+  public renameAllowedAt: Timestamp | null
   
   constructor(id: string, doc: UserDoc) {
     const name = doc.name ?? undefined // null -> undefined

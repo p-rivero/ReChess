@@ -10,6 +10,7 @@
         :text="user.displayName ?? ''"
         :placeholder="`@${user.username}`"
         :editable="myProfile(user)"
+        :start-edit-callback="startNameEdit"
         :error-handler="errorHandler"
         :validator="text => text.length > 50 ? 'The display name must be at most 50 characters long' : undefined"
         @save="updateName"
@@ -121,6 +122,7 @@
   import EditableTitle from '@/components/BasicWrappers/EditableTitle.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import { Timestamp } from '@firebase/firestore'
   
   const router = useRouter()
   const route = useRoute()
@@ -164,6 +166,24 @@
     return user.uid === authStore.loggedUser?.uid
   }
   
+  function startNameEdit(): boolean {
+    if (!user.value) {
+      throw new Error('User is undefined')
+    }
+    if (!user.value.renameAllowedAt) {
+      // User has never changed their name, continue with the edit
+      return true
+    }
+    if (Date.now() < user.value.renameAllowedAt.toMillis()) {
+      showPopup(
+        'Cannot edit display name',
+        'To prevent spam, you can only change your display name once every **30 minutes**. Please try again later.',
+        'ok'
+      )
+      return false
+    }
+    return true
+  }
   
   async function updateName(name: string) {
     if (!user.value) {
@@ -183,10 +203,12 @@
       user.value.name = oldName
       showPopup(
         'Cannot edit display name',
-        'To prevent spam, you can only change your display name once every **60 minutes**. Please try again later.',
+        'There has been an unexpected error. Please try again later.',
         'ok'
       )
     }
+    // Update the timestamp to prevent 2 consecutive edits
+    user.value.renameAllowedAt = Timestamp.fromMillis(Date.now() + 30 * 60 * 1000)
   }
   
   async function deleteAccount() {

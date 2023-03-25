@@ -59,6 +59,7 @@
     placeholder?: string
     editable: boolean
     validator?: (text: string) => string | undefined
+    startEditCallback?: () => boolean
     errorHandler?: ErrorMessageHandler
   }>()
   
@@ -82,7 +83,12 @@
   }
   
   function toggleEdit(setEditing: boolean) {
-    if (!textInput.value) throw new Error('TextInput not defined')
+    if (!textInput.value) {
+      throw new Error('TextInput not defined')
+    }
+    if (props.startEditCallback && !props.startEditCallback()) {
+      return
+    }
     currentText.value = props.text === props.placeholder ? '' : props.text
     textInput.value.setText(currentText.value)
     editing.value = setEditing
