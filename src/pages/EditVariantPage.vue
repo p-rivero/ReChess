@@ -413,7 +413,8 @@
   }
   
   .board-container {
-    height: 31rem;
+    // 32rem - 0.75rem (border) * 2
+    height: 30.5rem;
   }
   
   .rules-field:not(:last-child) {

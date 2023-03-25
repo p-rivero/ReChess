@@ -37,6 +37,7 @@ export default defineConfig({
           'firebaseFirestore': ['firebase/firestore'],
           'firebaseStorage': ['firebase/storage'],
           'firebasePerformance': ['firebase/performance'],
+          'fuse': ['fuse.js'],
         }
       }
     },
