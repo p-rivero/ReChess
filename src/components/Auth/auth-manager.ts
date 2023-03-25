@@ -56,6 +56,13 @@ export function checkEmailVerified(): boolean {
   return false
 }
 
+export function hideSignInPopup() {
+  if (!signInPopup) throw new Error('Sign in popup not set')
+  if (!signInPopup.value) throw new Error('Sign in popup not initialized')
+  signInPopup.value.hide()
+}
+
+
 function showPopup(stage: 'loginRegister'|'chooseUsername'|'verifyEmail') {
   if (!signInPopup) throw new Error('Sign in popup not set')
   if (!signInPopup.value) throw new Error('Sign in popup not initialized')

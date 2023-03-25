@@ -65,11 +65,9 @@ export async function getUrl(filePath: string): Promise<string | undefined> {
   const fileRef = ref(storage, filePath)
   try {
     const url = await getDownloadURL(fileRef)
-    console.log(`File found: ${filePath}`)
     return url
   } catch (error) {
     if (error instanceof FirebaseError && error.code === 'storage/object-not-found') {
-      console.warn(`File not found: ${filePath}`)
       return undefined
     }
     throw error

@@ -15,7 +15,6 @@ export async function useAdmin(): Promise<typeof admin> {
   // See https://youtu.be/v3eG9xpzNXM
   const admin = await import('firebase-admin')
   if (!adminInitialized) {
-    console.log('Initializing admin SDK')
     admin.initializeApp()
     adminInitialized = true
   }

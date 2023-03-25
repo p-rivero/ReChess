@@ -10,6 +10,7 @@ import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
 import * as fb from 'firebase/auth'
 import { FirebaseError } from '@firebase/util'
 import type { UserDoc } from '@/firebase/db/schema'
+import { hideSignInPopup } from '@/components/Auth/auth-manager'
 
 const AUTH_USER_KEY = 'loggedUser'
 
@@ -62,6 +63,12 @@ export const useAuthStore = defineStore('auth-user', () => {
     // We need to fetch the user fields (username, about) from the database
     const user = await UserDB.getUserById(newUser.uid)
     persistUser(new AuthUser(newUser, user))
+    
+    // If the user has just verified their email, the popup may already be showing.
+    // If needed, hide it.
+    if (loggedUser.value?.verified) {
+      hideSignInPopup()
+    }
   }
   
   function persistUser(user: AuthUser|null) {
