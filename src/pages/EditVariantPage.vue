@@ -18,7 +18,7 @@
         />
       </div>
       
-      <div class="horizontal-field">
+      <div class="is-flex is-align-items-center mb-4">
         <div class="field-label">
           <label>Board size:</label>
         </div>
@@ -43,7 +43,7 @@
         />
       </div>
       
-      <div class="horizontal-field">
+      <div class="is-flex is-align-items-center mb-4">
         <div class="field-label">
           <label>First player to move:</label>
         </div>
@@ -56,7 +56,7 @@
         </div>
       </div>
       
-      <div class="field">
+      <div class="field mb-6">
         <label class="label">Place piece:</label>
         <PiecePlacementButtons
           ref="pieceSelector"
@@ -67,55 +67,66 @@
           @piece-deselected="selectedPieceId = 'none'"
         />
       </div>
-      <br>
       
       <SmartErrorMessage
         v-show="hasError"
         class="my-4"
         :handler="errorMsgHandler"
       />
-      <button
-        class="button bottom-button"
-        :disabled="hasError || loading"
-        @click="$router.push({name: 'analysis'})"
-      >
-        <div class="sz-icon icon-analysis color-theme" />
-        <span>Analysis board</span>
-      </button>
-      <button
-        class="button bottom-button"
-        :disabled="hasError || loading"
-        @click="playPopup?.show()"
-      >
-        <div class="sz-icon icon-cpu color-theme" />
-        <span>Play vs. engine</span>
-      </button>
-      <br>
-      <button
-        class="button is-primary bottom-button"
-        :disabled="hasError || loading"
-        @click="publish"
-      >
-        <div class="sz-icon icon-rocket color-white" />
-        <span>Publish variant</span>
-      </button>
-      <br>
-      <br>
-      <button
-        class="button bottom-button"
-        @click="draftStore.backupFile"
-      >
-        <div class="sz-icon icon-download color-theme" />
-        <span>Back up</span>
-      </button>
-      <button
-        class="button bottom-button"
-        @click="uploadFile"
-      >
-        <div class="sz-icon icon-upload color-theme" />
-        <span>Upload</span>
-      </button>
-      <br>
+      <div class="columns">
+        <div class="column pb-1 pr-2">
+          <button
+            class="button is-fullwidth"
+            :disabled="hasError || loading"
+            @click="$router.push({name: 'analysis'})"
+          >
+            <div class="sz-icon icon-analysis color-theme" />
+            <span>Analysis board</span>
+          </button>
+        </div>
+        <div class="column pb-1 pl-2">
+          <button
+            class="button is-fullwidth"
+            :disabled="hasError || loading"
+            @click="playPopup?.show()"
+          >
+            <div class="sz-icon icon-cpu color-theme" />
+            <span>Play vs. engine</span>
+          </button>
+        </div>
+      </div>
+      <div class="columns mb-5">
+        <div class="column is-6 pr-2">
+          <button
+            class="button is-primary is-fullwidth"
+            :disabled="hasError || loading"
+            @click="publish"
+          >
+            <div class="sz-icon icon-rocket color-white" />
+            <span>Publish variant</span>
+          </button>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column pb-1 pr-2">
+          <button
+            class="button is-fullwidth"
+            @click="draftStore.backupFile"
+          >
+            <div class="sz-icon icon-download color-theme" />
+            <span>Back up</span>
+          </button>
+        </div>
+        <div class="column pl-2">
+          <button
+            class="button is-fullwidth"
+            @click="uploadFile"
+          >
+            <div class="sz-icon icon-upload color-theme" />
+            <span>Upload</span>
+          </button>
+        </div>
+      </div>
       <p>* Your draft is saved automatically, you can close this page and come back later to continue editing.</p>
     </div>
     
@@ -123,7 +134,7 @@
     
     <div class="column">
       <SmartTextInput
-        class="is-large"
+        class="is-large mb-5"
         placeholder="Variant name"
         :start-text="draftStore.state.displayName"
         :validator="(text) => {
@@ -135,8 +146,6 @@
         :error-handler="errorMsgHandler"
         @changed="name => draftStore.state.displayName = name"
       />
-      <br>
-      <br>
       <EditableMarkdown
         class="mb-5"
         :text="draftStore.state.description"
@@ -149,14 +158,13 @@
       
       <label class="label">Rules:</label>
       <div class="columns is-mobile">
-        <div class="column ">
+        <div class="column">
           <SmartCheckbox
             text="Capturing is forced"
             class="rules-field"
             :start-value="draftStore.state.globalRules.capturingIsForced"
             @changed="value => draftStore.state.globalRules.capturingIsForced = value"
           />
-          <br>
           <SmartCheckbox
             text="Check is forbidden"
             class="rules-field"
@@ -175,7 +183,6 @@
             :start-value="draftStore.state.globalRules.stalematedPlayerLoses"
             @changed="value => draftStore.state.globalRules.stalematedPlayerLoses = value"
           />
-          <br>
           <SmartCheckbox
             text="Invert ALL win conditions"
             class="rules-field"
@@ -184,7 +191,7 @@
           />
         </div>
       </div>
-      <div class="horizontal-field">
+      <div class="is-flex is-align-items-center mb-4">
         <div class="field-label">
           <label>Repetitions for draw:</label>
         </div>
@@ -197,7 +204,7 @@
           @changed="value => draftStore.state.globalRules.repetitionsDraw = value"
         />
       </div>
-      <div class="horizontal-field">
+      <div class="is-flex is-align-items-center mb-6">
         <div class="field-label">
           <label>Lose when put in check</label>
         </div>
@@ -216,7 +223,6 @@
           <label>times</label>
         </div>
       </div>
-      <br>
       <label class="label">Pieces:</label>
       <PiecesSummary
         :editable="true"
@@ -406,20 +412,8 @@
     margin-right: 0;
   }
   
-  .horizontal-field {
-    display: flex;
-    margin-bottom: 1rem;
-    align-items: center;
-  }
-  
   .board-container {
     height: 31rem;
-  }
-  
-  .bottom-button {
-    width: 45%;
-    margin-bottom: 0.5rem;
-    margin-right: 0.5rem;
   }
   
   .rules-field:not(:last-child) {

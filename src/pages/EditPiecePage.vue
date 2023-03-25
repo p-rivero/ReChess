@@ -10,32 +10,37 @@
       <div class="is-flex is-justify-content-center mb-4">
         <PieceViewerWithZoom
           v-if="piece"
+          class="mb-5"
           :piece="piece"
           style="z-index: 11;"
           @clicked="editDelta"
         />
       </div>
       
-      <br>
       <SmartErrorMessage
         v-show="hasError"
         class="mb-4"
         :handler="errorMsgHandler"
       />
-      <button
-        class="button is-primary bottom-button"
-        @click="$router.push({name: 'edit-variant'})"
-      >
-        <div class="sz-icon icon-check color-white" />
-        <span>Done</span>
-      </button>
+      
+      <div class="columns mb-5">
+        <div class="column is-6 pr-2">
+          <button
+            class="button is-primary is-fullwidth"
+            @click="$router.push({name: 'edit-variant'})"
+          >
+            <div class="sz-icon icon-check color-white" />
+            <span>Done</span>
+          </button>
+        </div>
+      </div>
     </div>
     
     
     
     <div class="column">
       <SmartTextInput
-        class="is-large"
+        class="is-large mb-5"
         placeholder="Piece name"
         :start-text="piece?.displayName"
         :error-handler="errorMsgHandler"
@@ -47,8 +52,6 @@
         }"
         @changed="name => piece!.displayName = name"
       />
-      <br>
-      <br>
       <div class="columns">
         <div class="column">
           <div class="horizontal-field">
@@ -164,12 +167,11 @@
       <label>Win instantly when standing on:</label>
       <CoordPillList
         :editable="true"
-        class="mb-5"
+        class="mb-6"
         :allow-repeat="false"
         :starting-coords="piece?.winSquares"
         @changed="coords => piece!.winSquares = coords"
       />
-      <br>
       <label class="label">Movement:</label>
       <AddRemoveButtons
         text="Jumps:"
@@ -187,13 +189,12 @@
       <label>Double jump when standing on:</label>
       <CoordPillList
         :editable="true"
-        class="mb-5"
+        class="mb-6"
         :allow-repeat="false"
         :starting-coords="piece?.doubleJumpSquares"
         @changed="coords => piece!.doubleJumpSquares = coords"
       />
         
-      <br>
       <label class="label">Capture:</label>
       <AddRemoveButtons
         text="Jumps:"
@@ -202,25 +203,24 @@
         :selected-delta="selectedDelta"
         @update-delta="delta => selectedDelta=delta"
       />
-      <div class="mb-5">
+      <div class="mb-6">
         <MovementSlideRow
           :piece-index="pieceIndex"
           type="capture"
         />
       </div>
       
-      <br>
       <label class="label">Promote:</label>
       <label>Promote when landing on:</label>
       <CoordPillList
+        class="mb-5"
         :editable="true"
         :allow-repeat="false"
         :starting-coords="piece?.promotionSquares"
         @changed="coords => piece!.promotionSquares = coords"
       />
-      <br>
         
-      <div class="columns">
+      <div class="columns mb-6">
         <div
           v-if="!whiteInvisible"
           class="column"
@@ -248,7 +248,6 @@
         </div>
       </div>
       
-      <br>
       <label class="label">Explode:</label>
       <div class="columns">
         <div class="column ">
@@ -465,10 +464,6 @@
     display: flex;
     margin-bottom: 1rem;
     align-items: center;
-  }
-  
-  .bottom-button {
-    width: 45%;
   }
   
   .rules-field:not(:last-child) {

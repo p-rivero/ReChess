@@ -78,7 +78,7 @@
         class="is-flex"
       >
         <div
-          class="is-flex is-align-items-center mt-6 px-1 py-2 is-clickable"
+          class="is-flex is-align-items-center mt-6 pl-2 pr-1 py-2 is-clickable danger-dropdown-container"
           @click="showDangerZone = !showDangerZone"
         >
           <p class="has-text-danger unselectable">
@@ -259,6 +259,12 @@
   .sz-chevron{
     width: 1.5rem;
     height: 1.5rem;
+  }
+  .danger-dropdown-container {
+    &:hover {
+      background-color: rgba($danger, 0.1);
+      border-radius: $radius;
+    }
   }
   .danger-zone-container{
     border-left: 1px solid $danger;

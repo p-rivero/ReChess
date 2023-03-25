@@ -2,6 +2,7 @@
   <div class="w-100 h-100">
     <PieceViewer
       :key="`${width}-${height}-${position}`"
+      class="mb-4"
       :piece="piece"
       :width="width"
       :height="height"
@@ -10,7 +11,6 @@
       @clicked="delta => emit('clicked', delta)"
     />
     
-    <br>
     <label class="label">View:</label>
     <div
       v-for="(group, groupIndex) of ZOOM_BUTTONS"

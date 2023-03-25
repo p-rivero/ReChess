@@ -1,14 +1,16 @@
 <template>
-  <label class="b-checkbox checkbox">
-    <input
-      ref="checkboxInput"
-      type="checkbox"
-      value="false"
-      @change="checkboxChanged($event.target)"
-    >
-    <span class="check" />
-    <span class="control-label">{{ text }}</span>
-  </label>
+  <div>
+    <label class="b-checkbox checkbox">
+      <input
+        ref="checkboxInput"
+        type="checkbox"
+        value="false"
+        @change="checkboxChanged($event.target)"
+      >
+      <span class="check" />
+      <span class="control-label">{{ text }}</span>
+    </label>
+  </div>
 </template>
 
 <script setup lang="ts">
