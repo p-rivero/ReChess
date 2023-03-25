@@ -196,6 +196,10 @@
     } else {
       user.value.name = name
     }
+    if (user.value.name === oldName) {
+      // Name has not changed, nothing to do
+      return
+    }
     user.value.updateDisplayName()
     
     try {
@@ -239,7 +243,7 @@
       console.error(e)
       showPopup(
         'Account deletion failed',
-        'This usually happens because it\'s been a long time since you last logged in. \
+        'This usually happens because it\'s been some time since you last logged in. \
         \n\nPlease sign out and in again, and try again. If the problem persists, please \
         [open an issue on GitHub](https://github.com/p-rivero/ReChess/issues). \
         \n\nDo you want to log out now?',

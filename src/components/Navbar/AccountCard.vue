@@ -1,19 +1,20 @@
 <template>
-  <a
+  <div
     v-if="authStore.loggedUser"
     class="card-header"
+    :class="{ 'is-clickable': $route.name !== 'user-profile' }"
     @click="onAccountClick"
   >
-    <span class="card-header-icon py-0 pl-3 pr-0">
+    <div class="pl-3 pr-0 is-align-self-center">
       <div
         class="account-icon sz-2 icon-account color-theme"
         style="border-radius: 50%;"
       />
-    </span>
-    <p class="card-header-title">
+    </div>
+    <p class="card-header-title unselectable">
       {{ authStore.loggedUser.displayName }}
     </p>
-  </a>
+  </div>
   <button
     v-else
     class="button is-primary"
