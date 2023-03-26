@@ -18,6 +18,21 @@ export function debounce<T extends Function>(cb: T, wait = 20) {
   return callable as unknown as T
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function throttle<T extends Function>(cb: T, wait = 20) {
+  let inThrottle = false
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const callable = (...args: any) => {
+    if (!inThrottle) {
+      cb(...args)
+      inThrottle = true
+      setTimeout(() => inThrottle = false, wait)
+    }
+  }
+  return callable as unknown as T
+}
+
+
 // https://stackoverflow.com/questions/1068834/object-comparison-in-javascript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function object_equals(x: any, y: any) {

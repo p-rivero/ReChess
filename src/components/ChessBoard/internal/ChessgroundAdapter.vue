@@ -10,11 +10,9 @@
     <div
       ref="board"
       class="cg-board-wrap"
-      @click="e => onClick(e)"
       @mousedown="startDrag"
-      @mousemove="onDrag"
+      @mousemove="onDragThrottled"
       @mouseup="endDrag"
-      @mouseout="endDrag"
       @touchstart="onTap"
       @wheel="onWheel"
     />
@@ -29,7 +27,7 @@
   import type { Config } from 'chessgroundx/config'
   import type { DrawShape } from 'chessgroundx/draw'
   import { ref, onMounted, onUnmounted } from 'vue'
-  import { clone, debounce } from '@/utils/ts-utils'
+  import { clone, debounce, throttle } from '@/utils/ts-utils'
   
   // Map from piece id to the URL of the image to use
   export type PlayerPieceImages = [string, string][]
@@ -106,33 +104,41 @@
     return `url("${pieceUrl}")`
   }
   
-  function onClick(e: MouseEvent) {
-    emitClick([e.clientX, e.clientY])
-  }
   function onTap(e: TouchEvent) {
     const touch: Touch = e.targetTouches[0]
-    emitClick([touch.clientX, touch.clientY])
-  }
-  function emitClick(coords: [number, number]) {
-    if (chessgroundApi === undefined) throw new Error('Chessground API is not initialized')
-    let key = chessgroundApi.getKeyAtDomPos(coords)
+    const key = mouseCoordsToKey(touch.clientX, touch.clientY)
     if (key) emit('clicked', key)
   }
   
   let isDragging = false
-  let canDragAgain = true
-  function startDrag() {
+  let lastKey: cg.Key | null = null
+  function startDrag(e: MouseEvent) {
     isDragging = true
+    onDrag(e)
   }
+  
+  const onDragThrottled = throttle(onDrag, 10)
   function onDrag(e: MouseEvent) {
-    if (isDragging && canDragAgain) {
-      canDragAgain = false
-      onClick(e)
-      setTimeout(() => canDragAgain = true, 10)
+    if (!isDragging) return
+    if (e.buttons !== 1) {
+      // mouseup event is not reliable, check if the button is still pressed
+      endDrag()
+      return
+    }
+    const key = mouseCoordsToKey(e.clientX, e.clientY)
+    if (key && key !== lastKey) {
+      lastKey = key
+      emit('clicked', key)
     }
   }
   function endDrag() {
     isDragging = false
+    lastKey = null
+  }
+  
+  function mouseCoordsToKey(x: number, y: number): cg.Key | undefined {
+    if (chessgroundApi === undefined) throw new Error('Chessground API is not initialized')
+    return chessgroundApi.getKeyAtDomPos([x, y])
   }
   
   function onWheel(e: WheelEvent) {

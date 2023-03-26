@@ -32,17 +32,10 @@
     <div class="control">
       <button
         class="button sz-3 px-2 py-2"
-        :class="{'is-primary': selectedId === 'delete'}"
         :style="{zIndex}"
-        @click="onPieceClick('delete')"
+        @click="emit('delete-click')"
       >
-        <span
-          class="icon-trash"
-          :class="{
-            'color-theme': selectedId !== 'delete',
-            'color-white': selectedId === 'delete',
-          }"
-        />
+        <span class="icon-trash color-theme" />
       </button>
     </div>
   </div>
@@ -62,8 +55,9 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'piece-selected', piece: string|'wall'|'delete'): void
+    (event: 'piece-selected', piece: string|'wall'): void
     (event: 'piece-deselected'): void
+    (event: 'delete-click'): void
   }>()
   
   defineExpose({
@@ -102,7 +96,7 @@
     }
   }
   
-  function onPieceClick(piece: Piece|'wall'|'delete') {
+  function onPieceClick(piece: Piece|'wall') {
     let id: string
     if (typeof piece === 'string') {
       // Wall or delete

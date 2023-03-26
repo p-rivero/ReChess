@@ -14,7 +14,7 @@
           :view-only="true"
           :show-coordinates="true"
           :capture-wheel-events="false"
-          @clicked="coords => placePiece(coords)"
+          @clicked="coords => togglePiece(coords)"
         />
       </div>
       
@@ -57,7 +57,7 @@
       </div>
       
       <div class="field mb-6">
-        <label class="label">Place piece:</label>
+        <label class="label">Place or remove pieces:</label>
         <PiecePlacementButtons
           ref="pieceSelector"
           :key="JSON.stringify(draftStore.state.pieceTypes)"
@@ -65,6 +65,7 @@
           :state="draftStore.state"
           @piece-selected="id => selectedPieceId = id"
           @piece-deselected="selectedPieceId = 'none'"
+          @delete-click="clearBoard"
         />
       </div>
       
@@ -277,7 +278,7 @@
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
   const pieceSelector = ref<InstanceType<typeof PiecePlacementButtons>>()
-  const selectedPieceId = ref<string|'wall'|'delete'|'none'>('none')
+  const selectedPieceId = ref<string|'wall'|'none'>('none')
   
   // This page is only accessible when logged in
   if (!authStore.loggedUser) {
@@ -318,31 +319,53 @@
     router.push({ name: 'edit-piece', params: { pieceIndex: draftStore.state.pieceTypes.length - 1 } })
   }
   
-  function placePiece(coords: [number, number]) {
+  function togglePiece(coords: [number, number]) {
+    // No piece selected, don't interact with board
     if (selectedPieceId.value === 'none') return
-    // Get index of the existing placement at this coordinate, if any
+    
+    // The existing placement is a wall. If the selected piece is a wall, remove it. Otherwise, do nothing (walls have priority over pieces)
+    if (draftStore.state.invalidSquares.some(square => square[0] === coords[0] && square[1] === coords[1])) {
+      if (selectedPieceId.value === 'wall') {
+        draftStore.state.invalidSquares = draftStore.state.invalidSquares.filter(square => square[0] !== coords[0] || square[1] !== coords[1])
+      }
+      return
+    }
+    
+    // If the selected piece was already placed here, remove it (toggle)
+    // Otherwise, remove the existing piece and place the new one
+    
+    // Get existing piece placement at this coordinate, if any
     const existingIndex = draftStore.state.pieces.findIndex(piece => piece.x === coords[0] && piece.y === coords[1])
-    // If the piece is already placed here, do nothing
-    if (existingIndex !== -1 && draftStore.state.pieces[existingIndex].pieceId === selectedPieceId.value) return
-    // Remove old placement, if any
-    if (existingIndex !== -1) draftStore.state.pieces.splice(existingIndex, 1)
-    // Remove existing wall, if any
-    draftStore.state.invalidSquares = draftStore.state.invalidSquares.filter(square => square[0] !== coords[0] || square[1] !== coords[1])
-    // Add wall
+    const existingId = existingIndex !== -1 ? draftStore.state.pieces[existingIndex].pieceId : null
+    
+    // Remove existing piece
+    if (existingIndex !== -1) {
+      draftStore.state.pieces.splice(existingIndex, 1)
+    }
+    // Replace with wall or new piece (or do nothing if the selected piece is the same)
     if (selectedPieceId.value === 'wall') {
       draftStore.state.invalidSquares.push(coords)
       return
+    } else if (existingId !== selectedPieceId.value) {
+      draftStore.state.pieces.push({
+        x: coords[0],
+        y: coords[1],
+        pieceId: selectedPieceId.value,
+      })
     }
-    // Delete existing piece (don't need to do anything else)
-    if (selectedPieceId.value === 'delete') {
-      return
-    }
-    // Add new placement
-    draftStore.state.pieces.push({
-      x: coords[0],
-      y: coords[1],
-      pieceId: selectedPieceId.value,
-    })
+  }
+  function clearBoard() {
+    showPopup(
+      'Clear board',
+      'This will remove **all** pieces and walls from the board. Do you want to continue? \
+      \n\n> Tip: If you want to remove a single piece or wall, select it here \
+      and then *click it* on the board.',
+      'yes-no',
+      () => {
+        draftStore.state.pieces = []
+        draftStore.state.invalidSquares = []
+      }
+    )
   }
   
   async function uploadFile() {
