@@ -16,9 +16,14 @@
           :capture-wheel-events="false"
         />
       </div>
-      <p class="mt-3 is-size-5 has-text-weight-semibold">
-        {{ variant.displayName }}
-      </p>
+      <div class="mt-3 is-size-5 has-text-weight-semibold">
+        <HighlightWords
+          :search-words="[/* Not used */]"
+          :text-to-highlight="variant.displayName"
+          highlight-class-name="has-text-primary-dark"
+          :find-chunks="() => highlightMatches ?? []"
+        />
+      </div>
     </div>
     
     <p
@@ -61,6 +66,7 @@
   import type { PublishedVariantGui } from '@/protochess/types'
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import HighlightWords from 'vue-highlight-words'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import UpvoteButton from '@/components/Variant/View/UpvoteButton.vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
@@ -78,6 +84,7 @@
   
   const props = defineProps<{
     variant: PublishedVariantGui
+    highlightMatches?: {start: number, end: number}[]
   }>()
   
   const emit = defineEmits<{

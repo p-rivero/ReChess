@@ -12,7 +12,11 @@
         :capture-wheel-events="false"
       />
       <p class="mt-3 is-size-5 has-text-weight-semibold">
-        {{ searchResult.name }}
+        <HighlightWords
+          :search-words="[/* Not used */]"
+          :text-to-highlight="searchResult.name"
+          :find-chunks="() => searchResult.matches"
+        />
       </p>
     </div>
     
@@ -59,6 +63,7 @@
   import { onMounted, ref } from 'vue'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import type { GameStateGui } from '@/protochess/types'
+  import HighlightWords from 'vue-highlight-words'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   

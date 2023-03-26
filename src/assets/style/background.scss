@@ -15,3 +15,7 @@ html {
     scroll-behavior: smooth;
     scroll-padding-top: $navbar-height + 1rem;
 }
+
+mark {
+    background-color: transparent;
+}

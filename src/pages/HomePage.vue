@@ -101,8 +101,9 @@
       searching.value = false
       return
     }
+    // Wait until the index has been fetched before setting searching to true
+    searchResults.value = await searchVariants(text, 10)
     searching.value = true
-    searchResults.value = await searchVariants(text)
   }
 </script>
 

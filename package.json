@@ -31,6 +31,7 @@
     "sanitize-filename": "^1.6.3",
     "sass": "^1.58.0",
     "vue": "^3.2.38",
+    "vue-highlight-words": "^3.0.1",
     "vue-input-autowidth": "^2.2.0",
     "vue-markdown-render": "^2.0.1",
     "vue-router": "^4.1.6",

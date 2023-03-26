@@ -37,10 +37,12 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   function setWidth(width: number) {
     state.value.boardWidth = width
     state.value.pieces = state.value.pieces.filter((piece: PiecePlacement) => piece.x < width)
+    state.value.invalidSquares = state.value.invalidSquares.filter((square: [number, number]) => square[0] < width)
   }
   function setHeight(height: number) {
     state.value.boardHeight = height
     state.value.pieces = state.value.pieces.filter((piece: PiecePlacement) => piece.y < height)
+    state.value.invalidSquares = state.value.invalidSquares.filter((square: [number, number]) => square[1] < height)
   }
   
   

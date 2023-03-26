@@ -7,6 +7,7 @@
   <VariantCard
     v-if="loadedVariant"
     :variant="loadedVariant"
+    :highlight-matches="searchResult.matches"
   />
   <SearchCardPlaceholder
     v-else
