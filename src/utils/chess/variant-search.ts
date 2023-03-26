@@ -46,7 +46,6 @@ class VariantSearchIndex {
         score,
         matches: this.getMatchRanges(matches),
       }
-      console.log(typedRet)
       return typedRet
     })
   }

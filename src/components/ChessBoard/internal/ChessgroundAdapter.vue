@@ -40,6 +40,7 @@
     whitePov: boolean
     pieceImages: PieceImages
     captureWheelEvents: boolean
+    disableRefresh?: boolean
     getClickMode?: (key: cg.Key) => 'add'|'remove'
   }>()
   
@@ -159,14 +160,16 @@
   
   // Redraw the board when the window is resized
   // https://github.com/lichess-org/chessground/issues/54
+  if (!props.disableRefresh) {
+    const redrawBoardDebounced = debounce(redrawBoard)
+    window.addEventListener('resize', redrawBoard)
+    window.addEventListener('scroll', redrawBoardDebounced)
+    onUnmounted(() => window.removeEventListener('resize', redrawBoard))
+    onUnmounted(() => window.removeEventListener('scroll', redrawBoardDebounced))
+  }
   function redrawBoard() {
     chessgroundApi?.redrawAll()
   }
-  const redrawBoardDebounced = debounce(redrawBoard)
-  window.addEventListener('resize', redrawBoard)
-  window.addEventListener('scroll', redrawBoardDebounced)
-  onUnmounted(() => window.removeEventListener('resize', redrawBoard))
-  onUnmounted(() => window.removeEventListener('scroll', redrawBoardDebounced))
   
 </script>
 

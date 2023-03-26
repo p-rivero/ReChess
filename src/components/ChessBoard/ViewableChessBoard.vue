@@ -17,6 +17,7 @@
     :piece-images="pieceImages"
     :capture-wheel-events="captureWheelEvents"
     :get-click-mode="getClickModeProxy"
+    :disable-refresh="disableRefresh"
     
     @clicked="(key, mode) => emit('clicked', keyToPosition(key), mode)"
     @wheel="up => emit('wheel', up)"
@@ -38,6 +39,7 @@
     viewOnly: boolean
     showCoordinates: boolean
     captureWheelEvents: boolean
+    disableRefresh?: boolean
     getClickMode?: (position: [number, number]) => 'add'|'remove'
   }>()
   

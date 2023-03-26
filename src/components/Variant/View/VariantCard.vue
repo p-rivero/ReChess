@@ -14,6 +14,7 @@
           :view-only="true"
           :show-coordinates="false"
           :capture-wheel-events="false"
+          :disable-refresh="true"
         />
       </div>
       <div class="mt-3 is-size-5 has-text-weight-semibold">
