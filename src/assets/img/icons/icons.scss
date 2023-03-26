@@ -269,6 +269,14 @@
 }
 
 
+/* sad.svg */
+.icon-sad {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/sad.svg");
+  mask-image: url("@/assets/img/icons/sad.svg");
+}
+
+
 /* save.svg */
 .icon-save {
   @extend .icon-common;

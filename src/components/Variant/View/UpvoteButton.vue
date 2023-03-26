@@ -1,6 +1,6 @@
 <template>
   <button
-    class="heart-button button"
+    class="pr-2 button"
     @click="upvoteClicked"
   >
     <p class="mr-3">
@@ -69,10 +69,6 @@
 
 
 <style scoped lang="scss">
-  .heart-button {
-    padding-right: 0.5rem;
-  }
-  
   // Animation for the heart button when it's clicked
   @keyframes heart-pulse {
     0% {

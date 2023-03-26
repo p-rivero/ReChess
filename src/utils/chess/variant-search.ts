@@ -7,7 +7,7 @@ type VariantIndexEntry = {
   description: string
 }
 
-type VariantIndexResult = {
+export type VariantIndexResult = {
   id: string
   name: string
   score: number // 0 is best, 1 is worst
@@ -47,7 +47,7 @@ class VariantSearchIndex {
 
 let currentIndex: VariantSearchIndex | null = null
 
-export async function searchVariants(query: string) {
+export async function searchVariants(query: string): Promise<VariantIndexResult[]> {
   // If the index is not yet initialized, fetch it from the server
   if (currentIndex === null) {
     const indexDoc = await VariantDB.getVariantIndex()
