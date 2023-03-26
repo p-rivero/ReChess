@@ -1,6 +1,7 @@
 <template>
   <div class="w-100 h-100">
     <PieceViewer
+      ref="board"
       :key="`${width}-${height}-${position}`"
       class="mb-4"
       :piece="piece"
@@ -11,6 +12,25 @@
       
       @clicked="(delta, mode) => emit('clicked', delta, mode)"
     />
+    
+    <div class="columns">
+      <div class="column is-flex">
+        <div class="legend-square green" />
+        <label class="mx-2">Only move</label>
+      </div>
+      <div class="column is-flex">
+        <div class="legend-square red" />
+        <label class="mx-2">Only capture</label>
+      </div>
+      <div class="column is-flex">
+        <div class="legend-square purple" />
+        <label class="mx-2">Move + capture</label>
+      </div>
+      <div class="column is-flex">
+        <div class="legend-square orange" />
+        <label class="mx-2">Explode</label>
+      </div>
+    </div>
     
     <label class="label">View:</label>
     <div
@@ -46,6 +66,8 @@
   import type { PieceDefinition } from '@/protochess/types'
   import { ref, toRefs } from 'vue'
   
+  const board = ref<InstanceType<typeof PieceViewer>>()
+  
   const props = defineProps<{
     piece: PieceDefinition
     getClickMode?: (position: [number, number]) => 'add'|'remove'
@@ -55,6 +77,10 @@
   const emit = defineEmits<{
     (event: 'clicked', delta: [number, number], mode?: 'add'|'remove'): void
   }>()
+  
+  defineExpose({
+    redraw: () => board.value?.redraw(),
+  })
   
   const width = ref<number>(7)
   const height = ref<number>(7)
@@ -80,6 +106,25 @@
   .view-button {
     width: 4rem;
     height: 4rem;
+  }
+  
+  .legend-square {
+    width: 1rem;
+    height: 1.5rem;
+    border-radius: 0.2rem;
+    flex-shrink: 0;
+    &.green {
+      background-color: green;
+    }
+    &.red {
+      background-color: red;
+    }
+    &.purple {
+      background-color: purple;
+    }
+    &.orange {
+      background-color: darkorange;
+    }
   }
 </style>
 

@@ -22,6 +22,7 @@
         <div>
           <PieceViewerWithZoom
             v-if="piece"
+            ref="board"
             :key="pieceIndex"
             :piece="piece"
             :get-click-mode="getClickMode"
@@ -50,6 +51,7 @@
   
   const popup = ref<HTMLElement>()
   const buttonClose = ref<HTMLButtonElement>()
+  const board = ref<InstanceType<typeof PieceViewerWithZoom>>()
   
   const pieceIndex = ref(-1)
   const props = defineProps<{
@@ -68,6 +70,7 @@
       popup.value?.classList.add('is-active')
       document.documentElement.classList.add('is-clipped')
       buttonClose.value?.focus()
+      board.value?.redraw()
     },
     hide: closePopup,
   })
@@ -83,5 +86,8 @@
 <style scoped lang="scss">
   .modal-card-title {
     flex-shrink: 1;
+  }
+  .modal-card {
+    max-width: 30rem;
   }
 </style>
