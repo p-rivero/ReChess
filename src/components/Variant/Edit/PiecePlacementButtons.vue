@@ -1,20 +1,18 @@
 <template>
   <div class="field is-grouped is-grouped-multiline">
-    <div
+    <button
       v-for="(piece, index) in pieceList"
       :key="index"
-      class="control"
+      class="control button sz-3 px-1 py-1"
+      :class="{'is-primary': selectedId === piece.id}"
       :style="{zIndex}"
+      @click="onPieceClick(piece)"
     >
-      <img
-        class="button sz-3 px-1 py-1"
-        draggable="false"
-        :src="piece.url"
-        :alt="`Select ${piece.id}`"
-        :class="{'is-primary': selectedId === piece.id}"
-        @click="onPieceClick(piece.id)"
-      >
-    </div>
+      <PieceImageView
+        :piece="piece.definition"
+        :color="piece.color"
+      />
+    </button>
     <div class="control">
       <button
         class="button sz-3 px-2 py-2"
@@ -51,8 +49,10 @@
 </template>
 
 <script setup lang="ts">
-  import type { GameState } from '@/protochess/types'
+  import type { GameState, PieceDefinition, Player } from '@/protochess/types'
   import { ref } from 'vue'
+  import PieceImageView from '@/components/Variant/PieceImageView.vue'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
   
   const selectedId = ref<string|'wall'|'delete'|'none'>('none')
     
@@ -73,28 +73,67 @@
     },
   })
   
+  type Piece = {
+    id: string|null|undefined
+    definition: PieceDefinition
+    color: Player
+  }
+  
   // Extract the id and url from the piece definition
-  const pieceList = ref<{id: string, url: string}[]>([])
+  const pieceList = ref<Piece[]>([])
   // First all white pieces
   for (const piece of props.state.pieceTypes) {
-    if (piece.ids[0] && piece.imageUrls[0]) {
+    if (piece.ids[0] || piece.imageUrls[0]) {
       pieceList.value.push({
         id: piece.ids[0],
-        url: piece.imageUrls[0],
+        definition: piece,
+        color: 'white',
       })
     }
   }
   // Then all black pieces
   for (const piece of props.state.pieceTypes) {
-    if (piece.ids[1] && piece.imageUrls[1]) {
+    if (piece.ids[1] || piece.imageUrls[1]) {
       pieceList.value.push({
         id: piece.ids[1],
-        url: piece.imageUrls[1],
+        definition: piece,
+        color: 'black',
       })
     }
   }
   
-  function onPieceClick(id: string|'wall'|'delete') {
+  function onPieceClick(piece: Piece|'wall'|'delete') {
+    let id: string
+    if (typeof piece === 'string') {
+      // Wall or delete
+      id = piece
+    } else {
+      // Piece
+      const pieceName = piece.definition.displayName ? `**${piece.definition.displayName}**` : 'this piece'
+      const image = piece.definition.imageUrls[piece.color === 'white' ? 0 : 1]
+      if (!piece.id) {
+        showPopup(
+          'Invalid piece',
+          `You cannot place ${pieceName} on the board because it is missing a *symbol* that identifies it 
+          (usually an *uppercase letter* for White and a *lowercase letter* for Black).\n\nPlease edit ${pieceName}
+          and add a symbol for **${piece.color}**.`,
+          'ok'
+        )
+        return
+      }
+      if (!image) {
+        showPopup(
+          'Invalid piece',
+          `You cannot place ${pieceName} (${piece.id}) on the board because it is missing an *image*.
+          \n\nPlease edit ${pieceName} and add an image for **${piece.color}**.`,
+          'ok'
+        )
+        return
+      }
+      id = piece.id
+    }
+    
+    // No error, select the piece
     if (selectedId.value === id) {
       selectedId.value = 'none'
       emit('piece-deselected')

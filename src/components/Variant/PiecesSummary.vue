@@ -29,32 +29,16 @@
           }"
         />
         
-        <img
-          v-if="piece.ids[0] != null && piece.imageUrls[0]"
-          :src="piece.imageUrls[0]"
-          alt="piece image"
+        <PieceImageView
+          :piece="piece"
+          color="white"
           class="sz-3 mr-4"
-          draggable="false"
-        >
-        <div
-          v-else
-          alt="piece image"
-          class="sz-3 mr-4 icon-cross"
-          :class="{'color-theme': piece.ids[0] != null}"
         />
         
-        <img
-          v-if="piece.ids[1] != null && piece.imageUrls[1]"
-          :src="piece.imageUrls[1]"
-          alt="piece image"
+        <PieceImageView
+          :piece="piece"
+          color="black"
           class="sz-3 mr-4"
-          draggable="false"
-        >
-        <div
-          v-else
-          alt="piece image"
-          class="sz-3 mr-4 icon-cross"
-          :class="{'color-theme': piece.ids[1] != null}"
         />
         
         <p class="mr-4 py-2">
@@ -116,6 +100,7 @@
 <script setup lang="ts">
   import type { GameState } from '@/protochess/types'
   import { ref } from 'vue'
+  import PieceImageView from '@/components/Variant/PieceImageView.vue'
   
   const hovered = ref(-1)
   const props = defineProps<{
