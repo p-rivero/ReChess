@@ -10,6 +10,7 @@
       <div class="is-flex is-justify-content-center mb-4">
         <PieceViewerWithZoom
           v-if="piece"
+          ref="board"
           class="mb-5"
           :piece="piece"
           style="z-index: 11;"
@@ -38,7 +39,7 @@
     
     
     
-    <div class="column">
+    <div class="column mb-5">
       <SmartTextInput
         class="is-large mb-5"
         placeholder="Piece name"
@@ -177,8 +178,9 @@
         text="Jumps:"
         :z-index="11"
         type="move"
-        :selected-delta="selectedDelta"
-        @update-delta="delta => selectedDelta=delta"
+        :selected-type="selectedDelta"
+        @set-type="setSelectedDelta"
+        @clear="clearDelta('move')"
       />
       <div class="mb-4">
         <MovementSlideRow
@@ -200,8 +202,9 @@
         text="Jumps:"
         :z-index="11"
         type="capture"
-        :selected-delta="selectedDelta"
-        @update-delta="delta => selectedDelta=delta"
+        :selected-type="selectedDelta"
+        @set-type="setSelectedDelta"
+        @clear="clearDelta('capture')"
       />
       <div class="mb-6">
         <MovementSlideRow
@@ -272,15 +275,16 @@
         text="Explosion squares:"
         :z-index="11"
         type="explosion"
-        :selected-delta="selectedDelta"
-        @update-delta="delta => selectedDelta=delta"
+        :selected-type="selectedDelta"
+        @set-type="setSelectedDelta"
+        @clear="clearDelta('explosion')"
       />
     </div>
   </div>
   <PopupOverlay
-    v-if="selectedDelta[0] !== 'none'"
+    v-if="selectedDelta !== 'none'"
     :z-index="10"
-    @click="selectedDelta[0] = 'none'"
+    @click="selectedDelta = 'none'"
   />
 </template>
 
@@ -326,11 +330,12 @@
     piece = draftStore.state.pieceTypes[pieceIndex]
   }
   
+  const board = ref<InstanceType<typeof PieceViewerWithZoom>>()
   const hasError = ref(false)
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
   // Current selected paint mode. True if adding, false if removing
-  const selectedDelta = ref<['none'|'move'|'capture'|'explosion', boolean]>(['none', false])
+  const selectedDelta = ref<'none'|'move'|'capture'|'explosion'>('none')
   
   // Hide a piece if it's current id is null or undefined
   const whiteInvisible = computed(() => piece?.ids[0] == null || piece?.ids[0] === undefined)
@@ -380,23 +385,53 @@
     setTimeout(() => errorMsgHandler.clear())
   }
   
+  function setSelectedDelta(delta: 'none'|'move'|'capture'|'explosion') {
+    selectedDelta.value = delta
+    // Scroll to the board
+    if (delta === 'none') return
+    if (!board.value) throw new Error('Board is undefined')
+    board.value.$el.scrollIntoView()
+  }
+  
   function editDelta(delta: [number, number]) {
     if (!piece) return
-    if (selectedDelta.value[0] === 'none') return
-    const adding = selectedDelta.value[1]
+    if (selectedDelta.value === 'none') return
     
-    if (selectedDelta.value[0] === 'move') {
-      piece.translateJumpDeltas = piece.translateJumpDeltas.filter(d => d[0] !== delta[0] || d[1] !== delta[1])
-      if (adding) piece.translateJumpDeltas.push(delta)
-    } else if (selectedDelta.value[0] === 'capture') {
-      piece.attackJumpDeltas = piece.attackJumpDeltas.filter(d => d[0] !== delta[0] || d[1] !== delta[1])
-      if (adding) piece.attackJumpDeltas.push(delta)
-    } else if (selectedDelta.value[0] === 'explosion') {
-      piece.explosionDeltas = piece.explosionDeltas.filter(d => d[0] !== delta[0] || d[1] !== delta[1])
-      if (adding) piece.explosionDeltas.push(delta)
+    // Toggle the selected delta (add or remove)
+    if (selectedDelta.value === 'move') {
+      const i = piece.translateJumpDeltas.findIndex(d => d[0] === delta[0] && d[1] === delta[1])
+      if (i === -1) piece.translateJumpDeltas.push(delta)
+      else piece.translateJumpDeltas.splice(i, 1)
+    } else if (selectedDelta.value === 'capture') {
+      const i = piece.attackJumpDeltas.findIndex(d => d[0] === delta[0] && d[1] === delta[1])
+      if (i === -1) piece.attackJumpDeltas.push(delta)
+      else piece.attackJumpDeltas.splice(i, 1)
+    } else if (selectedDelta.value === 'explosion') {
+      const i = piece.explosionDeltas.findIndex(d => d[0] === delta[0] && d[1] === delta[1])
+      if (i === -1) piece.explosionDeltas.push(delta)
+      else piece.explosionDeltas.splice(i, 1)
     } else {
       throw new Error('Invalid selectedDelta')
     }
+  }
+  function clearDelta(delta: 'move'|'capture'|'explosion') {
+    const plural = delta === 'move' ? 'jump moves' :
+      delta === 'capture' ? 'jump captures' :
+      'explosion squares'
+    showPopup(
+      `Clear all ${plural}?`,
+      `This will remove **all** the ${plural} of this piece. Do you want to continue?
+      \n\n> Tip: If you only want to remove one, select "Add / Remove" \
+      and then *click the square* on the board.`,
+      'yes-no',
+      () => {
+        if (!piece) throw new Error('Piece is null')
+        if (delta === 'move') piece.translateJumpDeltas = []
+        else if (delta === 'capture') piece.attackJumpDeltas = []
+        else if (delta === 'explosion') piece.explosionDeltas = []
+        else throw new Error('Invalid delta')
+      }
+    )
   }
   
   function updatePieceId(newId: string, color: Player) {
@@ -494,6 +529,6 @@
 
 <style>
   cg-board {
-    cursor: v-bind("selectedDelta[0] === 'none' ? 'default' : 'pointer'");
+    cursor: v-bind("selectedDelta === 'none' ? 'default' : 'pointer'");
   }
 </style>

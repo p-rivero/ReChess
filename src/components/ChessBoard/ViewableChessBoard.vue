@@ -17,7 +17,7 @@
     :piece-images="pieceImages"
     :capture-wheel-events="captureWheelEvents"
     
-    @clicked="key => emit('clicked', keyToPosition(key))"
+    @clicked="(key, mode) => emit('clicked', keyToPosition(key), mode)"
     @wheel="up => emit('wheel', up)"
   />
 </template>
@@ -40,7 +40,7 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'clicked', position: [number, number]): void
+    (event: 'clicked', position: [number, number], mode?: 'add'|'remove'): void
     (event: 'user-moved', from: [number, number], to: [number, number]): void
     (event: 'wheel', up: boolean): void
   }>()

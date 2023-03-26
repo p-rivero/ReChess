@@ -63,7 +63,7 @@
           :key="JSON.stringify(draftStore.state.pieceTypes)"
           :z-index="11"
           :state="draftStore.state"
-          @piece-selected="id => selectedPieceId = id"
+          @piece-selected="id => { board?.$el.scrollIntoView(); selectedPieceId = id }"
           @piece-deselected="selectedPieceId = 'none'"
           @delete-click="clearBoard"
         />

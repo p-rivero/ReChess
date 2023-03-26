@@ -9,31 +9,24 @@
     >
       <button
         class="button mr-4"
-        :class="{ 'is-primary': addSelected }"
-        @click="addClick"
+        :class="{ 'is-primary': selected }"
+        @click="onClick"
       >
         <div
-          class="sz-icon icon-add"
+          class="sz-icon icon-edit"
           :class="{
-            'color-theme': !addSelected,
-            'color-white': addSelected
+            'color-theme': !selected,
+            'color-white': selected
           }"
         />
-        <span>Add</span>
+        <span>Add / Remove</span>
       </button>
       <button
         class="button"
-        :class="{ 'is-primary': removeSelected }"
-        @click="removeClick"
+        @click="emit('clear', props.type)"
       >
-        <div
-          class="sz-icon icon-trash"
-          :class="{
-            'color-theme': !removeSelected,
-            'color-white': removeSelected
-          }"
-        />
-        <span>Remove</span>
+        <div class="sz-icon icon-trash color-theme" />
+        <span>Clear all</span>
       </button>
     </div>
   </div>
@@ -48,29 +41,22 @@
     text: string
     zIndex: number
     type: 'move'|'capture'|'explosion'
-    selectedDelta: ['none'|'move'|'capture'|'explosion', boolean]
+    selectedType: 'none'|'move'|'capture'|'explosion'
   }>()
   
-  const addSelected = computed(() => props.selectedDelta[0] === props.type && props.selectedDelta[1] === true)
-  const removeSelected = computed(() => props.selectedDelta[0] === props.type && props.selectedDelta[1] === false)
+  const selected = computed(() => props.selectedType === props.type)
 
   const emit = defineEmits<{
-    (event: 'update-delta', delta: ['none'|'move'|'capture'|'explosion', boolean]): void
+    (event: 'set-type', type: 'none'|'move'|'capture'|'explosion'): void
+    (event: 'clear', type: 'move'|'capture'|'explosion'): void
   }>()
   
   
-  function addClick() {
-    if (props.selectedDelta[0] === props.type && props.selectedDelta[1] === true) {
-      emit('update-delta', ['none', false])
+  function onClick() {
+    if (selected.value) {
+      emit('set-type', 'none')
     } else {
-      emit('update-delta', [props.type, true])
-    }
-  }
-  function removeClick() {
-    if (props.selectedDelta[0] === props.type && props.selectedDelta[1] === false) {
-      emit('update-delta', ['none', false])
-    } else {
-      emit('update-delta', [props.type, false])
+      emit('set-type', props.type)
     }
   }
 </script>

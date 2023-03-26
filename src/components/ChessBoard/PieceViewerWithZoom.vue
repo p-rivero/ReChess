@@ -8,7 +8,7 @@
       :height="height"
       :position="position"
       
-      @clicked="delta => emit('clicked', delta)"
+      @clicked="(delta, mode) => emit('clicked', delta, mode)"
     />
     
     <label class="label">View:</label>
@@ -51,7 +51,7 @@
   const { piece } = toRefs(props)
   
   const emit = defineEmits<{
-    (event: 'clicked', delta: [number, number]): void
+    (event: 'clicked', delta: [number, number], mode?: 'add'|'remove'): void
   }>()
   
   const width = ref<number>(7)

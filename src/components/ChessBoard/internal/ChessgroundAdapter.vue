@@ -40,10 +40,11 @@
     whitePov: boolean
     pieceImages: PieceImages
     captureWheelEvents: boolean
+    getClickMode?: (key: cg.Key) => 'add'|'remove'
   }>()
   
   const emit = defineEmits<{
-    (event: 'clicked', position: cg.Key): void
+    (event: 'clicked', position: cg.Key, mode?: 'add'|'remove'): void
     (event: 'wheel', up: boolean): void
   }>()
 
@@ -107,11 +108,15 @@
   function onTap(e: TouchEvent) {
     const touch: Touch = e.targetTouches[0]
     const key = mouseCoordsToKey(touch.clientX, touch.clientY)
-    if (key) emit('clicked', key)
+    if (key) {
+      const mode = props.getClickMode?.(key)
+      emit('clicked', key, mode)
+    }
   }
   
   let isDragging = false
   let lastKey: cg.Key | null = null
+  let mode: 'add'|'remove'|undefined = undefined
   function startDrag(e: MouseEvent) {
     isDragging = true
     onDrag(e)
@@ -127,8 +132,11 @@
     }
     const key = mouseCoordsToKey(e.clientX, e.clientY)
     if (key && key !== lastKey) {
+      if (props.getClickMode && !mode) {
+        mode = props.getClickMode(key)
+      }
       lastKey = key
-      emit('clicked', key)
+      emit('clicked', key, mode)
     }
   }
   function endDrag() {

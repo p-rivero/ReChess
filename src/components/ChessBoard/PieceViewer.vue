@@ -31,7 +31,7 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'clicked', delta: [number, number]): void
+    (event: 'clicked', delta: [number, number], mode?: 'add'|'remove'): void
   }>()
   
   const image = computed(() => props.piece.imageUrls[0] || props.piece.imageUrls[1] || '')
@@ -93,10 +93,10 @@
   }
   
   
-  function clicked(key: Key) {
+  function clicked(key: Key, mode?: 'add'|'remove') {
     const coords = keyToPosition(key)
     const delta: [number, number] = [coords[0] - piece_coords[0], coords[1] - piece_coords[1]]
-    emit('clicked', delta)
+    emit('clicked', delta, mode)
   }
   
   
