@@ -2,7 +2,7 @@ import { db } from '@/firebase'
 import type { UserUpvotesDoc, VariantDoc, VariantIndexDoc, VariantUpvotesDoc } from '@/firebase/db/schema'
 import type { Variant } from '@/protochess/types'
 
-import { collection, addDoc, getDoc, doc, getDocs, setDoc, deleteDoc, writeBatch, increment, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, getDoc, doc, getDocs, setDoc, deleteDoc, writeBatch, increment, serverTimestamp, query, where, getCountFromServer } from 'firebase/firestore'
 
 // Attempts to create a new variant in the database and returns the variant ID. Throws an error if the write fails.
 export async function createVariant(userId: string, displayName: string, variant: Variant): Promise<string> {
@@ -52,6 +52,13 @@ export async function getVariantUpvotes(id: string): Promise<VariantUpvotesDoc |
   const document = await getDoc(doc(db, 'variants', id, 'upvotes', 'doc'))
   if (!document.exists()) return undefined
   return document.data() as VariantUpvotesDoc
+}
+
+// Returns the number of variants with the given name
+export async function getNumVariantsWithName(name: string): Promise<number> {
+  const q = query(collection(db, 'variants'), where('name', '==', name))
+  const count = await getCountFromServer(q)
+  return count.data().count
 }
 
 

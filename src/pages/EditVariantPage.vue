@@ -401,9 +401,14 @@
   }
   
   async function publish() {
+    const nameExists = await draftStore.nameExists()
+    const nameExistsWarning = !nameExists ? '' :
+      '\n\n>**WARNING:** A variant with this name already exists. If you proceed, it could be \
+      harder to find your variant. Consider changing the name.'
     showPopup(
       'Are you sure you want to publish this variant?',
-      'You cannot remove it or edit elements that affect gameplay. However, you are able to change its name and description.',
+      'You cannot remove it or edit elements that affect gameplay. However, you are able to change \
+      its name and description.' + nameExistsWarning,
       'yes-no',
       async () => {
         loading.value = true

@@ -6,7 +6,7 @@ import type { Variant, PieceDefinition, PiecePlacement } from '@/protochess/type
 import { exportFile, importFile } from '@/utils/file-io'
 import { clone, object_equals } from '@/utils/ts-utils'
 import { parseVariantJson } from '@/utils/chess/variant-json'
-import { createVariant } from '@/firebase/db/variant'
+import { VariantDB } from '@/firebase/db'
 import { useAuthStore } from '@/stores/auth-user'
 
 export const useVariantDraftStore = defineStore('variant-draft', () => {
@@ -67,12 +67,18 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     return true
   }
   
+  // Returns true if there is already a variant with the same name as the draft
+  async function nameExists(): Promise<boolean> {
+    const num = await VariantDB.getNumVariantsWithName(state.value.displayName)
+    return num > 0
+  }
+  
   // Attempts to publish the variant to the server. If successful, returns the id of the variant.
   async function publish(): Promise<string | undefined> {
     const authStore = useAuthStore()
     if (!authStore.loggedUser) return undefined
     try {
-      const id = await createVariant(authStore.loggedUser.uid, authStore.loggedUser.displayName, state.value)
+      const id = await VariantDB.createVariant(authStore.loggedUser.uid, authStore.loggedUser.displayName, state.value)
       // Draft published successfully, remove it
       discardDraft()
       return id
@@ -98,7 +104,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     state.value = clone(DEFAULT_DRAFT)
   }
 
-  return { state, addPiece, setWidth, setHeight, backupFile, uploadFile, publish, hasDraft,
+  return { state, addPiece, setWidth, setHeight, backupFile, uploadFile, publish, nameExists, hasDraft,
     seeCreateHint, hideCreateHint, discardDraft }
 })
 
