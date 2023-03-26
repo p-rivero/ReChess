@@ -24,6 +24,7 @@
             v-if="piece"
             :key="pieceIndex"
             :piece="piece"
+            :get-click-mode="getClickMode"
           />
         </div>
       </section>
@@ -53,6 +54,7 @@
   const pieceIndex = ref(-1)
   const props = defineProps<{
     variant: Variant
+    getClickMode?: (position: [number, number]) => 'add'|'remove'
   }>()
   
   const piece = computed(() => {

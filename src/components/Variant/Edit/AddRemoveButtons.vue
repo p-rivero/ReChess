@@ -26,7 +26,7 @@
         @click="emit('clear', props.type)"
       >
         <div class="sz-icon icon-trash color-theme" />
-        <span>Clear all</span>
+        <span>Clear</span>
       </button>
     </div>
   </div>

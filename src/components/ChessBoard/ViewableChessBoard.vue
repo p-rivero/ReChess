@@ -16,6 +16,7 @@
     :initial-config="currentBoardConfig"
     :piece-images="pieceImages"
     :capture-wheel-events="captureWheelEvents"
+    :get-click-mode="getClickModeProxy"
     
     @clicked="(key, mode) => emit('clicked', keyToPosition(key), mode)"
     @wheel="up => emit('wheel', up)"
@@ -29,7 +30,7 @@
   import { positionToKey, keyToPosition } from '@/utils/chess/chess-coords'
   import type { Config } from 'chessgroundx/config'
   import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue'
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { deepMerge } from '@/utils/ts-utils'
 
   const props = defineProps<{
@@ -37,6 +38,7 @@
     viewOnly: boolean
     showCoordinates: boolean
     captureWheelEvents: boolean
+    getClickMode?: (position: [number, number]) => 'add'|'remove'
   }>()
   
   const emit = defineEmits<{
@@ -44,6 +46,13 @@
     (event: 'user-moved', from: [number, number], to: [number, number]): void
     (event: 'wheel', up: boolean): void
   }>()
+  
+  
+  const getClickModeProxy = computed(() => {
+    const fn = props.getClickMode
+    if (!fn) return undefined
+    return (key: cg.Key) => fn(keyToPosition(key))
+  })
   
   // Initial board configuration
   let currentWidth = 0

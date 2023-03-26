@@ -14,7 +14,8 @@
           :view-only="true"
           :show-coordinates="true"
           :capture-wheel-events="false"
-          @clicked="coords => togglePiece(coords)"
+          :get-click-mode="getClickMode"
+          @clicked="togglePiece"
         />
       </div>
       
@@ -319,41 +320,61 @@
     router.push({ name: 'edit-piece', params: { pieceIndex: draftStore.state.pieceTypes.length - 1 } })
   }
   
-  function togglePiece(coords: [number, number]) {
-    // No piece selected, don't interact with board
-    if (selectedPieceId.value === 'none') return
-    
-    // The existing placement is a wall. If the selected piece is a wall, remove it. Otherwise, do nothing (walls have priority over pieces)
-    if (draftStore.state.invalidSquares.some(square => square[0] === coords[0] && square[1] === coords[1])) {
-      if (selectedPieceId.value === 'wall') {
-        draftStore.state.invalidSquares = draftStore.state.invalidSquares.filter(square => square[0] !== coords[0] || square[1] !== coords[1])
-      }
-      return
-    }
-    
-    // If the selected piece was already placed here, remove it (toggle)
-    // Otherwise, remove the existing piece and place the new one
-    
-    // Get existing piece placement at this coordinate, if any
-    const existingIndex = draftStore.state.pieces.findIndex(piece => piece.x === coords[0] && piece.y === coords[1])
-    const existingId = existingIndex !== -1 ? draftStore.state.pieces[existingIndex].pieceId : null
-    
-    // Remove existing piece
-    if (existingIndex !== -1) {
-      draftStore.state.pieces.splice(existingIndex, 1)
-    }
-    // Replace with wall or new piece (or do nothing if the selected piece is the same)
+  /**
+   * Determine whether this drag is an add or remove operation (based on the first square of the drag)
+   * @param coords The coordinates of the first square of the drag
+   */
+  function getClickMode(coords: [number, number]): 'add'|'remove' {
     if (selectedPieceId.value === 'wall') {
-      draftStore.state.invalidSquares.push(coords)
-      return
-    } else if (existingId !== selectedPieceId.value) {
-      draftStore.state.pieces.push({
-        x: coords[0],
-        y: coords[1],
-        pieceId: selectedPieceId.value,
-      })
+      return draftStore.state.invalidSquares.some(p => p[0] === coords[0] && p[1] === coords[1]) ? 'remove' : 'add'
+    } else {
+      return draftStore.state.pieces.some(p => p.x === coords[0] && p.y === coords[1] && p.pieceId === selectedPieceId.value) ? 'remove' : 'add'
     }
   }
+  
+  /**
+   * Called for each square of a drag
+   * @param coords The coordinates of the selected square
+   * @param mode The mode of the drag (add or remove)
+   */
+  function togglePiece(coords: [number, number], mode?: 'add'|'remove') {
+    if (!mode) throw new Error('Mode must be specified')
+    // No piece selected, don't interact with board
+    if (selectedPieceId.value === 'none') return
+
+    const hasWall = draftStore.state.invalidSquares.some(square => square[0] === coords[0] && square[1] === coords[1])
+    const placementIndex = draftStore.state.pieces.findIndex(piece => piece.x === coords[0] && piece.y === coords[1])
+    const pieceId = placementIndex !== -1 ? draftStore.state.pieces[placementIndex].pieceId : null
+    
+    if (mode === 'remove') {
+      if (selectedPieceId.value === 'wall') {
+        // Selected wall in remove mode: only remove walls
+        draftStore.state.invalidSquares = draftStore.state.invalidSquares.filter(square => square[0] !== coords[0] || square[1] !== coords[1])
+        return
+      } else {
+        // Selected piece in remove mode: only remove the selected piece
+        if (pieceId === selectedPieceId.value) {
+          draftStore.state.pieces.splice(placementIndex, 1)
+        }
+      }
+    } else {
+      if (selectedPieceId.value === 'wall') {
+        // Selected wall in add mode: add wall if there's none. Also, if there was a piece, remove it
+        if (pieceId) draftStore.state.pieces.splice(placementIndex, 1)
+        if (!hasWall) draftStore.state.invalidSquares.push(coords)
+      } else {
+        // Selected piece in add mode: if there's no wall, replace the piece (or add it if there was none)
+        if (hasWall) return
+        if (pieceId) draftStore.state.pieces.splice(placementIndex, 1)
+        draftStore.state.pieces.push({
+          x: coords[0],
+          y: coords[1],
+          pieceId: selectedPieceId.value,
+        })
+      }
+    }
+  }
+  
   function clearBoard() {
     showPopup(
       'Clear board',

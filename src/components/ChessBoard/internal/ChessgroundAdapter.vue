@@ -142,6 +142,7 @@
   function endDrag() {
     isDragging = false
     lastKey = null
+    mode = undefined
   }
   
   function mouseCoordsToKey(x: number, y: number): cg.Key | undefined {

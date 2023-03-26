@@ -12,8 +12,9 @@
           v-if="piece"
           ref="board"
           class="mb-5"
-          :piece="piece"
           style="z-index: 11;"
+          :piece="piece"
+          :get-click-mode="getClickMode"
           @clicked="editDelta"
         />
       </div>
@@ -393,23 +394,42 @@
     board.value.$el.scrollIntoView()
   }
   
-  function editDelta(delta: [number, number]) {
-    if (!piece) return
+  /**
+   * Determine whether this drag is an add or remove operation (based on the first square of the drag)
+   * @param delta The first square of the drag
+   */
+  function getClickMode(delta: [number, number]): 'add'|'remove' {
+    if (!piece) throw new Error('Piece is null')
+    if (selectedDelta.value === 'move') {
+      return piece.translateJumpDeltas.some(d => d[0] === delta[0] && d[1] === delta[1]) ? 'remove' : 'add'
+    } else if (selectedDelta.value === 'capture') {
+      return piece.attackJumpDeltas.some(d => d[0] === delta[0] && d[1] === delta[1]) ? 'remove' : 'add'
+    } else if (selectedDelta.value === 'explosion') {
+      return piece.explosionDeltas.some(d => d[0] === delta[0] && d[1] === delta[1]) ? 'remove' : 'add'
+    } else {
+      return 'add'
+    }
+  }
+  /**
+   * Called for each square of a drag
+   * @param delta The square of the drag
+   * @param mode The mode of the drag (add or remove)
+   */
+  function editDelta(delta: [number, number], mode?: 'add'|'remove') {
+    if (!piece) throw new Error('Piece is null')
+    if (!mode) throw new Error('Mode is undefined')
     if (selectedDelta.value === 'none') return
     
     // Toggle the selected delta (add or remove)
     if (selectedDelta.value === 'move') {
-      const i = piece.translateJumpDeltas.findIndex(d => d[0] === delta[0] && d[1] === delta[1])
-      if (i === -1) piece.translateJumpDeltas.push(delta)
-      else piece.translateJumpDeltas.splice(i, 1)
+      piece.translateJumpDeltas = piece.translateJumpDeltas.filter(d => d[0] !== delta[0] || d[1] !== delta[1])
+      if (mode === 'add') piece.translateJumpDeltas.push(delta)
     } else if (selectedDelta.value === 'capture') {
-      const i = piece.attackJumpDeltas.findIndex(d => d[0] === delta[0] && d[1] === delta[1])
-      if (i === -1) piece.attackJumpDeltas.push(delta)
-      else piece.attackJumpDeltas.splice(i, 1)
+      piece.attackJumpDeltas = piece.attackJumpDeltas.filter(d => d[0] !== delta[0] || d[1] !== delta[1])
+      if (mode === 'add') piece.attackJumpDeltas.push(delta)
     } else if (selectedDelta.value === 'explosion') {
-      const i = piece.explosionDeltas.findIndex(d => d[0] === delta[0] && d[1] === delta[1])
-      if (i === -1) piece.explosionDeltas.push(delta)
-      else piece.explosionDeltas.splice(i, 1)
+      piece.explosionDeltas = piece.explosionDeltas.filter(d => d[0] !== delta[0] || d[1] !== delta[1])
+      if (mode === 'add') piece.explosionDeltas.push(delta)
     } else {
       throw new Error('Invalid selectedDelta')
     }

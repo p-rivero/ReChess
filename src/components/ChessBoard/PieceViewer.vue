@@ -8,6 +8,7 @@
     :initial-config="boardConfig"
     :piece-images="{white: [['P', image]], black: []}"
     :capture-wheel-events="false"
+    :get-click-mode="getClickModeProxy"
     
     @clicked="clicked"
   />
@@ -28,6 +29,7 @@
     width: number
     height: number
     position: 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+    getClickMode?: (position: [number, number]) => 'add'|'remove'
   }>()
   
   const emit = defineEmits<{
@@ -36,6 +38,16 @@
   
   const image = computed(() => props.piece.imageUrls[0] || props.piece.imageUrls[1] || '')
   const board = ref<InstanceType<typeof ChessgroundAdapter>>()
+    
+  const getClickModeProxy = computed(() => {
+    const fn = props.getClickMode
+    if (!fn) return undefined
+    return (key: Key) => {
+      const coords = keyToPosition(key)
+      const delta: [number, number] = [coords[0] - piece_coords[0], coords[1] - piece_coords[1]]
+      return fn(delta)
+    }
+  })
     
   watch(props.piece, () => board.value?.setShapes(getShapes()))
   onMounted(() => board.value?.setShapes(getShapes()))
