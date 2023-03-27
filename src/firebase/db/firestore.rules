@@ -152,12 +152,6 @@ service cloud.firestore {
       }
       
       match /upvotedVariants/{variantId} {
-        function assertUpvoteDelta(delta) {
-          let docBefore = get(/databases/$(database)/documents/variants/$(variantId)/upvotes/doc);
-          let docAfter = getAfter(/databases/$(database)/documents/variants/$(variantId)/upvotes/doc);
-          return docAfter.data.numUpvotes == docBefore.data.numUpvotes + delta;
-        }
-        
         // Other users cannot see my upvotes
         allow read: if isAuth(userId);
         // When creating an upvote, also increment the variant's numUpvotes
@@ -165,13 +159,15 @@ service cloud.firestore {
           hasCorrectFields(['timeUpvoted'], []) &&
           isAuth(userId) &&
           isServerTimestamp(request.resource.data.timeUpvoted) &&
-          assertUpvoteDelta(1);
+          exists(/databases/$(database)/documents/variants/$(variantId));
         // Cannot update an upvote, only delete it
         allow update: if false;
         // When deleting an upvote, also decrement the variant's numUpvotes
         allow delete: if
-          isAuth(userId) &&
-          assertUpvoteDelta(-1);
+          // For some reason, deleting a document that doesn't exist succeeds instead of failing
+          // This delete will trigger a cloud function, so make sure it's valid
+          exists(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId)) &&
+          isAuth(userId);
       }
     }
     
@@ -180,7 +176,7 @@ service cloud.firestore {
     match /variants/{variantId} {
       function isVariantDoc() {
         return hasCorrectFields(['name', 'description', 'IMMUTABLE'], []) &&
-          hasCorrectImmutableFields(['creationTime', 'creatorDisplayName', 'initialState'], ['creatorId']);
+          hasCorrectImmutableFields(['creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes'], ['creatorId']);
       }
       function isValidVariantEdit(variant) {
         let userDoc = get(/databases/$(database)/documents/users/$(variant.IMMUTABLE.creatorId));
@@ -194,6 +190,7 @@ service cloud.firestore {
           // Creator can be null if their account has been deleted (not when creating the variant)
           variant.IMMUTABLE.creatorId != null &&
           isAuth(variant.IMMUTABLE.creatorId) &&
+          variant.IMMUTABLE.numUpvotes == 0 &&
           variant.IMMUTABLE.initialState.size() <= 100000;
       }
       
@@ -211,44 +208,6 @@ service cloud.firestore {
       
       // Disallow deleting variants
       allow delete: if false;
-      
-      
-      match /upvotes/{doc} {
-        function isVariantUpvotesDoc() {
-          return hasCorrectFields(['numUpvotes'], []);
-        }
-        function isVariantCreator() {
-          let creator = get(/databases/$(database)/documents/variants/$(variantId)).data.IMMUTABLE.creatorId;
-          return isAuth(creator);
-        }
-        function isValidUpvote() {
-          // Check that the logged user had not upvoted this variant before
-          let userId = request.auth.uid;
-          return !exists(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId)) &&
-            existsAfter(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId));
-        }
-        function isValidUnUpvote() {
-          // Check that the logged user had upvoted this variant before
-          let userId = request.auth.uid;
-          return exists(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId)) &&
-            !existsAfter(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId));
-        }
-        
-        allow read;
-        // Created once, when making the variant
-        allow create: if 
-          isVariantUpvotesDoc() &&
-          isVariantCreator() &&
-          doc == 'doc' && // Only 1 document allowed
-          request.resource.data.numUpvotes == 0;
-        // Updated when upvoted
-        allow update: if
-          // Valid increment or decrement
-          (request.resource.data.numUpvotes == resource.data.numUpvotes + 1 && isValidUpvote()) ||
-          (request.resource.data.numUpvotes == resource.data.numUpvotes - 1 && isValidUnUpvote());
-        // Disallow deleting
-        allow delete: if false;
-      }
     }
     
     // Read-only access to variantIndex

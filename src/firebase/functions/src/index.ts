@@ -9,7 +9,7 @@ region('europe-west1')
 .firestore
 .document('users/{userId}')
 .onUpdate((change, context) => {
-  return callFunction(import('./rename-user'), change, context)
+  return callFunction(import('./rename-user'), change, context.params.userId)
 })
 
 export const deleteUser =
@@ -27,6 +27,23 @@ region('europe-west1')
 .onCreate(snap => {
   return callFunction(import('./update-variant-index'), snap)
 })
+
+export const incrementVariantUpvotes =
+region('europe-west1')
+.firestore
+.document('users/{userId}/upvotedVariants/{variantId}')
+.onCreate((_snap, context) => {
+  return callFunction(import('./increment-variant-upvotes'), context.params.variantId)
+})
+
+export const decrementVariantUpvotes =
+region('europe-west1')
+.firestore
+.document('users/{userId}/upvotedVariants/{variantId}')
+.onDelete((_snap, context) => {
+  return callFunction(import('./decrement-variant-upvotes'), context.params.variantId)
+})
+
 
 export const checkPieceHash =
 region('europe-west1')

@@ -3,7 +3,6 @@ import { batchedUpdate, useAdmin } from './helpers'
 import { updateName } from './rename-user'
 import type { UserDoc } from 'db/schema'
 import type { UserRecord } from 'firebase-admin/auth'
-import { FieldValue } from 'firebase-admin/firestore'
 
 /**
  * Called when a user Auth record is deleted. Deletes the user document
@@ -27,14 +26,6 @@ export default async function renameUser(
   const userUpvotes = await userDoc.ref.collection('upvotedVariants').get()
   await batchedUpdate(db, userUpvotes, (batch, ref) => {
     batch.delete(ref)
-  })
-  // Decrement the upvote count for each upvoted variant
-  userUpvotes.forEach(async doc => {
-    const variantId = doc.id
-    const upvotesDoc = db.collection('variants').doc(variantId).collection('upvotes').doc('doc')
-    await upvotesDoc.update({
-      numUpvotes: FieldValue.increment(-1)
-    })
   })
   // Delete the user public and private documents
   await userDoc.ref.collection('private').doc('doc').delete()

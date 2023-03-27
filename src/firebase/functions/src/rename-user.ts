@@ -1,6 +1,6 @@
 
 import { Timestamp } from 'firebase-admin/firestore'
-import type { Change, EventContext } from 'firebase-functions'
+import type { Change } from 'firebase-functions'
 import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 
 import { useAdmin, batchedUpdate } from './helpers'
@@ -10,20 +10,19 @@ import type { UserDoc } from 'db/schema'
 /**
  * Called when a user document changes. Checks if the name has changed and,
  * if so, updates the name also in the denormalized fields.
- * @param {Change<QueryDocumentSnapshot>} change The cloud function change object
- * @param {EventContext<Params>} context The cloud function event context
+ * @param {Change<QueryDocumentSnapshot>} change Snapshots of the user document before and after the change
+ * @param {string} userId The UID of the user that changed
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function renameUser(
   change: Change<QueryDocumentSnapshot>,
-  context: EventContext<{ userId: string }>
+  userId: string
 ): Promise<void> {
   const TIMEOUT_SECONDS = 30 * 60 // 30 minutes
   
   const admin = await useAdmin()
   const db = admin.firestore()
   
-  const { userId } = context.params
   const before = change.before.data() as UserDoc
   const after = change.after.data() as UserDoc
   // When the user is updated, check if the name has changed

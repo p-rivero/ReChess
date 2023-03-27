@@ -45,17 +45,13 @@ export interface VariantDoc {
     creationTime: FieldValue | Timestamp
     creatorDisplayName: string
     creatorId: string | null
+    numUpvotes: number
     // JSON string that corresponds to the GameState interface in src/protochess/types.ts
     // Validated client-side (on every fetch), since server-side validation would require importing
     // the protochess wasm module on the cloud function
     // Also, this object could be quite big and we don't want firebase to create any indexes its fields
     initialState: string
   }
-}
-
-// variants/{variantId}/upvotes/doc
-export interface VariantUpvotesDoc {
-  numUpvotes: number
 }
 
 // variantIndex/doc
