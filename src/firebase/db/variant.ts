@@ -2,7 +2,7 @@ import { db } from '@/firebase'
 import type { UserUpvotesDoc, VariantDoc, VariantIndexDoc, VariantUpvotesDoc } from '@/firebase/db/schema'
 import type { Variant } from '@/protochess/types'
 
-import { collection, addDoc, getDoc, doc, getDocs, setDoc, deleteDoc, writeBatch, increment, serverTimestamp, query, where, getCountFromServer } from 'firebase/firestore'
+import { collection, addDoc, getDoc, doc, getDocs, setDoc, deleteDoc, writeBatch, increment, serverTimestamp, query, where, getCountFromServer, orderBy } from 'firebase/firestore'
 
 // Attempts to create a new variant in the database and returns the variant ID. Throws an error if the write fails.
 export async function createVariant(userId: string, displayName: string, variant: Variant): Promise<string> {
@@ -100,7 +100,12 @@ export async function removeUpvoteVariant(userId: string, variantId: string): Pr
 
 
 // TODO: Add pagination and ordering
-export async function getVariantList(): Promise<[VariantDoc, string][]> {
-  const querySnapshot = await getDocs(collection(db, 'variants'))
+export async function getVariantList(order: 'newest' | 'upvotes'): Promise<[VariantDoc, string][]> {
+  console.log('Fetching variant list', order)
+  const orderQuery = order === 'newest' ?
+    orderBy('IMMUTABLE.creationTime', 'desc') :
+    orderBy('upvotes.numUpvotes', 'desc')
+  const q = query(collection(db, 'variants'), orderQuery)
+  const querySnapshot = await getDocs(q)
   return querySnapshot.docs.map(doc => [doc.data() as VariantDoc, doc.id])
 }

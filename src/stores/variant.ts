@@ -13,18 +13,19 @@ export const useVariantStore = defineStore('variant', () => {
   
   // Currently fetched variants
   const variantList = ref<PublishedVariantGui[]>([])
+  const variantListOrder = ref<'newest' | 'upvotes'>('newest')
+  
   const authStore = useAuthStore()
   
   let listUpvotesUid: string | undefined = undefined
   // Fetches the list of variants from the database
-  // TODO: Add pagination and ordering
-  async function refreshList() {
-    // Only fetch the list if it hasn't been fetched yet
-    // TODO: Check if the order has changed
-    if (variantList.value.length > 0) return
+  // TODO: Add pagination
+  async function refreshList(order: 'newest' | 'upvotes') {
+    // Only fetch the list if it hasn't been fetched yet (or if the order has changed)
+    if (variantList.value.length > 0 && variantListOrder.value === order) return
     
     // Fetch the list of variant documents from the database
-    const docsWithId = await VariantDB.getVariantList()
+    const docsWithId = await VariantDB.getVariantList(order)
     
     // Fetch the upvotes for each variant simultaneously
     const upvotes = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.getVariantUpvotes(id)))
@@ -34,13 +35,15 @@ export const useVariantStore = defineStore('variant', () => {
     const userUpvoted = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, id)))
     
     // Convert each pair of documents into a PublishedVariantGui
-    variantList.value = []
+    const result = []
     for (const [i, [doc, id]] of docsWithId.entries()) {
       const upvotesDoc = upvotes[i]
       if (!upvotesDoc) continue
       const state = readDocument(doc, upvotesDoc, userUpvoted[i], id)
-      if (state) variantList.value.push(state)
+      if (state) result.push(state)
     }
+    variantList.value = result
+    variantListOrder.value = order
   }
   
   watch(authStore, async () => {

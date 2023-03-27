@@ -17,13 +17,14 @@
 </template>
 
 
+<script lang="ts">
+  // Default order when not searching
+  export const DEFAULT_ORDER = 'upvotes'
+</script>
 
 <script setup lang="ts">
   import { computed, ref, watchEffect } from 'vue'
   import type { SearchOrder } from '@/utils/chess/variant-search'
-  
-  // Default order when not searching
-  const DEFAULT_ORDER: SearchOrder = 'upvotes'
   
   const OPTIONS_TEXT: Record<SearchOrder, string> = {
     'search-relevance': 'Search relevance',

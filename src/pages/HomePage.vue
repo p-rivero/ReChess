@@ -14,8 +14,8 @@
         <span class="icon sort-dropdown is-flex mr-1">
           <SearchOrderDropdown
             :searching="searching"
-            :start-order="lastSearchOrder"
-            @search-order-changed="order => lastSearchOrder = order"
+            :start-order="orderBy"
+            @search-order-changed="order => orderBy = order"
           />
         </span>
       </p>
@@ -33,8 +33,8 @@
       :variant-name="searchResult.name"
       :matches="searchResult.matches"
       :current-search-score="searchResult.searchScore"
-      :order-by="lastSearchOrder"
-      @play-clicked="variant => playClicked(variant)"
+      :order-by="orderBy"
+      @play-clicked="variant => playPopup?.show(variant.uid)"
       @update-score="score => searchResult.sortScore = score"
     />
     <div
@@ -56,7 +56,7 @@
       v-for="(variant, index) of variantStore.variantList"
       :key="index"
       :variant="variant"
-      @play-clicked="playClicked(variant)"
+      @play-clicked="playPopup?.show(variant.uid)"
     />
   </div>
   
@@ -72,11 +72,11 @@
   import DraftCard from '@/components/Variant/View/DraftCard.vue'
   import SearchCard from '@/components/Variant/Search/SearchCard.vue'
   import SearchOrderDropdown from '@/components/Variant/Search/SearchOrderDropdown.vue'
+  import { DEFAULT_ORDER } from '@/components/Variant/Search/SearchOrderDropdown.vue'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { updateTitle } from '@/utils/web-utils'
   import { searchVariants } from '@/utils/chess/variant-search'
-  import type { PublishedVariantGui } from '@/protochess/types'
   import type { SearchOrder, VariantIndexResult } from '@/utils/chess/variant-search'
   
   const variantStore = useVariantStore()
@@ -106,20 +106,7 @@
   
   onMounted(() => updateTitle())
   
-  variantStore.refreshList().catch(e => {
-    console.error(e)
-    showPopup(
-      'Cannot load variants',
-      'There was an error loading the variants. Please try again later.',
-      'ok'
-    )
-  })
-  
-  function playClicked(variant: PublishedVariantGui) {
-    playPopup.value?.show(variant.uid)
-  }
-  
-  const lastSearchOrder = ref<SearchOrder>('search-relevance')
+  const orderBy = ref<SearchOrder>('search-relevance')
   const lastSearchText = ref('')
   
   async function search(text: string) {
@@ -138,15 +125,31 @@
   // Store the last search in session storage so that it can be restored
   // when the user navigates back to the home page
   const storedSearchText = sessionStorage.getItem('last-search-text')
-  const storedSearchOrder = sessionStorage.getItem('last-search-order') as SearchOrder | null
+  const storedSearchOrder = sessionStorage.getItem('search-order') as SearchOrder | null
   if (storedSearchText) {
     search(storedSearchText)
   }
   if (storedSearchOrder) {
-    lastSearchOrder.value = storedSearchOrder
+    orderBy.value = storedSearchOrder
   }
   watch(lastSearchText, text => sessionStorage.setItem('last-search-text', text))
-  watch(lastSearchOrder, order => sessionStorage.setItem('last-search-order', order))
+  watch(orderBy, async order => {
+    sessionStorage.setItem('search-order', order)
+    if (order === 'search-relevance') {
+      order = DEFAULT_ORDER
+    }
+    try {
+      await variantStore.refreshList(order)
+    } catch (e) {
+      console.error(e)
+      showPopup(
+        'Cannot load variants',
+        'There was an error loading the variants. Please try again later.',
+        'ok'
+      )
+    }
+  }, { immediate: true })
+  
 </script>
 
 <style lang="scss" scoped>

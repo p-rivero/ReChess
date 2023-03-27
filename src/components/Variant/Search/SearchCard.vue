@@ -66,15 +66,16 @@
     
     switch (props.orderBy) {
     case 'search-relevance':
+      // Use the search score as the ordering score
       emit('update-score', props.currentSearchScore)
       break
     case 'upvotes':
-      emit('update-score', loadedVariant.value.numUpvotes)
+      // More upvotes means a higher score. Use the search score as a tiebreaker
+      emit('update-score', loadedVariant.value.numUpvotes + 0.1 * props.currentSearchScore)
       break
     case 'newest':
-      // A new variant has a greater timestamp
-      // TODO
-      // emit('update-score', loadedVariant.value.createdAt)
+      // A newer variant has a greater timestamp (and thus a higher score)
+      emit('update-score', loadedVariant.value.creationTime.getTime())
       break
     default:
       throw new Error('Unknown sort order: ' + props.orderBy)
