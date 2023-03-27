@@ -37,7 +37,13 @@ export default async function renameUser(
   const timeoutDate = new Date(timeout)
   const timeoutTimestamp = Timestamp.fromDate(timeoutDate)
   // This will trigger renameUser again, but the name won't have changed
-  db.collection('users').doc(userId).update({ "IMMUTABLE.renameAllowedAt": timeoutTimestamp })
+  db.collection('users')
+    .doc(userId)
+    .update({ 'IMMUTABLE.renameAllowedAt': timeoutTimestamp })
+    .catch((err) => {
+      console.error('Error while updating rename timeout for user', userId + ':')
+      console.error(err)
+    })
 }
 
 
@@ -59,28 +65,37 @@ export async function updateName(
 ): Promise<void> {
   // Update the creator name of the variants this user has created
   const updatedVariants = await db.collection('variants').where('IMMUTABLE.creatorId', '==', userId).get()
-  await batchedUpdate(db, updatedVariants, (batch, ref) => {
+  batchedUpdate(db, updatedVariants, (batch, ref) => {
     batch.update(ref, {
       'IMMUTABLE.creatorDisplayName': newName,
       'IMMUTABLE.creatorId': removeId ? null : userId,
     })
+  }).catch((err) => {
+    console.error('Error while updating variants for user', userId + ':')
+    console.error(err)
   })
   
   // Update the opponent name of the games this user has played as white
   const updatedGamesWhite = await db.collection('games').where('IMMUTABLE.whiteId', '==', userId).get()
-  await batchedUpdate(db, updatedGamesWhite, (batch, ref) => {
+  batchedUpdate(db, updatedGamesWhite, (batch, ref) => {
     batch.update(ref, {
       'IMMUTABLE.whiteDisplayName': newName,
       'IMMUTABLE.whiteId': removeId ? null : userId,
     })
+  }).catch((err) => {
+    console.error('Error while updating games (white) for user', userId + ':')
+    console.error(err)
   })
   
   // Update the opponent name of the games this user has played as black
   const updatedGamesBlack = await db.collection('games').where('IMMUTABLE.blackId', '==', userId).get()
-  await batchedUpdate(db, updatedGamesBlack, (batch, ref) => {
+  batchedUpdate(db, updatedGamesBlack, (batch, ref) => {
     batch.update(ref, {
       'IMMUTABLE.blackDisplayName': newName,
       'IMMUTABLE.blackId': removeId ? null : userId,
     })
+  }).catch((err) => {
+    console.error('Error while updating games (black) for user', userId + ':')
+    console.error(err)
   })
 }

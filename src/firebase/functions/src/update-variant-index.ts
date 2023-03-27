@@ -9,12 +9,12 @@ import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function updateVariantIndex(
-  snap: QueryDocumentSnapshot,
+  snap: QueryDocumentSnapshot
 ): Promise<void> {
   const admin = await useAdmin()
   const db = admin.firestore()
   
-  let {name, description} = snap.data() as VariantDoc
+  let { name, description } = snap.data() as VariantDoc
   // Replace tabs and newlines with spaces
   name = name.replace(/[\t\n]/g, ' '),
   description = description.replace(/[\t\n]/g, ' ')
@@ -29,12 +29,12 @@ export default async function updateVariantIndex(
     const indexData = indexDoc.data() as VariantIndexDoc
     const oldIndex = indexData.index
     await indexRef.set({
-      index: oldIndex + '\n' + line
+      index: oldIndex + '\n' + line,
     })
   } else {
     // Create the index with the new line
     await indexRef.set({
-      index: line
+      index: line,
     })
   }
 }
