@@ -10,9 +10,7 @@ import type { UserRecord } from 'firebase-admin/auth'
  * @param {UserRecord} user The user auth record that was deleted
  * @return {Promise<void>} A promise that resolves when the function is done
  */
-export default async function renameUser(
-  user: UserRecord
-): Promise<void> {
+export default async function(user: UserRecord): Promise<void> {
   const admin = await useAdmin()
   const db = admin.firestore()
   const userId = user.uid

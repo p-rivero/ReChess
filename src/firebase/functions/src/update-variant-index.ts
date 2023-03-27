@@ -8,9 +8,7 @@ import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
  * @param {Change<QueryDocumentSnapshot>} snap Snapshot of the document that was inserted
  * @return {Promise<void>} A promise that resolves when the function is done
  */
-export default async function updateVariantIndex(
-  snap: QueryDocumentSnapshot
-): Promise<void> {
+export default async function(snap: QueryDocumentSnapshot): Promise<void> {
   const admin = await useAdmin()
   const db = admin.firestore()
   

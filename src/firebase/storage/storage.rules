@@ -19,7 +19,7 @@ service firebase.storage {
       // Anyone can see the images
       allow read;
       
-      // Only allow uploading images of 200 KiB or less.
+      // Only allow uploading images of 200kB or less.
       // The client sets the file name to the SHA-256 hash of the file contents, so
       // collisions are very unlikely.
       // Storage rules seems to be unable to access the file's bytes, so we can't
@@ -32,6 +32,21 @@ service firebase.storage {
         
       // Cannot edit the metadata of an image or delete it, since other variants may reference it.
       allow update, delete: if false;
+    }
+    
+    match /profile-images/{userId} {
+      // Anyone can see the images
+      allow read;
+      
+      // Only allow uploading images of 1MB or less, and only for the user's own profile.
+      allow create, update: if
+        authMetadata() &&
+        sizeKb(1024) &&
+        isImage() &&
+        request.auth.uid == userId;
+        
+      // Only allow deleting the user's own profile image.
+      allow delete: if request.auth.uid == userId;
     }
   }
 }

@@ -14,7 +14,7 @@ import type { UserDoc } from 'db/schema'
  * @param {string} userId The UID of the user that changed
  * @return {Promise<void>} A promise that resolves when the function is done
  */
-export default async function renameUser(
+export default async function(
   change: Change<QueryDocumentSnapshot>,
   userId: string
 ): Promise<void> {

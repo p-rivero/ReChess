@@ -9,11 +9,13 @@ import { createHash } from 'node:crypto'
  * @param {ObjectMetadata} image The object metadata of the uploaded image
  * @return {Promise<void>} A promise that resolves when the function is done
  */
-export default async function checkPieceHash(
-  image: ObjectMetadata
-): Promise<void> {
+export default async function(image: ObjectMetadata): Promise<void> {
   const admin = await useAdmin()
   if (!image.name) return
+  
+  // TODO: Remove this
+  console.info('Checking hash of', image.name)
+  if (image.name.startsWith('profile-images/')) return
 
   // Download the image
   const fileRef = admin.storage().bucket(image.bucket).file(image.name)

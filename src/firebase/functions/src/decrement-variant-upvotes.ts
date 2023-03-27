@@ -7,9 +7,7 @@ import { FieldValue } from 'firebase-admin/firestore'
  * @param {string} variantId UID of the variant that was un-upvoted
  * @return {Promise<void>} A promise that resolves when the function is done
  */
-export default async function incrementVariantUpvotes(
-  variantId: string
-): Promise<void> {
+export default async function(variantId: string): Promise<void> {
   const admin = await useAdmin()
   const db = admin.firestore()
   
