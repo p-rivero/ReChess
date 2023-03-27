@@ -2,7 +2,7 @@
   <div class="card px-2 py-2 mx-3 my-4">
     <div
       class="is-clickable"
-      @click="$router.push({ name: 'variant-details', params: { variantId: searchResult.id } })"
+      @click="$router.push({ name: 'variant-details', params: { variantId: id } })"
     >
       <ViewableChessBoard
         ref="board"
@@ -14,8 +14,8 @@
       <p class="mt-3 is-size-5 has-text-weight-semibold">
         <HighlightWords
           :search-words="[/* Not used */]"
-          :text-to-highlight="searchResult.name"
-          :find-chunks="() => searchResult.matches"
+          :text-to-highlight="name"
+          :find-chunks="() => matches"
         />
       </p>
     </div>
@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { VariantIndexResult } from '@/utils/chess/variant-search'
+  import type { Match } from '@/utils/chess/variant-search'
   import { onMounted, ref } from 'vue'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import type { GameStateGui } from '@/protochess/types'
@@ -68,7 +68,9 @@
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   
   defineProps<{
-    searchResult: VariantIndexResult
+    id: string,
+    name: string,
+    matches: Match[]
   }>()
   
   

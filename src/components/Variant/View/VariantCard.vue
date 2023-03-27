@@ -90,7 +90,6 @@
   
   const emit = defineEmits<{
     (event: 'play-clicked'): void
-    (event: 'edit-variant'): void
   }>()
   
   onMounted(async () => {
@@ -105,7 +104,7 @@
     if (!draftStore.hasDraft()) {
       // Nothing will be lost, so just go ahead and edit
       draftStore.state = clone(props.variant)
-      emit('edit-variant')
+      router.push({ name: 'edit-variant' })
       return
     }
     const nameDetails = draftStore.state.displayName ?
@@ -117,7 +116,7 @@
       'yes-no',
       () => {
         draftStore.state = clone(props.variant)
-        emit('edit-variant')
+        router.push({ name: 'edit-variant' })
       }
     )
   }

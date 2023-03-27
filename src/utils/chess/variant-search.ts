@@ -7,11 +7,14 @@ type VariantIndexEntry = {
   description: string
 }
 
-type Match = {start: number, end: number} // end is exclusive
+export type SearchOrder = 'search-relevance' | 'upvotes' | 'newest'
+
+export type Match = {start: number, end: number} // end is exclusive
 export type VariantIndexResult = {
   id: string
   name: string
-  score: number // 0 is best, 1 is worst
+  searchScore: number // The search relevance of this result (between 0 and 1)
+  sortScore: number // The list is sorted by sortScore in descending order
   matches: Match[]
 }
 
@@ -39,11 +42,16 @@ class VariantSearchIndex {
     return this.index.search(query, { limit }).map(result => {
       const { item, score, matches } = result
       const { id, name } = item
+      
+      // Fuse.js returns a score of 0 for the best match, so we need to invert it
       if (typeof score === 'undefined') throw new Error('Score is undefined')
+      const searchScore = 1 - score
+      
       const typedRet: VariantIndexResult = {
         id,
         name,
-        score,
+        searchScore,
+        sortScore: NaN, // Set by SearchCard when the variant is loaded
         matches: this.getMatchRanges(matches),
       }
       return typedRet
