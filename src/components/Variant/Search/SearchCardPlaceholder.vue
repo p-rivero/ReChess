@@ -15,6 +15,7 @@
         <HighlightWords
           :search-words="[/* Not used */]"
           :text-to-highlight="name"
+          highlight-class-name="has-text-primary-dark"
           :find-chunks="() => matches"
         />
       </p>
