@@ -36,7 +36,7 @@
       </p>
       <button
         v-if="editable"
-        class="button mt-2"
+        class="button mt-1"
         @click="toggleEdit(true)"
       >
         <div class="sz-icon icon-edit color-theme" />

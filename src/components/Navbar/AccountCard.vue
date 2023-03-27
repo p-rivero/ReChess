@@ -5,13 +5,13 @@
     :class="{ 'is-clickable': $route.name !== 'user-profile' }"
     @click="onAccountClick"
   >
-    <div class="pl-3 pr-0 is-align-self-center">
+    <div class="px-3 is-align-self-center">
       <div
-        class="account-icon sz-2 icon-account color-theme"
+        class="icon-account color-theme"
         style="border-radius: 50%;"
       />
     </div>
-    <p class="card-header-title unselectable">
+    <p class="pl-0 card-header-title unselectable">
       {{ authStore.loggedUser.displayName }}
     </p>
   </div>
@@ -50,7 +50,8 @@
     font-weight: 400;
   }
   
-  .loading-placeholder {
-    width: 6rem;
+  .icon-account {
+    height: 1.8rem;
+    width: 1.8rem;
   }
 </style>

@@ -61,7 +61,8 @@ export const useUserStore = defineStore('user', () => {
     return lastUserCache.value
   }
   
-  // Store a user in the database
+  // Attempt to store a user in the database. This will only succeed if the
+  // user is authenticated as the user being stored.
   async function storeUser(user: User): Promise<void> {
     const doc: UserDoc = {
       name: user.name || null, // undefined | "" -> null

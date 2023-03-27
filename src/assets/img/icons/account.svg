@@ -1,6 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-circle" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-   <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
-   <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
-   <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855"></path>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   class="icon icon-tabler icon-tabler-user-circle"
+   width="19.5"
+   height="19.499992"
+   viewBox="0 0 19.5 19.499992"
+   stroke-width="1.5"
+   stroke="currentColor"
+   fill="none"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   version="1.1"
+   id="svg10"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs14" />
+  <path
+     stroke="none"
+     d="m -2.25,-2.2500039 h 24 V 21.749996 h -24 z"
+     fill="none"
+     id="path2" />
+  <path
+     d="m 9.75,9.7499961 m -9,0 a 9,9 0 1 0 18,0 9,9 0 1 0 -18,0"
+     id="path4" />
+  <path
+     d="m 9.75,7.7499961 m -3,0 a 3,3 0 1 0 6,0 3,3 0 1 0 -6,0"
+     id="path6" />
+  <path
+     d="m 3.918,16.598996 a 4,4 0 0 1 3.832,-2.849 h 4 a 4,4 0 0 1 3.834,2.855"
+     id="path8" />
 </svg>

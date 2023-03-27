@@ -4,17 +4,53 @@
     class="columns"
   >
     <div class="column is-8">
-      <EditableTitle
-        class="mb-5"
-        :edit-button-text="'Edit display name'"
-        :text="user.displayName ?? ''"
-        :placeholder="`@${user.username}`"
-        :editable="myProfile(user)"
-        :start-edit-callback="startNameEdit"
-        :error-handler="errorHandler"
-        :validator="text => text.length > 50 ? 'The display name must be at most 50 characters long' : undefined"
-        @save="updateName"
-      />
+      <div class="is-flex is-align-items-center mb-5">
+        <div
+          class="mr-4 profile-image-container"
+          :class="{
+            'editable': myProfile(user),
+            'force-show-overlay': loading
+          }"
+          @click="imageClicked"
+        >
+          <img
+            v-if="user.profileImg"
+            class="h-100 h-100"
+            :src="user.profileImg"
+            draggable="false"
+            alt="Profile image"
+          >
+          <div
+            v-else
+            class="icon-account color-theme w-100 h-100"
+          />
+          <div
+            v-if="myProfile(user)"
+            
+            class="overlay is-flex is-align-items-center is-justify-content-center"
+          >
+            <div
+              v-if="loading"
+              class="button is-loading is-large is-transparent"
+            />
+            <div
+              v-else
+              class="icon-edit color-white sz-3"
+            />
+          </div>
+        </div>
+        
+        <EditableTitle
+          :edit-button-text="'Edit display name'"
+          :text="user.displayName ?? ''"
+          :placeholder="`@${user.username}`"
+          :editable="myProfile(user)"
+          :start-edit-callback="startNameEdit"
+          :error-handler="errorHandler"
+          :validator="text => text.length > 50 ? 'The display name must be at most 50 characters long' : undefined"
+          @save="updateName"
+        />
+      </div>
       <div class="is-flex is-align-items-center mb-4">
         <div class="sz-2 icon-at color-theme" />
         <p class="is-size-5 ml-2">
@@ -123,6 +159,8 @@
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { Timestamp } from '@firebase/firestore'
+  import { importFile as loadFile } from '@/utils/file-io'
+  import { getUrl, uploadBlob } from '@/firebase/storage'
   
   const router = useRouter()
   const route = useRoute()
@@ -133,6 +171,7 @@
   const hasError = ref(false)
   const showDangerZone = ref(false)
   const sendingResetPasswordEmail = ref(false)
+  const loading = ref(false)
   
   const errorHandler = new ErrorMessageHandler(hasError)
   
@@ -214,6 +253,32 @@
         'There has been an unexpected error. Please try again later.',
         'ok'
       )
+    }
+  }
+  
+  async function imageClicked() {
+    if (!user.value || !myProfile(user.value)) {
+      return
+    }
+    // Get the new image from the user
+    const image = await loadFile('image/*')
+    loading.value = true
+    try {
+      // Upload the image to Firebase Storage
+      await uploadBlob(image, `profile-images/${user.value.uid}`)
+      const url = await getUrl(`profile-images/${user.value.uid}`)
+      // Update the user profile image
+      user.value.profileImg = url
+      await userStore.storeUser(user.value)
+    } catch (e) {
+      console.error(e)
+      showPopup(
+        'Could not upload image',
+        'Make sure you uploaded a valid image file and the file size is **1MB** or less.',
+        'ok'
+      )
+    } finally {
+      loading.value = false
     }
   }
   
@@ -299,4 +364,48 @@
     border-width: 0.2rem;
     padding: 1rem;
   }
+  
+  .profile-image-container {
+    width: 7rem;
+    height: 7rem;
+    position: relative;
+    margin-left: -0.4rem;
+    img {
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+  
+  .button.is-transparent {
+    background-color: transparent;
+    border: none;
+    font-size: 3rem;
+    &::after {
+      border: 4px solid hsl(0, 0%, 86%);
+      border-right-color: transparent;
+      border-bottom-color: transparent;
+    }
+  }
+  
+  .profile-image-container.editable {
+    cursor: pointer;
+    
+    .overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      top: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      transition: all 0.1s;
+      -webkit-transition: all 0.1s;
+    }
+    
+    &:hover .overlay, &.force-show-overlay .overlay {
+      opacity: 1;
+    }
+  }
+  
 </style>
