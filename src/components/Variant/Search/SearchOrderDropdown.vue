@@ -97,7 +97,6 @@
 
 <style scoped lang="scss">
   .select select {
-    padding-top: 0.6rem;
     font-size: 0.9rem;
     text-align: right;
     // Remove outline
