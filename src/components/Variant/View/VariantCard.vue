@@ -17,7 +17,7 @@
           :disable-refresh="true"
         />
       </div>
-      <div class="mt-3 is-size-5 has-text-weight-semibold">
+      <div class="mt-3 is-size-5 has-text-weight-semibold is-break-word">
         <HighlightWords
           :search-words="[/* Not used */]"
           :text-to-highlight="variant.displayName"
@@ -29,7 +29,7 @@
     
     <p
       v-if="variant.creatorId"
-      class="mb-0 has-text-weight-light"
+      class="mb-0 has-text-weight-light is-break-word"
     >
       By <a @click="creatorClicked">{{ variant.creatorDisplayName }}</a>
     </p>

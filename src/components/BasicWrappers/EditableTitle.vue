@@ -31,7 +31,7 @@
       </div>
     </div>
     <div v-show="!editing || !editable">
-      <p class="is-size-2">
+      <p class="is-size-2 is-break-word">
         {{ text }}
       </p>
       <button

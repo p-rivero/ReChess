@@ -11,7 +11,7 @@
         style="border-radius: 50%;"
       />
     </div>
-    <p class="pl-0 card-header-title unselectable">
+    <p class="pl-0 card-header-title unselectable is-break-word">
       {{ authStore.loggedUser.displayName }}
     </p>
   </div>
@@ -43,10 +43,8 @@
 <style lang="scss" scoped>
 
   .card-header-title {
-    // Don't use more than 1 line for the account name
-    white-space: nowrap;
-    overflow: hidden;
-    max-width: 400px;
+    overflow: clip;
+    max-height: 3rem;
     font-weight: 400;
   }
   

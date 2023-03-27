@@ -6,7 +6,7 @@
     <div class="column is-8">
       <div class="is-flex is-align-items-center mb-5">
         <div
-          class="mr-4 profile-image-container"
+          class="mr-4 profile-image-container is-flex-shrink-0 is-flex-grow-0"
           :class="{
             'editable': myProfile(user),
             'force-show-overlay': loading
@@ -41,6 +41,7 @@
         </div>
         
         <EditableTitle
+          class="w-100"
           :edit-button-text="'Edit display name'"
           :text="user.displayName ?? ''"
           :placeholder="`@${user.username}`"

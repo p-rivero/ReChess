@@ -1,13 +1,13 @@
 <template>
   <div class="columns">
     <div class="column is-6">
-      <p class="is-size-2 mb-2">
+      <p class="is-size-2 mb-2 is-break-word">
         {{ variant?.displayName }}
       </p>
       
       <p
         v-if="variant?.creatorId"
-        class="is-size-5 has-text-weight-semibold mb-4"
+        class="is-size-5 has-text-weight-semibold mb-4 is-break-word"
       >
         Created by
         <a @click="creatorClicked">{{ variant?.creatorDisplayName }}</a>

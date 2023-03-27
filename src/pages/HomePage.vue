@@ -4,7 +4,7 @@
       <p class="control has-icons-left has-icons-right is-flex-grow-1">
         <SmartTextInput
           class="is-medium"
-          placeholder="Search variants..."
+          placeholder="Search..."
           :start-text="lastSearchText"
           @changed="text => search(text)"
         />

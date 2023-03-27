@@ -19,7 +19,7 @@
           :capture-wheel-events="false"
         />
       </div>
-      <p class="mt-3 is-size-5 has-text-weight-semibold">
+      <p class="mt-3 is-size-5 has-text-weight-semibold is-break-word">
         {{ draftStore.state.displayName }}
       </p>
     </div>
