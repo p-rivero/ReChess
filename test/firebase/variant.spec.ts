@@ -7,10 +7,10 @@ import type { UserDoc, VariantDoc } from '@/firebase/db/schema'
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
-let { get, query, set, add, remove }: TestUtilsSignature = notInitialized()
+let { get, query, set, add, remove, now, afterSeconds }: TestUtilsSignature = notInitialized()
 
 setupJest('variant-tests', env => {
-  ({ get, query, set, add, remove } = setupTestUtils(env, MY_ID, MY_EMAIL))
+  ({ get, query, set, add, remove, now, afterSeconds } = setupTestUtils(env, MY_ID, MY_EMAIL))
 })
 
 
@@ -45,6 +45,7 @@ test('can create variant with display name', async () => {
     name: 'My variant',
     description: 'Variant description',
     IMMUTABLE: {
+      creationTime: now(),
       creatorDisplayName: 'My name',
       creatorId: MY_ID,
       initialState: '{}',
@@ -62,6 +63,7 @@ test('can create variant with username', async () => {
     name: 'My variant',
     description: 'Variant description',
     IMMUTABLE: {
+      creationTime: now(),
       creatorDisplayName: '@my_username',
       creatorId: MY_ID,
       initialState: '{}',
@@ -79,6 +81,7 @@ test('cannot create variant if not verified', async () => {
     name: 'My variant',
     description: 'Variant description',
     IMMUTABLE: {
+      creationTime: now(),
       creatorDisplayName: 'My name',
       creatorId: MY_ID,
       initialState: '{}',
@@ -96,6 +99,7 @@ test('variant name must be trimmed', async () => {
     name: '  My variant ',
     description: 'Variant description',
     IMMUTABLE: {
+      creationTime: now(),
       creatorDisplayName: 'My name',
       creatorId: MY_ID,
       initialState: '{}',
@@ -113,12 +117,17 @@ test('creator id must be correct', async () => {
     name: 'My variant',
     description: 'Variant description',
     IMMUTABLE: {
+      creationTime: now(),
       creatorDisplayName: 'My name',
       creatorId: 'WRONG_ID', // Trying to impersonate another user
       initialState: '{}',
     },
   }
   await assertFails(
+    add('verified', variant, 'variants')
+  )
+  variant.IMMUTABLE.creatorId = MY_ID
+  await assertSucceeds(
     add('verified', variant, 'variants')
   )
 })
@@ -130,6 +139,7 @@ test('creator must id must mot be null', async () => {
     name: 'My variant',
     description: 'Variant description',
     IMMUTABLE: {
+      creationTime: now(),
       creatorDisplayName: 'My name',
       creatorId: null,
       initialState: '{}',
@@ -149,6 +159,7 @@ test('creator display name must be correct', async () => {
     name: 'My variant',
     description: 'Variant description',
     IMMUTABLE: {
+      creationTime: now(),
       creatorDisplayName: 'ANOTHER NAME',
       creatorId: MY_ID,
       initialState: '{}',
@@ -158,6 +169,7 @@ test('creator display name must be correct', async () => {
     add('verified', variant, 'variants')
   )
   
+  // Remove the user's name
   await setupUser(null)
   
   variant.IMMUTABLE.creatorDisplayName = '@wrong_username'
@@ -170,12 +182,35 @@ test('creator display name must be correct', async () => {
   )
 })
 
+test('creation time must be correct', async () => {
+  await setupUser()
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    IMMUTABLE: {
+      creationTime: afterSeconds(100),
+      creatorDisplayName: 'My name',
+      creatorId: MY_ID,
+      initialState: '{}',
+    },
+  }
+  await assertFails(
+    add('verified', variant, 'variants')
+  )
+  variant.IMMUTABLE.creationTime = now()
+  await assertSucceeds(
+    add('verified', variant, 'variants')
+  )
+})
+
 test('cannot remove variant', async () => {
   await setupUser()
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
     IMMUTABLE: {
+      creationTime: now(),
       creatorDisplayName: 'My name',
       creatorId: MY_ID,
       initialState: '{}',

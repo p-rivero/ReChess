@@ -7,6 +7,7 @@ import { parseVariantJson } from '@/utils/chess/variant-json'
 import type { VariantDoc, VariantUpvotesDoc } from '@/firebase/db/schema'
 import { placementsToFen } from '@/utils/chess/fen-to-placements'
 import { useAuthStore } from '@/stores/auth-user'
+import type { Timestamp } from '@firebase/firestore'
 
 export const useVariantStore = defineStore('variant', () => {
   
@@ -37,7 +38,7 @@ export const useVariantStore = defineStore('variant', () => {
     for (const [i, [doc, id]] of docsWithId.entries()) {
       const upvotesDoc = upvotes[i]
       if (!upvotesDoc) continue
-      const state = readDocuments(doc, upvotesDoc, userUpvoted[i], id)
+      const state = readDocument(doc, upvotesDoc, userUpvoted[i], id)
       if (state) variantList.value.push(state)
     }
   }
@@ -68,7 +69,7 @@ export const useVariantStore = defineStore('variant', () => {
     ]).then(([doc, upvotes, userUpvoted]) => {
       // Convert the documents into a PublishedVariantGui
       if (!doc || !upvotes) return undefined
-      return readDocuments(doc, upvotes, userUpvoted, id)
+      return readDocument(doc, upvotes, userUpvoted, id)
     })
   }
   
@@ -84,15 +85,17 @@ export const useVariantStore = defineStore('variant', () => {
   }
   
   
-  function readDocuments(doc: VariantDoc, upvotes: VariantUpvotesDoc, userUpvoted: boolean, id: string): PublishedVariantGui | undefined {
+  function readDocument(doc: VariantDoc, upvotes: VariantUpvotesDoc, userUpvoted: boolean, id: string): PublishedVariantGui | undefined {
     const variant = parseVariantJson(doc.IMMUTABLE.initialState)
     if (!variant) {
       console.error('Illegal variant document', doc)
       return undefined
     }
+    const creationTimestamp = doc.IMMUTABLE.creationTime as Timestamp
     const pv: PublishedVariant = {
       ...variant,
       uid: id,
+      creationTime: creationTimestamp.toDate(),
       creatorDisplayName: doc.IMMUTABLE.creatorDisplayName,
       creatorId: doc.IMMUTABLE.creatorId ?? undefined,
       numUpvotes: upvotes.numUpvotes,

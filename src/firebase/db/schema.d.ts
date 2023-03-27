@@ -42,6 +42,7 @@ export interface VariantDoc {
   name: string
   description: string
   IMMUTABLE: {
+    creationTime: FieldValue | Timestamp
     creatorDisplayName: string
     creatorId: string | null
     // JSON string that corresponds to the GameState interface in src/protochess/types.ts

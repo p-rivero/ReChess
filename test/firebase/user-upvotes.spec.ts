@@ -30,6 +30,7 @@ async function createUserAndVariant(creatorId = 'some_id', addUpvote = true) {
     name: 'My variant',
     description: 'Variant description',
     IMMUTABLE: {
+      creationTime: now(),
       creatorDisplayName: 'Another user',
       creatorId,
       initialState: '{}',

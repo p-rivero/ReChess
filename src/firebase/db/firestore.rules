@@ -28,7 +28,7 @@ function mapEq(mapA, mapB) {
 }
 
 // Checks that a field was created with serverTimestamp()
-function correctTimestamp(field) {
+function isServerTimestamp(field) {
   return field == request.time;
 }
 
@@ -164,7 +164,7 @@ service cloud.firestore {
         allow create: if
           hasCorrectFields(['timeUpvoted'], []) &&
           isAuth(userId) &&
-          correctTimestamp(request.resource.data.timeUpvoted) &&
+          isServerTimestamp(request.resource.data.timeUpvoted) &&
           assertUpvoteDelta(1);
         // Cannot update an upvote, only delete it
         allow update: if false;
@@ -180,7 +180,7 @@ service cloud.firestore {
     match /variants/{variantId} {
       function isVariantDoc() {
         return hasCorrectFields(['name', 'description', 'IMMUTABLE'], []) &&
-          hasCorrectImmutableFields(['creatorDisplayName', 'initialState'], ['creatorId']);
+          hasCorrectImmutableFields(['creationTime', 'creatorDisplayName', 'initialState'], ['creatorId']);
       }
       function isValidVariantEdit(variant) {
         let userDoc = get(/databases/$(database)/documents/users/$(variant.IMMUTABLE.creatorId));
@@ -189,6 +189,7 @@ service cloud.firestore {
           variant.name.size() >= 3 &&
           variant.name.size() <= 50 &&
           variant.description.size() <= 1000 &&
+          isServerTimestamp(variant.IMMUTABLE.creationTime) &&
           variant.IMMUTABLE.creatorDisplayName == expectedDisplayName &&
           // Creator can be null if their account has been deleted (not when creating the variant)
           variant.IMMUTABLE.creatorId != null &&

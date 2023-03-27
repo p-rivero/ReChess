@@ -142,6 +142,7 @@ export function isPublishedVariant(obj: unknown): obj is PublishedVariant {
     return (
         isVariant(typedObj) as boolean &&
         typeof typedObj["uid"] === "string" &&
+        typedObj["creationTime"] instanceof Date &&
         typeof typedObj["creatorDisplayName"] === "string" &&
         (typeof typedObj["creatorId"] === "undefined" ||
             typeof typedObj["creatorId"] === "string") &&

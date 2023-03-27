@@ -15,6 +15,7 @@ export async function createVariant(userId: string, displayName: string, variant
     name: variant.displayName.trim(),
     description: variant.description,
     IMMUTABLE: {
+      creationTime: serverTimestamp(),
       creatorDisplayName: displayName,
       creatorId: userId,
       initialState: JSON.stringify(variant),

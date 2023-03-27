@@ -94,6 +94,7 @@ export interface Variant extends GameState {
 /** @see {isPublishedVariant} ts-auto-guard:type-guard */
 export interface PublishedVariant extends Variant {
   uid: string,
+  creationTime: Date,
   creatorDisplayName: string,
   creatorId?: string,
   numUpvotes: number,
