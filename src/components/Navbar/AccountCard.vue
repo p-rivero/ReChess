@@ -5,10 +5,17 @@
     :class="{ 'is-clickable': $route.name !== 'user-profile' }"
     @click="onAccountClick"
   >
-    <div class="px-3 is-align-self-center">
+    <div class="ml-3 mr-2 account-image-container is-align-self-center">
+      <img
+        v-if="authStore.loggedUser.profileImg"
+        class="h-100 h-100"
+        :src="authStore.loggedUser.profileImg"
+        draggable="false"
+        alt="Profile image"
+      >
       <div
-        class="icon-account color-theme"
-        style="border-radius: 50%;"
+        v-else
+        class="icon-account color-theme w-100 h-100"
       />
     </div>
     <p class="pl-0 card-header-title unselectable is-break-word">
@@ -48,8 +55,12 @@
     font-weight: 400;
   }
   
-  .icon-account {
+  .account-image-container {
     height: 1.8rem;
     width: 1.8rem;
+    img {
+      border-radius: 50%;
+      max-height: 1.8rem;
+    }
   }
 </style>
