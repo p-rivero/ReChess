@@ -19,7 +19,7 @@
         />
       </header>
       <footer class="modal-card-foot is-flex is-justify-content-center">
-        <div class="columns w-100">
+        <div class="columns is-mobile w-100 px-2">
           <div
             class="column is-clickable"
             @click="play('white')"
@@ -30,7 +30,9 @@
             >
               <span class="icon-king color-black" />
             </button>
-            <p>As White</p>
+            <p class="has-text-centered">
+              As White
+            </p>
           </div>
           <div
             class="column is-clickable"
@@ -40,7 +42,9 @@
               aria-label="play as random side"
               class="button random-side px-0 py-0 mr-0"
             />
-            <p>Random side</p>
+            <p class="has-text-centered">
+              Random side
+            </p>
           </div>
           <div
             class="column is-clickable"
@@ -52,7 +56,9 @@
             >
               <span class="icon-king color-white" />
             </button>
-            <p>As Black</p>
+            <p class="has-text-centered">
+              As Black
+            </p>
           </div>
         </div>
       </footer>
