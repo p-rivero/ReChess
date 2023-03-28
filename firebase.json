@@ -24,7 +24,7 @@
         ]
       },
       {
-        "source": "/",
+        "source": "**",
         "headers": [
           {
             "key": "Cross-Origin-Embedder-Policy",
