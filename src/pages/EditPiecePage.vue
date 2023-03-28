@@ -373,13 +373,19 @@
   
   function enabledCheckboxChanged(enabled: boolean, color: Player) {
     if (!piece) throw new Error('Piece is null')
+    // Determine the new id to use
     const textBoxVal = color === 'white' ? pieceIdWhite.value : pieceIdBlack.value
     const enabledId = textBoxVal ?? ''
     const newId = enabled ? enabledId : null
-    const i = color === 'white' ? 0 : 1
+    
     // Remove placements of the piece
+    const i = color === 'white' ? 0 : 1
     const oldId = piece.ids[i] ?? ''
     draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== oldId)
+    
+    // If disabling the piece, remove the image
+    if (!enabled) piece.imageUrls[i] = undefined
+    
     // Set the new id
     piece.ids[i] = newId
     // Remove error message if the piece id was invalid before

@@ -19,9 +19,10 @@
     </p>
   </div>
   <div
-    v-else
-    class="icon-cross color-black"
+    v-else-if="type === 'cross'"
+    class="icon-cross color-theme"
   />
+  <div v-else />
 </template>
 
 
@@ -37,13 +38,20 @@
   const index = computed(() => props.color === 'white' ? 0 : 1)
   
   const type = computed(() => {
+    // An image is available, use it
     if (props.piece.imageUrls[index.value]) {
       return 'image'
     }
-    if (props.piece.ids[index.value]) {
-      return 'text'
+    // If symbol is null or undefined, the piece is not available for that color
+    if (props.piece.ids[index.value] == null) {
+      return 'none'
     }
-    return 'none'
+    // The piece is available, but has no image and no symbol, show a cross
+    if (!props.piece.ids[index.value]) {
+      return 'cross'
+    }
+    // The piece has a symbol, show it
+    return 'text'
   })
   
 </script>
