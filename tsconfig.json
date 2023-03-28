@@ -13,7 +13,9 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    // Temporary fix for https://github.com/vuejs/tsconfig/issues/6
+    "ignoreDeprecations": "5.0"
   },
   "references": [
     {

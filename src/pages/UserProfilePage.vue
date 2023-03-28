@@ -9,7 +9,7 @@
           class="mr-4 profile-image-container is-flex-shrink-0 is-flex-grow-0"
           :class="{
             'editable': myProfile(user),
-            'force-show-overlay': loading
+            'force-show-overlay': imageSelectPopup?.loading
           }"
           @click="imageClicked"
         >
@@ -30,7 +30,7 @@
             class="overlay is-flex is-align-items-center is-justify-content-center"
           >
             <div
-              v-if="loading"
+              v-if="imageSelectPopup?.loading"
               class="button is-loading is-large is-transparent"
             />
             <div
@@ -144,6 +144,17 @@
     </div>
     <div class="column is-4" />
   </div>
+  <ImageSelectPopup
+    ref="imageSelectPopup"
+    :uploaded-image-width="256"
+    @image-uploaded="setProfileImage"
+    @remove-image="setProfileImage(undefined)"
+    @upload-error="showPopup(
+      'Could not upload image',
+      'Make sure you uploaded a valid image file and the file size is **200kB** or less.',
+      'ok'
+    )"
+  />
 </template>
 
 <script setup lang="ts">
@@ -158,10 +169,9 @@
   import EditableMarkdown from '@/components/BasicWrappers/EditableMarkdown.vue'
   import EditableTitle from '@/components/BasicWrappers/EditableTitle.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
+  import ImageSelectPopup from '@/components/ImageSelect/ImageSelectPopup.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { Timestamp } from '@firebase/firestore'
-  import { importFile as loadFile } from '@/utils/file-io'
-  import { getUrl, uploadBlob } from '@/firebase/storage'
   
   const router = useRouter()
   const route = useRoute()
@@ -172,7 +182,7 @@
   const hasError = ref(false)
   const showDangerZone = ref(false)
   const sendingResetPasswordEmail = ref(false)
-  const loading = ref(false)
+  const imageSelectPopup = ref<InstanceType<typeof ImageSelectPopup>>()
   
   const errorHandler = new ErrorMessageHandler(hasError)
   
@@ -261,26 +271,14 @@
     if (!user.value || !myProfile(user.value)) {
       return
     }
-    // Get the new image from the user
-    const image = await loadFile('image/*')
-    loading.value = true
-    try {
-      // Upload the image to Firebase Storage
-      await uploadBlob(image, `profile-images/${user.value.uid}`)
-      const url = await getUrl(`profile-images/${user.value.uid}`)
-      // Update the user profile image
-      user.value.profileImg = url
-      await userStore.storeUser(user.value)
-    } catch (e) {
-      console.error(e)
-      showPopup(
-        'Could not upload image',
-        'Make sure you uploaded a valid image file and the file size is **200kB** or less.',
-        'ok'
-      )
-    } finally {
-      loading.value = false
+    imageSelectPopup.value?.show(`profile-images/${user.value.uid}`)
+  }
+  async function setProfileImage(url: string | undefined) {
+    if (!user.value) {
+      throw new Error('User is undefined')
     }
+    user.value.profileImg = url
+    await userStore.storeUser(user.value)
   }
   
   async function deleteAccount() {
