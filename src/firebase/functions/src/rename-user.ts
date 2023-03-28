@@ -18,7 +18,7 @@ export default async function(
   change: Change<QueryDocumentSnapshot>,
   userId: string
 ): Promise<void> {
-  const TIMEOUT_SECONDS = 30 * 60 // 30 minutes
+  const TIMEOUT_SECONDS = 5 * 60 // 5 minutes
   
   const admin = await useAdmin()
   const db = admin.firestore()

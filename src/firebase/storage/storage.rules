@@ -38,10 +38,10 @@ service firebase.storage {
       // Anyone can see the images
       allow read;
       
-      // Only allow uploading images of 1MB or less, and only for the user's own profile.
+      // Only allow uploading images of 200kB or less, and only for the user's own profile.
       allow create, update: if
         authMetadata() &&
-        sizeKb(1024) &&
+        sizeKb(200) &&
         isImage() &&
         request.auth.uid == userId;
         

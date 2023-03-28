@@ -217,7 +217,7 @@
     if (Date.now() < user.value.renameAllowedAt.toMillis()) {
       showPopup(
         'Cannot edit display name',
-        'To prevent spam, you can only change your display name once every **30 minutes**. Please try again later.',
+        'To prevent spam, you can only change your display name once every **5 minutes**. Please try again later.',
         'ok'
       )
       return false
@@ -275,7 +275,7 @@
       console.error(e)
       showPopup(
         'Could not upload image',
-        'Make sure you uploaded a valid image file and the file size is **1MB** or less.',
+        'Make sure you uploaded a valid image file and the file size is **200kB** or less.',
         'ok'
       )
     } finally {

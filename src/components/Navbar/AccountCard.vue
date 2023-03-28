@@ -61,6 +61,7 @@
     img {
       border-radius: 50%;
       max-height: 1.8rem;
+      object-fit: cover;
     }
   }
 </style>
