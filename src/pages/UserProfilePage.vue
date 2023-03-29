@@ -26,7 +26,6 @@
           />
           <div
             v-if="myProfile(user)"
-            
             class="overlay is-flex is-align-items-center is-justify-content-center"
           >
             <div
@@ -41,8 +40,8 @@
         </div>
         
         <EditableTitle
-          class="w-100"
-          :edit-button-text="'Edit display name'"
+          class="w-100 is-flex-shrink-1 is-small"
+          :edit-button-text="'Edit name'"
           :text="user.displayName ?? ''"
           :placeholder="`@${user.username}`"
           :editable="myProfile(user)"
@@ -53,8 +52,8 @@
         />
       </div>
       <div class="is-flex is-align-items-center mb-4">
-        <div class="sz-2 icon-at color-theme" />
-        <p class="is-size-5 ml-2">
+        <div class="sz-2 icon-at color-theme is-flex-shrink-0" />
+        <p class="is-size-5 ml-2 is-break-word">
           {{ user.username }}
         </p>
       </div>
@@ -63,26 +62,32 @@
         class="is-flex is-align-items-center mb-4"
       >
         <div
-          class="sz-2 color-theme"
+          class="sz-2 color-theme is-flex-shrink-0"
           :class="{
             'icon-mail': user.signInProvider === 'password',
             'icon-google': user.signInProvider === 'google.com',
             'icon-github': user.signInProvider === 'github.com',
           }"
         />
-        <p class="is-size-5 ml-2 mr-3">
-          {{ user.email }}
-        </p>
-        <button
-          v-if="user.signInProvider === 'password'"
-          class="button ml-4"
-          :class="{ 'is-loading': sendingResetPasswordEmail }"
-          :disabled="sendingResetPasswordEmail"
-          @click="resetPassword"
-        >
-          <div class="sz-icon icon-key color-theme" />
-          Change password
-        </button>
+        <div class="columns mx-0 my-0 is-align-items-center">
+          <div class="column px-0 py-0">
+            <p class="is-size-5 ml-2 mr-3 is-break-word">
+              {{ user.email }}
+            </p>
+          </div>
+          <div class="column px-0 py-0 is-narrow">
+            <button
+              v-if="user.signInProvider === 'password'"
+              class="button ml-4"
+              :class="{ 'is-loading': sendingResetPasswordEmail }"
+              :disabled="sendingResetPasswordEmail"
+              @click="resetPassword"
+            >
+              <div class="sz-icon icon-key color-theme" />
+              Change password
+            </button>
+          </div>
+        </div>
       </div>
       <div class="content mb-0 pt-4">
         <h4>About:</h4>
@@ -367,6 +372,10 @@
   .profile-image-container {
     width: 7rem;
     height: 7rem;
+    @media screen and (max-width: 768px) {
+      width: 5rem;
+      height: 5rem;
+    }
     position: relative;
     margin-left: -0.4rem;
     img {

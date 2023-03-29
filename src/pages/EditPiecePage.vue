@@ -6,7 +6,7 @@
 
 <template>
   <div class="columns is-desktop reverse-columns">
-    <div class="column is-narrow left-column">
+    <div class="column is-5">
       <div class="is-flex is-justify-content-center mb-4">
         <PieceViewerWithZoom
           v-if="piece"
@@ -40,7 +40,7 @@
     
     
     
-    <div class="column mb-5">
+    <div class="column mb-5 is-7">
       <SmartTextInput
         class="is-large mb-5"
         placeholder="Piece name"
@@ -128,18 +128,21 @@
         @changed="value => piece!.isLeader = value"
       />
       
-      <div class="horizontal-field">
-        <div class="field-label">
-          <label>Castling</label>
+      <div class="columns mb-4">
+        <div class="column is-flex is-align-items-center">
+          <div class="field-label">
+            <label>Castling</label>
+          </div>
+          <SmartDropdown
+            :items="['No', 'As king', 'As rook']"
+            :start-item="piece?.isCastleRook ? 'As rook' : piece?.castleFiles ? 'As king' : 'No'"
+            @changed="item =>castlingDropdownChanged(item)"
+          />
         </div>
-        <SmartDropdown
-          :items="['No', 'As king', 'As rook']"
-          :start-item="piece?.isCastleRook ? 'As rook' : piece?.castleFiles ? 'As king' : 'No'"
-          :on-changed="item =>castlingDropdownChanged(item)"
-        />
+        
         <div
           v-show="piece?.castleFiles"
-          class="is-flex-not-important is-flex-direction-row is-align-items-center"
+          class="column is-flex-not-important is-align-items-center"
         >
           <div class="field-label-both">
             <label>Queenside file</label>
@@ -152,6 +155,12 @@
             :validator="text => validateCastlingFile(text, 'Queenside')"
             @changed="text => { castleFileQueenside = letterToNumber(text); piece!.castleFiles![0] = castleFileQueenside }"
           />
+        </div>
+        
+        <div
+          v-show="piece?.castleFiles"
+          class="column is-flex-not-important is-align-items-center"
+        >
           <div class="field-label-both">
             <label>Kingside file</label>
           </div>
@@ -349,6 +358,7 @@
   const castleFileKingside = ref(piece?.castleFiles?.[1] || 6)
   
   function castlingDropdownChanged(item: string) {
+    console.log('Castling dropdown changed to', item)
     if (!piece) throw new Error('Piece is null')
     if (item === 'No') {
       piece.castleFiles = undefined
@@ -494,18 +504,14 @@
       display: flex;
       flex-direction: column-reverse;
     }
+    .column {
+      width: 80%;
+      align-self: center;
+    }
   }
-  
-  .left-column {
-    min-width: 32rem;
-    max-width: 32rem;
-  }
-  
-  // In mobile, allow left column to be as small as needed
-  @media screen and (max-width: 1023px) {
-    .left-column {
-      min-width: 0;
-      margin-right: 0;
+  @media screen and (max-width: 767px) {
+    .column {
+      width: 100%;
     }
   }
     

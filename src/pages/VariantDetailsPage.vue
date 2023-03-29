@@ -44,7 +44,7 @@
       />
     </div>
     
-    <div class="column is-6 columns reverse-columns board-column">
+    <div class="column is-6 columns reverse-columns px-0 mx-0">
       <div class="column mt-2 is-5 is-narrow">
         <button
           class="button is-primary is-fullwidth mb-4"
@@ -287,6 +287,7 @@
     .reverse-columns {
       display: flex;
       flex-direction: column-reverse;
+      height: fit-content;
       
       .column {
         width: 100%;
@@ -294,10 +295,8 @@
     }
   }
   
-  @media screen and (min-width: 1024px) {
-    .board-column {
-      padding-right: 0;
-      padding-left: 0;
-    }
+  .board-column {
+    padding-right: 0.75;
   }
+
 </style>
