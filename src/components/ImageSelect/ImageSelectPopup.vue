@@ -18,11 +18,13 @@
           @click="closePopup"
         />
       </header>
-      <section class="modal-card-body px-0 pb-0 pt-2">
+      <section class="modal-card-body px-0 py-0">
         <div
-          v-if="!hasImage"
-          class="w-100 is-flex py-6 is-flex-direction-column is-justify-content-center is-align-items-center"
+          v-show="!hasImage"
+          style="position: relative;"
+          class="w-100 is-flex-show py-6 is-flex-direction-column is-justify-content-center is-align-items-center"
         >
+          <FileDropArea @file-dropped="showImage" />
           <p> Drag and drop your image here </p>
           <p class="my-4">
             or
@@ -81,6 +83,7 @@
   import { importFile } from '@/utils/file-io'
   import { getUrl, uploadBlob } from '@/firebase/storage'
   import type { CacheHeader, Bucket } from '@/firebase/storage'
+  import FileDropArea from '../FileDropArea.vue'
   
   const popup = ref<HTMLElement>()
   const buttonUpload = ref<HTMLButtonElement>()
@@ -124,6 +127,9 @@
   async function selectFile() {
     // Get the new image from the user
     const image = await importFile('image/*')
+    showImage(image)
+  }
+  function showImage(image: Blob) {
     hasImage.value = true
     nextTick(() => {
       imageCrop.value?.setBlob(image)

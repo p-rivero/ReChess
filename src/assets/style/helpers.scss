@@ -46,6 +46,11 @@
     word-break: break-word;
 }
 
+// Similar to is-flex, but allows using v-show
+.is-flex-show {
+    display: flex;
+}
+
 .content ul {
     margin-top: 0.5em;
     margin-bottom: 0.5em;

@@ -142,7 +142,7 @@
         
         <div
           v-show="piece?.castleFiles"
-          class="column is-flex-not-important is-align-items-center"
+          class="column is-flex-show is-align-items-center"
         >
           <div class="field-label-both">
             <label>Queenside file</label>
@@ -159,7 +159,7 @@
         
         <div
           v-show="piece?.castleFiles"
-          class="column is-flex-not-important is-align-items-center"
+          class="column is-flex-show is-align-items-center"
         >
           <div class="field-label-both">
             <label>Kingside file</label>
@@ -541,20 +541,8 @@
     width: 3rem;
   }
   
-  .piece-image {
-    width: 4rem;
-    height: 4rem;
-    flex-shrink: 0;
-    background-color: #b58863;
-    border-radius: 0.25rem;
-  }
-  
   .invisible {
     visibility: hidden;
-  }
-  
-  .is-flex-not-important {
-    display: flex;
   }
 </style>
 
