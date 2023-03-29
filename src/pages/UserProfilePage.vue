@@ -78,7 +78,7 @@
           <div class="column px-0 py-0 is-narrow">
             <button
               v-if="user.signInProvider === 'password'"
-              class="button ml-4"
+              class="button ml-2"
               :class="{ 'is-loading': sendingResetPasswordEmail }"
               :disabled="sendingResetPasswordEmail"
               @click="resetPassword"
@@ -152,6 +152,7 @@
   <ImageSelectPopup
     ref="imageSelectPopup"
     :uploaded-image-width="256"
+    :show-delete-button="() => user?.profileImg !== undefined"
     @image-uploaded="setProfileImage"
     @remove-image="setProfileImage(undefined)"
     @upload-error="showPopup(

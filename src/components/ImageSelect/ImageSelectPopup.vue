@@ -21,23 +21,22 @@
       <section class="modal-card-body px-0 pb-0 pt-2">
         <div
           v-if="!hasImage"
-          class="w-100 is-flex is-flex-direction-column is-justify-content-center is-align-items-center"
+          class="w-100 is-flex py-6 is-flex-direction-column is-justify-content-center is-align-items-center"
         >
-          <p class="mt-6">
-            Drag and drop your image here
-          </p>
+          <p> Drag and drop your image here </p>
           <p class="my-4">
             or
           </p>
           <button
             ref="buttonUpload"
-            class="button is-primary mb-5"
+            class="button is-primary"
             @click="selectFile"
           >
             Upload image
           </button>
           <button
-            class="button is-small mb-6"
+            v-if="showDeleteButton()"
+            class="button is-small mt-5"
             @click="() => {
               emit('remove-image')
               closePopup()
@@ -91,6 +90,7 @@
   let uploadBlobName = ''
   
   defineProps<{
+    showDeleteButton: () => boolean
     uploadedImageWidth: number
   }>()
   
