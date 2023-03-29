@@ -153,6 +153,7 @@
     ref="imageSelectPopup"
     :uploaded-image-width="256"
     :show-delete-button="() => user?.profileImg !== undefined"
+    :cache="PROFILE_IMG_CACHE"
     @image-uploaded="setProfileImage"
     @remove-image="setProfileImage(undefined)"
     @upload-error="showPopup(
@@ -178,6 +179,9 @@
   import ImageSelectPopup from '@/components/ImageSelect/ImageSelectPopup.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { Timestamp } from '@firebase/firestore'
+  
+  // Cache profile images for 1 hour to reduce network requests at the cost of a slightly outdated image
+  const PROFILE_IMG_CACHE = 'public, max-age=3600' as const
   
   const router = useRouter()
   const route = useRoute()

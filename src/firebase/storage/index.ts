@@ -5,18 +5,23 @@ import type { UploadMetadata, UploadResult } from 'firebase/storage'
 import { FirebaseError } from '@firebase/util'
 
 
+export type CacheHeader = `${'public' | 'private'}, max-age=${number}${', immutable' | ''}`
+
 /**
  * Uploads a blob to cloud storage, at a given path. The user must be logged in,
  * and the user id will be added to the file metadata.
  * @param {Blob} file The file to upload
  * @param {string} filePath The path to upload the file to
+ * @param {CacheHeader} cache The cache header to set on the file.
+ * For example: `public, max-age=31536000` (publicly readable file, cached for 1 year)
  * @throws {Error} If the user is not logged in or if the upload fails
  */
-export async function uploadBlob(file: Blob, filePath: string): Promise<UploadResult> {
+export async function uploadBlob(file: Blob, filePath: string, cache: CacheHeader): Promise<UploadResult> {
   const authStore = useAuthStore()
   const user = authStore.loggedUser
   if (!user) throw new Error('User must be logged in to upload a file')
   const metadata: UploadMetadata = {
+    cacheControl: cache,
     customMetadata: {
       userId: user.uid,
     },

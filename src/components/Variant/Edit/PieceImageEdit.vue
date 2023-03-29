@@ -36,6 +36,10 @@
   
   import { ref, toRefs } from 'vue'
   
+  // Cache is public because averyone can see all piece images. Since the file name is based
+  // on the SHA-256 hash, we can cache it forever because we are not expecting hash collisions.
+  const PIECE_IMG_CACHE = 'public, max-age=31536000, immutable'
+  
   const props = defineProps<{
     imageUrl?: string|null
   }>()
@@ -65,7 +69,7 @@
         return
       }
       // Otherwise, upload the image
-      await uploadBlob(file, filePath)
+      await uploadBlob(file, filePath, PIECE_IMG_CACHE)
       const url = await getUrl(filePath)
       if (!url) throw new Error('Failed to get URL for image that was just uploaded')
       emit('image-changed', url)

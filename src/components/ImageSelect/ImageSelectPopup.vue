@@ -80,6 +80,7 @@
   import { nextTick, ref } from 'vue'
   import { importFile } from '@/utils/file-io'
   import { getUrl, uploadBlob } from '@/firebase/storage'
+  import type { CacheHeader } from '@/firebase/storage'
   
   const popup = ref<HTMLElement>()
   const buttonUpload = ref<HTMLButtonElement>()
@@ -89,9 +90,10 @@
   const loading = ref(false)
   let uploadBlobName = ''
   
-  defineProps<{
+  const props = defineProps<{
     showDeleteButton: () => boolean
     uploadedImageWidth: number
+    cache: CacheHeader
   }>()
   
   defineExpose({
@@ -140,7 +142,7 @@
     // Upload the image to Firebase Storage
     loading.value = true
     try {
-      await uploadBlob(image, uploadBlobName)
+      await uploadBlob(image, uploadBlobName, props.cache)
       const url = await getUrl(uploadBlobName)
       if (!url) throw new Error('Could not get image URL')
       emit('image-uploaded', url)
