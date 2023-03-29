@@ -281,7 +281,7 @@
     if (!user.value || !myProfile(user.value)) {
       return
     }
-    imageSelectPopup.value?.show(`profile-images/${user.value.uid}`)
+    imageSelectPopup.value?.show('default', `profile-images/${user.value.uid}`)
   }
   async function setProfileImage(url: string | undefined) {
     if (!user.value) {

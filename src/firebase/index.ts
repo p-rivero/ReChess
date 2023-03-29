@@ -1,4 +1,4 @@
-import { FIREBASE_CONFIG, CAPTCHA_V3_PUBLIC_KEY } from './credentials'
+import { FIREBASE_CONFIG, CAPTCHA_V3_PUBLIC_KEY, PIECE_IMAGES_BUCKET_URL } from './credentials'
 
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { initializeApp } from 'firebase/app'
@@ -17,7 +17,8 @@ declare global {
 // Initialize Firebase
 const app = initializeApp(FIREBASE_CONFIG)
 const db = getFirestore(app)
-const storage = getStorage(app)
+const defaultStorage = getStorage(app)
+const pieceStorage = getStorage(app, PIECE_IMAGES_BUCKET_URL)
 const auth = getAuth(app)
 const _perf = getPerformance(app)
 
@@ -28,7 +29,8 @@ if (import.meta.env.DEV) {
   globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN = true
   connectAuthEmulator(auth, 'http://localhost:9099')
   connectFirestoreEmulator(db, 'localhost', 8080)
-  connectStorageEmulator(storage, 'localhost', 9199)
+  connectStorageEmulator(defaultStorage, 'localhost', 9199)
+  connectStorageEmulator(pieceStorage, 'localhost', 9199)
 }
 
 // Enable multi-tab persistence only in production, since the emulator is cleared on every restart
@@ -51,4 +53,4 @@ initializeAppCheck(app, {
 
 const authUI = new firebaseui.auth.AuthUI(auth)
 
-export { db, storage, auth, authUI }
+export { db, defaultStorage, pieceStorage, auth, authUI }

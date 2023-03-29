@@ -1,11 +1,13 @@
-import { storage } from '@/firebase'
+import { defaultStorage, pieceStorage } from '@/firebase'
 import { useAuthStore } from '@/stores/auth-user'
-import { getDownloadURL, ref, uploadBytes, deleteObject } from 'firebase/storage'
+import { getDownloadURL, ref, uploadBytes, deleteObject, type FirebaseStorage } from 'firebase/storage'
 import type { UploadMetadata, UploadResult } from 'firebase/storage'
 import { FirebaseError } from '@firebase/util'
 
 
 export type CacheHeader = `${'public' | 'private'}, max-age=${number}${', immutable' | ''}`
+
+export type Bucket = 'default' | 'piece-images'
 
 /**
  * Uploads a blob to cloud storage, at a given path. The user must be logged in,
@@ -16,8 +18,9 @@ export type CacheHeader = `${'public' | 'private'}, max-age=${number}${', immuta
  * For example: `public, max-age=31536000` (publicly readable file, cached for 1 year)
  * @throws {Error} If the user is not logged in or if the upload fails
  */
-export async function uploadBlob(file: Blob, filePath: string, cache: CacheHeader): Promise<UploadResult> {
+export async function uploadBlob(file: Blob, bucket: Bucket, filePath: string, cache: CacheHeader): Promise<UploadResult> {
   const authStore = useAuthStore()
+  const storage = getStorageRef(bucket)
   const user = authStore.loggedUser
   if (!user) throw new Error('User must be logged in to upload a file')
   const metadata: UploadMetadata = {
@@ -37,8 +40,8 @@ export async function uploadBlob(file: Blob, filePath: string, cache: CacheHeade
  * @return {Promise<Blob | undefined>} A promise that resolves to the blob, or undefined if the file does not exist
  * @throws {Error} If the user does not have permission to download the file
  */
-export async function downloadBlob(filePath: string): Promise<Blob | undefined> {
-  const url = await getUrl(filePath)
+export async function downloadBlob(bucket: Bucket, filePath: string): Promise<Blob | undefined> {
+  const url = await getUrl(bucket, filePath)
   if (!url) return undefined
   
   const response = await fetch(url)
@@ -54,7 +57,8 @@ export async function downloadBlob(filePath: string): Promise<Blob | undefined> 
  * @return {Promise<void>} A promise that resolves when the file is deleted
  * @throws {Error} If the user is not logged in or does not have permission to delete the file
  */
-export async function deleteFile(filePath: string): Promise<void> {
+export async function deleteFile(bucket: Bucket, filePath: string): Promise<void> {
+  const storage = getStorageRef(bucket)
   const fileRef = ref(storage, filePath)
   await deleteObject(fileRef)
 }
@@ -66,7 +70,8 @@ export async function deleteFile(filePath: string): Promise<void> {
  * @return {Promise<string | undefined>} A promise that resolves to the download URL,
  * or undefined if the file does not exist
  */
-export async function getUrl(filePath: string): Promise<string | undefined> {
+export async function getUrl(bucket: Bucket, filePath: string): Promise<string | undefined> {
+  const storage = getStorageRef(bucket)
   const fileRef = ref(storage, filePath)
   try {
     const url = await getDownloadURL(fileRef)
@@ -84,7 +89,17 @@ export async function getUrl(filePath: string): Promise<string | undefined> {
  * @param {string} url The download URL of the file
  * @return {Promise<string>} A promise that resolves to the file path
  */
-export async function getFilePath(url: string): Promise<string> {
+export async function getFilePath(bucket: Bucket, url: string): Promise<string> {
+  const storage = getStorageRef(bucket)
   const fileRef = ref(storage, url)
   return fileRef.fullPath
+}
+
+
+function getStorageRef(bucket: Bucket): FirebaseStorage {
+  switch (bucket) {
+    case 'default': return defaultStorage
+    case 'piece-images': return pieceStorage
+    default: throw new Error(`Invalid bucket: ${bucket}`)
+  }
 }

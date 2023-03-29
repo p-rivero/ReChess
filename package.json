@@ -14,7 +14,7 @@
     "type-check": "vue-tsc --noEmit",
     "build-only": "vite build --config .config/vite.config.ts",
     "dev-only": "vite --config .config/vite.config.ts",
-    "start-emulator": "firebase emulators:start --project rechess-web",
+    "start-emulator": "firebase emulators:start",
     "postinstall": "chmod +x ./src/assets/img/icons/generate-icons.sh"
   },
   "dependencies": {

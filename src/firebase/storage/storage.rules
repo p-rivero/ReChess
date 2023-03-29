@@ -19,12 +19,14 @@ service firebase.storage {
       // Anyone can see the images
       allow read;
       
-      // Only allow uploading images of 200kB or less.
       // The client sets the file name to the SHA-256 hash of the file contents, so
       // collisions are very unlikely.
       // Storage rules seems to be unable to access the file's bytes, so we can't
       // check the hash here. See the checkPieceHash cloud function for that.
+      // Store the piece images in a separate bucket, so that we can run the 
+      // cloud function only when needed.
       allow create: if
+        bucket == "rechess-web-piece-images" &&
         authMetadata() &&
         sizeKb(200) &&
         isImage() &&
@@ -33,6 +35,7 @@ service firebase.storage {
       // Cannot edit the metadata of an image or delete it, since other variants may reference it.
       allow update, delete: if false;
     }
+    
     
     match /profile-images/{userId} {
       // Anyone can see the images

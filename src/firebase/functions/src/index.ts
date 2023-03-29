@@ -48,6 +48,7 @@ region('europe-west1')
 export const checkPieceHash =
 region('europe-west1')
   .storage
+  .bucket('rechess-web-piece-images')
   .object()
   .onFinalize(async (object) => {
     return callFunction(import('./check-piece-hash'), object)

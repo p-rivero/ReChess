@@ -58,7 +58,7 @@ jobs:
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --project rechess-web
+          args: deploy
         env:
           GCP_SA_KEY: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_RECHESS_WEB }}'
           PROJECT_ID: rechess-web

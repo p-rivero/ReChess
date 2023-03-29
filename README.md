@@ -109,7 +109,7 @@ If you use VSCode, I recommend installing the [ESLint extension](https://marketp
 ```sh
 firebase login
 npm run build
-firebase deploy --project rechess-web
+firebase deploy
 ```
 
 ---

@@ -1,7 +1,7 @@
 import { db } from '@/firebase'
 import type { UserDoc, UsernameDoc, UserPrivateDoc } from '@/firebase/db/schema'
 
-import { doc, getDoc, setDoc, updateDoc, writeBatch } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore'
 import type { User } from '@firebase/auth'
 
 // Creates a new user in the database (public data + private data + username)
