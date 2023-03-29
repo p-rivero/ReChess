@@ -121,9 +121,11 @@
         </div>
         <div class="column pl-2">
           <button
+            style="position: relative;"
             class="button is-fullwidth"
-            @click="uploadFile"
+            @click="importFile('application/json').then(loadFile)"
           >
+            <FileDropArea @file-dropped="loadFile" />
             <div class="sz-icon icon-upload color-theme" />
             <span>Upload</span>
           </button>
@@ -257,6 +259,7 @@
   import PopupOverlay from '@/components/PopupMsg/PopupOverlay.vue'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import PiecePlacementButtons from '@/components/Variant/Edit/PiecePlacementButtons.vue'
+  import FileDropArea from '@/components/FileDropArea.vue'
   import { checkState } from '@/components/Variant/Edit/check-state'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { onMounted, ref, watch } from 'vue'
@@ -267,6 +270,7 @@
   import { clone } from '@/utils/ts-utils'
   import { useRouter } from 'vue-router'
   import type { PublishedVariantGui } from '@/protochess/types'
+  import { importFile } from '@/utils/file-io'
   
   const draftStore = useVariantDraftStore()
   const authStore = useAuthStore()
@@ -389,8 +393,8 @@
     )
   }
   
-  async function uploadFile() {
-    const success = await draftStore.uploadFile()
+  async function loadFile(file: Blob) {
+    const success = await draftStore.loadFile(file)
     // Refresh the page if the upload was successful
     if (success) router.go(0)
     else showPopup(

@@ -2,8 +2,9 @@
   <button
     class="button is-outlined mr-4 px-1 py-1 fit-content"
     :class="{'is-danger': error}"
-    @click="click"
+    @click="importFile('image/*').then(setImage)"
   >
+    <FileDropArea @file-dropped="setImage" />
     <div
       v-if="loading"
       class="button piece-container is-loading is-white is-large"
@@ -33,6 +34,7 @@
 <script setup lang="ts">
   import { importFile, hashBlob } from '@/utils/file-io'
   import { uploadBlob, getUrl } from '@/firebase/storage'
+  import FileDropArea from '@/components/FileDropArea.vue'
   
   import { ref, toRefs } from 'vue'
   
@@ -57,8 +59,7 @@
   const loading = ref(false)
   const error = ref(false)
   
-  async function click() {
-    const file = await importFile('image/*')
+  async function setImage(file: Blob) {
     loading.value = true
     error.value = false
     // Generate a file name for the image, based on its SHA-256 hash

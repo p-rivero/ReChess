@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import sanitizeFilename from 'sanitize-filename'
 
 import type { Variant, PieceDefinition, PiecePlacement } from '@/protochess/types'
-import { exportFile, importFile } from '@/utils/file-io'
+import { exportFile } from '@/utils/file-io'
 import { clone, object_equals } from '@/utils/ts-utils'
 import { parseVariantJson } from '@/utils/chess/variant-json'
 import { VariantDB } from '@/firebase/db'
@@ -58,9 +58,8 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     exportFile(file, fileName)
   }
   
-  async function uploadFile(): Promise<boolean> {
-    const fileBlob = await importFile('application/json')
-    const fileText = await fileBlob.text()
+  async function loadFile(file: Blob): Promise<boolean> {
+    const fileText = await file.text()
     const newGameState = parseVariantJson(fileText)
     if (!newGameState) return false
     state.value = newGameState
@@ -104,7 +103,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     state.value = clone(DEFAULT_DRAFT)
   }
 
-  return { state, addPiece, setWidth, setHeight, backupFile, uploadFile, publish, nameExists, hasDraft,
+  return { state, addPiece, setWidth, setHeight, backupFile, loadFile, publish, nameExists, hasDraft,
     seeCreateHint, hideCreateHint, discardDraft }
 })
 
