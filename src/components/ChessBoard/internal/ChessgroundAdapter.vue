@@ -13,7 +13,6 @@
       @mousedown="startDrag"
       @mousemove="onDragThrottled"
       @mouseup="endDrag"
-      @touchstart="onTap"
       @wheel="onWheel"
     />
   </div>
@@ -104,15 +103,6 @@
     if (images.length <= pieceIndex) return 'none'
     const [_id, pieceUrl] = images[pieceIndex]
     return `url("${pieceUrl}")`
-  }
-  
-  function onTap(e: TouchEvent) {
-    const touch: Touch = e.targetTouches[0]
-    const key = mouseCoordsToKey(touch.clientX, touch.clientY)
-    if (key) {
-      const mode = props.getClickMode?.(key)
-      emit('clicked', key, mode)
-    }
   }
   
   let isDragging = false
