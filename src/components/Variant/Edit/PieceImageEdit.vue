@@ -37,6 +37,7 @@
   import FileDropArea from '@/components/FileDropArea.vue'
   
   import { ref, toRefs } from 'vue'
+  import { autoCropImage, autoCropSvg } from '@/utils/web-utils'
   
   // Cache is public because averyone can see all piece images. Since the file name is based
   // on the SHA-256 hash, we can cache it forever because we are not expecting hash collisions.
@@ -60,6 +61,25 @@
   const error = ref(false)
   
   async function setImage(file: Blob) {
+    // Get the text of the file
+    const fileText = await file.text()
+    
+    // Crop the image so all pieces look the same size
+    switch (file.type) {
+    case 'image/svg+xml': {
+      const cropped = autoCropSvg(fileText)
+      file = new Blob([cropped], { type: 'image/svg+xml' })
+      break
+    }
+    case 'image/png':
+    case 'image/webp':
+      file = await autoCropImage(file)
+      break
+    case 'image/jpeg':
+      file = await autoCropImage(file, 20, true)
+      break
+    }
+    
     loading.value = true
     error.value = false
     // Generate a file name for the image, based on its SHA-256 hash

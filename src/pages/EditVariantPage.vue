@@ -136,7 +136,7 @@
     
     
     
-    <div class="column">
+    <div class="column mb-5">
       <SmartTextInput
         class="is-large mb-5"
         placeholder="Variant name"
