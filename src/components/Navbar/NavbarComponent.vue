@@ -2,6 +2,7 @@
   <nav class="navbar is-fixed-top">
     <div class="navbar-brand">
       <div
+        ref="navbarBurger"
         class="navbar-burger ml-0 mr-auto"
         data-target="navbarMenu"
         @click="navBarBurgerClick"
@@ -28,6 +29,7 @@
 
     <div
       id="navbarMenu"
+      ref="navbarMenu"
       class="navbar-menu"
     >
       <div class="navbar-start">
@@ -40,6 +42,7 @@
         <a
           class="navbar-item"
           href="/"
+          @click="hideNavBarMenu"
         >Browse</a>
         <a
           class="navbar-item"
@@ -68,20 +71,27 @@
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { toggleTheme } from '@/utils/theme'
+  import { ref } from 'vue'
   
   const authStore = useAuthStore()
   const router = useRouter()
+  const navbarBurger = ref<HTMLElement>()
+  const navbarMenu = ref<HTMLElement>()
   
   function navBarBurgerClick() {
-    const navbarBurger = document.querySelector('.navbar-burger')
-    const navbarMenu = document.querySelector('.navbar-menu')
-    navbarBurger?.classList.toggle('is-active')
-    navbarMenu?.classList.toggle('is-active')
+    navbarBurger.value?.classList.toggle('is-active')
+    navbarMenu.value?.classList.toggle('is-active')
+  }
+  
+  function hideNavBarMenu() {
+    navbarBurger.value?.classList.remove('is-active')
+    navbarMenu.value?.classList.remove('is-active')
   }
   
   
   function create() {
     if (authStore.loggedUser) {
+      hideNavBarMenu()
       router.push({ name: 'edit-variant' })
     } else {
       requestSignIn()
