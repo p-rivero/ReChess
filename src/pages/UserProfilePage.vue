@@ -117,7 +117,7 @@
       </button>
       
       <div
-        v-show="myProfile(user)"
+        v-if="myProfile(user)"
         class="is-flex"
       >
         <div
@@ -219,7 +219,7 @@
   })
   
   function myProfile(user: User | AuthUser): user is AuthUser {
-    return user.uid === authStore.loggedUser?.uid
+    return authStore.loggedUser !== null && user.uid === authStore.loggedUser.uid
   }
   
   function startNameEdit(): boolean {
@@ -334,7 +334,7 @@
     sendingResetPasswordEmail.value = true
     try {
       await authStore.sendPasswordResetEmail(authStore.loggedUser.email)
-      showPopup('Change password', `We have sent ${authStore.loggedUser.email} an email to reset your password.`, 'ok')
+      showPopup('Change password', `We have sent \`${authStore.loggedUser.email}\` an email to reset your password.`, 'ok')
     } catch (e) {
       console.error(e)
       showPopup('Cannot change password at the moment', 'Please try again later.', 'ok')

@@ -358,7 +358,6 @@
   const castleFileKingside = ref(piece?.castleFiles?.[1] || 6)
   
   function castlingDropdownChanged(item: string) {
-    console.log('Castling dropdown changed to', item)
     if (!piece) throw new Error('Piece is null')
     if (item === 'No') {
       piece.castleFiles = undefined

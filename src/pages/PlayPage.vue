@@ -42,9 +42,14 @@
       winner === 'black' ? 'Black wins!' :
       'It\'s a Draw!'
     const message = getMessage(flag, playerToMove)
+    
+    // Wait some time before showing the popup, so that the user can see the
+    // final position of the game.
     if (messageShown) return
-    showPopupImportant(title, message, 'ok')
     messageShown = true
+    setTimeout(() => {
+      showPopupImportant(title, message, 'ok')
+    }, 700)
   }
   
   function newMove(playerToMove: Player) {

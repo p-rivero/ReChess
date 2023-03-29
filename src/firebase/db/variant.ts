@@ -75,7 +75,6 @@ export async function removeUpvoteVariant(userId: string, variantId: string): Pr
 
 // TODO: Add pagination
 export async function getVariantList(order: 'newest' | 'upvotes'): Promise<[VariantDoc, string][]> {
-  console.log('Fetching variant list', order)
   const orderQuery = order === 'newest' ?
     orderBy('IMMUTABLE.creationTime', 'desc') :
     orderBy('IMMUTABLE.numUpvotes', 'desc')
