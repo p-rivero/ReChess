@@ -63,17 +63,19 @@
   async function setImage(file: Blob) {
     
     // Crop the image so all pieces look the same size
+    const RATIO_TARGET = 0.35
+    const MAX_HEIGHT = 0.75
     switch (file.type) {
     case 'image/svg+xml': {
-      file = await autoCropSvg(file)
+      file = await autoCropSvg(file, RATIO_TARGET, MAX_HEIGHT)
       break
     }
     case 'image/png':
     case 'image/webp':
-      file = await autoCropImage(file, 512)
+      file = await autoCropImage(file, 512, false, RATIO_TARGET, MAX_HEIGHT)
       break
     case 'image/jpeg':
-      file = await autoCropImage(file, 512, true)
+      file = await autoCropImage(file, 512, true, RATIO_TARGET, MAX_HEIGHT)
       break
     }
     
