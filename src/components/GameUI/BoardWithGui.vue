@@ -5,6 +5,7 @@
         ref="board"
         :white="white"
         :black="black"
+        :invert-enemy-direction="invertEnemyDirection"
         @piece-moved="pieceMoved"
         @player-changed="p => emit('player-changed', p)"
       />
@@ -39,6 +40,7 @@
     white: 'human' | 'engine' | CustomMoveCallback
     black: 'human' | 'engine' | CustomMoveCallback
     hasGauge: boolean
+    invertEnemyDirection?: boolean
   }>()
   
   

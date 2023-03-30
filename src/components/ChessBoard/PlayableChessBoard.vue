@@ -20,6 +20,7 @@
       :view-only="false"
       :show-coordinates="true"
       :capture-wheel-events="true"
+      :invert-enemy-direction="invertEnemyDirection"
       @user-moved="userMovedCallback"
       
       @wheel="onWheel"
@@ -44,6 +45,7 @@
   const props = defineProps<{
     white: 'human' | 'engine' | CustomMoveCallback
     black: 'human' | 'engine' | CustomMoveCallback
+    invertEnemyDirection?: boolean
   }>()
   
   type Result = {flag: MakeMoveFlag, winner: MakeMoveWinner}

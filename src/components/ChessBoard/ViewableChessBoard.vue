@@ -40,6 +40,7 @@
     showCoordinates: boolean
     captureWheelEvents: boolean
     disableRefresh?: boolean
+    invertEnemyDirection?: boolean
     getClickMode?: (position: [number, number]) => 'add'|'remove'
   }>()
   
@@ -91,7 +92,8 @@
         },
       },
     },
-    pieceSize: 1,
+    allyPieceSize: 1,
+    enemyPieceSize: props.invertEnemyDirection ? -1 : 1,
   }
   let pieceImages: PieceImages = { white: [], black: [] }
   

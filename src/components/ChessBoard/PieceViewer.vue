@@ -106,7 +106,7 @@
         },
       },
     },
-    pieceSize: 1,
+    allyPieceSize: 1,
   }
   
   
