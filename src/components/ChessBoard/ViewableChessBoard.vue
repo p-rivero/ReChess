@@ -91,6 +91,7 @@
         },
       },
     },
+    pieceSize: 1,
   }
   let pieceImages: PieceImages = { white: [], black: [] }
   

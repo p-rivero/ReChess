@@ -37,7 +37,7 @@
   import FileDropArea from '@/components/FileDropArea.vue'
   
   import { ref, toRefs } from 'vue'
-  import { autoCropImage, autoCropSvg } from '@/utils/web-utils'
+  import { autoCropSvg, autoCropImage } from '@/utils/image-crop'
   
   // Cache is public because averyone can see all piece images. Since the file name is based
   // on the SHA-256 hash, we can cache it forever because we are not expecting hash collisions.
@@ -61,22 +61,19 @@
   const error = ref(false)
   
   async function setImage(file: Blob) {
-    // Get the text of the file
-    const fileText = await file.text()
     
     // Crop the image so all pieces look the same size
     switch (file.type) {
     case 'image/svg+xml': {
-      const cropped = autoCropSvg(fileText)
-      file = new Blob([cropped], { type: 'image/svg+xml' })
+      file = await autoCropSvg(file)
       break
     }
     case 'image/png':
     case 'image/webp':
-      file = await autoCropImage(file)
+      file = await autoCropImage(file, 512)
       break
     case 'image/jpeg':
-      file = await autoCropImage(file, 20, true)
+      file = await autoCropImage(file, 512, true)
       break
     }
     
@@ -121,7 +118,6 @@
     width: 100%;
     height: 100%;
     // Mimic the same rendering as the chessboard
-    transform: scale(0.9);
     object-fit: cover;
     object-position: left;
   }
