@@ -95,8 +95,8 @@
     },
     
     // Draw an arrow between the given positions
-    drawArrow(from: [number, number], to: [number, number], brush: string) {
-      board.value?.drawArrow(from, to, brush)
+    drawArrow(from: [number, number], to: [number, number], brush: string, pieceId?: string) {
+      board.value?.drawArrow(from, to, brush, pieceId)
     },
     
     // Clear all arrows

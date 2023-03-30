@@ -122,7 +122,7 @@
     const player = await protochess.playerToMove()
     
     gauge.value?.updateEvaluation(mv.evaluation, mv.depth, player === 'black')
-    board.value?.drawArrow(mv.from, mv.to, 'analysis')
+    board.value?.drawArrow(mv.from, mv.to, 'analysis', mv.promotion)
   }
 </script>
 

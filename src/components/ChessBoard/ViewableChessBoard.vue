@@ -187,7 +187,7 @@
     },
     
     // Draw an arrow between two positions
-    drawArrow(from: [number, number], to: [number, number], brush: string) {
+    drawArrow(from: [number, number], to: [number, number], brush: string, pieceId?: string) {
       const fromKey = positionToKey(from)
       const toKey = positionToKey(to)
       const shapes = board.value?.getShapes() || []
@@ -196,6 +196,13 @@
         dest: toKey,
         brush,
       })
+      if (pieceId) {
+        shapes.push({
+          orig: toKey,
+          piece: mappingLookup(pieceId),
+          brush,
+        })
+      }
       board.value?.setShapes(shapes)
     },
     
@@ -250,6 +257,22 @@
   function incrementalUpdateConfig(newConfig: Config) {
     deepMerge(currentBoardConfig, newConfig)
     board.value?.setConfig(currentBoardConfig)
+  }
+  
+  // Convert a custom ID to a chessgroundx piece
+  function mappingLookup(id: string): cg.Piece {
+    const mapping = currentBoardConfig.mapping ?? { whitePieces: [], blackPieces: [] }
+    const whiteIndex = mapping.whitePieces.indexOf(id)
+    if (whiteIndex >= 0) {
+      const mappedLetter = String.fromCharCode('a'.charCodeAt(0) + whiteIndex)
+      return { color: 'white', role: idToRole(mappedLetter) }
+    }
+    const blackIndex = mapping.blackPieces.indexOf(id)
+    if (blackIndex >= 0) {
+      const mappedLetter = String.fromCharCode('a'.charCodeAt(0) + blackIndex)
+      return { color: 'black', role: idToRole(mappedLetter) }
+    }
+    throw new Error(`Unknown piece id: ${id}`)
   }
 
 </script>

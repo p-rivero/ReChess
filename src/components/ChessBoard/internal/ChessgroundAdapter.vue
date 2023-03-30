@@ -255,6 +255,11 @@
     z-index: 1;
     opacity: 0.5;
   }
+  
+  cg-auto-pieces piece {
+    opacity: 0.5;
+  }
+  
   .cg-wrap square.move-dest:hover {
     background-color: rgba(20, 85, 30, 0.3);
   }
