@@ -206,7 +206,7 @@
   
   
   const firebaseuiSettings: firebaseui.auth.Config = {
-    signInFlow: 'popup',
+    signInFlow: 'redirect',
     signInSuccessUrl: 'rechess.org',
     signInOptions: [
       GoogleAuthProvider.PROVIDER_ID,

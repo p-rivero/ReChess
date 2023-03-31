@@ -405,7 +405,19 @@
   }
   
   async function publish() {
-    const nameExists = await draftStore.nameExists()
+    let nameExists: boolean
+    try {
+      nameExists = await draftStore.nameExists()
+    } catch {
+      showPopup(
+        'Could not publish variant',
+        'It seems that it\'s not possible to connect to the server. Please try again later. \
+        If the problem persists, back up your variant and \
+        [open an issue on GitHub](https://github.com/p-rivero/ReChess/issues).',
+        'ok'
+      )
+      return
+    }
     const nameExistsWarning = !nameExists ? '' :
       '\n\n>**WARNING:** A variant with this name already exists. If you proceed, it could be \
       harder to find your variant. Consider changing the name.'
