@@ -152,27 +152,27 @@
       >Don't have an account?</a>
     </div>
     
-    <div id="firebaseui-auth-container" />
-    <div
-      v-if="loadingSocialSignin"
-      class="is-align-self-center pt-5"
-    >
-      Loading other sign in options...
+    <div class="is-flex is-flex-direction-column is-justify-content-space-between is-align-items-center">
+      <button
+        class="button is-white mt-2"
+        @click="thirdPartySignIn('google')"
+      >
+        Google Sign In
+      </button>
+      <button
+        class="button is-dark mt-2"
+        @click="thirdPartySignIn('github')"
+      >
+        GitHub Sign In
+      </button>
     </div>
   </div>
 </template>
 
 
 <script setup lang="ts">
-  import * as firebaseui from 'firebaseui'
-  import 'firebaseui/dist/firebaseui.css'
-  import { GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth'
-  import type { UserCredential } from '@firebase/auth'
-  
   import { computed, ref, watch } from 'vue'
   import { useAuthStore } from '@/stores/auth-user'
-  import { authUI } from '@/firebase'
-  import { UserDB } from '@/firebase/db'
   
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
@@ -181,11 +181,11 @@
   import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
   import { debounce } from '@/utils/ts-utils'
   import { RechessError } from '@/utils/errors/RechessError'
+  import { PopupClosedError } from '@/utils/errors/PopupClosedError'
   
   
   const emailRef = ref<InstanceType<typeof SmartTextInput>>()
   const usernameRef = ref<InstanceType<typeof SmartTextInput>>()
-  const loadingSocialSignin = ref(true)
   const email = ref('')
   const username = ref('')
   const password = ref('')
@@ -204,49 +204,8 @@
     return hasError.value || loading.value || (isRegister.value && usernameStatus.value !== 'available')
   })
   
-  
-  const firebaseuiSettings: firebaseui.auth.Config = {
-    signInFlow: 'popup',
-    signInSuccessUrl: 'rechess.org',
-    signInOptions: [
-      GoogleAuthProvider.PROVIDER_ID,
-      GithubAuthProvider.PROVIDER_ID,
-    ],
-    credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO,
-    callbacks: {
-      signInSuccessWithAuthResult: (authResult: UserCredential) => {
-        loading.value = true
-        authStore.updateUser(authResult.user).then(async () => {
-          const user = await UserDB.getUserById(authResult.user.uid)
-          if (user) {
-            // User exists, we can just skip this step and ckeck directly if the user is verified
-            emit('check-verify')
-          } else {
-            emit('choose-username')
-          }
-        })
-        // Don't redirect
-        return false
-      },
-      uiShown: () => {
-        loadingSocialSignin.value = false
-      },
-      signInFailure: error => {
-        console.error('Sign in failed', error)
-      },
-    },
-  }
-  
   defineExpose({
     init() {
-      try {
-        // Mount firebaseui
-        authUI.start('#firebaseui-auth-container', firebaseuiSettings)
-      } catch (e) {
-        // start() failed, probably because it was already mounted
-        console.error('Could not mount firebaseui', e)
-        authUI.reset()
-      }
       emailRef.value?.focus()
     },
     cleanup() {
@@ -336,9 +295,35 @@
           resetPasswordHint.value = 'shown'
           throw e
         }
-        throw new RechessError('WRONG_PASSWORD_PROVIDER')
+        throw new RechessError('WRONG_PASSWORD_PROVIDER', { provider: provider === 'google.com' ? 'Google' : 'GitHub' })
       }
       throw e
+    }
+  }
+  
+  async function thirdPartySignIn(provider: 'google'|'github') {
+    loading.value = true
+    try {
+      const user = await authStore.thirdPartySignIn(provider)
+      if (user) {
+        // User exists, we can just skip this step and ckeck directly if the user is verified
+        emit('check-verify')
+      } else {
+        emit('choose-username')
+      }
+    } catch (e) {
+      if (e instanceof PopupClosedError) {
+        // The user closed the popup, do nothing
+        return
+      }
+      if (e instanceof RechessError) {
+        errorHandler.showException(e)
+        return
+      }
+      console.error(e)
+      showPopup('Error', 'An unknown error occurred while signing in. Please try again later.', 'ok')
+    } finally {
+      loading.value = false
     }
   }
   

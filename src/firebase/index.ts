@@ -7,7 +7,6 @@ import { connectStorageEmulator, getStorage } from 'firebase/storage'
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 import { getPerformance } from 'firebase/performance'
 import { getAuth, connectAuthEmulator, browserLocalPersistence } from 'firebase/auth'
-import * as firebaseui from 'firebaseui'
 
 declare global {
   // eslint-disable-next-line no-var
@@ -51,6 +50,4 @@ initializeAppCheck(app, {
 })
 
 
-const authUI = new firebaseui.auth.AuthUI(auth)
-
-export { db, defaultStorage, pieceStorage, auth, authUI }
+export { db, defaultStorage, pieceStorage, auth }

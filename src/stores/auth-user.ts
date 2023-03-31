@@ -11,14 +11,16 @@ import * as fb from 'firebase/auth'
 import { FirebaseError } from '@firebase/util'
 import type { UserDoc } from '@/firebase/db/schema'
 import { hideSignInPopup } from '@/components/Auth/auth-manager'
+import { PopupClosedError } from '@/utils/errors/PopupClosedError'
 
 const AUTH_USER_KEY = 'loggedUser'
 
+export type SignInProvider = 'password' | 'google.com' | 'github.com'
 
 export class AuthUser extends User {
   public readonly email: string
   public readonly verified: boolean
-  public readonly signInProvider: 'password' | 'google.com' | 'github.com'
+  public readonly signInProvider: SignInProvider
   
   constructor(authUser: fb.User, dbUser: UserDoc | undefined) {
     if (!authUser.email) throw new Error('User has no email')
@@ -132,6 +134,43 @@ export const useAuthStore = defineStore('auth-user', () => {
     await updateUser(credential.user)
   }
   
+  
+  async function thirdPartySignIn(signInprovider: 'google'|'github'): Promise<UserDoc | undefined> {
+    // This should be fb.BaseOAuthProvider, but it's not exported
+    let provider: fb.GoogleAuthProvider | fb.GithubAuthProvider
+    
+    if (signInprovider === 'google') {
+      provider = new fb.GoogleAuthProvider()
+    } else {
+      provider = new fb.GithubAuthProvider()
+    }
+    
+    provider.addScope('profile')
+    provider.addScope('https://www.googleapis.com/auth/userinfo.email')
+    provider.addScope('https://www.googleapis.com/auth/userinfo.profile')
+    auth.useDeviceLanguage()
+    
+    try {
+      const credential = await fb.signInWithPopup(auth, provider)
+      await updateUser(credential.user)
+      return UserDB.getUserById(credential.user.uid)
+    } catch (e) {
+      if (!(e instanceof FirebaseError)) {
+        throw e
+      }
+      switch (e.code) {
+      case 'auth/popup-closed-by-user':
+        throw new PopupClosedError()
+      case 'auth/account-exists-with-different-credential': {
+        console.log(e)
+        throw new RechessError('WRONG_PASSWORD_PROVIDER', { provider: signInprovider === 'google' ? 'GitHub' : 'Google' })
+      }
+      default:
+        throw e
+      }
+    }
+  }
+  
   // Creates a new user that is already authenticated with a third party provider
   async function thirdPartyRegister(username: string): Promise<void> {
     if (!auth.currentUser) throw new Error('User needs to be logged in with a third party provider')
@@ -176,11 +215,11 @@ export const useAuthStore = defineStore('auth-user', () => {
     })
   }
   
-  async function getProvider(email: string): Promise<string> {
+  async function getProvider(email: string): Promise<SignInProvider> {
     const methods = await fb.fetchSignInMethodsForEmail(auth, email)
     if (methods.length === 0) throw new UserNotFoundError()
     if (methods.length > 1) throw new Error('User has multiple sign in methods')
-    return methods[0]
+    return methods[0] as SignInProvider
   }
   
   // Returns true if a username is available
@@ -189,8 +228,8 @@ export const useAuthStore = defineStore('auth-user', () => {
   }
 
   return {
-    emailLogIn, emailRegister, thirdPartyRegister, signOut, deleteUser,
-    sendEmailVerification, sendPasswordResetEmail, getProvider, checkUsername, updateUser,
+    emailLogIn, emailRegister, thirdPartySignIn, thirdPartyRegister, signOut, deleteUser,
+    sendEmailVerification, sendPasswordResetEmail, getProvider, checkUsername,
     loggedUser,
   }
 })
