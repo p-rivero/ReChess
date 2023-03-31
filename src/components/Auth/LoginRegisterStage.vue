@@ -164,7 +164,7 @@
 
 
 <script setup lang="ts">
-  import type * as firebaseui from 'firebaseui'
+  import * as firebaseui from 'firebaseui'
   import 'firebaseui/dist/firebaseui.css'
   import { GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth'
   import type { UserCredential } from '@firebase/auth'
@@ -206,12 +206,13 @@
   
   
   const firebaseuiSettings: firebaseui.auth.Config = {
-    signInFlow: 'redirect',
+    signInFlow: 'popup',
     signInSuccessUrl: 'rechess.org',
     signInOptions: [
       GoogleAuthProvider.PROVIDER_ID,
       GithubAuthProvider.PROVIDER_ID,
     ],
+    credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO,
     callbacks: {
       signInSuccessWithAuthResult: (authResult: UserCredential) => {
         loading.value = true
@@ -230,7 +231,7 @@
       uiShown: () => {
         loadingSocialSignin.value = false
       },
-      signInFailure: (error: firebaseui.auth.AuthUIError) => {
+      signInFailure: error => {
         console.error('Sign in failed', error)
       },
     },
@@ -244,6 +245,7 @@
       } catch (e) {
         // start() failed, probably because it was already mounted
         console.error('Could not mount firebaseui', e)
+        authUI.reset()
       }
       emailRef.value?.focus()
     },

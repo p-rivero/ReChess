@@ -6,7 +6,6 @@ import type { User } from '@firebase/auth'
 
 // Creates a new user in the database (public data + private data + username)
 export async function createUser(user: User, username: string): Promise<UserDoc> {
-  const batch = writeBatch(db)
   const newPublicData: UserDoc = {
     name: user.displayName,
     about: '',
@@ -27,6 +26,7 @@ export async function createUser(user: User, username: string): Promise<UserDoc>
   const newUsername: UsernameDoc = {
     userId: user.uid,
   }
+  const batch = writeBatch(db)
   batch.set(doc(db, 'users', user.uid), newPublicData)
   batch.set(doc(db, 'users', user.uid, 'private', 'doc'), newPrivateData)
   batch.set(doc(db, 'usernames', username), newUsername)
