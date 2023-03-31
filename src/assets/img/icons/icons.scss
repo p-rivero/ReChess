@@ -181,6 +181,14 @@
 }
 
 
+/* google-color.svg */
+.icon-google-color {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/google-color.svg");
+  mask-image: url("@/assets/img/icons/google-color.svg");
+}
+
+
 /* google.svg */
 .icon-google {
   @extend .icon-common;

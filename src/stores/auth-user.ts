@@ -162,7 +162,6 @@ export const useAuthStore = defineStore('auth-user', () => {
       case 'auth/popup-closed-by-user':
         throw new PopupClosedError()
       case 'auth/account-exists-with-different-credential': {
-        console.log(e)
         throw new RechessError('WRONG_PASSWORD_PROVIDER', { provider: signInprovider === 'google' ? 'GitHub' : 'Google' })
       }
       default:

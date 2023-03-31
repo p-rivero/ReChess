@@ -154,16 +154,18 @@
     
     <div class="is-flex is-flex-direction-column is-justify-content-space-between is-align-items-center">
       <button
-        class="button is-white mt-2"
+        class="button is-light mt-5 has-shadow"
         @click="thirdPartySignIn('google')"
       >
-        Google Sign In
+        <div class="sz-icon mr-3 google-icon" />
+        Sign in with Google
       </button>
       <button
-        class="button is-dark mt-2"
+        class="button is-dark mt-3 has-shadow"
         @click="thirdPartySignIn('github')"
       >
-        GitHub Sign In
+        <div class="sz-icon mr-3 icon-github color-white" />
+        Sign in with GitHub
       </button>
     </div>
   </div>
@@ -349,3 +351,17 @@
     resetPasswordHint.value = 'hidden'
   })
 </script>
+
+
+<style scoped>
+  .google-icon {
+    background: url("@/assets/img/icons/google-color.svg");
+    background-size: 85%;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  button.has-shadow {
+    box-shadow: 0 0.1em 0.5em 0 rgba(0, 0, 0, 0.2);
+  }
+</style>
