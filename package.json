@@ -30,6 +30,8 @@
     "protochess-singlethread": "./protochess-engine/protochess-engine-wasm/pkg",
     "sanitize-filename": "^1.6.3",
     "sass": "^1.60.0",
+    "sortablejs": "^1.15.0",
+    "sortablejs-vue3": "^1.2.9",
     "vue": "^3.2.38",
     "vue-highlight-words": "^3.0.1",
     "vue-input-autowidth": "^2.2.0",

@@ -234,6 +234,7 @@
         @piece-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
         @delete-click="pieceIndex => deletePiece(pieceIndex)"
         @new-click="createNewPiece"
+        @reorder="movePieceType"
       />
     </div>
   </div>
@@ -439,6 +440,11 @@
         )
       }
     )
+  }
+  
+  function movePieceType(oldIndex: number, newIndex: number) {
+    const piece = draftStore.state.pieceTypes.splice(oldIndex, 1)[0]
+    draftStore.state.pieceTypes.splice(newIndex, 0, piece)
   }
 </script>
 
