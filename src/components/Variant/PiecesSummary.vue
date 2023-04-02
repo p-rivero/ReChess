@@ -3,20 +3,26 @@
     :list="props.state.pieceTypes"
     :item-key="piece => (piece as PieceDefinition).ids[0] ?? '' + (piece as PieceDefinition).ids[1]"
     :options="options"
-    @end="emit('reorder', $event.oldIndex, $event.newIndex)"
+    @end="e => emit('reorder', e.oldIndex, e.newIndex)"
   >
     <template #item="{element: piece, index: pieceIndex}">
       <div
         :key="pieceIndex"
         class="piece-container mb-5"
       >
-        <div v-if="editable">
+        <div
+          v-if="editable"
+          class="columns mx-0 my-0 is-align-items-center"
+        >
           <button
-            class="button sz-3 mr-4 my-1 px-2 fit-content"
+            class="column button sz-3 my-1 mx-1 px-2 py-0 fit-content"
             @click="emit('delete-click', pieceIndex)"
           >
             <div class="icon-trash color-theme" />
           </button>
+          <div class="column sz-3 my-1 ml-1 mr-2 px-2 py-2 drag-handle">
+            <div class="icon-grip color-theme" />
+          </div>
         </div>
         <div
           class="box py-2 px-2 is-clickable"
@@ -119,6 +125,9 @@
   
   const options = {
     disabled: !props.editable,
+    animation: 200,
+    forceFallback: true,
+    handle: '.drag-handle',
   }
   
   const emit = defineEmits<{

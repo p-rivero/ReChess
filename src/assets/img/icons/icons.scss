@@ -197,6 +197,14 @@
 }
 
 
+/* grip.svg */
+.icon-grip {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/grip.svg");
+  mask-image: url("@/assets/img/icons/grip.svg");
+}
+
+
 /* heart-fill.svg */
 .icon-heart-fill {
   @extend .icon-common;
