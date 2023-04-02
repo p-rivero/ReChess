@@ -155,6 +155,7 @@
     <div class="is-flex is-flex-direction-column is-justify-content-space-between is-align-items-center">
       <button
         class="button is-light mt-5 has-shadow"
+        :disabled="loading"
         @click="thirdPartySignIn('google')"
       >
         <div class="sz-icon mr-3 google-icon" />
@@ -162,6 +163,7 @@
       </button>
       <button
         class="button is-dark mt-3 has-shadow"
+        :disabled="loading"
         @click="thirdPartySignIn('github')"
       >
         <div class="sz-icon mr-3 icon-github color-white" />
