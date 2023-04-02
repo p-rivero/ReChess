@@ -31,12 +31,13 @@
   import { positionToKey, keyToPosition } from '@/utils/chess/chess-coords'
   import type { Config } from 'chessgroundx/config'
   import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { deepMerge } from '@/utils/ts-utils'
 
   const props = defineProps<{
     whitePov: boolean
-    viewOnly: boolean
+    viewOnly?: boolean
+    freeMode?: boolean
     showCoordinates: boolean
     captureWheelEvents: boolean
     disableRefresh?: boolean
@@ -61,13 +62,10 @@
   let currentWidth = 0
   let currentHeight = 0
   let currentBoardConfig: Config = {
-    orientation: props.whitePov ? 'white' : 'black',
     fen: ' ',
     autoCastle: false,
-    viewOnly: props.viewOnly,
     disableContextMenu: true,
     blockTouchScroll: true,
-    coordinates: props.showCoordinates,
     dimensions: {
       width: currentWidth,
       height: currentHeight,
@@ -93,13 +91,27 @@
       },
     },
     allyPieceSize: 1,
-    enemyPieceSize: props.invertEnemyDirection ? -1 : 1,
   }
   let pieceImages: PieceImages = { white: [], black: [] }
   
   // Ref to the board, and a key that is incremented every time the board is re-rendered
   const boardUpdateKey = ref(0)
   const board = ref<InstanceType<typeof ChessgroundAdapter>>()
+    
+  // Ensure props are updated when they change
+  watch(props, () => {
+    incrementalUpdateConfig({
+      orientation: props.whitePov ? 'white' : 'black',
+      viewOnly: props.viewOnly,
+      disableContextMenu: !props.freeMode,
+      coordinates: props.showCoordinates,
+      highlight: { lastMove: !props.freeMode },
+      selectable: { enabled: !props.freeMode },
+      movable: { free: props.freeMode },
+      drawable: { enabled: !props.freeMode },
+      enemyPieceSize: props.invertEnemyDirection ? -1 : 1,
+    })
+  }, { immediate: true })
   
   defineExpose({
     // Set the state of the board

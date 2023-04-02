@@ -170,4 +170,8 @@
   .box p {
     overflow-wrap: anywhere;
   }
+  
+  .drag-handle {
+    cursor: ns-resize;
+  }
 </style>

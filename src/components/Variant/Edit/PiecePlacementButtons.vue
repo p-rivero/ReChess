@@ -1,43 +1,61 @@
 <template>
-  <div class="field is-grouped is-grouped-multiline">
-    <button
-      v-for="(piece, index) in pieceList"
-      :key="index"
-      class="control button sz-3 px-1 py-1"
-      :class="{'is-primary': selectedId === piece.id}"
-      :style="{zIndex}"
-      @click="onPieceClick(piece)"
-    >
-      <PieceImageView
-        :piece="piece.definition"
-        :color="piece.color"
-      />
-    </button>
-    <div class="control">
+  <div>
+    <div class="field is-grouped is-grouped-multiline">
       <button
-        class="button sz-3 px-2 py-2"
-        :class="{'is-primary': selectedId === 'wall'}"
+        v-for="(piece, index) in pieceList"
+        :key="index"
+        class="control button sz-3 px-1 py-1"
+        :class="{'is-primary': selectedId === piece.id}"
         :style="{zIndex}"
-        @click="onPieceClick('wall')"
+        @click="onPieceClick(piece)"
       >
-        <span
-          class="icon-block"
-          :class="{
-            'color-theme': selectedId !== 'wall',
-            'color-white': selectedId === 'wall',
-          }"
+        <PieceImageView
+          :piece="piece.definition"
+          :color="piece.color"
         />
       </button>
+      
+      <div class="control">
+        <button
+          class="button sz-3 px-2 py-2"
+          :class="{'is-primary': selectedId === 'wall'}"
+          :style="{zIndex}"
+          @click="onPieceClick('wall')"
+        >
+          <div
+            class="icon-block"
+            :class="{
+              'color-theme': selectedId !== 'wall',
+              'color-white': selectedId === 'wall',
+            }"
+          />
+        </button>
+      </div>
+      
+      <div class="control">
+        <button
+          class="button sz-3 px-2 py-2"
+          :class="{'is-primary': selectedId === 'delete'}"
+          :style="{zIndex}"
+          @click="onPieceClick('delete')"
+        >
+          <div
+            class="icon-trash"
+            :class="{
+              'color-theme': selectedId !== 'delete',
+              'color-white': selectedId === 'delete',
+            }"
+          />
+        </button>
+      </div>
     </div>
-    <div class="control">
-      <button
-        class="button sz-3 px-2 py-2"
-        :style="{zIndex}"
-        @click="emit('delete-click')"
-      >
-        <span class="icon-trash color-theme" />
-      </button>
-    </div>
+    <button
+      class="button"
+      @click="emit('clear-all-click')"
+    >
+      <span class="sz-icon icon-trash color-theme" />
+      Clear board
+    </button>
   </div>
 </template>
 
@@ -55,9 +73,10 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'piece-selected', piece: string|'wall'): void
+    (event: 'piece-selected', piece: string | 'wall' | 'delete'): void
     (event: 'piece-deselected'): void
     (event: 'delete-click'): void
+    (event: 'clear-all-click'): void
   }>()
   
   defineExpose({
@@ -96,8 +115,9 @@
     }
   }
   
-  function onPieceClick(piece: Piece|'wall') {
+  function onPieceClick(piece: Piece | 'wall' | 'delete') {
     let id: string
+    
     if (typeof piece === 'string') {
       // Wall or delete
       id = piece

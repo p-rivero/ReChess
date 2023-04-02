@@ -11,11 +11,13 @@
           ref="board"
           style="z-index: 20"
           :white-pov="true"
-          :view-only="true"
+          :view-only="selectedPieceId !== 'none'"
           :show-coordinates="true"
           :capture-wheel-events="false"
           :get-click-mode="getClickMode"
+          :free-mode="true"
           @clicked="togglePiece"
+          @user-moved="movePiece"
         />
       </div>
       
@@ -67,6 +69,7 @@
           @piece-selected="id => { board?.$el.scrollIntoView(); selectedPieceId = id }"
           @piece-deselected="selectedPieceId = 'none'"
           @delete-click="clearBoard"
+          @clear-all-click="clearBoard"
         />
       </div>
       
@@ -284,7 +287,7 @@
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
   const pieceSelector = ref<InstanceType<typeof PiecePlacementButtons>>()
-  const selectedPieceId = ref<string|'wall'|'none'>('none')
+  const selectedPieceId = ref<string|'wall'|'delete'|'none'>('none')
   
   // This page is only accessible when logged in
   if (!authStore.loggedUser) {
@@ -330,6 +333,7 @@
    * @param coords The coordinates of the first square of the drag
    */
   function getClickMode(coords: [number, number]): 'add'|'remove' {
+    // If selectedPieceId === 'delete', the click mode doesn't matter
     if (selectedPieceId.value === 'wall') {
       return draftStore.state.invalidSquares.some(p => p[0] === coords[0] && p[1] === coords[1]) ? 'remove' : 'add'
     } else {
@@ -350,6 +354,13 @@
     const hasWall = draftStore.state.invalidSquares.some(square => square[0] === coords[0] && square[1] === coords[1])
     const placementIndex = draftStore.state.pieces.findIndex(piece => piece.x === coords[0] && piece.y === coords[1])
     const pieceId = placementIndex !== -1 ? draftStore.state.pieces[placementIndex].pieceId : null
+    
+    if (selectedPieceId.value === 'delete') {
+      // Delete button selected: override click mode and remove all pieces and walls at this square
+      draftStore.state.invalidSquares = draftStore.state.invalidSquares.filter(square => square[0] !== coords[0] || square[1] !== coords[1])
+      draftStore.state.pieces = draftStore.state.pieces.filter(piece => piece.x !== coords[0] || piece.y !== coords[1])
+      return
+    }
     
     if (mode === 'remove') {
       if (selectedPieceId.value === 'wall') {
@@ -380,12 +391,27 @@
     }
   }
   
+  function movePiece(from: [number, number], to: [number, number]) {
+    // If there's a wall at the destination, don't move the piece
+    if (draftStore.state.invalidSquares.some(square => square[0] === to[0] && square[1] === to[1])) {
+      updateBoardAndError()
+      return
+    }
+    // If there's a piece at the destination, remove it
+    draftStore.state.pieces = draftStore.state.pieces.filter(p => p.x !== to[0] || p.y !== to[1])
+    // Move the piece
+    const pieceIndex = draftStore.state.pieces.findIndex(p => p.x === from[0] && p.y === from[1])
+    if (pieceIndex === -1) {
+      throw new Error('Could not find piece to move')
+    }
+    draftStore.state.pieces[pieceIndex].x = to[0]
+    draftStore.state.pieces[pieceIndex].y = to[1]
+  }
+  
   function clearBoard() {
     showPopup(
       'Clear board',
-      'This will remove **all** pieces and walls from the board. Do you want to continue? \
-      \n\n> Tip: If you want to remove a single piece or wall, select it here \
-      and then *click it* on the board.',
+      'This will remove **all** pieces and walls from the board. Do you want to continue?',
       'yes-no',
       () => {
         draftStore.state.pieces = []
