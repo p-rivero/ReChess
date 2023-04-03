@@ -38,11 +38,11 @@ export interface Protochess {
   getBestMoveTimeout(time: number): Promise<MoveInfoWithEvalDepth>,
   /** Set the current state, formed by an InitialState, and the list of moves that were played.
     * If a FEN is provided, it will be applied before the moves. */
-  setState(state: GameState2): Promise<StateDiff>,
+  setState(state: GameState): Promise<StateDiff>,
   /** Load a user-provided FEN string. See FullFen for the format. */
   loadFen(fen: FullFen): Promise<void>,
   /** Get the full current state, which can later be used in `setState()` */
-  getState(): Promise<GameState2>,
+  getState(): Promise<GameState>,
   /** Get the current state, but only the information that can change during a game */
   getStateDiff(): Promise<StateDiff>,
   /** Get all possible moves for the current player (for each origin square, what are the possible destinations) */
@@ -116,8 +116,8 @@ export interface InitialState extends StateDiff {
   globalRules: GlobalRules,
 }
 
-/** @see {isGameState2} ts-auto-guard:type-guard */
-export interface GameState2 {
+/** @see {isGameState} ts-auto-guard:type-guard */
+export interface GameState {
   initialState: InitialState,
   initialFen?: FullFen,
   moveHistory: MoveInfo[],
@@ -208,7 +208,7 @@ export interface IWasmModule {
     makeMoveStr(moveStr: string): Promise<unknown>,
     getBestMove(depth: number): Promise<unknown>,
     getBestMoveTimeout(time: number): Promise<unknown>,
-    setState(state: GameState2): Promise<unknown>,
+    setState(state: GameState): Promise<unknown>,
     loadFen(fen: FullFen): Promise<unknown>,
     getState(): Promise<unknown>,
     getStateDiff(): Promise<unknown>,

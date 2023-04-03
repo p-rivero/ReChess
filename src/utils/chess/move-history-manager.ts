@@ -1,10 +1,10 @@
 
-import type { GameState2, InitialState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from '@/protochess/types'
+import type { GameState, InitialState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from '@/protochess/types'
 import { clone } from '@/utils/ts-utils'
 
 export type MoveResult = { flag: MakeMoveFlag, winner: MakeMoveWinner }
 
-export type MoveHistoryQueryResult = { state: GameState2, result?: MoveResult, lastMove?: MoveInfo } | null
+export type MoveHistoryQueryResult = { state: GameState, result?: MoveResult, lastMove?: MoveInfo } | null
 
 type MoveHistoryEntry = {
   // The move that was made to reach the state. Undefined in the initial state.
@@ -78,7 +78,7 @@ export class MoveHistoryManager {
     return null
   }
   
-  private buildStateFromCurrentIndex(): GameState2 {
+  private buildStateFromCurrentIndex(): GameState {
     return {
       initialState: clone(this.initialState) as InitialState,
       initialFen: this.initialFen,

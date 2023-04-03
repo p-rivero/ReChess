@@ -2,7 +2,7 @@
  * Generated type guards for "types.ts".
  * WARNING: Do not manually change this file.
  */
-import type { MakeMoveResult, MoveInfo, MoveList, StateDiff, InitialState, GameState2, Variant, PublishedVariant, PieceDefinitionLogic, GetBestMoveResult, GetBestMoveTimeoutResult } from "./types";
+import type { MakeMoveResult, MoveInfo, MoveList, StateDiff, InitialState, GameState, Variant, PublishedVariant, PieceDefinitionLogic, GetBestMoveResult, GetBestMoveTimeoutResult } from "./types";
 
 export function isMakeMoveResult(obj: unknown): obj is MakeMoveResult {
     const typedObj = obj as MakeMoveResult
@@ -104,8 +104,8 @@ export function isInitialState(obj: unknown): obj is InitialState {
     )
 }
 
-export function isGameState2(obj: unknown): obj is GameState2 {
-    const typedObj = obj as GameState2
+export function isGameState(obj: unknown): obj is GameState {
+    const typedObj = obj as GameState
     return (
         (typedObj !== null &&
             typeof typedObj === "object" ||

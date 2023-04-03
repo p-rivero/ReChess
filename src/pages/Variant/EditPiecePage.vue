@@ -76,13 +76,7 @@
               :start-text="pieceIdWhite ?? undefined"
               :error-handler="errorMsgHandler"
               :error-priority="1"
-              :validator="text => {
-                if (whiteInvisible && blackInvisible) return 'This piece must be available to White, Black or both players'
-                if (whiteInvisible) return
-                if (text.length === 0) return 'Missing piece symbol for White player'
-                if (text === piece?.ids[1]) return 'The piece symbol for White and Black must be different'
-                if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
-              }"
+              :validator="symbolValidator"
               @changed="text => updatePieceId(text, 'white')"
             />
           </div>
@@ -108,12 +102,7 @@
               placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :error-handler="errorMsgHandler"
-              :validator="text => {
-                if (blackInvisible) return
-                if (text.length === 0) return 'Missing piece symbol for Black player'
-                if (text === piece?.ids[0]) return 'The piece symbol for White and Black must be different'
-                if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
-              }"
+              :validator="symbolValidator"
               @changed="text => updatePieceId(text, 'black')"
             />
           </div>
@@ -494,6 +483,19 @@
       \n\n> Keep in mind that, for very complex images, the SVG file could be larger than the original.',
       'ok'
     )
+  }
+  
+  function symbolValidator(text: string) {
+    if (whiteInvisible.value && blackInvisible) return 'This piece must be available to White, Black or both players'
+    if (whiteInvisible.value) return
+    if (text.length === 0) return 'Missing piece symbol for White player'
+    if (text === piece?.ids[1]) return 'The piece symbol for White and Black must be different'
+    if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
+    const reservedCharRegex = /[\s/0-9*]/
+    if (reservedCharRegex.test(text)) {
+      return 'The following characters are reserved and cannot be used as piece symbols: \
+      Space, Slash (/), Asterisk (*), Numbers (0-9)'
+    }
   }
 </script>
 
