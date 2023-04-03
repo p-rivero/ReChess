@@ -18,10 +18,10 @@
 
 
 <script setup lang="ts">
-  import type { GameState } from '@/protochess/types'
+  import type { Variant } from '@/protochess/types'
   import { ref } from 'vue'
 
-  let variant: GameState | null = null
+  let variant: Variant | null = null
   
   const active = ref(false)
   const selectedIndex = ref(-1)
@@ -38,8 +38,8 @@
   defineExpose({
     // Update the pointer to the initial state, so that we can get the dimensions and look up the piece images from the ids
     // This only needs to be called once, since the images and dimensions will not change during the game
-    initState(state: GameState) {
-      variant = state
+    initialize(initVariant: Variant) {
+      variant = initVariant
     },
     // Show the promotion popup and return the index of the selected promotion
     async pickPromotion(to: [number, number], possiblePromotions: string[]): Promise<number | undefined> {

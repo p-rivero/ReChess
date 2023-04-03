@@ -28,7 +28,7 @@
   import { getProtochess } from '@/protochess'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useVariantStore } from '@/stores/variant'
-  import type { GameState, MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
+  import type { MakeMoveFlag, MakeMoveWinner, Player, Variant } from '@/protochess/types'
   import { debounce } from '@/utils/ts-utils'
   
   const route = useRoute()
@@ -52,10 +52,11 @@
   
   onMounted(async () => {
     const protochess = await getProtochess()
-    const state = await getState()
-    if (!state) return
+    const variant = await getVariant()
+    if (!variant) return
     // Set the board state and make sure it's valid
-    await board.value?.setState(state)
+    // Since the page has just loaded, the move history is empty
+    await board.value?.setState(variant, [])
     try {
       await protochess.validatePosition()
     } catch (e) {
@@ -70,16 +71,16 @@
   
   
   // If the variantId parameter is missing, use the stored draft variant
-  async function getState(): Promise<GameState|undefined> {
+  async function getVariant(): Promise<Variant|undefined> {
     const variantId = route.params.variantId
     if (variantId && typeof variantId === 'string') {
-      return getStateFromServer(variantId)
+      return getVariantFromServer(variantId)
     }
     const draftStore = useVariantDraftStore()
     const draft = draftStore.state
     return draft
   }
-  async function getStateFromServer(id: string): Promise<GameState|undefined> {
+  async function getVariantFromServer(id: string): Promise<Variant|undefined> {
     const variantStore = useVariantStore()
     const variant = await variantStore.getVariant(id)
     // Variant ID is incorrect (or the uploader of this variant is malicious), redirect to home page

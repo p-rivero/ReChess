@@ -320,6 +320,7 @@
   import { numberToLetter, letterToNumber } from '@/utils/chess/chess-coords'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { removePiecesById } from '@/utils/chess/fen'
   
   const router = useRouter()
   const route = useRoute()
@@ -390,7 +391,7 @@
     // Remove placements of the piece
     const i = color === 'white' ? 0 : 1
     const oldId = piece.ids[i] ?? ''
-    draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== oldId)
+    draftStore.state.fen = removePiecesById(draftStore.state.fen, oldId)
     
     // If disabling the piece, remove the image
     if (!enabled) piece.imageUrls[i] = undefined
@@ -473,7 +474,7 @@
     if (!piece) throw new Error('Piece is null')
     // Remove all existing placements of this piece
     const oldId = color === 'white' ? piece.ids[0] : piece.ids[1]
-    draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== oldId)
+    if (oldId) draftStore.state.fen = removePiecesById(draftStore.state.fen, oldId)
     // Update the piece id
     if (color === 'white') {
       pieceIdWhite.value = newId

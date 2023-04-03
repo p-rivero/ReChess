@@ -65,7 +65,7 @@
           ref="pieceSelector"
           :key="JSON.stringify(draftStore.state.pieceTypes)"
           :z-index="11"
-          :state="draftStore.state"
+          :variant="draftStore.state"
           @piece-selected="id => { board?.$el.scrollIntoView(); selectedPieceId = id }"
           @piece-deselected="selectedPieceId = 'none'"
           @delete-click="clearBoard"
@@ -269,12 +269,10 @@
   import { onMounted, ref, watch } from 'vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useAuthStore } from '@/stores/auth-user'
-  import { placementsToFen } from '@/utils/chess/fen-to-placements'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
-  import { clone } from '@/utils/ts-utils'
   import { useRouter } from 'vue-router'
-  import type { PublishedVariantGui } from '@/protochess/types'
   import { importFile } from '@/utils/file-io'
+  import { fenToPlacements, getPieceAt, placementsToFen, removePiecesByIds } from '@/utils/chess/fen'
   
   const draftStore = useVariantDraftStore()
   const authStore = useAuthStore()
@@ -294,16 +292,15 @@
     router.push({ name: 'home' })
   }
     
-  // When state changes, update the board and run a state check
+  // When state changes, check if the state is valid, and update the board
   watch(draftStore.state, () => updateBoardAndError(), { deep: true })
   onMounted(updateBoardAndError)
-  function updateBoardAndError() {
-    checkState(draftStore.state, errorMsgHandler)
-    // Clone state and add GUI fields
-    let state = clone(draftStore.state) as PublishedVariantGui
-    state.fen = placementsToFen(draftStore.state)
-    state.inCheck = false
-    board.value?.setState(state)
+  async function updateBoardAndError() {
+    // Update error message
+    const stateDiff = await checkState(draftStore.state, errorMsgHandler)
+    // Update board and inCheck field
+    draftStore.state.inCheck = stateDiff?.inCheck ?? false
+    board.value?.setState(draftStore.state)
   }
   
   function deletePiece(pieceIndex: number) {
@@ -314,7 +311,9 @@
       () => {
         const ids = draftStore.state.pieceTypes[pieceIndex].ids
         draftStore.state.pieceTypes.splice(pieceIndex, 1)
-        draftStore.state.pieces = draftStore.state.pieces.filter(p => p.pieceId !== ids[0] && p.pieceId !== ids[1])
+        let fen = draftStore.state.fen
+        fen = removePiecesByIds(fen, [ids[0] ?? '', ids[1] ?? ''])
+        draftStore.state.fen = fen
       }
     )
   }
@@ -337,7 +336,7 @@
     if (selectedPieceId.value === 'wall') {
       return draftStore.state.invalidSquares.some(p => p[0] === coords[0] && p[1] === coords[1]) ? 'remove' : 'add'
     } else {
-      return draftStore.state.pieces.some(p => p.x === coords[0] && p.y === coords[1] && p.pieceId === selectedPieceId.value) ? 'remove' : 'add'
+      return getPieceAt(draftStore.state.fen, coords) === selectedPieceId.value ? 'remove' : 'add'
     }
   }
   
@@ -350,15 +349,17 @@
     if (!mode) throw new Error('Mode must be specified')
     // No piece selected, don't interact with board
     if (selectedPieceId.value === 'none') return
+    let placements = fenToPlacements(draftStore.state.fen)
 
     const hasWall = draftStore.state.invalidSquares.some(square => square[0] === coords[0] && square[1] === coords[1])
-    const placementIndex = draftStore.state.pieces.findIndex(piece => piece.x === coords[0] && piece.y === coords[1])
-    const pieceId = placementIndex !== -1 ? draftStore.state.pieces[placementIndex].pieceId : null
+    const placementIndex = placements.findIndex(piece => piece.x === coords[0] && piece.y === coords[1])
+    const pieceId = placementIndex !== -1 ? placements[placementIndex].pieceId : null
     
     if (selectedPieceId.value === 'delete') {
       // Delete button selected: override click mode and remove all pieces and walls at this square
       draftStore.state.invalidSquares = draftStore.state.invalidSquares.filter(square => square[0] !== coords[0] || square[1] !== coords[1])
-      draftStore.state.pieces = draftStore.state.pieces.filter(piece => piece.x !== coords[0] || piece.y !== coords[1])
+      placements = placements.filter(piece => piece.x !== coords[0] || piece.y !== coords[1])
+      draftStore.state.fen = placementsToFen(placements)
       return
     }
     
@@ -370,25 +371,26 @@
       } else {
         // Selected piece in remove mode: only remove the selected piece
         if (pieceId === selectedPieceId.value) {
-          draftStore.state.pieces.splice(placementIndex, 1)
+          placements.splice(placementIndex, 1)
         }
       }
     } else {
       if (selectedPieceId.value === 'wall') {
         // Selected wall in add mode: add wall if there's none. Also, if there was a piece, remove it
-        if (pieceId) draftStore.state.pieces.splice(placementIndex, 1)
+        if (pieceId) placements.splice(placementIndex, 1)
         if (!hasWall) draftStore.state.invalidSquares.push(coords)
       } else {
         // Selected piece in add mode: if there's no wall, replace the piece (or add it if there was none)
         if (hasWall) return
-        if (pieceId) draftStore.state.pieces.splice(placementIndex, 1)
-        draftStore.state.pieces.push({
+        if (pieceId) placements.splice(placementIndex, 1)
+        placements.push({
           x: coords[0],
           y: coords[1],
           pieceId: selectedPieceId.value,
         })
       }
     }
+    draftStore.state.fen = placementsToFen(placements)
   }
   
   function movePiece(from: [number, number], to: [number, number]) {
@@ -397,15 +399,16 @@
       updateBoardAndError()
       return
     }
+    let placements = fenToPlacements(draftStore.state.fen)
     // If there's a piece at the destination, remove it
-    draftStore.state.pieces = draftStore.state.pieces.filter(p => p.x !== to[0] || p.y !== to[1])
+    placements = placements.filter(p => p.x !== to[0] || p.y !== to[1])
     // Move the piece
-    const pieceIndex = draftStore.state.pieces.findIndex(p => p.x === from[0] && p.y === from[1])
+    const pieceIndex = placements.findIndex(p => p.x === from[0] && p.y === from[1])
     if (pieceIndex === -1) {
       throw new Error('Could not find piece to move')
     }
-    draftStore.state.pieces[pieceIndex].x = to[0]
-    draftStore.state.pieces[pieceIndex].y = to[1]
+    placements[pieceIndex].x = to[0]
+    placements[pieceIndex].y = to[1]
   }
   
   function clearBoard() {
@@ -414,7 +417,7 @@
       'This will remove **all** pieces and walls from the board. Do you want to continue?',
       'yes-no',
       () => {
-        draftStore.state.pieces = []
+        draftStore.state.fen = ''
         draftStore.state.invalidSquares = []
       }
     )

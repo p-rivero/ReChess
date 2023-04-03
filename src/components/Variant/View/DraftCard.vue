@@ -70,8 +70,6 @@
   import { useRouter } from 'vue-router'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
-  import type { GameStateGui } from '@/protochess/types'
-  import { placementsToFen } from '@/utils/chess/fen-to-placements'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
@@ -82,12 +80,7 @@
     if (!draftStore.hasDraft()) {
       return
     }
-    const stateGui: GameStateGui = {
-      ...draftStore.state,
-      fen: placementsToFen(draftStore.state),
-      inCheck: false,
-    }
-    board.value?.setState(stateGui)
+    board.value?.setState(draftStore.state)
   })
   
   

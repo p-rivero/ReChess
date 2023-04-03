@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { GameState, PieceDefinition, Player } from '@/protochess/types'
+  import type { PieceDefinition, Player, Variant } from '@/protochess/types'
   import { ref } from 'vue'
   import PieceImageView from '@/components/Variant/PieceImageView.vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
@@ -68,7 +68,7 @@
   const selectedId = ref<string|'wall'|'delete'|'none'>('none')
     
   const props = defineProps<{
-    state: GameState
+    variant: Variant
     zIndex: number
   }>()
   
@@ -95,7 +95,7 @@
   // Extract the id and url from the piece definition
   const pieceList = ref<Piece[]>([])
   // First all white pieces
-  for (const piece of props.state.pieceTypes) {
+  for (const piece of props.variant.pieceTypes) {
     if (piece.ids[0] || piece.imageUrls[0]) {
       pieceList.value.push({
         id: piece.ids[0],
@@ -105,7 +105,7 @@
     }
   }
   // Then all black pieces
-  for (const piece of props.state.pieceTypes) {
+  for (const piece of props.variant.pieceTypes) {
     if (piece.ids[1] || piece.imageUrls[1]) {
       pieceList.value.push({
         id: piece.ids[1],

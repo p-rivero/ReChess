@@ -26,7 +26,7 @@
 
 
 <script setup lang="ts">
-  import type { GameStateGui, MoveList, Player } from '@/protochess/types'
+  import type { MoveList, MoveInfo, Player, StateDiff, Variant, InitialState } from '@/protochess/types'
   import type * as cg from 'chessgroundx/types'
   import { positionToKey, keyToPosition } from '@/utils/chess/chess-coords'
   import type { Config } from 'chessgroundx/config'
@@ -115,7 +115,7 @@
   
   defineExpose({
     // Set the state of the board
-    setState(state: GameStateGui) {
+    setState(state: Variant) {
       if (state.boardWidth < 2 || state.boardHeight < 2) {
         throw new Error('Minimum board size is 2x2')
       }
@@ -142,6 +142,11 @@
       newConfig.fen = state.fen
       newConfig.kingRoles = getLeaderIds(state)
       incrementalUpdateConfig(newConfig)
+    },
+    
+    // Set the board, but only the parts that can change during a game
+    setStateDiff(_diff: StateDiff) {
+      throw new Error('Not implemented')
     },
     
     // Define which sides are movable by the user
@@ -176,15 +181,15 @@
     },
     
     // Highlight last move
-    highlightMove(from: [number, number], to: [number, number]) {
-      const fromKey = positionToKey(from)
-      const toKey = positionToKey(to)
+    setLastMove(move: MoveInfo) {
+      const fromKey = positionToKey(move.from)
+      const toKey = positionToKey(move.to)
       const newConfig: Config = {
         lastMove: [fromKey, toKey],
       }
       board.value?.setConfig(newConfig)
     },
-    clearHighlightMove() {
+    clearLastMove() {
       const newConfig: Config = { lastMove: [] }
       board.value?.setConfig(newConfig)
     },
@@ -237,7 +242,7 @@
     return `${id}-piece` as cg.Role
   }
   
-  function extractImages(state: GameStateGui): PieceImages {
+  function extractImages(state: Variant): PieceImages {
     const images: PieceImages = {
       white: [],
       black: [],
@@ -256,7 +261,7 @@
     return images
   }
   
-  function getLeaderIds(state: GameStateGui): string[] {
+  function getLeaderIds(state: InitialState): string[] {
     const roles: string[] = []
     for (const pieceDef of state.pieceTypes) {
       if (pieceDef.isLeader) {

@@ -23,7 +23,7 @@
   import { onMounted, ref, watch } from 'vue'
   import SearchCardPlaceholder from './SearchCardPlaceholder.vue'
   import VariantCard from '../View/VariantCard.vue'
-  import type { PublishedVariantGui } from '@/protochess/types'
+  import type { PublishedVariant } from '@/protochess/types'
   import { useVariantStore } from '@/stores/variant'
   
   const props = defineProps<{
@@ -35,12 +35,12 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'play-clicked', variant: PublishedVariantGui): void
+    (event: 'play-clicked', variant: PublishedVariant): void
     (event: 'update-score', score: number): void
   }>()
   
   const variantStore = useVariantStore()
-  const loadedVariant = ref<PublishedVariantGui>()
+  const loadedVariant = ref<PublishedVariant>()
   
   onMounted(async () => {
     // Fetch the variant data

@@ -2,12 +2,13 @@ import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import sanitizeFilename from 'sanitize-filename'
 
-import type { Variant, PieceDefinition, PiecePlacement } from '@/protochess/types'
+import type { Variant, PieceDefinition } from '@/protochess/types'
 import { exportFile } from '@/utils/file-io'
 import { clone, object_equals } from '@/utils/ts-utils'
 import { parseVariantJson } from '@/utils/chess/variant-json'
 import { VariantDB } from '@/firebase/db'
 import { useAuthStore } from '@/stores/auth-user'
+import { fenToPlacements, placementsToFen } from '@/utils/chess/fen'
 
 export const useVariantDraftStore = defineStore('variant-draft', () => {
   
@@ -36,12 +37,16 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   }
   function setWidth(width: number) {
     state.value.boardWidth = width
-    state.value.pieces = state.value.pieces.filter((piece: PiecePlacement) => piece.x < width)
+    let placements = fenToPlacements(state.value.fen)
+    placements = placements.filter(piece => piece.x < width)
+    state.value.fen = placementsToFen(placements)
     state.value.invalidSquares = state.value.invalidSquares.filter((square: [number, number]) => square[0] < width)
   }
   function setHeight(height: number) {
     state.value.boardHeight = height
-    state.value.pieces = state.value.pieces.filter((piece: PiecePlacement) => piece.y < height)
+    let placements = fenToPlacements(state.value.fen)
+    placements = placements.filter(piece => piece.y < height)
+    state.value.fen = placementsToFen(placements)
     state.value.invalidSquares = state.value.invalidSquares.filter((square: [number, number]) => square[1] < height)
   }
   
@@ -107,14 +112,14 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     seeCreateHint, hideCreateHint, discardDraft }
 })
 
-const DEFAULT_DRAFT: Variant = {
+const DEFAULT_DRAFT: Readonly<Variant> = {
   displayName: '',
   description: '',
+  fen: '',
   pieceTypes: [],
   boardWidth: 8,
   boardHeight: 8,
   invalidSquares: [],
-  pieces: [],
   playerToMove: 0,
   globalRules: {
     capturingIsForced: false,
@@ -124,9 +129,10 @@ const DEFAULT_DRAFT: Variant = {
     repetitionsDraw: 3,
     checksToLose: 0,
   },
+  inCheck: false,
 }
 
-const DEFAULT_PIECE: PieceDefinition = {
+const DEFAULT_PIECE: Readonly<PieceDefinition> = {
   ids: ['', ''],
   isLeader: false,
   castleFiles: undefined,

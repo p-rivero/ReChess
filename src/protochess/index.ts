@@ -1,39 +1,18 @@
 
 import { clone } from '@/utils/ts-utils'
 import * as Comlink from 'comlink'
-import type {
-  Protochess,
-  MakeMoveResult,
-  MakeMoveResultWithDepth,
-  MoveInfo,
-  MoveInfoWithEval,
-  MoveInfoWithEvalDepth,
-  IWasmModule,
-  GameState,
-  GameStateGui,
-  MoveList,
-  Player,
-  GetBestMoveResult,
-IWasmModuleConstructor,
-} from './types'
-import {
-  isMakeMoveResult,
-  isMoveInfo,
-  isMoveList,
-  isPlayBestMoveTimeoutResult,
-  isGetBestMoveResult,
-  isGetBestMoveTimeoutResult,
-  isGetStateResult,
-} from './types.guard'
+import type * as t from './types'
+import * as guard from './types.guard'
+import type { MoveInfo } from './types'
 
 // Call this at the start of the app to initialize the wasm module
-let protochess: Protochess | null = null
+let protochess: t.Protochess | null = null
 let supportsThreads: boolean | undefined = undefined
 export async function initializeProtochess() {
   protochess = await init()
 }
 // Use this to get a reference to the protochess object
-export async function getProtochess(): Promise<Protochess> {
+export async function getProtochess(): Promise<t.Protochess> {
   // Wait for the wasm module to be initialized
   while (protochess === null) {
     await new Promise(resolve => setTimeout(resolve, 10))
@@ -50,11 +29,11 @@ export async function protochessSupportsThreads(): Promise<boolean> {
 
 
 
-async function init(): Promise<Protochess> {
+async function init(): Promise<t.Protochess> {
   // Create a separate thread from wasm-worker.js and get a proxy to its handler
-  const WasmModule = Comlink.wrap(new Worker(new URL('./wasm-worker.js', import.meta.url), { type: 'module' })) as unknown as IWasmModuleConstructor
+  const WasmModule = Comlink.wrap(new Worker(new URL('./wasm-worker.js', import.meta.url), { type: 'module' })) as unknown as t.IWasmModuleConstructor
   // WasmModule is a proxy to a class, so it's constructable even though tsc disagrees
-  const wasm: IWasmModule = await new WasmModule()
+  const wasm: t.IWasmModule = await new WasmModule()
   // wasm is an object that lives in the worker thread, but appears to be local
   await wasm.init()
   
@@ -74,7 +53,7 @@ async function init(): Promise<Protochess> {
       return str
     },
     
-    async playerToMove(): Promise<Player> {
+    async playerToMove(): Promise<t.Player> {
       const player = await wasm.wasmObject.playerToMove()
       if (typeof player !== 'number' || !(player === 0 || player === 1)) {
         throw new Error(`Expected 0 or 1, got ${player}`)
@@ -89,78 +68,47 @@ async function init(): Promise<Protochess> {
       }
     },
     
-    async playBestMove(depth: number): Promise<MakeMoveResult> {
-      const result = await wasm.wasmObject.playBestMove(depth)
-      if (!isMakeMoveResult(result)) {
-        throw new Error(`Expected MakeMoveResult, got ${result}`)
-      }
-      return result
-    },
-    
-    async playBestMoveTimeout(time: number): Promise<MakeMoveResultWithDepth> {
-      const result = await wasm.wasmObject.playBestMoveTimeout(time)
-      if (!isPlayBestMoveTimeoutResult(result)) {
-        throw new Error(`Expected MakeMoveResultWithDepth, got ${result}`)
-      }
-      return { ...result.makeMoveResult, depth: result.depth }
-    },
-    
-    async makeMove(move: MoveInfo): Promise<MakeMoveResult> {
+    async makeMove(move: t.MoveInfo): Promise<t.MakeMoveResult> {
       const result = await wasm.wasmObject.makeMove(move)
-      if (!isMakeMoveResult(result)) {
+      if (!guard.isMakeMoveResult(result)) {
         throw new Error(`Expected MakeMoveResult, got ${result}`)
       }
       return result
     },
     
-    async makeMoveStr(moveStr: string): Promise<MakeMoveResult> {
+    async makeMoveStr(moveStr: string): Promise<t.MakeMoveResult> {
       const result = await wasm.wasmObject.makeMoveStr(moveStr)
-      if (!isMakeMoveResult(result)) {
+      if (!guard.isMakeMoveResult(result)) {
         throw new Error(`Expected MakeMoveResult, got ${result}`)
       }
       return result
     },
     
-    async getBestMove(depth: number): Promise<MoveInfoWithEval> {
+    async getBestMove(depth: number): Promise<t.MoveInfoWithEval> {
       const result = await wasm.wasmObject.getBestMove(depth)
-      if (!isGetBestMoveResult(result)) {
+      if (!guard.isGetBestMoveResult(result)) {
         throw new Error(`Expected GetBestMoveResult, got ${result}`)
       }
       return adaptMoveInfoWithEval(result)
     },
     
-    async getBestMoveTimeout(time: number): Promise<MoveInfoWithEvalDepth> {
+    async getBestMoveTimeout(time: number): Promise<t.MoveInfoWithEvalDepth> {
       const result = await wasm.wasmObject.getBestMoveTimeout(time)
-      if (!isGetBestMoveTimeoutResult(result)) {
+      if (!guard.isGetBestMoveTimeoutResult(result)) {
         throw new Error(`Expected PlayBestMoveTimeoutResult, got ${result}`)
       }
       const moveEval = adaptMoveInfoWithEval(result)
       return { ...moveEval, depth: result.depth }
     },
     
-    async isInCheck(): Promise<boolean> {
-      const ret = await wasm.wasmObject.toMoveInCheck()
-      if (typeof ret !== 'boolean') {
-        throw new Error(`Expected boolean, got ${ret}`)
-      }
-      return ret
-    },
-    
-    async setState(state: GameState): Promise<void> {
+    async setState(state: t.GameState2): Promise<t.StateDiff> {
       // Clone the state object manually to avoid errors when passing it to wasm
       const stateClone = clone(state)
       const ret = await wasm.wasmObject.setState(stateClone)
-      if (typeof ret !== 'undefined') {
-        throw new Error(`Unexpected return value: ${ret}`)
+      if (!guard.isStateDiff(ret)) {
+        throw new Error(`Expected StateDiff, got ${ret}`)
       }
-    },
-    
-    async getState(): Promise<GameStateGui> {
-      const result = await wasm.wasmObject.getState()
-      if (!isGetStateResult(result)) {
-        throw new Error(`Expected GetStateResult, got ${result}`)
-      }
-      return { ...result.state, fen: result.fen, inCheck: result.inCheck }
+      return ret
     },
     
     async loadFen(fen: string): Promise<void> {
@@ -170,25 +118,33 @@ async function init(): Promise<Protochess> {
       }
     },
     
-    async movesFrom(x: number, y: number): Promise<MoveInfo[]> {
-      const moves = await wasm.wasmObject.movesFrom(x, y)
-      if (!Array.isArray(moves) || !moves.every(isMoveInfo)) {
-        throw new Error(`Expected array, got ${moves}`)
+    async getState(): Promise<t.GameState2> {
+      const result = await wasm.wasmObject.getState()
+      if (!guard.isGameState2(result)) {
+        throw new Error(`Expected GetStateResult, got ${result}`)
       }
-      return moves
+      return result
     },
     
-    async legalMoves(): Promise<MoveList[]> {
+    async getStateDiff(): Promise<t.StateDiff> {
+      const result = await wasm.wasmObject.getStateDiff()
+      if (!guard.isStateDiff(result)) {
+        throw new Error(`Expected StateDiff, got ${result}`)
+      }
+      return result
+    },
+    
+    async legalMoves(): Promise<t.MoveList[]> {
       const moves = await wasm.wasmObject.legalMoves()
-      if (!Array.isArray(moves) || !moves.every(isMoveList)) {
+      if (!Array.isArray(moves) || !moves.every(guard.isMoveList)) {
         throw new Error(`Expected array, got ${moves}`)
       }
       return moves
     },
     
-    async possiblePromotions(fromX: number, fromY: number, toX: number, toY: number): Promise<string[]> {
-      const promotions = await wasm.wasmObject.possiblePromotions(fromX, fromY, toX, toY)
-      if (!isStringArray(promotions)) {
+    async possiblePromotions(move: MoveInfo): Promise<string[]> {
+      const promotions = await wasm.wasmObject.possiblePromotions(move)
+      if (!Array.isArray(promotions) || !promotions.every(e => typeof e === 'string')) {
         throw new Error(`Expected array, got ${promotions}`)
       }
       return promotions
@@ -212,7 +168,7 @@ async function init(): Promise<Protochess> {
 }
 
 
-function adaptMoveInfoWithEval(moveInfoEval: GetBestMoveResult): MoveInfoWithEval {
+function adaptMoveInfoWithEval(moveInfoEval: t.GetBestMoveResult): t.MoveInfoWithEval {
   // Engine constants
   const MATE_VALUE = 1_000_000
   const MAX_DEPTH = 256 // Actually 127, but this is a safe upper bound
@@ -230,6 +186,3 @@ function adaptMoveInfoWithEval(moveInfoEval: GetBestMoveResult): MoveInfoWithEva
   return { ...moveInfo, evaluation }
 }
 
-function isStringArray(arr: unknown): arr is string[] {
-  return Array.isArray(arr) && arr.every(e => typeof e === 'string')
-}

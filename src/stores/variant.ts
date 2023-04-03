@@ -1,18 +1,17 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
-import type { PublishedVariant, PublishedVariantGui } from '@/protochess/types'
+import type { PublishedVariant } from '@/protochess/types'
 import { VariantDB } from '@/firebase/db'
 import { parseVariantJson } from '@/utils/chess/variant-json'
 import type { VariantDoc } from '@/firebase/db/schema'
-import { placementsToFen } from '@/utils/chess/fen-to-placements'
 import { useAuthStore } from '@/stores/auth-user'
 import type { Timestamp } from '@firebase/firestore'
 
 export const useVariantStore = defineStore('variant', () => {
   
   // Currently fetched variants
-  const variantList = ref<PublishedVariantGui[]>([])
+  const variantList = ref<PublishedVariant[]>([])
   const variantListOrder = ref<'newest' | 'upvotes'>('newest')
   
   const authStore = useAuthStore()
@@ -31,7 +30,7 @@ export const useVariantStore = defineStore('variant', () => {
     listUpvotesUid = authStore.loggedUser?.uid
     const userUpvoted = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, id)))
     
-    // Convert each pair of documents into a PublishedVariantGui
+    // Convert each pair of documents into a PublishedVariant
     const result = []
     for (const [i, [doc, id]] of docsWithId.entries()) {
       const state = readDocument(doc, userUpvoted[i], id)
@@ -52,7 +51,7 @@ export const useVariantStore = defineStore('variant', () => {
   })
   
   // Gets a variant from the database, or returns undefined if it doesn't exist
-  async function getVariant(id: string): Promise<PublishedVariantGui | undefined> {
+  async function getVariant(id: string): Promise<PublishedVariant | undefined> {
     // First check if the variant has already been fetched
     const existingVariant = variantList.value.find(variant => variant.uid === id)
     if (existingVariant) {
@@ -64,7 +63,7 @@ export const useVariantStore = defineStore('variant', () => {
       VariantDB.getVariantById(id),
       VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, id),
     ]).then(([doc, userUpvoted]) => {
-      // Convert the documents into a PublishedVariantGui
+      // Convert the documents into a PublishedVariant
       if (!doc) return undefined
       return readDocument(doc, userUpvoted, id)
     })
@@ -82,7 +81,7 @@ export const useVariantStore = defineStore('variant', () => {
   }
   
   
-  function readDocument(doc: VariantDoc, userUpvoted: boolean, id: string): PublishedVariantGui | undefined {
+  function readDocument(doc: VariantDoc, userUpvoted: boolean, id: string): PublishedVariant | undefined {
     const variant = parseVariantJson(doc.IMMUTABLE.initialState)
     if (!variant) {
       console.error('Illegal variant document', doc)
@@ -101,14 +100,7 @@ export const useVariantStore = defineStore('variant', () => {
       displayName: doc.name,
       description: doc.description,
     }
-    // Also compute the GUI-specific fields, since almost all components will
-    // need them and it's faster and easier to do it only once here
-    const pvg: PublishedVariantGui = {
-      ...pv,
-      fen: placementsToFen(variant),
-      inCheck: false, // Don't show the check indicator in the preview
-    }
-    return pvg
+    return pv
   }
   
   return { refreshList, getVariant, upvote, variantList }

@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
   import { computed, ref } from 'vue'
-  import type { PublishedVariantGui } from '@/protochess/types'
+  import type { PublishedVariant } from '@/protochess/types'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { useAuthStore } from '@/stores/auth-user'
@@ -31,7 +31,7 @@
   const animateHeart = ref(false)
   
   const props = defineProps<{
-    variant: PublishedVariantGui
+    variant: PublishedVariant
   }>()
 
   const numUpvotes = computed(() => {

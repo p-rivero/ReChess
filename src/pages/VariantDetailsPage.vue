@@ -108,7 +108,7 @@
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useAuthStore } from '@/stores/auth-user'
   import { useUserStore } from '@/stores/user'
-  import type { PublishedVariantGui } from '@/protochess/types'
+  import type { PublishedVariant } from '@/protochess/types'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import PieceDetailsPopup from '@/components/Variant/View/PieceDetailsPopup.vue'
@@ -128,7 +128,7 @@
   const authStore = useAuthStore()
   const userStore = useUserStore()
   
-  const variant = ref<PublishedVariantGui>()
+  const variant = ref<PublishedVariant>()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const playPopup = ref<InstanceType<typeof PlayPopup>>()
   const pieceDetailsPopup = ref<InstanceType<typeof PieceDetailsPopup>>()

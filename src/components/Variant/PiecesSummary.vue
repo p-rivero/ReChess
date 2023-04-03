@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { GameState, PieceDefinition } from '@/protochess/types'
+  import type { PieceDefinition, Variant } from '@/protochess/types'
   import { ref } from 'vue'
   import PieceImageView from '@/components/Variant/PieceImageView.vue'
   import { Sortable } from 'sortablejs-vue3'
@@ -120,7 +120,7 @@
   const hovered = ref(-1)
   const props = defineProps<{
     editable: boolean
-    state: GameState
+    state: Variant
   }>()
   
   const options = {

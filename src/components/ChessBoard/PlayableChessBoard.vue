@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { GameState, MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
+  import type { MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player, Variant, StateDiff } from '@/protochess/types'
   import { getProtochess } from '@/protochess'
   import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
   import { remToPx } from '@/utils/web-utils'
@@ -66,14 +66,16 @@
   
   defineExpose({
     // Set the state of the board
-    async setState(state: GameState) {
+    async setState(variant: Variant, history: MoveInfo[]) {
       const protochess = await getProtochess()
-      await protochess.setState(state)
+      await protochess.setState({ initialState: variant, moveHistory: history })
       await synchronizeBoardState()
-      promotionPopup.value?.initState(state)
-      moveHistory.initialize(state)
-      emit('player-changed', state.playerToMove === 0 ? 'white' : 'black')
+      promotionPopup.value?.initialize(variant)
+      moveHistory.initialize(variant)
+      emit('player-changed', variant.playerToMove === 0 ? 'white' : 'black')
     },
+    
+    // TODO: Load fen (call protochess.loadFen and reinitialize the move history with the fen)
     
     // Move a piece from one position to another, and optionally promote it
     makeMove(from: [number, number], to: [number, number], promotion?: {color: Player, id: string}) {
@@ -111,7 +113,7 @@
   // Called when the user makes a move on the board
   async function userMovedCallback(from: [number, number], to: [number, number]) {
     const protochess = await getProtochess()
-    const possiblePromotions = await protochess.possiblePromotions(from[0], from[1], to[0], to[1])
+    const possiblePromotions = await protochess.possiblePromotions({ from, to })
     let promotion: string|undefined = undefined
     if (possiblePromotions.length > 0) {
       // Choose promotion
@@ -162,26 +164,26 @@
     if (playMoveBefore) {
       // Play the move before synchronizing the state
       const result = await protochess.makeMove(playMoveBefore)
-      board.value?.highlightMove(playMoveBefore.from, playMoveBefore.to)
+      board.value?.setLastMove(playMoveBefore)
       // Handle the result, if the game has ended don't emit piece-moved
       moveResult = handleResult(result)
     }
-    const state = await protochess.getState()
-    board.value?.setState(state)
+    const stateDiff = await protochess.getStateDiff()
+    board.value?.setStateDiff(stateDiff)
     
     // Move was played, emit piece-moved and store history
     if (moveResult !== 'N/A') {
       if (!playMoveBefore) throw new Error('playMoveBefore is undefined')
-      moveHistory.newMove(playMoveBefore, state, moveResult)
+      moveHistory.newMove(playMoveBefore, moveResult)
       emit('piece-moved', playMoveBefore.from, playMoveBefore.to, moveResult)
-      emit('player-changed', state.playerToMove === 0 ? 'white' : 'black')
+      emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
       // Game has ended, don't continue
       if (moveResult) return
     }
     
-    updateMovableSquares(state)
+    updateMovableSquares(stateDiff)
   }
-  async function updateMovableSquares(state: GameState) {
+  async function updateMovableSquares(state: StateDiff) {
     const protochess = await getProtochess()
     const moves = await protochess.legalMoves()
     const moveWhite = props.white == 'human' && state.playerToMove == 0
@@ -212,20 +214,19 @@
     if (!entry) return
     
     // Update the state of the engine and the board
-    await protochess.setState(entry.state)
-    const guiState = await protochess.getState()
-    board.value?.setState(guiState)
+    const stateDiff = await protochess.setState(entry.state)
+    board.value?.setStateDiff(stateDiff)
     
     // Update highlighted move
-    if (entry.move) {
-      board.value?.highlightMove(entry.move.from, entry.move.to)
+    if (entry.lastMove) {
+      board.value?.setLastMove(entry.lastMove)
     } else {
-      board.value?.clearHighlightMove()
+      board.value?.clearLastMove()
     }
     
     // Update movable squares
     if (moveHistory.canMakeMove()) {
-      updateMovableSquares(entry.state)
+      updateMovableSquares(stateDiff)
     } else {
       board.value?.setMovable(false, false, [])
     }

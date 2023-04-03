@@ -64,7 +64,6 @@
 </template>
 
 <script setup lang="ts">
-  import type { PublishedVariantGui } from '@/protochess/types'
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import HighlightWords from 'vue-highlight-words'
@@ -76,6 +75,7 @@
   import { useAuthStore } from '@/stores/auth-user'
   import { useUserStore } from '@/stores/user'
   import { clone } from '@/utils/ts-utils'
+  import type { PublishedVariant } from '@/protochess/types'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const draftStore = useVariantDraftStore()
@@ -84,7 +84,7 @@
   const router = useRouter()
   
   const props = defineProps<{
-    variant: PublishedVariantGui
+    variant: PublishedVariant
     highlightMatches?: {start: number, end: number}[]
   }>()
   

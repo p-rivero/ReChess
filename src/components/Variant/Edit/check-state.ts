@@ -1,16 +1,22 @@
-import type { GameState, PieceDefinition } from '@/protochess/types'
+import type { InitialState, PieceDefinition, StateDiff, Variant } from '@/protochess/types'
 import { getProtochess } from '@/protochess'
 import type { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
 
-export async function checkState(state: GameState, errorMsgHandler: ErrorMessageHandler) {
-  if (!checkPieces(state, errorMsgHandler)) return
-  if (!await checkProtochess(state, errorMsgHandler)) return
-  // Clear the error message and enable the publish button
-  errorMsgHandler.clear()
+export async function checkState(variant: Variant, errorMsgHandler: ErrorMessageHandler): Promise<StateDiff | undefined> {
+  if (!checkPieces(variant, errorMsgHandler)) return
+  try {
+    const stateDiff = await checkProtochess(variant)
+    // Clear the error message and enable the publish button
+    errorMsgHandler.clear()
+    return stateDiff
+  } catch (e) {
+    // Use priority -1, which is lower than the priority of text input errors
+    errorMsgHandler.show(`Illegal starting position: ${e}`, -1)
+  }
 }
 
 
-function checkPieces(state: GameState, errorMsgHandler: ErrorMessageHandler): boolean {
+function checkPieces(state: Variant, errorMsgHandler: ErrorMessageHandler): boolean {
   for (let i = 0; i < state.pieceTypes.length; i++) {
     const piece = state.pieceTypes[i]
     if (!piece.displayName) {
@@ -80,17 +86,11 @@ function checkPieces(state: GameState, errorMsgHandler: ErrorMessageHandler): bo
 }
 
 
-async function checkProtochess(state: GameState, errorMsgHandler: ErrorMessageHandler): Promise<boolean> {
-  try {
-    const protochess = await getProtochess()
-    await protochess.setState(state)
-    await protochess.validatePosition()
-  } catch (e) {
-    // Use priority -1, which is lower than the priority of text input errors
-    errorMsgHandler.show(`Illegal starting position: ${e}`, -1)
-    return false
-  }
-  return true
+async function checkProtochess(state: InitialState): Promise<StateDiff> {
+  const protochess = await getProtochess()
+  const stateDiff = await protochess.setState({ initialState: state, moveHistory: [] })
+  await protochess.validatePosition()
+  return stateDiff
 }
 
 
@@ -113,7 +113,7 @@ function squareName(square: [number, number]): string {
   return `${String.fromCharCode(square[0] + 97)}${square[1] + 1}`
 }
 
-function checkDuplicateSymbol(i: number, player: number, state: GameState, errorMsgHandler: ErrorMessageHandler): boolean {
+function checkDuplicateSymbol(i: number, player: number, state: Variant, errorMsgHandler: ErrorMessageHandler): boolean {
   const piece = state.pieceTypes[i]
   const playerSym = piece.ids[player]
   if (!playerSym) return false

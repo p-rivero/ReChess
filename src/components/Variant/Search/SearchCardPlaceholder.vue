@@ -63,8 +63,8 @@
   import type { Match } from '@/utils/chess/variant-search'
   import { onMounted, ref } from 'vue'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
-  import type { GameStateGui } from '@/protochess/types'
   import HighlightWords from 'vue-highlight-words'
+  import type { Variant } from '@/protochess/types'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   
@@ -76,14 +76,13 @@
   
   
   onMounted(async () => {
-    const DUMMY_STATE: GameStateGui = {
+    const DUMMY_VARIANT: Variant = {
       boardWidth: 8,
       boardHeight: 8,
       fen: '8/8/8/8/8/8/8/8 w - - 0 1',
       playerToMove: 0,
       inCheck: false,
       pieceTypes: [],
-      pieces: [],
       invalidSquares: [],
       globalRules: {
         capturingIsForced: false,
@@ -93,8 +92,10 @@
         repetitionsDraw: 0,
         checksToLose: 0,
       },
+      displayName: '',
+      description: '',
     }
-    board.value?.setState(DUMMY_STATE)
+    board.value?.setState(DUMMY_VARIANT)
   })
     
 </script>
