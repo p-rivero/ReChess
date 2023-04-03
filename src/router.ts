@@ -27,18 +27,18 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'variant-details',
     path: '/variant/:variantId',
-    component: () => import('@/pages/VariantDetailsPage.vue'),
+    component: () => import('@/pages/Variant/VariantDetailsPage.vue'),
   },
   {
     name: 'edit-variant',
     path: '/edit',
-    component: () => import('@/pages/EditVariantPage.vue'),
+    component: () => import('@/pages/Variant/EditVariantPage.vue'),
     meta: { title: 'Edit Draft' },
   },
   {
     name: 'edit-piece',
     path: '/edit/pieces/:pieceIndex',
-    component: () => import('@/pages/EditPiecePage.vue'),
+    component: () => import('@/pages/Variant/EditPiecePage.vue'),
     meta: { title: 'Edit Draft' },
   },
   {
@@ -55,19 +55,19 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'privacy',
     path: '/privacy',
-    component: () => import('@/pages/legal/PrivacyPolicyPage.vue'),
+    component: () => import('@/pages/Legal/PrivacyPolicyPage.vue'),
     meta: { title: 'Privacy Policy' },
   },
   {
     name: 'cookies',
     path: '/cookies',
-    component: () => import('@/pages/legal/CookiePolicyPage.vue'),
+    component: () => import('@/pages/Legal/CookiePolicyPage.vue'),
     meta: { title: 'Cookie Policy' },
   },
   {
     name: 'tos',
     path: '/tos',
-    component: () => import('@/pages/legal/TermsOfServicePage.vue'),
+    component: () => import('@/pages/Legal/TermsOfServicePage.vue'),
     meta: { title: 'Terms of Service' },
   },
 ]
