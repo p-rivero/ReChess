@@ -83,7 +83,6 @@
       playerToMove: 0,
       inCheck: false,
       pieceTypes: [],
-      invalidSquares: [],
       globalRules: {
         capturingIsForced: false,
         checkIsForbidden: false,

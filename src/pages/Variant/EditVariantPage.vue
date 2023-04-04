@@ -334,7 +334,7 @@
   function getClickMode(coords: [number, number]): 'add'|'remove' {
     // If selectedPieceId === 'delete', the click mode doesn't matter
     if (selectedPieceId.value === 'wall') {
-      return draftStore.state.invalidSquares.some(p => p[0] === coords[0] && p[1] === coords[1]) ? 'remove' : 'add'
+      return getPieceAt(draftStore.state.fen, coords) === '*' ? 'remove' : 'add'
     } else {
       return getPieceAt(draftStore.state.fen, coords) === selectedPieceId.value ? 'remove' : 'add'
     }
@@ -351,55 +351,43 @@
     if (selectedPieceId.value === 'none') return
     let placements = fenToPlacements(draftStore.state.fen)
 
-    const hasWall = draftStore.state.invalidSquares.some(square => square[0] === coords[0] && square[1] === coords[1])
     const placementIndex = placements.findIndex(piece => piece.x === coords[0] && piece.y === coords[1])
     const pieceId = placementIndex !== -1 ? placements[placementIndex].pieceId : null
+    const hasWall = pieceId === '*'
     
     if (selectedPieceId.value === 'delete') {
       // Delete button selected: override click mode and remove all pieces and walls at this square
-      draftStore.state.invalidSquares = draftStore.state.invalidSquares.filter(square => square[0] !== coords[0] || square[1] !== coords[1])
       placements = placements.filter(piece => piece.x !== coords[0] || piece.y !== coords[1])
       draftStore.state.fen = placementsToFen(placements)
       return
     }
     
+    const selectedId = selectedPieceId.value === 'wall' ? '*' : selectedPieceId.value
     if (mode === 'remove') {
-      if (selectedPieceId.value === 'wall') {
-        // Selected wall in remove mode: only remove walls
-        draftStore.state.invalidSquares = draftStore.state.invalidSquares.filter(square => square[0] !== coords[0] || square[1] !== coords[1])
-        return
-      } else {
-        // Selected piece in remove mode: only remove the selected piece
-        if (pieceId === selectedPieceId.value) {
-          placements.splice(placementIndex, 1)
-        }
+      // Remove mode: only remove the selected piece (or walls)
+      if (pieceId === selectedId) {
+        placements.splice(placementIndex, 1)
       }
     } else {
-      if (selectedPieceId.value === 'wall') {
-        // Selected wall in add mode: add wall if there's none. Also, if there was a piece, remove it
-        if (pieceId) placements.splice(placementIndex, 1)
-        if (!hasWall) draftStore.state.invalidSquares.push(coords)
-      } else {
-        // Selected piece in add mode: if there's no wall, replace the piece (or add it if there was none)
-        if (hasWall) return
-        if (pieceId) placements.splice(placementIndex, 1)
-        placements.push({
-          x: coords[0],
-          y: coords[1],
-          pieceId: selectedPieceId.value,
-        })
-      }
+      // Add mode: add the selected piece (or walls) only if there's no wall there
+      if (hasWall) return
+      if (pieceId) placements.splice(placementIndex, 1)
+      placements.push({
+        x: coords[0],
+        y: coords[1],
+        pieceId: selectedId,
+      })
     }
     draftStore.state.fen = placementsToFen(placements)
   }
   
   function movePiece(from: [number, number], to: [number, number]) {
+    let placements = fenToPlacements(draftStore.state.fen)
     // If there's a wall at the destination, don't move the piece
-    if (draftStore.state.invalidSquares.some(square => square[0] === to[0] && square[1] === to[1])) {
+    if (placements.some(p => p.x === to[0] && p.y === to[1] && p.pieceId === '*')) {
       updateBoardAndError()
       return
     }
-    let placements = fenToPlacements(draftStore.state.fen)
     // If there's a piece at the destination, remove it
     placements = placements.filter(p => p.x !== to[0] || p.y !== to[1])
     // Move the piece
@@ -416,10 +404,7 @@
       'Clear board',
       'This will remove **all** pieces and walls from the board. Do you want to continue?',
       'yes-no',
-      () => {
-        draftStore.state.fen = ''
-        draftStore.state.invalidSquares = []
-      }
+      () => { draftStore.state.fen = '' }
     )
   }
   

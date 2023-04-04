@@ -1,5 +1,6 @@
 import type { Variant } from '@/protochess/types'
 import { isVariant } from '@/protochess/types.guard'
+import { fenToPlacements } from './fen'
 
 export function parseVariantJson(json: string): Variant | undefined {
   try {
@@ -19,6 +20,6 @@ function isValidVariant(state: unknown): state is Variant {
   if (state.pieceTypes.length > 26) return false
   if (state.boardWidth < 1 || state.boardWidth > 16) return false
   if (state.boardHeight < 1 || state.boardHeight > 16) return false
-  if (state.invalidSquares.some(square => square[0] < 0 || square[0] >= state.boardWidth || square[1] < 0 || square[1] >= state.boardHeight)) return false
+  if (fenToPlacements(state.fen).some(p => p.x < 0 || p.x >= state.boardWidth || p.y < 0 || p.y >= state.boardHeight)) return false
   return true
 }

@@ -40,14 +40,12 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     let placements = fenToPlacements(state.value.fen)
     placements = placements.filter(piece => piece.x < width)
     state.value.fen = placementsToFen(placements)
-    state.value.invalidSquares = state.value.invalidSquares.filter((square: [number, number]) => square[0] < width)
   }
   function setHeight(height: number) {
     state.value.boardHeight = height
     let placements = fenToPlacements(state.value.fen)
     placements = placements.filter(piece => piece.y < height)
     state.value.fen = placementsToFen(placements)
-    state.value.invalidSquares = state.value.invalidSquares.filter((square: [number, number]) => square[1] < height)
   }
   
   
@@ -119,7 +117,6 @@ const DEFAULT_DRAFT: Readonly<Variant> = {
   pieceTypes: [],
   boardWidth: 8,
   boardHeight: 8,
-  invalidSquares: [],
   playerToMove: 0,
   globalRules: {
     capturingIsForced: false,

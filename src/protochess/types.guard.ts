@@ -86,12 +86,6 @@ export function isInitialState(obj: unknown): obj is InitialState {
         ) &&
         typeof typedObj["boardWidth"] === "number" &&
         typeof typedObj["boardHeight"] === "number" &&
-        Array.isArray(typedObj["invalidSquares"]) &&
-        typedObj["invalidSquares"].every((e: any) =>
-            Array.isArray(e) &&
-            typeof e[0] === "number" &&
-            typeof e[1] === "number"
-        ) &&
         (typedObj["globalRules"] !== null &&
             typeof typedObj["globalRules"] === "object" ||
             typeof typedObj["globalRules"] === "function") &&
