@@ -101,14 +101,13 @@ async function init(): Promise<t.Protochess> {
       return { ...moveEval, depth: result.depth }
     },
     
-    async setState(state: t.GameState): Promise<t.StateDiff> {
+    async setState(state: t.GameState): Promise<void> {
       // Clone the state object manually to avoid errors when passing it to wasm
       const stateClone = clone(state)
       const ret = await wasm.wasmObject.setState(stateClone)
-      if (!guard.isStateDiff(ret)) {
-        throw new Error(`Expected StateDiff, got ${ret}`)
+      if (typeof ret !== 'undefined') {
+        throw new Error(`Unexpected return value: ${ret}`)
       }
-      return ret
     },
     
     async loadFen(fen: string): Promise<void> {

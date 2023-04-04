@@ -79,7 +79,12 @@ export function isStateDiff(obj: unknown): obj is StateDiff {
 export function isInitialState(obj: unknown): obj is InitialState {
     const typedObj = obj as InitialState
     return (
-        isStateDiff(typedObj) as boolean &&
+        (typedObj !== null &&
+            typeof typedObj === "object" ||
+            typeof typedObj === "function") &&
+        typeof typedObj["fen"] === "string" &&
+        (typedObj["playerToMove"] === 0 ||
+            typedObj["playerToMove"] === 1) &&
         Array.isArray(typedObj["pieceTypes"]) &&
         typedObj["pieceTypes"].every((e: any) =>
             isPieceDefinition(e) as boolean

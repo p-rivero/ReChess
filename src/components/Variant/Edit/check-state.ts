@@ -1,14 +1,13 @@
-import type { InitialState, FullPieceDef, StateDiff, Variant } from '@/protochess/types'
+import type { InitialState, FullPieceDef, Variant } from '@/protochess/types'
 import { getProtochess } from '@/protochess'
 import type { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
 
-export async function checkState(variant: Variant, errorMsgHandler: ErrorMessageHandler): Promise<StateDiff | undefined> {
+export async function checkState(variant: Variant, errorMsgHandler: ErrorMessageHandler): Promise<void> {
   if (!checkPieces(variant, errorMsgHandler)) return
   try {
-    const stateDiff = await checkProtochess(variant)
+    await checkProtochess(variant)
     // Clear the error message and enable the publish button
     errorMsgHandler.clear()
-    return stateDiff
   } catch (e) {
     // Use priority -1, which is lower than the priority of text input errors
     errorMsgHandler.show(`Illegal starting position: ${e}`, -1)
@@ -86,11 +85,10 @@ function checkPieces(state: Variant, errorMsgHandler: ErrorMessageHandler): bool
 }
 
 
-async function checkProtochess(state: InitialState): Promise<StateDiff> {
+async function checkProtochess(state: InitialState): Promise<void> {
   const protochess = await getProtochess()
-  const stateDiff = await protochess.setState({ initialState: state, moveHistory: [] })
+  await protochess.setState({ initialState: state, moveHistory: [] })
   await protochess.validatePosition()
-  return stateDiff
 }
 
 

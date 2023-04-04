@@ -69,13 +69,16 @@
     async setState(variant: Variant, history: MoveInfo[]) {
       const protochess = await getProtochess()
       await protochess.setState({ initialState: variant, moveHistory: history })
-      await synchronizeBoardState()
+      const stateDiff = await protochess.getStateDiff()
+      
+      board.value?.setState(variant)
+      board.value?.setStateDiff(stateDiff)
+      updateMovableSquares(stateDiff)
+      
       promotionPopup.value?.initialize(variant)
       moveHistory.initialize(variant)
       emit('player-changed', variant.playerToMove === 0 ? 'white' : 'black')
     },
-    
-    // TODO: Load fen (call protochess.loadFen and reinitialize the move history with the fen)
     
     // Move a piece from one position to another, and optionally promote it
     makeMove(from: [number, number], to: [number, number], promotion?: {color: Player, id: string}) {
@@ -214,7 +217,8 @@
     if (!entry) return
     
     // Update the state of the engine and the board
-    const stateDiff = await protochess.setState(entry.state)
+    await protochess.setState(entry.state)
+    const stateDiff = await protochess.getStateDiff()
     board.value?.setStateDiff(stateDiff)
     
     // Update highlighted move

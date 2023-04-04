@@ -297,9 +297,7 @@
   onMounted(updateBoardAndError)
   async function updateBoardAndError() {
     // Update error message
-    const stateDiff = await checkState(draftStore.state, errorMsgHandler)
-    // Update board and inCheck field
-    draftStore.state.inCheck = stateDiff?.inCheck ?? false
+    await checkState(draftStore.state, errorMsgHandler)
     board.value?.setState(draftStore.state)
   }
   

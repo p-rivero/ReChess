@@ -46,9 +46,11 @@ export interface Protochess {
   /** Searches the best move for the given time (in seconds). Returns the move, the evaluation of the position, and the depth reached. */
   getBestMoveTimeout(time: number): Promise<MoveInfoWithEvalDepth>,
   /** Set the current state, formed by an InitialState, and the list of moves that were played.
-    * If a FEN is provided, it will be applied before the moves. */
-  setState(state: GameState): Promise<StateDiff>,
-  /** Load a user-provided FEN string. See FullFen for the format. */
+    * If a FEN is provided, it will be applied before the moves.
+    * After calling `setState()`, use `getStateDiff()` to update the GUI */
+  setState(state: GameState): Promise<void>,
+  /** Load a user-provided FEN string. See FullFen for the format.
+    * After calling `loadFen()`, use `getStateDiff()` to update the GUI */
   loadFen(fen: FullFen): Promise<void>,
   /** Get the full current state, which can later be used in `setState()` */
   getState(): Promise<GameState>,
@@ -117,7 +119,9 @@ export interface StateDiff {
 
 // Immutable properties of the game
 /** @see {isInitialState} ts-auto-guard:type-guard */
-export interface InitialState extends StateDiff {
+export interface InitialState {
+  fen: FenPlacements, // Initial piece placements for this variant
+  playerToMove: 0 | 1, // First player to move in this variant (0 = White, 1 = Black)
   pieceTypes: PieceDefinition[],
   boardWidth: number,
   boardHeight: number,

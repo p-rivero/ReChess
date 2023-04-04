@@ -81,7 +81,6 @@
       boardHeight: 8,
       fen: '8/8/8/8/8/8/8/8 w - - 0 1',
       playerToMove: 0,
-      inCheck: false,
       pieceTypes: [],
       globalRules: {
         capturingIsForced: false,

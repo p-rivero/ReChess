@@ -113,7 +113,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
 const DEFAULT_DRAFT: Readonly<Variant> = {
   displayName: '',
   description: '',
-  fen: '',
+  fen: '/',
   pieceTypes: [],
   boardWidth: 8,
   boardHeight: 8,
@@ -126,7 +126,6 @@ const DEFAULT_DRAFT: Readonly<Variant> = {
     repetitionsDraw: 3,
     checksToLose: 0,
   },
-  inCheck: false,
 }
 
 const DEFAULT_PIECE: Readonly<FullPieceDef> = {
