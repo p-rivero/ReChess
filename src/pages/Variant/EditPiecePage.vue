@@ -300,7 +300,7 @@
   import AddRemoveButtons from '@/components/Variant/Edit/AddRemoveButtons.vue'
   import PieceImageEdit from '@/components/Variant/Edit/PieceImageEdit.vue'
   import PopupOverlay from '@/components/PopupMsg/PopupOverlay.vue'
-  import type { PieceDefinition, Player } from '@/protochess/types'
+  import type { FullPieceDef, Player } from '@/protochess/types'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useAuthStore } from '@/stores/auth-user'
   import { paramToInt } from '@/utils/web-utils'
@@ -316,7 +316,7 @@
   const draftStore = useVariantDraftStore()
   const authStore = useAuthStore()
   const pieceIndex = paramToInt(route.params.pieceIndex)
-  let piece: PieceDefinition|null = null
+  let piece: FullPieceDef|null = null
   
   // This page is only accessible when logged in
   if (!authStore.loggedUser) {

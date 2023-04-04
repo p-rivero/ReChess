@@ -2,7 +2,7 @@ import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import sanitizeFilename from 'sanitize-filename'
 
-import type { Variant, PieceDefinition } from '@/protochess/types'
+import type { Variant, FullPieceDef } from '@/protochess/types'
 import { exportFile } from '@/utils/file-io'
 import { clone, object_equals } from '@/utils/ts-utils'
 import { parseVariantJson } from '@/utils/chess/variant-json'
@@ -132,7 +132,7 @@ const DEFAULT_DRAFT: Readonly<Variant> = {
   inCheck: false,
 }
 
-const DEFAULT_PIECE: Readonly<PieceDefinition> = {
+const DEFAULT_PIECE: Readonly<FullPieceDef> = {
   ids: ['', ''],
   isLeader: false,
   castleFiles: undefined,

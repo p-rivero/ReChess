@@ -20,12 +20,12 @@
   import type { Config } from 'chessgroundx/config'
   import type { Key } from 'chessgroundx/types'
   import type { DrawShape } from 'chessgroundx/draw'
-  import type { PieceDefinition } from '@/protochess/types'
+  import type { FullPieceDef } from '@/protochess/types'
   import { keyToPosition, positionToKey } from '@/utils/chess/chess-coords'
   import { onMounted, ref, watch, computed } from 'vue'
   
   const props = defineProps<{
-    piece: PieceDefinition
+    piece: FullPieceDef
     width: number
     height: number
     position: 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'

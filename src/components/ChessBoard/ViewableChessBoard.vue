@@ -145,8 +145,12 @@
     },
     
     // Set the board, but only the parts that can change during a game
-    setStateDiff(_diff: StateDiff) {
-      throw new Error('Not implemented')
+    setStateDiff(diff: StateDiff) {
+      let newConfig: Config = {}
+      newConfig.turnColor = diff.playerToMove == 0 ? 'white' : 'black'
+      newConfig.check = diff.inCheck
+      newConfig.fen = diff.fen
+      incrementalUpdateConfig(newConfig)
     },
     
     // Define which sides are movable by the user

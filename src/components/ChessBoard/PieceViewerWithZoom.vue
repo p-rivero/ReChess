@@ -63,13 +63,13 @@
 
 <script setup lang="ts">
   import PieceViewer from './PieceViewer.vue'
-  import type { PieceDefinition } from '@/protochess/types'
+  import type { FullPieceDef } from '@/protochess/types'
   import { ref, toRefs } from 'vue'
   
   const board = ref<InstanceType<typeof PieceViewer>>()
   
   const props = defineProps<{
-    piece: PieceDefinition
+    piece: FullPieceDef
     getClickMode?: (position: [number, number]) => 'add'|'remove'
   }>()
   const { piece } = toRefs(props)

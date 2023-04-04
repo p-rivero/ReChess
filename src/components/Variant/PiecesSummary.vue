@@ -1,7 +1,7 @@
 <template>
   <Sortable
     :list="props.state.pieceTypes"
-    :item-key="piece => (piece as PieceDefinition).ids[0] ?? '' + (piece as PieceDefinition).ids[1]"
+    :item-key="piece => (piece as FullPieceDef).ids[0] ?? '' + (piece as FullPieceDef).ids[1]"
     :options="options"
     @end="e => emit('reorder', e.oldIndex, e.newIndex)"
   >
@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { PieceDefinition, Variant } from '@/protochess/types'
+  import type { FullPieceDef, Variant } from '@/protochess/types'
   import { ref } from 'vue'
   import PieceImageView from '@/components/Variant/PieceImageView.vue'
   import { Sortable } from 'sortablejs-vue3'

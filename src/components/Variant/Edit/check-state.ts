@@ -1,4 +1,4 @@
-import type { InitialState, PieceDefinition, StateDiff, Variant } from '@/protochess/types'
+import type { InitialState, FullPieceDef, StateDiff, Variant } from '@/protochess/types'
 import { getProtochess } from '@/protochess'
 import type { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
 
@@ -94,7 +94,7 @@ async function checkProtochess(state: InitialState): Promise<StateDiff> {
 }
 
 
-function pieceName(index: number, piece: PieceDefinition): string {
+function pieceName(index: number, piece: FullPieceDef): string {
   if (piece.displayName) {
     return `"${piece.displayName}"`
   }

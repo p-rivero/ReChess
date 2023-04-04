@@ -2,7 +2,7 @@
  * Generated type guards for "types.ts".
  * WARNING: Do not manually change this file.
  */
-import type { MakeMoveResult, MoveInfo, MoveList, StateDiff, InitialState, GameState, Variant, PublishedVariant, PieceDefinitionLogic, GetBestMoveResult, GetBestMoveTimeoutResult } from "./types";
+import type { MakeMoveResult, MoveInfo, MoveList, StateDiff, InitialState, GameState, Variant, PublishedVariant, PieceDefinition, GetBestMoveResult, GetBestMoveTimeoutResult } from "./types";
 
 export function isMakeMoveResult(obj: unknown): obj is MakeMoveResult {
     const typedObj = obj as MakeMoveResult
@@ -82,7 +82,7 @@ export function isInitialState(obj: unknown): obj is InitialState {
         isStateDiff(typedObj) as boolean &&
         Array.isArray(typedObj["pieceTypes"]) &&
         typedObj["pieceTypes"].every((e: any) =>
-            isPieceDefinitionLogic(e) as boolean
+            isPieceDefinition(e) as boolean
         ) &&
         typeof typedObj["boardWidth"] === "number" &&
         typeof typedObj["boardHeight"] === "number" &&
@@ -126,7 +126,7 @@ export function isVariant(obj: unknown): obj is Variant {
         isInitialState(typedObj) as boolean &&
         Array.isArray(typedObj["pieceTypes"]) &&
         typedObj["pieceTypes"].every((e: any) =>
-            isPieceDefinitionLogic(e) as boolean &&
+            isPieceDefinition(e) as boolean &&
             typeof e["displayName"] === "string" &&
             Array.isArray(e["imageUrls"]) &&
             (typeof e["imageUrls"][0] === "undefined" ||
@@ -155,8 +155,8 @@ export function isPublishedVariant(obj: unknown): obj is PublishedVariant {
     )
 }
 
-export function isPieceDefinitionLogic(obj: unknown): obj is PieceDefinitionLogic {
-    const typedObj = obj as PieceDefinitionLogic
+export function isPieceDefinition(obj: unknown): obj is PieceDefinition {
+    const typedObj = obj as PieceDefinition
     return (
         (typedObj !== null &&
             typeof typedObj === "object" ||

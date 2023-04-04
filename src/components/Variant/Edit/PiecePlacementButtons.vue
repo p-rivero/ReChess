@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { PieceDefinition, Player, Variant } from '@/protochess/types'
+  import type { FullPieceDef, Player, Variant } from '@/protochess/types'
   import { ref } from 'vue'
   import PieceImageView from '@/components/Variant/PieceImageView.vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
@@ -88,7 +88,7 @@
   
   type Piece = {
     id: string|null|undefined
-    definition: PieceDefinition
+    definition: FullPieceDef
     color: Player
   }
   

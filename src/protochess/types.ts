@@ -9,16 +9,25 @@ type FenPlacements = string
 /**  String containing the following parts, separated by spaces:
   * - Placement of the pieces, in the FEN format
   * - Player to move (w or b)
-  * - Castling rights. This format needs to support arbitrary variants, so a custom format is used.
-  *   The squares with a piece that has not moved are enclosed in square brackets and separated by commas (no spaces).
-  *   To keep it short, only the rellevant squares are included (pieces that participate in castling).
-  *   For example, the starting position would be: `[a1,h1,e1,a8,h8,e8]`
-  *   To mantain compatibility with traditional FEN, `QKqk` and `AHah` formats are also supported.
+  * - Castling rights. See below for the format.
   * - En passant square (if any)
   * - (Optional) Check count for variants like 3-check.
   *   Format: +W+B, where W is the number of times White put Black in check
   * - (Optional) Halfmove clock (ignored)
-  * - (Optional) Fullmove number (ignored) */
+  * - (Optional) Fullmove number (ignored)
+  *
+  * ### Custom castling rights format:
+  * Some variants can have complex castling rights, so the standard FEN format is not enough.
+  * The custom format used is the following:
+  *
+  * The squares with a *piece that has not moved* are enclosed in parentheses and separated by commas (no spaces).
+  * To keep it short, only the rellevant squares are included (pieces that participate in castling).
+  * For example, the starting position would be: `(a1,h1,e1,a8,h8,e8)`
+  *
+  * To mantain compatibility with traditional FEN, `QKqk` and `AHah` formats are also supported, but with some limitations:
+  * - Use `QKqk` only when the piece positions are the same as in standard chess (rooks at the edges, king in the middle)
+  * - When using `AHah`, also include the square of the king (the starting position would be `AEHaeh`)
+  */
 type FullFen = string
 
 export interface Protochess {
@@ -109,10 +118,9 @@ export interface StateDiff {
 // Immutable properties of the game
 /** @see {isInitialState} ts-auto-guard:type-guard */
 export interface InitialState extends StateDiff {
-  pieceTypes: PieceDefinitionLogic[],
+  pieceTypes: PieceDefinition[],
   boardWidth: number,
   boardHeight: number,
-  invalidSquares: [number, number][],
   globalRules: GlobalRules,
 }
 
@@ -125,7 +133,7 @@ export interface GameState {
 
 /** @see {isVariant} ts-auto-guard:type-guard */
 export interface Variant extends InitialState {
-  pieceTypes: PieceDefinition[],
+  pieceTypes: FullPieceDef[],
   displayName: string,
   description: string,
 }
@@ -142,8 +150,8 @@ export interface PublishedVariant extends Variant {
 
 
 // Piece properties that affect the game logic
-/** @see {isPieceDefinitionLogic} ts-auto-guard:type-guard */
-export interface PieceDefinitionLogic {
+/** @see {isPieceDefinition} ts-auto-guard:type-guard */
+export interface PieceDefinition {
   ids: [string|undefined|null, string|undefined|null],
   isLeader: boolean,
   castleFiles?: [number, number],
@@ -178,7 +186,7 @@ export interface PieceDefinitionLogic {
 }
 
 // Piece properties that are only used for the GUI
-export interface PieceDefinition extends PieceDefinitionLogic {
+export interface FullPieceDef extends PieceDefinition {
   displayName: string,
   imageUrls: [string|undefined|null, string|undefined|null],
 }

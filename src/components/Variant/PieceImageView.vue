@@ -27,11 +27,11 @@
 
 
 <script setup lang="ts">
-  import type { PieceDefinition, Player } from '@/protochess/types'
+  import type { FullPieceDef, Player } from '@/protochess/types'
   import { computed } from 'vue'
   
   const props = defineProps<{
-    piece: PieceDefinition
+    piece: FullPieceDef
     color: Player
   }>()
   
