@@ -116,7 +116,6 @@
   defineExpose({
     // Set the state of the board
     setState(state: Variant) {
-      console.log('FULL UPDATE')
       if (state.boardWidth < 2 || state.boardHeight < 2) {
         throw new Error('Minimum board size is 2x2')
       }
@@ -147,7 +146,6 @@
     
     // Set the board, but only the parts that can change during a game
     setStateDiff(diff: StateDiff) {
-      console.log('diff update')
       let newConfig: Config = {}
       newConfig.turnColor = diff.playerToMove == 0 ? 'white' : 'black'
       newConfig.check = diff.inCheck

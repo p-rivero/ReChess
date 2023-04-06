@@ -6,28 +6,8 @@ export type Player = 'white' | 'black'
 // Only the placement of the pieces, in the FEN format
 type FenPlacements = string
 
-/**  String containing the following parts, separated by spaces:
-  * - Placement of the pieces, in the FEN format
-  * - Player to move (w or b)
-  * - Castling rights. See below for the format.
-  * - En passant square (if any)
-  * - (Optional) Check count for variants like 3-check.
-  *   Format: +W+B, where W is the number of times White put Black in check
-  * - (Optional) Halfmove clock (ignored)
-  * - (Optional) Fullmove number (ignored)
-  *
-  * ### Custom castling rights format:
-  * Some variants can have complex castling rights, so the standard FEN format is not enough.
-  * The custom format used is the following:
-  *
-  * The squares with a *piece that has not moved* are enclosed in parentheses and separated by commas (no spaces).
-  * To keep it short, only the rellevant squares are included (pieces that participate in castling).
-  * For example, the starting position would be: `(a1,h1,e1,a8,h8,e8)`
-  *
-  * To mantain compatibility with traditional FEN, `QKqk` and `AHah` formats are also supported, but with some limitations:
-  * - Use `QKqk` only when the piece positions are the same as in standard chess (rooks at the edges, king in the middle)
-  * - When using `AHah`, also include the square of the king (the starting position would be `AEHaeh`)
-  */
+/** See [this document](https://github.com/p-rivero/protochess-engine/tree/master/docs/FEN.md)
+ *  for the custom FEN format */
 type FullFen = string
 
 export interface Protochess {
@@ -59,7 +39,7 @@ export interface Protochess {
   /** Get all possible moves for the current player (for each origin square, what are the possible destinations) */
   legalMoves(): Promise<MoveList[]>,
   /** For a given move (from, to), returns the IDs of the pieces that can be promoted to */
-  possiblePromotions(move: MoveInfo): Promise<string[]>,
+  possiblePromotions(from: [number, number], to: [number, number]): Promise<string[]>,
   
   // Multi-threading control
   /** Returns the maximum number of threads that can be used in `setNumThreads()` */
@@ -225,7 +205,7 @@ export interface IWasmModule {
     getState(): Promise<unknown>,
     getStateDiff(): Promise<unknown>,
     legalMoves(): Promise<unknown>,
-    possiblePromotions(move: MoveInfo): Promise<unknown>,
+    possiblePromotions(fromX: number, fromY: number, toX: number, toY: number): Promise<unknown>,
     getMaxThreads(): Promise<unknown>,
     setNumThreads(threads: number): Promise<unknown>,
   }

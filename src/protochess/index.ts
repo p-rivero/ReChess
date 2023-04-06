@@ -141,8 +141,8 @@ async function init(): Promise<t.Protochess> {
       return moves
     },
     
-    async possiblePromotions(move: MoveInfo): Promise<string[]> {
-      const promotions = await wasm.wasmObject.possiblePromotions(move)
+    async possiblePromotions(from: [number, number], to: [number, number]): Promise<string[]> {
+      const promotions = await wasm.wasmObject.possiblePromotions(from[0], from[1], to[0], to[1])
       if (!Array.isArray(promotions) || !promotions.every(e => typeof e === 'string')) {
         throw new Error(`Expected array, got ${promotions}`)
       }

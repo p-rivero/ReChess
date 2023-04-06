@@ -78,11 +78,13 @@ export class MoveHistoryManager {
     return null
   }
   
+  // Creates a GameState object with a move history that ends at the current index (inclusive)
   private buildStateFromCurrentIndex(): GameState {
     return {
       initialState: clone(this.initialState) as InitialState,
       initialFen: this.initialFen,
-      moveHistory: this.history.slice(1, this.currentIndex).map(entry => entry.move),
+      // End index is inclusive, add 1
+      moveHistory: this.history.slice(1, this.currentIndex+1).map(entry => entry.move),
     }
   }
 }

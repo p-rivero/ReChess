@@ -116,7 +116,7 @@
   // Called when the user makes a move on the board
   async function userMovedCallback(from: [number, number], to: [number, number]) {
     const protochess = await getProtochess()
-    const possiblePromotions = await protochess.possiblePromotions({ from, to })
+    const possiblePromotions = await protochess.possiblePromotions(from, to)
     let promotion: string|undefined = undefined
     if (possiblePromotions.length > 0) {
       // Choose promotion
