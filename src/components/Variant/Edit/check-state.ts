@@ -122,9 +122,9 @@ function checkDuplicateSymbol(i: number, player: number, state: Variant, errorMs
   for (let j = 0; j < i; j++) {
     const otherPiece = state.pieceTypes[j]
     if (playerSym === otherPiece.ids[0] || playerSym === otherPiece.ids[1]) {
-      const first = Math.min(i, j) + 1
-      const second = Math.max(i, j) + 1
-      errorMsgHandler.show(`There are 2 pieces with the symbol '${playerSym}' (positions ${first} and ${second})`, -1)
+      const piece1 = pieceName(i, piece)
+      const piece2 = pieceName(j, otherPiece)
+      errorMsgHandler.show(`There are 2 pieces with the symbol '${playerSym}' (${piece1} and ${piece2})`, -1)
       return true
     }
   }

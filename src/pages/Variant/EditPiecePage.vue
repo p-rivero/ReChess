@@ -76,7 +76,7 @@
               :start-text="pieceIdWhite ?? undefined"
               :error-handler="errorMsgHandler"
               :error-priority="1"
-              :validator="symbolValidator"
+              :validator="t => symbolValidator(t, 'white')"
               @changed="text => updatePieceId(text, 'white')"
             />
           </div>
@@ -102,7 +102,7 @@
               placeholder="a"
               :start-text="pieceIdBlack ?? undefined"
               :error-handler="errorMsgHandler"
-              :validator="symbolValidator"
+              :validator="t => symbolValidator(t, 'black')"
               @changed="text => updatePieceId(text, 'black')"
             />
           </div>
@@ -485,11 +485,13 @@
     )
   }
   
-  function symbolValidator(text: string) {
-    if (whiteInvisible.value && blackInvisible) return 'This piece must be available to White, Black or both players'
-    if (whiteInvisible.value) return
+  function symbolValidator(text: string, color: Player) {
+    if (whiteInvisible.value && blackInvisible.value) return 'This piece must be available to White, Black or both players'
+    if (color === 'white' && whiteInvisible.value) return
+    if (color === 'black' && blackInvisible.value) return
     if (text.length === 0) return 'Missing piece symbol for White player'
-    if (text === piece?.ids[1]) return 'The piece symbol for White and Black must be different'
+    const otherIndex = color === 'white' ? 1 : 0
+    if (text === piece?.ids[otherIndex]) return 'The piece symbol for White and Black must be different'
     if ([...text].length !== 1) return 'The piece symbol must be a single unicode character'
     const reservedCharRegex = /[\s/0-9*]/
     if (reservedCharRegex.test(text)) {
