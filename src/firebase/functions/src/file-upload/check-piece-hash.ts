@@ -1,6 +1,6 @@
 
 import type { ObjectMetadata } from 'firebase-functions/v1/storage'
-import { useAdmin } from './helpers'
+import { useAdmin } from '../helpers'
 import { createHash } from 'node:crypto'
 
 /**
@@ -10,11 +10,11 @@ import { createHash } from 'node:crypto'
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function(image: ObjectMetadata): Promise<void> {
-  const admin = await useAdmin()
   if (!image.name) return
   if (image.name.startsWith('profile-images/')) return
-
+  
   // Download the image
+  const admin = await useAdmin()
   const fileRef = admin.storage().bucket(image.bucket).file(image.name)
   const [file] = await fileRef.download()
   

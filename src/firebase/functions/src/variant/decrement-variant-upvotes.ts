@@ -1,5 +1,5 @@
 
-import { useAdmin } from './helpers'
+import { useAdmin } from '../helpers'
 import { FieldValue } from 'firebase-admin/firestore'
 
 /**

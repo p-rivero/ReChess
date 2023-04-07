@@ -3,7 +3,7 @@ import { Timestamp } from 'firebase-admin/firestore'
 import type { Change } from 'firebase-functions'
 import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 
-import { useAdmin, batchedUpdate } from './helpers'
+import { useAdmin, batchedUpdate } from '../helpers'
 import type { UserDoc } from 'db/schema'
 
 

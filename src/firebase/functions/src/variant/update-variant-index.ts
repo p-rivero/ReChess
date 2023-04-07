@@ -1,5 +1,5 @@
 
-import { useAdmin } from './helpers'
+import { useAdmin } from '../helpers'
 import type { VariantDoc, VariantIndexDoc } from 'db/schema'
 import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 
