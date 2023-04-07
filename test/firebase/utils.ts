@@ -12,8 +12,7 @@ import {
   getDocs,
 } from 'firebase/firestore'
 import type { CollectionReference, FieldValue, Query, DocumentData } from '@firebase/firestore-types'
-import { DocumentSnapshot, QuerySnapshot, WriteBatch, Timestamp, DocumentReference, updateDoc } from '@firebase/firestore'
-import { writeBatch, serverTimestamp } from '@firebase/firestore'
+import { DocumentSnapshot, QuerySnapshot, WriteBatch, Timestamp, DocumentReference, updateDoc, writeBatch, serverTimestamp } from '@firebase/firestore'
 
 /**
 - `verified`: logged user with a verified email

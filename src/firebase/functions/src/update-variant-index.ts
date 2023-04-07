@@ -14,7 +14,7 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
   
   let { name, description } = snap.data() as VariantDoc
   // Replace tabs and newlines with spaces
-  name = name.replace(/[\t\n]/g, ' '),
+  name = name.replace(/[\t\n]/g, ' ')
   description = description.replace(/[\t\n]/g, ' ')
   
   const line = `${snap.id}\t${name}\t${description.slice(0, 100)}`

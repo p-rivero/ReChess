@@ -12,9 +12,6 @@ import { createHash } from 'node:crypto'
 export default async function(image: ObjectMetadata): Promise<void> {
   const admin = await useAdmin()
   if (!image.name) return
-  
-  // TODO: Remove this
-  console.info('Checking hash of', image.name)
   if (image.name.startsWith('profile-images/')) return
 
   // Download the image
