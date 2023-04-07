@@ -63,16 +63,35 @@ export interface VariantIndexDoc {
 }
 
 
+// variants/{variantId}/lobby/{creatorUserId}
+export interface LobbyEntryDoc {
+  IMMUTABLE: {
+    creatorDisplayName: string
+    timeCreated: FieldValue | Timestamp
+  }
+  challengerUserId: string | null
+  challengerDisplayName: string | null
+  // null if the creator has not accepted the challenge yet
+  gameDocId: string | null
+}
+
 // games/{gameId}
 export interface GameDoc {
+  // Space-separared list of moves like "e2e4" or "e7e8=Q". Validated by the opponent.
+  moveHistory: string
+  playerToMove: 'white' | 'black'
+  // winner = null if game is still in progress. Validated by the opponent.
+  winner: 'white' | 'black' | 'draw' | null
+  // Set by the cloud function when creating the game
   IMMUTABLE: {
-    timePlayed: Timestamp
-    winner: 'white' | 'black' | 'draw'
-    variantName: string
+    timeGameStarted: Timestamp
     variantId: string
+    variant: VariantDoc
     whiteDisplayName: string
     whiteId: string | null
     blackDisplayName: string
     blackId: string | null
+    // For the challenger to check if the creator is lying about the requested color
+    requestedColor: 'white' | 'black' | 'random'
   }
 }
