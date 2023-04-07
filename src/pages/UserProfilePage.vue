@@ -96,6 +96,7 @@
           :placeholder="'Tell us about yourself!\nYou can use **Markdown** to format your text.'"
           :editable="myProfile(user)"
           :error-handler="errorHandler"
+          :char-limit="1000"
           :validator="text => text.length > 1000 ? 'The About section must be at most 1000 characters long' : undefined"
           @save="text => { user!.about = text; userStore.storeUser(user!) }"
         />

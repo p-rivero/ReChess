@@ -10,7 +10,7 @@
         @changed="text => currentText = text"
         @enter-pressed="save"
       />
-      <div class="is-flex">
+      <div class="is-flex is-align-items-center">
         <button
           class="button is-primary mt-2 mr-2"
           :disabled="hasError"
@@ -27,6 +27,13 @@
           <div class="sz-icon icon-cross color-theme" />
           Cancel
         </button>
+        <p
+          v-if="charLimit && currentLength > charLimit / 2"
+          class="is-size-7 ml-5 mt-4"
+          :class="{'has-text-danger': currentLength > charLimit}"
+        >
+          {{ currentLength }} / {{ charLimit }} characters
+        </p>
       </div>
     </div>
     <div v-show="!editing || !editable">
@@ -66,6 +73,7 @@
     text?: string
     placeholder?: string
     editable: boolean
+    charLimit?: number
     validator?: (text: string) => string | undefined
     errorHandler?: ErrorMessageHandler
   }>()
@@ -78,10 +86,12 @@
   const hasError = ref(false)
   const textBox = ref<InstanceType<typeof SmartTextInput>>()
   const currentText = ref('')
+  const currentLength = ref(0)
   
   // Intercept the validator to set hasError only if this field has an error
   function validatorProxy(text: string) {
     if (props.validator) {
+      currentLength.value = text.length
       const error = props.validator(text)
       hasError.value = error !== undefined
       return error

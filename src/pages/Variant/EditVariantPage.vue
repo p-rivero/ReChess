@@ -159,6 +159,7 @@
         :placeholder="'Describe the rules of the variant and how fun it is to play!\nYou can use **Markdown** to format your text.'"
         :editable="true"
         :error-handler="errorMsgHandler"
+        :char-limit="1000"
         :validator="text => text.length > 1000 ? 'The variant description must be at most 1000 characters long' : undefined"
         @save="text => draftStore.state.description = text"
       />
