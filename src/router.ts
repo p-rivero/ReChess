@@ -53,6 +53,16 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/UserProfilePage.vue'),
   },
   {
+    name: 'user-published-variants',
+    path: '/user/:username/variants',
+    component: () => import('@/pages/UserPublishedVariantsPage.vue'),
+  },
+  {
+    name: 'user-upvoted-variants',
+    path: '/user/:username/upvoted',
+    component: () => import('@/pages/UserUpvotedVariantsPage.vue'),
+  },
+  {
     name: 'privacy',
     path: '/privacy',
     component: () => import('@/pages/Legal/PrivacyPolicyPage.vue'),

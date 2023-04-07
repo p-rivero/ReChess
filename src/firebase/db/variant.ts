@@ -82,3 +82,26 @@ export async function getVariantList(order: 'newest' | 'upvotes'): Promise<[Vari
   const querySnapshot = await getDocs(q)
   return querySnapshot.docs.map(doc => [doc.data() as VariantDoc, doc.id])
 }
+
+// Returns the variants created by the user, in order of creation time
+export async function getVariantsFromCreator(userId: string): Promise<[VariantDoc, string][]> {
+  const q = query(collection(db, 'variants'), where('IMMUTABLE.creatorId', '==', userId), orderBy('IMMUTABLE.creationTime', 'desc'))
+  const querySnapshot = await getDocs(q)
+  return querySnapshot.docs.map(doc => [doc.data() as VariantDoc, doc.id])
+}
+
+// Returns the upvoted variants for the user, in order of upvote time
+export async function getUpvotedVariants(userId: string): Promise<[VariantDoc, string][]> {
+  // Get upvoted variants
+  const q = query(collection(db, 'users', userId, 'upvotedVariants'), orderBy('timeUpvoted', 'desc'))
+  const querySnapshot = await getDocs(q)
+  const variantIds = querySnapshot.docs.map(doc => doc.id)
+  // For each variant, get the variant document
+  const variantDocs = await Promise.all(variantIds.map(id => {
+    const variant = getVariantById(id)
+    if (!variant) throw new Error(`Upvoted variant ${id} does not exist`)
+    return variant
+  }))
+  // Return the variant document and the variant ID
+  return variantDocs.map((doc, i) => [doc as VariantDoc, variantIds[i]])
+}

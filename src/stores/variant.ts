@@ -28,7 +28,7 @@ export const useVariantStore = defineStore('variant', () => {
     
     // Fetch whether the user has upvoted each variant simultaneously
     listUpvotesUid = authStore.loggedUser?.uid
-    const userUpvoted = await Promise.all(docsWithId.map(([_doc, id]) => VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, id)))
+    const userUpvoted = await Promise.all(docsWithId.map(hasUpvoted))
     
     // Convert each pair of documents into a PublishedVariant
     const result = []
@@ -69,6 +69,31 @@ export const useVariantStore = defineStore('variant', () => {
     })
   }
   
+  // Gets all the variants from a specific creator, in order of creation time
+  async function getVariantsFromCreator(userId: string): Promise<PublishedVariant[]> {
+    const docsWithId = await VariantDB.getVariantsFromCreator(userId)
+    // Fetch whether the user has upvoted each variant simultaneously
+    const userUpvoted = await Promise.all(docsWithId.map(hasUpvoted))
+    const result = []
+    for (const [i, [doc, id]] of docsWithId.entries()) {
+      const state = readDocument(doc, userUpvoted[i], id)
+      if (state) result.push(state)
+    }
+    return result
+  }
+  
+  // Gets all the variants that the user has upvoted, in order of upvote time
+  async function getUpvotedVariants(upvoterId: string): Promise<PublishedVariant[]> {
+    const docsWithId = await VariantDB.getUpvotedVariants(upvoterId)
+    const result: PublishedVariant[] = []
+    for (const [doc, id] of docsWithId) {
+      const state = readDocument(doc, true, id)
+      if (state) result.push(state)
+    }
+    return result
+  }
+  
+  // Sets or removes an upvote for a variant
   async function upvote(id: string, upvote: boolean): Promise<void> {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to upvote a variant')
@@ -103,5 +128,10 @@ export const useVariantStore = defineStore('variant', () => {
     return pv
   }
   
-  return { refreshList, getVariant, upvote, variantList }
+  function hasUpvoted(variant: [VariantDoc, string]): Promise<boolean> {
+    const variantId = variant[1]
+    return VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, variantId)
+  }
+  
+  return { refreshList, getVariant, getVariantsFromCreator, getUpvotedVariants, upvote, variantList }
 })

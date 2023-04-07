@@ -89,6 +89,25 @@
           </div>
         </div>
       </div>
+      
+      <div class="field is-grouped is-grouped-multiline mb-2">
+        <button
+          class="button mr-4 mb-1"
+          @click="router.push({ name: 'user-published-variants', params: { username: user?.username } })"
+        >
+          <div class="sz-icon icon-rocket color-theme" />
+          Published variants
+        </button>
+        <button
+          v-if="myProfile(user)"
+          class="button mb-1"
+          @click="router.push({ name: 'user-upvoted-variants', params: { username: user?.username } })"
+        >
+          <div class="sz-icon icon-heart color-theme" />
+          Upvoted variants
+        </button>
+      </div>
+      
       <div class="content mb-0 pt-4">
         <h4>About:</h4>
         <EditableMarkdown
