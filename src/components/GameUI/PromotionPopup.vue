@@ -111,5 +111,10 @@
     height: v-bind(promoItemPercent);
     background-size: 100% 100%;
     cursor: pointer;
+    
+    transition: transform 0.15s;
+    &:hover {
+      transform: scale(1.15);
+    }
   }
 </style>
