@@ -8,7 +8,7 @@
         :placeholder="placeholder"
         :error-handler="errorHandler"
         :validator="errorHandler ? validatorProxy : undefined"
-        @changed="text => currentText = text"
+        @changed="text => currentText = text.trim()"
         @enter-pressed="save"
       />
       <div class="is-flex">
@@ -75,7 +75,7 @@
   // Intercept the validator to set hasError only if this field has an error
   function validatorProxy(text: string) {
     if (props.validator) {
-      const error = props.validator(text)
+      const error = props.validator(text.trim())
       hasError.value = error !== undefined
       return error
     }

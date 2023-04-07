@@ -89,8 +89,11 @@ service cloud.firestore {
         return hasCorrectFields(['about', 'IMMUTABLE'], ['name', 'profileImg']) &&
           hasCorrectImmutableFields(['username', 'numWins'], ['renameAllowedAt']) &&
           request.resource.data.about.size() <= 1000 &&
-          (request.resource.data.name == null ||
-            (request.resource.data.name.size() <= 50 && request.resource.data.name.size() > 0)) &&
+          (request.resource.data.name == null || (
+            request.resource.data.name.size() <= 50 &&
+            request.resource.data.name.size() > 0 &&
+            request.resource.data.name == request.resource.data.name.trim()
+          )) &&
           (request.resource.data.profileImg == null ||
             request.resource.data.profileImg.size() <= 600);
       }
