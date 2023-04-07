@@ -154,7 +154,6 @@ service cloud.firestore {
       match /upvotedVariants/{variantId} {
         // Other users cannot see my upvotes
         allow read: if isAuth(userId);
-        // When creating an upvote, also increment the variant's numUpvotes
         allow create: if
           hasCorrectFields(['timeUpvoted'], []) &&
           isAuth(userId) &&
@@ -162,7 +161,6 @@ service cloud.firestore {
           exists(/databases/$(database)/documents/variants/$(variantId));
         // Cannot update an upvote, only delete it
         allow update: if false;
-        // When deleting an upvote, also decrement the variant's numUpvotes
         allow delete: if
           // For some reason, deleting a document that doesn't exist succeeds instead of failing
           // This delete will trigger a cloud function, so make sure it's valid

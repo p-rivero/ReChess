@@ -22,16 +22,40 @@ export default async function(user: UserRecord): Promise<void> {
   
   // Remove upvotes
   const userUpvotes = await userDoc.ref.collection('upvotedVariants').get()
-  await batchedUpdate(db, userUpvotes, (batch, ref) => {
+  batchedUpdate(db, userUpvotes, (batch, ref) => {
     batch.delete(ref)
+  }).catch(err => {
+    console.error('Error deleting upvotes for user', userId)
+    console.error(err)
   })
   // Delete the user public and private documents
-  await userDoc.ref.collection('private').doc('doc').delete()
-  await userDoc.ref.delete()
+  userDoc.ref.collection('private').doc('doc').delete().catch(err => {
+    console.error('Error deleting private user document for user', userId)
+    console.error(err)
+  })
+  userDoc.ref.delete().catch(err => {
+    console.error('Error deleting public user document for user', userId)
+    console.error(err)
+  })
   
   // Free the username
-  await db.collection('usernames').doc(username).delete()
+  db.collection('usernames').doc(username).delete().catch(err => {
+    console.error('Error deleting username', username, 'for user', userId)
+    console.error(err)
+  })
   
   // Update the user name in denormalized fields
-  await updateName(db, userId, '[deleted]', true)
+  updateName(db, userId, '[deleted]', true).catch(err => {
+    console.error('Error while updating name for user', userId + ':')
+    console.error(err)
+  })
+  
+  // Remove the user's profile picture
+  const appDefaultBucket = admin.storage().bucket()
+  const profilePicRef = appDefaultBucket.file(`profile-images/${userId}`)
+  profilePicRef.delete().catch(err => {
+    if (err.code === 404) return
+    console.error('Error deleting profile picture for user', userId)
+    console.error(err)
+  })
 }

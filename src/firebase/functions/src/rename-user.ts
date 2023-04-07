@@ -20,13 +20,14 @@ export default async function(
 ): Promise<void> {
   const TIMEOUT_SECONDS = 5 * 60 // 5 minutes
   
-  const admin = await useAdmin()
-  const db = admin.firestore()
-  
   const before = change.before.data() as UserDoc
   const after = change.after.data() as UserDoc
   // When the user is updated, check if the name has changed
   if (before.name === after.name) return
+  
+  // The name has changed, initialize the admin SDK
+  const admin = await useAdmin()
+  const db = admin.firestore()
   
   // If this write was allowed by the rules, the current timestamp must be after the renameAllowedAt
   const newName = after.name || `@${after.IMMUTABLE.username}`
