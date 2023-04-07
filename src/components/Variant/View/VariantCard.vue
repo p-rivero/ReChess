@@ -130,9 +130,7 @@
     if (!user) {
       throw new Error('Could not find user with id ' + props.variant.creatorId)
     }
-    // Open the user profile in a new tab
-    const location = router.resolve({ name: 'user-profile', params: { username: user.username } })
-    window.open(location.href, '_blank')
+    router.push({ name: 'user-profile', params: { username: user.username } })
   }
   
 </script>
