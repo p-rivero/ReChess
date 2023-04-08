@@ -44,8 +44,8 @@ export function fenToPlacements(fen: string): PiecePlacement[] {
  */
 export function placementsToFen(placements: PiecePlacement[]): string {
   // Get board height and width
-  let boardWidth = 0
-  let boardHeight = 0
+  let boardWidth = 1
+  let boardHeight = 1
   for (const placement of placements) {
     boardWidth = Math.max(boardWidth, placement.x + 1)
     boardHeight = Math.max(boardHeight, placement.y + 1)
