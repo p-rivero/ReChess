@@ -3,7 +3,7 @@
     ref="numberInput"
     class="input"
     type="number"
-    :placeholder="placeholder"
+    :placeholder="placeholder || props.default.toString()"
     :min="props.min"
     :max="props.max"
     @input="inputChanged($event.target)"
@@ -27,13 +27,13 @@
   const emit = defineEmits<{
     (event: 'changed', value: number): void
   }>()
-  
-  const placeholder = props.placeholder || props.default.toString()
-  
+    
   onMounted(() => {
     if (!numberInput.value) throw new Error('Number input is null')
     // If the value of the input is the default, don't set it and show the placeholder instead
-    if (props.startValue !== props.default) {
+    const usePlaceholder = props.placeholder && props.startValue === props.default
+    if (!usePlaceholder) {
+      console.log('setting value', props.startValue)
       numberInput.value.value = props.startValue.toString()
     }
   })
