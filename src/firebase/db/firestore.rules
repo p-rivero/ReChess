@@ -78,7 +78,7 @@ service cloud.firestore {
       
       allow update: if false;
       
-      // Disallow deleting usernames for now
+      // Disallow deleting usernames, they are deleted by a cloud function
       allow delete: if false;
     }
     
@@ -176,39 +176,29 @@ service cloud.firestore {
     
     match /variants/{variantId} {
       function isVariantDoc() {
-        return hasCorrectFields(['name', 'description', 'IMMUTABLE'], []) &&
-          hasCorrectImmutableFields(['creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes'], ['creatorId']);
+        return hasCorrectFields(['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes'], ['creatorId']);
       }
-      function isValidVariantEdit(variant) {
-        let userDoc = get(/databases/$(database)/documents/users/$(variant.IMMUTABLE.creatorId));
+      function isValidVariant(variant) {
+        let userDoc = get(/databases/$(database)/documents/users/$(variant.creatorId));
         let expectedDisplayName = userDoc.data.name == null ? '@' + userDoc.data.IMMUTABLE.username : userDoc.data.name;
         return isVariantDoc() &&
           variant.name.size() >= 3 &&
           variant.name.size() <= 50 &&
+          variant.name == variant.name.trim() &&
           variant.description.size() <= 1000 &&
-          isServerTimestamp(variant.IMMUTABLE.creationTime) &&
-          variant.IMMUTABLE.creatorDisplayName == expectedDisplayName &&
+          isServerTimestamp(variant.creationTime) &&
+          variant.creatorDisplayName == expectedDisplayName &&
           // Creator can be null if their account has been deleted (not when creating the variant)
-          variant.IMMUTABLE.creatorId != null &&
-          isAuth(variant.IMMUTABLE.creatorId) &&
-          variant.IMMUTABLE.numUpvotes == 0 &&
-          variant.IMMUTABLE.initialState.size() <= 100000;
+          variant.creatorId != null &&
+          isAuth(variant.creatorId) &&
+          variant.numUpvotes == 0 &&
+          variant.initialState.size() <= 100000;
       }
       
       allow read;
-      // Create if authenticated, update if authenticated and existing creator
-      allow create: if
-        isValidVariantEdit(request.resource.data) &&
-        // Check that there is no leading or trailing whitespace in the name
-        request.resource.data.name == request.resource.data.name.trim();
-        
-      allow update: if
-        immutableOk() &&
-        isValidVariantEdit(request.resource.data) &&
-        isAuth(resource.data.IMMUTABLE.creatorId);
-      
-      // Disallow deleting variants
-      allow delete: if false;
+      allow create: if isValidVariant(request.resource.data);
+      // Disallow editing and deleting variants
+      allow update, delete: if false;
     }
     
     // Read-only access to variantIndex

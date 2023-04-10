@@ -11,13 +11,11 @@ export async function createVariant(userId: string, displayName: string, variant
     // May not match the initial state. When fetching the state, the name and description are overwritten with this fields
     name: variant.displayName.trim(),
     description: variant.description,
-    IMMUTABLE: {
-      creationTime: serverTimestamp(),
-      creatorDisplayName: displayName,
-      creatorId: userId,
-      numUpvotes: 0,
-      initialState: JSON.stringify(variant),
-    },
+    creationTime: serverTimestamp(),
+    creatorDisplayName: displayName,
+    creatorId: userId,
+    numUpvotes: 0,
+    initialState: JSON.stringify(variant),
   }
   const docRef = await addDoc(collection(db, 'variants'), document)
   return docRef.id
@@ -76,8 +74,8 @@ export async function removeUpvoteVariant(userId: string, variantId: string): Pr
 // TODO: Add pagination
 export async function getVariantList(order: 'newest' | 'upvotes'): Promise<[VariantDoc, string][]> {
   const orderQuery = order === 'newest' ?
-    orderBy('IMMUTABLE.creationTime', 'desc') :
-    orderBy('IMMUTABLE.numUpvotes', 'desc')
+    orderBy('creationTime', 'desc') :
+    orderBy('numUpvotes', 'desc')
   const q = query(collection(db, 'variants'), orderQuery)
   const querySnapshot = await getDocs(q)
   return querySnapshot.docs.map(doc => [doc.data() as VariantDoc, doc.id])
@@ -85,7 +83,7 @@ export async function getVariantList(order: 'newest' | 'upvotes'): Promise<[Vari
 
 // Returns the variants created by the user, in order of creation time
 export async function getVariantsFromCreator(userId: string): Promise<[VariantDoc, string][]> {
-  const q = query(collection(db, 'variants'), where('IMMUTABLE.creatorId', '==', userId), orderBy('IMMUTABLE.creationTime', 'desc'))
+  const q = query(collection(db, 'variants'), where('creatorId', '==', userId), orderBy('creationTime', 'desc'))
   const querySnapshot = await getDocs(q)
   return querySnapshot.docs.map(doc => [doc.data() as VariantDoc, doc.id])
 }

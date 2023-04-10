@@ -65,11 +65,11 @@ export async function updateName(
   removeId: boolean
 ): Promise<void> {
   // Update the creator name of the variants this user has created
-  const updatedVariants = await db.collection('variants').where('IMMUTABLE.creatorId', '==', userId).get()
+  const updatedVariants = await db.collection('variants').where('creatorId', '==', userId).get()
   batchedUpdate(db, updatedVariants, (batch, ref) => {
     batch.update(ref, {
-      'IMMUTABLE.creatorDisplayName': newName,
-      'IMMUTABLE.creatorId': removeId ? null : userId,
+      'creatorDisplayName': newName,
+      'creatorId': removeId ? null : userId,
     })
   }).catch((err) => {
     console.error('Error while updating variants for user', userId + ':')

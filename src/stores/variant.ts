@@ -35,6 +35,7 @@ export const useVariantStore = defineStore('variant', () => {
     for (const [i, [doc, id]] of docsWithId.entries()) {
       const state = readDocument(doc, userUpvoted[i], id)
       if (state) result.push(state)
+      else console.warn('Invalid variant document', doc)
     }
     variantList.value = result
     variantListOrder.value = order
@@ -107,19 +108,19 @@ export const useVariantStore = defineStore('variant', () => {
   
   
   function readDocument(doc: VariantDoc, userUpvoted: boolean, id: string): PublishedVariant | undefined {
-    const variant = parseVariantJson(doc.IMMUTABLE.initialState)
+    const variant = parseVariantJson(doc.initialState)
     if (!variant) {
       console.error('Illegal variant document', doc)
       return undefined
     }
-    const creationTimestamp = doc.IMMUTABLE.creationTime as Timestamp
+    const creationTimestamp = doc.creationTime as Timestamp
     const pv: PublishedVariant = {
       ...variant,
       uid: id,
       creationTime: creationTimestamp.toDate(),
-      creatorDisplayName: doc.IMMUTABLE.creatorDisplayName,
-      creatorId: doc.IMMUTABLE.creatorId ?? undefined,
-      numUpvotes: doc.IMMUTABLE.numUpvotes,
+      creatorDisplayName: doc.creatorDisplayName,
+      creatorId: doc.creatorId ?? undefined,
+      numUpvotes: doc.numUpvotes,
       loggedUserUpvoted: userUpvoted,
       // Overwrite the existing name and description with the ones from the document
       displayName: doc.name,

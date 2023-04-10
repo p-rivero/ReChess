@@ -29,13 +29,11 @@ async function createUserAndVariant(creatorId = 'some_id') {
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: now(),
-      creatorDisplayName: 'Another user',
-      creatorId,
-      numUpvotes: 10,
-      initialState: '{}',
-    },
+    creationTime: now(),
+    creatorDisplayName: 'Another user',
+    creatorId,
+    numUpvotes: 10,
+    initialState: '{}',
   }
   await set('admin', user, 'users', MY_ID)
   await set('admin', variant, 'variants', '1234')

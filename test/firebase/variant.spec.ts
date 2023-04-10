@@ -7,10 +7,10 @@ import type { UserDoc, VariantDoc } from '@/firebase/db/schema'
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
-let { get, query, set, add, remove, now, afterSeconds }: TestUtilsSignature = notInitialized()
+let { get, query, set, update, add, remove, now, afterSeconds }: TestUtilsSignature = notInitialized()
 
 setupJest('variant-tests', env => {
-  ({ get, query, set, add, remove, now, afterSeconds } = setupTestUtils(env, MY_ID, MY_EMAIL))
+  ({ get, query, set, update, add, remove, now, afterSeconds } = setupTestUtils(env, MY_ID, MY_EMAIL))
 })
 
 
@@ -44,13 +44,11 @@ test('can create variant with display name', async () => {
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: now(),
-      creatorDisplayName: 'My name',
-      creatorId: MY_ID,
-      numUpvotes: 0,
-      initialState: '{}',
-    },
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    initialState: '{}',
   }
   await assertSucceeds(
     add('verified', variant, 'variants')
@@ -63,13 +61,11 @@ test('can create variant with username', async () => {
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: now(),
-      creatorDisplayName: '@my_username',
-      creatorId: MY_ID,
-      numUpvotes: 0,
-      initialState: '{}',
-    },
+    creationTime: now(),
+    creatorDisplayName: '@my_username',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    initialState: '{}',
   }
   await assertSucceeds(
     add('verified', variant, 'variants')
@@ -82,13 +78,11 @@ test('cannot create variant if not verified', async () => {
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: now(),
-      creatorDisplayName: 'My name',
-      creatorId: MY_ID,
-      numUpvotes: 0,
-      initialState: '{}',
-    },
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    initialState: '{}',
   }
   await assertFails(
     add('unverified', variant, 'variants')
@@ -101,13 +95,11 @@ test('variant name must be trimmed', async () => {
   const variant: VariantDoc = {
     name: '  My variant ',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: now(),
-      creatorDisplayName: 'My name',
-      creatorId: MY_ID,
-      numUpvotes: 0,
-      initialState: '{}',
-    },
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    initialState: '{}',
   }
   await assertFails(
     add('verified', variant, 'variants')
@@ -120,18 +112,16 @@ test('creator id must be correct', async () => {
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: now(),
-      creatorDisplayName: 'My name',
-      creatorId: 'WRONG_ID', // Trying to impersonate another user
-      numUpvotes: 0,
-      initialState: '{}',
-    },
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: 'WRONG_ID', // Trying to impersonate another user
+    numUpvotes: 0,
+    initialState: '{}',
   }
   await assertFails(
     add('verified', variant, 'variants')
   )
-  variant.IMMUTABLE.creatorId = MY_ID
+  variant.creatorId = MY_ID
   await assertSucceeds(
     add('verified', variant, 'variants')
   )
@@ -143,13 +133,11 @@ test('creator must id must mot be null', async () => {
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: now(),
-      creatorDisplayName: 'My name',
-      creatorId: null,
-      numUpvotes: 0,
-      initialState: '{}',
-    },
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: null,
+    numUpvotes: 0,
+    initialState: '{}',
   }
   // Creator id can be null if the user has been deleted,
   // but when creating a variant, the user must still exist
@@ -164,13 +152,11 @@ test('creator display name must be correct', async () => {
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: now(),
-      creatorDisplayName: 'ANOTHER NAME',
-      creatorId: MY_ID,
-      numUpvotes: 0,
-      initialState: '{}',
-    },
+    creationTime: now(),
+    creatorDisplayName: 'ANOTHER NAME',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    initialState: '{}',
   }
   await assertFails(
     add('verified', variant, 'variants')
@@ -179,11 +165,11 @@ test('creator display name must be correct', async () => {
   // Remove the user's name
   await setupUser(null)
   
-  variant.IMMUTABLE.creatorDisplayName = '@wrong_username'
+  variant.creatorDisplayName = '@wrong_username'
   await assertFails(
     add('verified', variant, 'variants')
   )
-  variant.IMMUTABLE.creatorDisplayName = '@my_username'
+  variant.creatorDisplayName = '@my_username'
   await assertSucceeds(
     add('verified', variant, 'variants')
   )
@@ -195,18 +181,16 @@ test('creation time must be correct', async () => {
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: afterSeconds(100),
-      creatorDisplayName: 'My name',
-      creatorId: MY_ID,
-      numUpvotes: 0,
-      initialState: '{}',
-    },
+    creationTime: afterSeconds(100),
+    creatorDisplayName: 'My name',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    initialState: '{}',
   }
   await assertFails(
     add('verified', variant, 'variants')
   )
-  variant.IMMUTABLE.creationTime = now()
+  variant.creationTime = now()
   await assertSucceeds(
     add('verified', variant, 'variants')
   )
@@ -217,20 +201,36 @@ test('num upvotes must be 0', async () => {
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: now(),
-      creatorDisplayName: 'My name',
-      creatorId: MY_ID,
-      numUpvotes: 10,
-      initialState: '{}',
-    },
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: MY_ID,
+    numUpvotes: 10,
+    initialState: '{}',
   }
   await assertFails(
     add('verified', variant, 'variants')
   )
-  variant.IMMUTABLE.numUpvotes = 0
+  variant.numUpvotes = 0
   await assertSucceeds(
     add('verified', variant, 'variants')
+  )
+})
+
+test('cannot edit variant', async () => {
+  await setupUser()
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    initialState: '{}',
+  }
+  await set('admin', variant, 'variants', 'variant_id')
+  
+  await assertFails(
+    update('verified', 'name', 'New name', 'variants', 'variant_id')
   )
 })
 
@@ -239,13 +239,11 @@ test('cannot remove variant', async () => {
   const variant: VariantDoc = {
     name: 'My variant',
     description: 'Variant description',
-    IMMUTABLE: {
-      creationTime: now(),
-      creatorDisplayName: 'My name',
-      creatorId: MY_ID,
-      numUpvotes: 0,
-      initialState: '{}',
-    },
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    initialState: '{}',
   }
   await set('admin', variant, 'variants', 'variant_id')
   

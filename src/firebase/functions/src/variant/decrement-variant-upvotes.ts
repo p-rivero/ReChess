@@ -13,7 +13,7 @@ export default async function(variantId: string): Promise<void> {
   
   db.collection('variants')
     .doc(variantId)
-    .update('IMMUTABLE.numUpvotes', FieldValue.increment(-1))
+    .update('numUpvotes', FieldValue.increment(-1))
     .catch((err) => {
       console.error('Error while decrementing variant upvotes for variant', variantId + ':')
       console.error(err)
