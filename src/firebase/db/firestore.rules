@@ -250,7 +250,7 @@ service cloud.firestore {
       
       
       match /lobby/{creatorUserId} {
-        function isLobbyEntryDoc(doc) {
+        function isLobbySlotDoc(doc) {
           return
             hasFields(doc, ['IMMUTABLE'], ['challengerId', 'challengerDisplayName', 'gameDocId']) &&
             hasFields(doc.IMMUTABLE, ['creatorDisplayName', 'timeCreated', 'requestedColor'], []) &&
@@ -261,23 +261,24 @@ service cloud.firestore {
             (doc.challengerDisplayName == null || doc.challengerDisplayName is string) &&
             (doc.gameDocId == null || doc.gameDocId is string);
         }
-        function allowCreateLobbyEntry() {
+        function allowCreateLobbySlot() {
           let doc = request.resource.data;
           return
-            isLobbyEntryDoc(doc) &&
+            isLobbySlotDoc(doc) &&
             loggedAs(creatorUserId) &&
+            exists(/databases/$(database)/documents/variants/$(variantId)) &&
             doc.IMMUTABLE.creatorDisplayName == expectedDisplayName(creatorUserId) &&
             isServerTimestamp(doc.IMMUTABLE.timeCreated) &&
-            // Creator initializes the entry with no challenger
+            // Creator initializes the slot with no challenger
             doc.challengerId == null &&
             doc.challengerDisplayName == null &&
             doc.gameDocId == null;
         }
-        function allowUpdateLobbyEntry() {
+        function allowUpdateLobbySlot() {
           let old = resource.data;
           let new = request.resource.data;
           return
-            isLobbyEntryDoc(new) &&
+            isLobbySlotDoc(new) &&
             mapEq(old.IMMUTABLE, new.IMMUTABLE) &&
             // Challenger clicks "Join"
             ((
@@ -306,12 +307,12 @@ service cloud.firestore {
               exists(/databases/$(database)/documents/games/$(new.gameDocId))
             ));
         }
-        function allowDeleteLobbyEntry() {
+        function allowDeleteLobbySlot() {
           let doc = resource.data;
           return
-            isLobbyEntryDoc(doc) &&
+            isLobbySlotDoc(doc) &&
             // Creator cancels the game, OR
-            // Challenger acknowledges the created game and clears the entry
+            // Challenger acknowledges the created game and clears the slot
             (loggedAs(creatorUserId) || (
               loggedAs(doc.challengerId) &&
               doc.gameDocId != null
@@ -319,9 +320,9 @@ service cloud.firestore {
         }
         
         allow read;
-        allow create: if allowCreateLobbyEntry();
-        allow update: if allowUpdateLobbyEntry();
-        allow delete: if allowDeleteLobbyEntry();
+        allow create: if allowCreateLobbySlot();
+        allow update: if allowUpdateLobbySlot();
+        allow delete: if allowDeleteLobbySlot();
       }
     }
     

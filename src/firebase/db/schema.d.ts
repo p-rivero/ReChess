@@ -62,7 +62,7 @@ export interface VariantIndexDoc {
 
 
 // variants/{variantId}/lobby/{creatorUserId}
-export interface LobbyEntryDoc {
+export interface LobbySlotDoc {
   IMMUTABLE: {
     creatorDisplayName: string
     timeCreated: FieldValue | Timestamp
