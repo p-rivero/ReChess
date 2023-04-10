@@ -253,8 +253,7 @@ service cloud.firestore {
         function isLobbyEntryDoc(doc) {
           return
             hasFields(doc, ['IMMUTABLE'], ['challengerId', 'challengerDisplayName', 'gameDocId']) &&
-            hasFields(doc.IMMUTABLE, ['creatorId', 'creatorDisplayName', 'timeCreated', 'requestedColor'], []) &&
-            doc.IMMUTABLE.creatorId is string &&
+            hasFields(doc.IMMUTABLE, ['creatorDisplayName', 'timeCreated', 'requestedColor'], []) &&
             doc.IMMUTABLE.creatorDisplayName is string &&
             doc.IMMUTABLE.timeCreated is timestamp &&
             doc.IMMUTABLE.requestedColor in ['white', 'black', 'random'] &&
@@ -266,8 +265,8 @@ service cloud.firestore {
           let doc = request.resource.data;
           return
             isLobbyEntryDoc(doc) &&
-            loggedAs(doc.IMMUTABLE.creatorId) &&
-            doc.IMMUTABLE.creatorDisplayName == expectedDisplayName(doc.IMMUTABLE.creatorId) &&
+            loggedAs(creatorUserId) &&
+            doc.IMMUTABLE.creatorDisplayName == expectedDisplayName(creatorUserId) &&
             isServerTimestamp(doc.IMMUTABLE.timeCreated) &&
             // Creator initializes the entry with no challenger
             doc.challengerId == null &&
@@ -285,13 +284,13 @@ service cloud.firestore {
               loggedAs(new.challengerId) &&
               old.challengerId == null &&
               old.gameDocId == null &&
-              new.challengerId != new.IMMUTABLE.creatorId &&
+              new.challengerId != creatorUserId &&
               new.challengerDisplayName == expectedDisplayName(new.challengerId) &&
               new.gameDocId == null
             )
             // Challenger clicks "Cancel", or creator rejects challenger
             || (
-              (loggedAs(old.challengerId) || loggedAs(old.IMMUTABLE.creatorId)) &&
+              (loggedAs(old.challengerId) || loggedAs(creatorUserId)) &&
               old.gameDocId == null &&
               new.challengerId == null &&
               new.challengerDisplayName == null &&
@@ -299,7 +298,7 @@ service cloud.firestore {
             )
             // Creator accepts challenger
             || (
-              loggedAs(old.IMMUTABLE.creatorId) &&
+              loggedAs(creatorUserId) &&
               old.gameDocId == null &&
               new.gameDocId != null &&
               new.challengerId == old.challengerId &&
@@ -313,7 +312,7 @@ service cloud.firestore {
             isLobbyEntryDoc(doc) &&
             // Creator cancels the game, OR
             // Challenger acknowledges the created game and clears the entry
-            (loggedAs(doc.IMMUTABLE.creatorId) || (
+            (loggedAs(creatorUserId) || (
               loggedAs(doc.challengerId) &&
               doc.gameDocId != null
             ));

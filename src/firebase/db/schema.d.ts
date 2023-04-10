@@ -64,7 +64,6 @@ export interface VariantIndexDoc {
 // variants/{variantId}/lobby/{creatorUserId}
 export interface LobbyEntryDoc {
   IMMUTABLE: {
-    creatorId: string
     creatorDisplayName: string
     timeCreated: FieldValue | Timestamp
     requestedColor: 'white' | 'black' | 'random'
