@@ -14,17 +14,12 @@ rules_version = '2';
 // HELPER FUNCTIONS
 
 // Returns true if the user is authenticated and has the given id
-function isAuth(id) {
-  return isAuthUnverified(id) && request.auth.token.email_verified;
+function loggedAs(id) {
+  return loggedAsUnverified(id) && request.auth.token.email_verified;
 }
-// Same as isAuth, but does not require the email to be verified
-function isAuthUnverified(id) {
+// Same as loggedAs, but does not require the email to be verified
+function loggedAsUnverified(id) {
   return request.auth != null && request.auth.uid != null && request.auth.uid == id;
-}
-
-// Checks that two maps are equal
-function mapEq(mapA, mapB) {
-  return mapA.diff(mapB).affectedKeys().size() == 0;
 }
 
 // Checks that a field was created with serverTimestamp()
@@ -32,19 +27,19 @@ function isServerTimestamp(field) {
   return field == request.time;
 }
 
-// Checks that the request contains all the required fields and no extra extra fields
-function hasCorrectFields(required, optional) {
-  let allowed = required.concat(optional);
-  return request.resource.data.keys().hasAll(required) && request.resource.data.keys().hasOnly(allowed);
+// Checks that two maps are equal
+function mapEq(objA, objB) {
+  return objA.diff(objB).affectedKeys().size() == 0;
 }
-// Same as hasCorrectFields, but checks the IMMUTABLE field
-function hasCorrectImmutableFields(required, optional) {
+// Checks that a map has all the required fields and no extra extra fields
+function hasFields(obj, required, optional) {
   let allowed = required.concat(optional);
-  return request.resource.data.IMMUTABLE.keys().hasAll(required) && request.resource.data.IMMUTABLE.keys().hasOnly(allowed);
+  return obj.keys().hasAll(required) && obj.keys().hasOnly(allowed);
 }
-// Checks that the IMMUTABLE field has not changed
-function immutableOk() {
-  return mapEq(request.resource.data.IMMUTABLE, resource.data.IMMUTABLE);
+
+// Returns true if the input string starts with the given prefix
+function startsWith(str, prefix) {
+  return str.size() >= prefix.size() && str[0 : prefix.size()] == prefix;
 }
 
 // Prints the input to the debug log and returns true
@@ -60,196 +55,250 @@ service cloud.firestore {
       return exists(/databases/$(database)/documents/usernames/$(username));
     }
     function isValidUsername(username) {
-      return username.size() >= 3 &&
+      return
+        username.size() >= 3 &&
         username.size() <= 25 &&
         username.matches('^[a-zA-Z0-9_]+$');
     }
     
     
+    
     match /usernames/{username} {
+      function isUsernameDoc(doc) {
+        return
+          hasFields(doc, ['userId'], []) &&
+          doc.userId is string &&
+          doc.userId.size() > 0;
+      }
+      function allowCreateUsername() {
+        let doc = request.resource.data;
+        return
+          isUsernameDoc(doc) &&
+          // When creating a user, the user must be authenticated and the starting data must be correct. Allow unverified accounts, since at the time of creation, the user has not yet verified their email.
+          loggedAsUnverified(doc.userId) &&
+          isValidUsername(username) &&
+          !usernameIsTaken(username) &&
+          // Username must be registered batched with a user document
+          getAfter(/databases/$(database)/documents/users/$(doc.userId)).data.IMMUTABLE.username == username;
+      }
+    
       allow read;
-      allow create: if
-        // When creating a user, the user must be authenticated and the starting data must be correct. Allow unverified accounts, since at the time of creation, the user has not yet verified their email.
-        isAuthUnverified(request.resource.data.userId) &&
-        isValidUsername(username) &&
-        !usernameIsTaken(username) &&
-        // Username must be registered batched with a user document
-        getAfter(/databases/$(database)/documents/users/$(request.resource.data.userId)).data.IMMUTABLE.username == username;
-      
-      allow update: if false;
-      
+      allow create: if allowCreateUsername();
       // Disallow deleting usernames, they are deleted by a cloud function
-      allow delete: if false;
     }
     
     
+    
     match /users/{userId} {
-      
-      function isUserDoc() {
-        return hasCorrectFields(['about', 'IMMUTABLE'], ['name', 'profileImg']) &&
-          hasCorrectImmutableFields(['username', 'numWins'], ['renameAllowedAt']) &&
-          request.resource.data.about.size() <= 1000 &&
-          (request.resource.data.name == null || (
-            request.resource.data.name.size() <= 50 &&
-            request.resource.data.name.size() > 0 &&
-            request.resource.data.name == request.resource.data.name.trim()
+      function isUserDoc(doc) {
+        return
+          hasFields(doc, ['about', 'IMMUTABLE'], ['name', 'profileImg']) &&
+          hasFields(doc.IMMUTABLE, ['username', 'numWins'], ['renameAllowedAt']) &&
+          doc.about is string &&
+          doc.about.size() <= 1000 &&
+          (doc.name == null || (
+            doc.name is string &&
+            doc.name.size() <= 50 &&
+            doc.name.size() > 0 &&
+            doc.name == doc.name.trim()
           )) &&
-          (request.resource.data.profileImg == null ||
-            request.resource.data.profileImg.size() <= 600);
+          (doc.profileImg == null || (
+            doc.profileImg is string &&
+            doc.profileImg.size() <= 600
+          )) &&
+          doc.IMMUTABLE.username is string &&
+          doc.IMMUTABLE.numWins is int &&
+          (doc.IMMUTABLE.renameAllowedAt == null || (
+            doc.IMMUTABLE.renameAllowedAt is timestamp
+          ));
       }
-      function isPrivateUserDoc() {
-        return hasCorrectFields(['IMMUTABLE'], []) &&
-          hasCorrectImmutableFields(['email', 'banned'], []) &&
-          request.resource.data.IMMUTABLE.email.size() <= 200;
+      function allowCreateUser() {
+        let doc = request.resource.data;
+        return
+          isUserDoc(doc) &&
+          loggedAsUnverified(userId) &&
+          // Username is correct and not taken
+          isValidUsername(doc.IMMUTABLE.username) &&
+          !usernameIsTaken(doc.IMMUTABLE.username) &&
+          doc.IMMUTABLE.numWins == 0 &&
+          doc.IMMUTABLE.renameAllowedAt == null &&
+          // User must be created in a batch with a username document
+          getAfter(/databases/$(database)/documents/usernames/$(doc.IMMUTABLE.username)).data.userId == userId &&
+          // User must be created in a batch with a private document
+          existsAfter(/databases/$(database)/documents/users/$(userId)/private/doc);
       }
-      function invalidNameChange() {
-        return // The name change is invalid if
-          // The name changed
-          request.resource.data.name != resource.data.name &&
-          // renameAllowedAt is set (the user has already changed their name once)
-          request.resource.data.IMMUTABLE.renameAllowedAt != null &&
-          // renameAllowedAt is in the future (the user cannot change their name yet)
-          request.resource.data.IMMUTABLE.renameAllowedAt > request.time;
+      function allowUpdateUser() {
+        let old = resource.data;
+        let new = request.resource.data;
+        return
+          isUserDoc(new) &&
+          loggedAs(userId) &&
+          mapEq(old.IMMUTABLE, new.IMMUTABLE) &&
+          // If the user changed their name, check that they waited long enough
+          (old.name != new.name ? (
+            old.IMMUTABLE.renameAllowedAt == null ||
+            request.time >= old.IMMUTABLE.renameAllowedAt
+          ) : true);
       }
-      
       
       allow read;
-      allow update: if 
-        isUserDoc() &&
-        isAuth(userId) &&
-        immutableOk() &&
-        !invalidNameChange();
+      allow create: if allowCreateUser();
+      allow update: if allowUpdateUser();
+      // Disallow deleting users directly, they are deleted by a cloud function
       
-      allow create: if
-        isUserDoc() &&
-        isAuthUnverified(userId) &&
-        // Username is correct and not taken
-        isValidUsername(request.resource.data.IMMUTABLE.username) &&
-        !usernameIsTaken(request.resource.data.IMMUTABLE.username) &&
-        request.resource.data.IMMUTABLE.numWins == 0 &&
-        request.resource.data.IMMUTABLE.renameAllowedAt == null &&
-        // User must be created in a batch with a username document
-        getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.IMMUTABLE.username)).data.userId == userId &&
-        // User must be created in a batch with a private document
-        existsAfter(/databases/$(database)/documents/users/$(userId)/private/doc);
+      
+      match /private/{docName} {
+        function isPrivateUserDoc(doc) {
+          return
+            hasFields(doc, ['IMMUTABLE'], []) &&
+            hasFields(doc.IMMUTABLE, ['email', 'banned'], []) &&
+            doc.IMMUTABLE.email is string &&
+            doc.IMMUTABLE.banned is bool;
+        }
+        function allowCreateUserPrivate() {
+          let doc = request.resource.data;
+          return
+            isPrivateUserDoc(doc) &&
+            loggedAsUnverified(userId) &&
+            docName == 'doc' && // Only 1 document allowed
+            doc.IMMUTABLE.email == request.auth.token.email &&
+            doc.IMMUTABLE.banned == false;
+        }
+        function allowUpdateUserPrivate() {
+          let old = resource.data;
+          let new = request.resource.data;
+          return
+            isPrivateUserDoc(new) &&
+            loggedAs(userId) &&
+            mapEq(old.IMMUTABLE, new.IMMUTABLE);
+        }
         
-      // Disallow deleting users for now
-      allow delete: if false;
-      
-      
-      match /private/{doc} {
-        allow read: if isAuth(userId);
-        allow update: if 
-          immutableOk() &&
-          isPrivateUserDoc() &&
-          isAuth(userId);
-          
-        allow create: if
-          isPrivateUserDoc() &&
-          isAuthUnverified(userId) &&
-          doc == 'doc' && // Only 1 document allowed
-          request.resource.data.IMMUTABLE.email == request.auth.token.email &&
-          request.resource.data.IMMUTABLE.banned == false;
-        
-        allow delete: if false;
+        allow read: if loggedAs(userId);
+        allow create: if allowCreateUserPrivate();
+        allow update: if allowUpdateUserPrivate();
       }
       
+      
       match /upvotedVariants/{variantId} {
+        function isUpvoteDoc(doc) {
+          return
+            hasFields(doc, ['timeUpvoted'], []) &&
+            doc.timeUpvoted is timestamp;
+        }
+        function allowCreateUpvote() {
+          let doc = request.resource.data;
+          return
+            isUpvoteDoc(doc) &&
+            loggedAs(userId) &&
+            // User can only upvote a variant once
+            isServerTimestamp(doc.timeUpvoted) &&
+            exists(/databases/$(database)/documents/variants/$(variantId));
+        }
+        function allowDeleteUpvote() {
+          return
+            // For some reason, deleting a document that doesn't exist succeeds instead of failing
+            // This delete will trigger a cloud function, so make sure it's valid
+            exists(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId)) &&
+            loggedAs(userId);
+        }
+        
         // Other users cannot see my upvotes
-        allow read: if isAuth(userId);
-        allow create: if
-          hasCorrectFields(['timeUpvoted'], []) &&
-          isAuth(userId) &&
-          isServerTimestamp(request.resource.data.timeUpvoted) &&
-          exists(/databases/$(database)/documents/variants/$(variantId));
-        // Cannot update an upvote, only delete it
-        allow update: if false;
-        allow delete: if
-          // For some reason, deleting a document that doesn't exist succeeds instead of failing
-          // This delete will trigger a cloud function, so make sure it's valid
-          exists(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId)) &&
-          isAuth(userId);
+        allow read: if loggedAs(userId);
+        allow create: if allowCreateUpvote();
+        allow delete: if allowDeleteUpvote();
       }
     }
     
     
     
     match /variants/{variantId} {
-      function isVariantDoc() {
-        return hasCorrectFields(['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes'], ['creatorId']);
+      function isVariantDoc(doc) {
+        return
+          hasFields(doc, ['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes'], ['creatorId']) &&
+          doc.name is string &&
+          doc.name.size() >= 3 &&
+          doc.name.size() <= 50 &&
+          doc.name == doc.name.trim() &&
+          doc.description is string &&
+          doc.description.size() <= 1000 &&
+          doc.creationTime is timestamp &&
+          doc.creatorDisplayName is string &&
+          doc.initialState is string &&
+          doc.initialState.size() <= 100000 &&
+          doc.numUpvotes is int &&
+          (doc.creatorId == null || doc.creatorId is string);
       }
-      function isValidVariant(variant) {
-        let userDoc = get(/databases/$(database)/documents/users/$(variant.creatorId));
+      function allowCreateVariant() {
+        let doc = request.resource.data;
+        let userDoc = get(/databases/$(database)/documents/users/$(doc.creatorId));
         let expectedDisplayName = userDoc.data.name == null ? '@' + userDoc.data.IMMUTABLE.username : userDoc.data.name;
-        return isVariantDoc() &&
-          variant.name.size() >= 3 &&
-          variant.name.size() <= 50 &&
-          variant.name == variant.name.trim() &&
-          variant.description.size() <= 1000 &&
-          isServerTimestamp(variant.creationTime) &&
-          variant.creatorDisplayName == expectedDisplayName &&
-          // Creator can be null if their account has been deleted (not when creating the variant)
-          variant.creatorId != null &&
-          isAuth(variant.creatorId) &&
-          variant.numUpvotes == 0 &&
-          variant.initialState.size() <= 100000;
+        return
+          isVariantDoc(doc) &&
+          // Creator can be null if their account has been deleted, but not when creating the variant
+          loggedAs(doc.creatorId) &&
+          doc.creatorDisplayName == expectedDisplayName &&
+          isServerTimestamp(doc.creationTime) &&
+          doc.numUpvotes == 0;
       }
       
       allow read;
-      allow create: if isValidVariant(request.resource.data);
+      allow create: if allowCreateVariant();
       // Disallow editing and deleting variants
-      allow update, delete: if false;
     }
     
+    
+    
     // Read-only access to variantIndex
-    match /variantIndex/{doc} {
+    match /variantIndex/{docName} {
       allow read;
-      allow write: if false;
     }
     
     
     
     match /games/{gameId} {
-      function isGameDoc() {
+      function isGameDoc(doc) {
+        let HISTORY_REGEX = '^([a-p][0-9]{1,2}[a-p][0-9]{1,2}(=..?)? )*$';
         return
-          hasCorrectFields(['moveHistory', 'newMove', 'playerToMove', 'IMMUTABLE'], ['winner']) &&
-          hasCorrectImmutableFields(['timeGameStarted', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName', 'requestedColor'], ['whiteId', 'blackId']);
-      }
-      function isValidGame(game) {
-        // Move history is a space-separated list of moves in the format "e2e4" or "e2e4=q"
-        let MOVE_REGEX = '^[a-p][0-9]+[a-p][0-9]+(=..?)? $';
-        return isGameDoc() &&
-          game.moveHistory.size() <= 5000 &&
-          game.newMove.matches(MOVE_REGEX) &&
-          (game.winner == null || game.winner == 'white' || game.winner == 'black' || game.winner == 'draw') &&
-          // If there is no winner, the game must be in progress
-          (game.winner == null ?
-            (game.playerToMove == 'white' || game.playerToMove == 'black') :
-            (game.playerToMove == 'game-over')
-          );
+          hasFields(doc, ['moveHistory', 'playerToMove', 'IMMUTABLE'], ['winner']) &&
+          hasFields(doc.IMMUTABLE, ['timeGameStarted', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName', 'requestedColor'], ['whiteId', 'blackId']) &&
+          doc.moveHistory is string &&
+          doc.moveHistory.size() <= 10000 &&
+          doc.moveHistory.matches(HISTORY_REGEX) &&
+          doc.playerToMove is string &&
+          (doc.winnner == null ? (
+            doc.playerToMove in ['white', 'black']
+          ) : (
+            doc.playerToMove == 'game-over' &&
+            doc.winner is string &&
+            doc.winner in ['white', 'black', 'draw']
+          ));
+          // Don't check immutable fields, they are set by a cloud function
       }
       function allowUpdateGame() {
         let old = resource.data;
         let new = request.resource.data;
-        return isValidGame(new) &&
-          immutableOk() &&
+        return
+          isGameDoc(new) &&
+          mapEq(old.IMMUTABLE, new.IMMUTABLE) &&
           // Only allow appending to the move history
-          old.moveHistory + new.newMove == new.moveHistory &&
+          startsWith(new.moveHistory, old.moveHistory) &&
           // Must pass the turn to the other player
           new.playerToMove != old.playerToMove &&
-          (old.playerToMove == 'white' && isAuth(old.IMMUTABLE.whiteId) ||
-           old.playerToMove == 'black' && isAuth(old.IMMUTABLE.blackId));
+          (old.playerToMove == 'white' && loggedAs(old.IMMUTABLE.whiteId) ||
+           old.playerToMove == 'black' && loggedAs(old.IMMUTABLE.blackId));
       }
       
       allow read;
-      // Games can only be created and deleted by cloud functions
-      allow create, delete: if false;
       allow update: if allowUpdateGame();
+      // Games can only be created and deleted by cloud functions
     }
+    
+    
     
     // cancelGame() stores cancelled games here so moderators can review them
     match /cancelledGames/{gameId} {
-      allow read, write: if false;
+      // Users cannot read or write to this collection
+      allow read: if false;
     }
   }
 }

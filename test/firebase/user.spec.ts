@@ -400,6 +400,11 @@ test('can edit image', async () => {
 test('cannot edit immutable fields', async () => {
   await setupUser()
   
+  // Actual data has not changed, so this should succeed
+  await assertSucceeds(
+    update('verified', 'IMMUTABLE.username', 'my_username', 'users', MY_ID)
+  )
+  
   await assertFails(
     update('verified', 'IMMUTABLE.username', 'new_username', 'users', MY_ID)
   )
@@ -408,5 +413,16 @@ test('cannot edit immutable fields', async () => {
   )
   await assertFails(
     update('verified', 'IMMUTABLE.renameAllowedAt', afterSeconds(2), 'users', MY_ID)
+  )
+})
+
+test('cannot edit immutable private fields', async () => {
+  await setupUser()
+  
+  await assertFails(
+    update('verified', 'IMMUTABLE.email', 'new@mail.com', 'users', MY_ID, 'private', 'doc')
+  )
+  await assertFails(
+    update('verified', 'IMMUTABLE.banned', true, 'users', MY_ID, 'private', 'doc')
   )
 })

@@ -79,7 +79,6 @@ export interface LobbyEntryDoc {
 export interface GameDoc {
   // Space-separared list of moves like "e2e4" or "e7e8=Q". Validated by the opponent.
   moveHistory: string
-  newMove: string // Used for enforcing the security rules
   playerToMove: 'white' | 'black' | 'game-over'
   // winner = null if game is still in progress. Validated by the opponent.
   winner: 'white' | 'black' | 'draw' | null

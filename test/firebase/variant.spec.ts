@@ -232,6 +232,9 @@ test('cannot edit variant', async () => {
   await assertFails(
     update('verified', 'name', 'New name', 'variants', 'variant_id')
   )
+  await assertFails(
+    update('verified', 'description', 'New description', 'variants', 'variant_id')
+  )
 })
 
 test('cannot remove variant', async () => {
