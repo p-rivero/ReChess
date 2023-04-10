@@ -33,7 +33,6 @@
     // If the value of the input is the default, don't set it and show the placeholder instead
     const usePlaceholder = props.placeholder && props.startValue === props.default
     if (!usePlaceholder) {
-      console.log('setting value', props.startValue)
       numberInput.value.value = props.startValue.toString()
     }
   })
