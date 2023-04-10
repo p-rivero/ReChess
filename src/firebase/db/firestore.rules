@@ -60,6 +60,11 @@ service cloud.firestore {
         username.size() <= 25 &&
         username.matches('^[a-zA-Z0-9_]+$');
     }
+    // Returns the expected display name for the given user id
+    function expectedDisplayName(userId) {
+      let userDoc = get(/databases/$(database)/documents/users/$(userId));
+      return userDoc.data.name == null ? '@' + userDoc.data.IMMUTABLE.username : userDoc.data.name;
+    }
     
     
     
@@ -195,10 +200,10 @@ service cloud.firestore {
             exists(/databases/$(database)/documents/variants/$(variantId));
         }
         function allowDeleteUpvote() {
+          let doc = resource.data;
           return
-            // For some reason, deleting a document that doesn't exist succeeds instead of failing
-            // This delete will trigger a cloud function, so make sure it's valid
-            exists(/databases/$(database)/documents/users/$(userId)/upvotedVariants/$(variantId)) &&
+            // Fail if the document does not exist, to avoid triggering a cloud function
+            isUpvoteDoc(doc) &&
             loggedAs(userId);
         }
         
@@ -230,13 +235,11 @@ service cloud.firestore {
       }
       function allowCreateVariant() {
         let doc = request.resource.data;
-        let userDoc = get(/databases/$(database)/documents/users/$(doc.creatorId));
-        let expectedDisplayName = userDoc.data.name == null ? '@' + userDoc.data.IMMUTABLE.username : userDoc.data.name;
         return
           isVariantDoc(doc) &&
           // Creator can be null if their account has been deleted, but not when creating the variant
           loggedAs(doc.creatorId) &&
-          doc.creatorDisplayName == expectedDisplayName &&
+          doc.creatorDisplayName == expectedDisplayName(doc.creatorId) &&
           isServerTimestamp(doc.creationTime) &&
           doc.numUpvotes == 0;
       }
@@ -244,6 +247,83 @@ service cloud.firestore {
       allow read;
       allow create: if allowCreateVariant();
       // Disallow editing and deleting variants
+      
+      
+      match /lobby/{creatorUserId} {
+        function isLobbyEntryDoc(doc) {
+          return
+            hasFields(doc, ['IMMUTABLE'], ['challengerId', 'challengerDisplayName', 'gameDocId']) &&
+            hasFields(doc.IMMUTABLE, ['creatorId', 'creatorDisplayName', 'timeCreated', 'requestedColor'], []) &&
+            doc.IMMUTABLE.creatorId is string &&
+            doc.IMMUTABLE.creatorDisplayName is string &&
+            doc.IMMUTABLE.timeCreated is timestamp &&
+            doc.IMMUTABLE.requestedColor in ['white', 'black', 'random'] &&
+            (doc.challengerId == null || doc.challengerId is string) &&
+            (doc.challengerDisplayName == null || doc.challengerDisplayName is string) &&
+            (doc.gameDocId == null || doc.gameDocId is string);
+        }
+        function allowCreateLobbyEntry() {
+          let doc = request.resource.data;
+          return
+            isLobbyEntryDoc(doc) &&
+            loggedAs(doc.IMMUTABLE.creatorId) &&
+            doc.IMMUTABLE.creatorDisplayName == expectedDisplayName(doc.IMMUTABLE.creatorId) &&
+            isServerTimestamp(doc.IMMUTABLE.timeCreated) &&
+            // Creator initializes the entry with no challenger
+            doc.challengerId == null &&
+            doc.challengerDisplayName == null &&
+            doc.gameDocId == null;
+        }
+        function allowUpdateLobbyEntry() {
+          let old = resource.data;
+          let new = request.resource.data;
+          return
+            isLobbyEntryDoc(new) &&
+            mapEq(old.IMMUTABLE, new.IMMUTABLE) &&
+            // Challenger clicks "Join"
+            ((
+              loggedAs(new.challengerId) &&
+              old.challengerId == null &&
+              old.gameDocId == null &&
+              new.challengerId != new.IMMUTABLE.creatorId &&
+              new.challengerDisplayName == expectedDisplayName(new.challengerId) &&
+              new.gameDocId == null
+            )
+            // Challenger clicks "Cancel", or creator rejects challenger
+            || (
+              (loggedAs(old.challengerId) || loggedAs(old.IMMUTABLE.creatorId)) &&
+              old.gameDocId == null &&
+              new.challengerId == null &&
+              new.challengerDisplayName == null &&
+              new.gameDocId == null
+            )
+            // Creator accepts challenger
+            || (
+              loggedAs(old.IMMUTABLE.creatorId) &&
+              old.gameDocId == null &&
+              new.gameDocId != null &&
+              new.challengerId == old.challengerId &&
+              new.challengerDisplayName == old.challengerDisplayName &&
+              exists(/databases/$(database)/documents/games/$(new.gameDocId))
+            ));
+        }
+        function allowDeleteLobbyEntry() {
+          let doc = resource.data;
+          return
+            isLobbyEntryDoc(doc) &&
+            // Creator cancels the game, OR
+            // Challenger acknowledges the created game and clears the entry
+            (loggedAs(doc.IMMUTABLE.creatorId) || (
+              loggedAs(doc.challengerId) &&
+              doc.gameDocId != null
+            ));
+        }
+        
+        allow read;
+        allow create: if allowCreateLobbyEntry();
+        allow update: if allowUpdateLobbyEntry();
+        allow delete: if allowDeleteLobbyEntry();
+      }
     }
     
     
@@ -264,12 +344,10 @@ service cloud.firestore {
           doc.moveHistory is string &&
           doc.moveHistory.size() <= 10000 &&
           doc.moveHistory.matches(HISTORY_REGEX) &&
-          doc.playerToMove is string &&
           (doc.winnner == null ? (
             doc.playerToMove in ['white', 'black']
           ) : (
             doc.playerToMove == 'game-over' &&
-            doc.winner is string &&
             doc.winner in ['white', 'black', 'draw']
           ));
           // Don't check immutable fields, they are set by a cloud function
@@ -284,6 +362,7 @@ service cloud.firestore {
           startsWith(new.moveHistory, old.moveHistory) &&
           // Must pass the turn to the other player
           new.playerToMove != old.playerToMove &&
+          // Must be logged in as the player whose turn it is
           (old.playerToMove == 'white' && loggedAs(old.IMMUTABLE.whiteId) ||
            old.playerToMove == 'black' && loggedAs(old.IMMUTABLE.blackId));
       }
