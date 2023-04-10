@@ -99,4 +99,7 @@ export async function updateName(
     console.error('Error while updating games (black) for user', userId + ':')
     console.error(err)
   })
+  
+  // Do not update the name in the lobby entries, because they are short-lived and
+  // it's not a problem to have the old name there for a while
 }

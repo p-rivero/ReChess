@@ -206,5 +206,50 @@ service cloud.firestore {
       allow read;
       allow write: if false;
     }
+    
+    
+    
+    match /games/{gameId} {
+      function isGameDoc() {
+        return
+          hasCorrectFields(['moveHistory', 'newMove', 'playerToMove', 'IMMUTABLE'], ['winner']) &&
+          hasCorrectImmutableFields(['timeGameStarted', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName', 'requestedColor'], ['whiteId', 'blackId']);
+      }
+      function isValidGame(game) {
+        // Move history is a space-separated list of moves in the format "e2e4" or "e2e4=q"
+        let MOVE_REGEX = '^[a-p][0-9]+[a-p][0-9]+(=..?)? $';
+        return isGameDoc() &&
+          game.moveHistory.size() <= 5000 &&
+          game.newMove.matches(MOVE_REGEX) &&
+          (game.winner == null || game.winner == 'white' || game.winner == 'black' || game.winner == 'draw') &&
+          // If there is no winner, the game must be in progress
+          (game.winner == null ?
+            (game.playerToMove == 'white' || game.playerToMove == 'black') :
+            (game.playerToMove == 'game-over')
+          );
+      }
+      function allowUpdateGame() {
+        let old = resource.data;
+        let new = request.resource.data;
+        return isValidGame(new) &&
+          immutableOk() &&
+          // Only allow appending to the move history
+          old.moveHistory + new.newMove == new.moveHistory &&
+          // Must pass the turn to the other player
+          new.playerToMove != old.playerToMove &&
+          (old.playerToMove == 'white' && isAuth(old.IMMUTABLE.whiteId) ||
+           old.playerToMove == 'black' && isAuth(old.IMMUTABLE.blackId));
+      }
+      
+      allow read;
+      // Games can only be created and deleted by cloud functions
+      allow create, delete: if false;
+      allow update: if allowUpdateGame();
+    }
+    
+    // cancelGame() stores cancelled games here so moderators can review them
+    match /cancelledGames/{gameId} {
+      allow read, write: if false;
+    }
   }
 }

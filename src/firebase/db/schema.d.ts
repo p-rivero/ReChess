@@ -64,10 +64,12 @@ export interface VariantIndexDoc {
 // variants/{variantId}/lobby/{creatorUserId}
 export interface LobbyEntryDoc {
   IMMUTABLE: {
+    creatorId: string
     creatorDisplayName: string
     timeCreated: FieldValue | Timestamp
+    requestedColor: 'white' | 'black' | 'random'
   }
-  challengerUserId: string | null
+  challengerId: string | null
   challengerDisplayName: string | null
   // null if the creator has not accepted the challenge yet
   gameDocId: string | null
@@ -77,7 +79,8 @@ export interface LobbyEntryDoc {
 export interface GameDoc {
   // Space-separared list of moves like "e2e4" or "e7e8=Q". Validated by the opponent.
   moveHistory: string
-  playerToMove: 'white' | 'black'
+  newMove: string // Used for enforcing the security rules
+  playerToMove: 'white' | 'black' | 'game-over'
   // winner = null if game is still in progress. Validated by the opponent.
   winner: 'white' | 'black' | 'draw' | null
   // Set by the cloud function when creating the game
@@ -92,4 +95,10 @@ export interface GameDoc {
     // For the challenger to check if the creator is lying about the requested color
     requestedColor: 'white' | 'black' | 'random'
   }
+}
+
+// cancelledGames/{gameId}
+export interface CancelledGameDoc extends GameDoc {
+  cancelledById: string
+  cancelReason: string
 }
