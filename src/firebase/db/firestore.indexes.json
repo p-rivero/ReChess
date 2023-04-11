@@ -1,4 +1,19 @@
 {
-    "indexes": [],
-    "fieldOverrides": []
+  "indexes": [
+    {
+      "collectionGroup": "variants",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "IMMUTABLE.creatorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "IMMUTABLE.creationTime",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
 }
