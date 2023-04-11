@@ -1,10 +1,34 @@
 import { serverTimestamp } from 'firebase/firestore'
-import type { LobbySlotDoc, UserDoc, VariantDoc } from '@/firebase/db/schema'
+import type { GameDoc, LobbySlotDoc, UserDoc, VariantDoc } from '@/firebase/db/schema'
 import type { TestUtilsSignature } from '../utils'
+import type { Timestamp } from 'firebase/firestore'
 
 const MY_ID = 'my_id'
 
-export type SlotUser = 'alice' | 'bob' | 'myself'
+const VARIANT_DOC: Readonly<VariantDoc> = {
+  name: 'My variant',
+  description: 'Variant description',
+  creationTime: serverTimestamp(),
+  creatorDisplayName: 'Alice',
+  creatorId: 'alice_id',
+  numUpvotes: 0,
+  initialState: '{}',
+}
+
+
+export type GameUser = 'alice' | 'bob' | 'myself'
+
+  
+function idAndName(user: GameUser): [string, string]
+function idAndName(user: GameUser | undefined): [string | null, string | null]
+function idAndName(user: GameUser | undefined): [string | null, string | null] {
+  switch (user) {
+    case 'alice': return ['alice_id', 'Alice']
+    case 'bob': return ['bob_id', 'Bob']
+    case 'myself': return [MY_ID, 'My name']
+    default: return [null, null]
+  }
+}
 
 export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
   const alice: UserDoc = {
@@ -37,33 +61,17 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
       renameAllowedAt: null,
     },
   }
-  const variant: VariantDoc = {
-    name: 'My variant',
-    description: 'Variant description',
-    creationTime: serverTimestamp(),
-    creatorDisplayName: 'Alice',
-    creatorId: 'alice_id',
-    numUpvotes: 0,
-    initialState: '{}',
-  }
   await Promise.all([
     set('admin', alice, 'users', 'alice_id'),
     set('admin', bob, 'users', 'bob_id'),
     set('admin', my_user, 'users', MY_ID),
-    set('admin', variant, 'variants', 'variant_id'),
+    set('admin', VARIANT_DOC, 'variants', 'variant_id'),
   ])
 }
 
-export async function setupLobbySlot(set: TestUtilsSignature['set'], creator: SlotUser, challenger?: SlotUser, gameDocId?: string) {
-  const [creatorId, creatorDisplayName] =
-    creator === 'alice' ? ['alice_id', 'Alice'] :
-    creator === 'bob' ? ['bob_id', 'Bob'] :
-    [MY_ID, 'My name']
-  const [challengerId, challengerDisplayName] =
-    challenger === 'alice' ? ['alice_id', 'Alice'] :
-    challenger === 'bob' ? ['bob_id', 'Bob'] :
-    challenger === 'myself' ? [MY_ID, 'My name'] :
-    [null, null]
+export async function setupLobbySlot(set: TestUtilsSignature['set'], creator: GameUser, challenger?: GameUser, gameDocId?: string) {
+  const [creatorId, creatorDisplayName] = idAndName(creator)
+  const [challengerId, challengerDisplayName] = idAndName(challenger)
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName,
@@ -75,4 +83,31 @@ export async function setupLobbySlot(set: TestUtilsSignature['set'], creator: Sl
     gameDocId: gameDocId ?? null,
   }
   await set('admin', slot, 'variants', 'variant_id', 'lobby', creatorId)
+}
+
+export async function setupGameDoc(
+  set: TestUtilsSignature['set'],
+  white: GameUser,
+  black: GameUser,
+  requestedColor: 'white' | 'black' | 'random' = 'random',
+  variantId = 'variant_id'
+) {
+  const [whiteId, whiteDisplayName] = idAndName(white)
+  const [blackId, blackDisplayName] = idAndName(black)
+  const game: GameDoc = {
+    moveHistory: '',
+    playerToMove: 'white',
+    winner: null,
+    IMMUTABLE: {
+      timeCreated: serverTimestamp() as Timestamp,
+      variantId,
+      variant: VARIANT_DOC,
+      whiteDisplayName,
+      whiteId,
+      blackDisplayName,
+      blackId,
+      requestedColor,
+    },
+  }
+  await set('admin', game, 'games', 'game_id')
 }

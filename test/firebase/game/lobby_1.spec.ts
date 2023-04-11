@@ -1,7 +1,7 @@
 
 import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from '../utils'
 import { setupJest } from '../init'
-import * as gtu from './game-test-utils'
+import { setupUsersAndVariant, setupLobbySlot } from './game-test-utils'
 
 import type { LobbySlotDoc, VariantDoc } from '@/firebase/db/schema'
 
@@ -14,13 +14,10 @@ setupJest('lobby-tests-1', env => {
   ({ get, query, set, update, add, now, afterSeconds } = setupTestUtils(env, MY_ID, MY_EMAIL))
 })
 
-const setupUsersAndVariant = () => gtu.setupUsersAndVariant(set)
-const setupLobbySlot = (creator: gtu.SlotUser, challenger?: gtu.SlotUser, gameDocId?: string) => gtu.setupLobbySlot(set, creator, challenger, gameDocId)
-
 
 test('anyone can read lobby entries for a variant', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice', 'bob')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice', 'bob')
   
   const snapshot = await get('not logged', 'variants', 'variant_id', 'lobby', 'alice_id')
     
@@ -42,7 +39,7 @@ test('anyone can read lobby entries for a variant', async () => {
 
 
 test('can create lobby slot', async () => {
-  await setupUsersAndVariant()
+  await setupUsersAndVariant(set)
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -60,7 +57,7 @@ test('can create lobby slot', async () => {
 })
 
 test('cannot create lobby slot if not authenticated', async () => {
-  await setupUsersAndVariant()
+  await setupUsersAndVariant(set)
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -84,7 +81,7 @@ test('cannot create lobby slot if not authenticated', async () => {
 })
 
 test('cannot create lobby slot for a variant that does not exist', async () => {
-  await setupUsersAndVariant()
+  await setupUsersAndVariant(set)
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -102,8 +99,8 @@ test('cannot create lobby slot for a variant that does not exist', async () => {
 })
 
 test('cannot create 2 entries for the same variant', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('myself')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'myself')
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -124,7 +121,7 @@ test('cannot create 2 entries for the same variant', async () => {
 })
 
 test('can create 2 entries for different variants', async () => {
-  await setupUsersAndVariant()
+  await setupUsersAndVariant(set)
   const variant: VariantDoc = {
     name: 'Another variant',
     description: 'Variant description',
@@ -155,8 +152,8 @@ test('can create 2 entries for different variants', async () => {
 })
 
 test('2 creators can create entries for the same variant', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice', 'bob')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice', 'bob')
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -174,7 +171,7 @@ test('2 creators can create entries for the same variant', async () => {
 })
 
 test('cannot create slot with challenger already set', async () => {
-  await setupUsersAndVariant()
+  await setupUsersAndVariant(set)
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -197,7 +194,7 @@ test('cannot create slot with challenger already set', async () => {
 })
 
 test('cannot create slot with game id already set', async () => {
-  await setupUsersAndVariant()
+  await setupUsersAndVariant(set)
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -219,7 +216,7 @@ test('cannot create slot with game id already set', async () => {
 })
 
 test('creator display name must be correct', async () => {
-  await setupUsersAndVariant()
+  await setupUsersAndVariant(set)
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -241,7 +238,7 @@ test('creator display name must be correct', async () => {
 })
 
 test('time created must be correct', async () => {
-  await setupUsersAndVariant()
+  await setupUsersAndVariant(set)
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -263,7 +260,7 @@ test('time created must be correct', async () => {
 })
 
 test('requested color must be correct', async () => {
-  await setupUsersAndVariant()
+  await setupUsersAndVariant(set)
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -289,8 +286,8 @@ test('requested color must be correct', async () => {
 // STEP 2: Challenger joins the lobby slot
 
 test('can join as challenger', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice')
   
   await assertSucceeds(
     update('verified', {
@@ -301,8 +298,8 @@ test('can join as challenger', async () => {
 })
 
 test('challenger must be authenticated', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice')
   
   await assertFails(
     update('unverified', {
@@ -325,8 +322,8 @@ test('challenger must be authenticated', async () => {
 })
 
 test('challenger must be different from creator', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('myself')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'myself')
   
   await assertFails(
     update('verified', {
@@ -337,8 +334,8 @@ test('challenger must be different from creator', async () => {
 })
 
 test('challenger name must be correct', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice')
   
   await assertFails(
     update('verified', {
@@ -349,8 +346,8 @@ test('challenger name must be correct', async () => {
 })
 
 test('challenger must set both fields at same time', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice')
   
   await assertFails(
     update('verified', {
@@ -371,8 +368,8 @@ test('challenger must set both fields at same time', async () => {
 })
 
 test('cannot join if a challenger is already set', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice', 'bob')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice', 'bob')
   
   await assertFails(
     update('verified', {
@@ -383,7 +380,7 @@ test('cannot join if a challenger is already set', async () => {
 })
 
 test('cannot join a slot that does not exist', async () => {
-  await setupUsersAndVariant()
+  await setupUsersAndVariant(set)
   
   await assertFails(
     update('verified', {
@@ -394,8 +391,8 @@ test('cannot join a slot that does not exist', async () => {
 })
 
 test('challenger cannot edit game doc', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice')
   
   await assertFails(
     update('verified', {
@@ -419,8 +416,8 @@ test('challenger cannot edit game doc', async () => {
 
 
 test('challenger can leave slot', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice', 'myself')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice', 'myself')
 
   await assertSucceeds(
     update('verified', {
@@ -431,8 +428,8 @@ test('challenger can leave slot', async () => {
 })
 
 test('challenger cannot kick other challenger', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice', 'bob')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice', 'bob')
 
   await assertFails(
     update('verified', {
@@ -443,8 +440,8 @@ test('challenger cannot kick other challenger', async () => {
 })
 
 test('slot creator can reject challenger', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('myself', 'bob')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'myself', 'bob')
 
   await assertSucceeds(
     update('verified', {
@@ -455,8 +452,8 @@ test('slot creator can reject challenger', async () => {
 })
 
 test('when leaving must remove all fields', async () => {
-  await setupUsersAndVariant()
-  await setupLobbySlot('alice', 'myself')
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'alice', 'myself')
 
   await assertFails(
     update('verified', {

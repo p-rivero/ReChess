@@ -62,8 +62,8 @@ service cloud.firestore {
     }
     // Returns the expected display name for the given user id
     function expectedDisplayName(userId) {
-      let userDoc = get(/databases/$(database)/documents/users/$(userId));
-      return userDoc.data.name == null ? '@' + userDoc.data.IMMUTABLE.username : userDoc.data.name;
+      let userDoc = get(/databases/$(database)/documents/users/$(userId)).data;
+      return userDoc.name == null ? '@' + userDoc.IMMUTABLE.username : userDoc.name;
     }
     
     
@@ -274,6 +274,13 @@ service cloud.firestore {
             doc.challengerDisplayName == null &&
             doc.gameDocId == null;
         }
+        function validateCreatedGame(lobbyDoc) {
+          let gameDoc = get(/databases/$(database)/documents/games/$(lobbyDoc.gameDocId)).data;
+          return
+            gameDoc.IMMUTABLE.variantId == variantId &&
+            gameDoc.IMMUTABLE.requestedColor == lobbyDoc.IMMUTABLE.requestedColor &&
+            gameDoc.IMMUTABLE.timeCreated > lobbyDoc.IMMUTABLE.timeCreated;
+        }
         function allowUpdateLobbySlot() {
           let old = resource.data;
           let new = request.resource.data;
@@ -304,7 +311,7 @@ service cloud.firestore {
               new.gameDocId != null &&
               new.challengerId == old.challengerId &&
               new.challengerDisplayName == old.challengerDisplayName &&
-              exists(/databases/$(database)/documents/games/$(new.gameDocId))
+              validateCreatedGame(new)
             ));
         }
         function allowDeleteLobbySlot() {
@@ -340,7 +347,7 @@ service cloud.firestore {
         let HISTORY_REGEX = '^([a-p][0-9]{1,2}[a-p][0-9]{1,2}(=..?)? )*$';
         return
           hasFields(doc, ['moveHistory', 'playerToMove', 'IMMUTABLE'], ['winner']) &&
-          hasFields(doc.IMMUTABLE, ['timeGameStarted', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName', 'requestedColor'], ['whiteId', 'blackId']) &&
+          hasFields(doc.IMMUTABLE, ['timeCreated', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName', 'requestedColor'], ['whiteId', 'blackId']) &&
           doc.moveHistory is string &&
           doc.moveHistory.size() <= 10000 &&
           doc.moveHistory.matches(HISTORY_REGEX) &&
