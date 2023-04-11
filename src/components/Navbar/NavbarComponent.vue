@@ -92,7 +92,7 @@
   function create() {
     if (authStore.loggedUser) {
       hideNavBarMenu()
-      router.push({ name: 'edit-variant' })
+      router.push({ name: 'edit-draft' })
     } else {
       requestSignIn()
     }

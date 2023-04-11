@@ -6,47 +6,78 @@ import { updateTitle } from '@/utils/web-utils'
 
 export type AppRouteNames =
   | 'home'
-  | 'play'
-  | 'edit-variant'
+  | 'variant-details'
+  | 'variant-lobby'
+  | 'variant-analysis'
+  | 'view-game'
+  | 'edit-draft'
   | 'edit-piece'
-  | 'analysis'
+  | 'draft-play'
+  | 'draft-analysis'
+  | 'user-profile'
+  | 'user-published-variants'
+  | 'user-upvoted-variants'
   | 'privacy'
   | 'cookies'
+  | 'tos'
 
 export const routes: RouteRecordRaw[] = [
+  
   {
     name: 'home',
     path: '/',
     component: HomePage,
   },
-  {
-    name: 'play',
-    path: '/play/:variantId?',
-    component: () => import('@/pages/PlayPage.vue'),
-  },
+  
+  
   {
     name: 'variant-details',
     path: '/variant/:variantId',
     component: () => import('@/pages/Variant/VariantDetailsPage.vue'),
   },
   {
-    name: 'edit-variant',
-    path: '/edit',
+    name: 'variant-lobby',
+    path: '/variant/:variantId/lobby',
+    component: () => import('@/pages/LobbyPage.vue'),
+  },
+  {
+    name: 'variant-analysis',
+    path: '/variant/:variantId/analysis',
+    component: () => import('@/pages/AnalysisPage.vue'),
+    meta: { title: 'Analysis Board' },
+  },
+  {
+    name: 'view-game',
+    path: '/game/:gameId',
+    component: () => import('@/pages/PlayPage.vue'),
+  },
+  
+  
+  {
+    name: 'edit-draft',
+    path: '/draft',
     component: () => import('@/pages/Variant/EditVariantPage.vue'),
     meta: { title: 'Edit Draft' },
   },
   {
     name: 'edit-piece',
-    path: '/edit/pieces/:pieceIndex',
+    path: '/draft/pieces/:pieceIndex',
     component: () => import('@/pages/Variant/EditPiecePage.vue'),
-    meta: { title: 'Edit Draft' },
+    meta: { title: 'Edit Piece' },
   },
   {
-    name: 'analysis',
-    path: '/analysis/:variantId?',
+    name: 'draft-play',
+    path: '/draft/play',
+    component: () => import('@/pages/PlayPage.vue'),
+  },
+  {
+    name: 'draft-analysis',
+    path: '/draft/analysis',
     component: () => import('@/pages/AnalysisPage.vue'),
     meta: { title: 'Analysis Board' },
   },
+  
+  
   {
     name: 'user-profile',
     path: '/user/:username',
@@ -62,6 +93,8 @@ export const routes: RouteRecordRaw[] = [
     path: '/user/:username/upvoted',
     component: () => import('@/pages/UserUpvotedVariantsPage.vue'),
   },
+  
+  
   {
     name: 'privacy',
     path: '/privacy',

@@ -85,7 +85,7 @@
   
   
   function editDraft() {
-    router.push({ name: 'edit-variant' })
+    router.push({ name: 'edit-draft' })
   }
   
   function discardDraft() {

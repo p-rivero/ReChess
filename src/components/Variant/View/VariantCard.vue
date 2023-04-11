@@ -104,7 +104,7 @@
     if (!draftStore.hasDraft()) {
       // Nothing will be lost, so just go ahead and edit
       draftStore.state = clone(props.variant)
-      router.push({ name: 'edit-variant' })
+      router.push({ name: 'edit-draft' })
       return
     }
     const nameDetails = draftStore.state.displayName ?
@@ -116,7 +116,7 @@
       'yes-no',
       () => {
         draftStore.state = clone(props.variant)
-        router.push({ name: 'edit-variant' })
+        router.push({ name: 'edit-draft' })
       }
     )
   }

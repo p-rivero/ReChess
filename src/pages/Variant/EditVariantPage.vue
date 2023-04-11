@@ -83,7 +83,7 @@
           <button
             class="button is-fullwidth"
             :disabled="hasError || loading"
-            @click="$router.push({name: 'analysis'})"
+            @click="$router.push({name: 'draft-analysis'})"
           >
             <div class="sz-icon icon-analysis color-theme" />
             <span>Analysis board</span>

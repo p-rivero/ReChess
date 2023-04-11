@@ -55,7 +55,7 @@
         </button>
         <button
           class="button is-fullwidth mb-4"
-          @click="$router.push({ name: 'analysis', params: {variantId: variant?.uid} })"
+          @click="$router.push({ name: 'variant-analysis', params: {variantId: variant?.uid} })"
         >
           <div class="sz-icon icon-analysis color-theme" />
           Analysis board
@@ -215,7 +215,7 @@
       if (!variant.value) throw new Error('variant is null')
       // Nothing will be lost, so just go ahead and edit
       draftStore.state = clone(variant.value)
-      router.push({ name: 'edit-variant' })
+      router.push({ name: 'edit-draft' })
       return
     }
     const nameDetails = draftStore.state.displayName ?
@@ -229,7 +229,7 @@
       () => {
         if (!variant.value) throw new Error('variant is null')
         draftStore.state = clone(variant.value)
-        router.push({ name: 'edit-variant' })
+        router.push({ name: 'edit-draft' })
       }
     )
   }

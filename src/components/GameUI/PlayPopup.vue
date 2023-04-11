@@ -75,11 +75,11 @@
   const popup = ref<HTMLElement>()
   const buttonRandom = ref<HTMLButtonElement>()
   // Undefined when playing the stored variant draft
-  let variantId: string | undefined
+  let _variantId: string | undefined
   
   defineExpose({
     show(id?: string) {
-      variantId = id
+      _variantId = id
       popup.value?.classList.add('is-active')
       document.documentElement.classList.add('is-clipped')
       buttonRandom.value?.focus()
@@ -95,7 +95,8 @@
   function play(side: 'white' | 'black' | 'random') {
     closePopup()
     // Go to play page
-    router.push({ name: 'play', params: { variantId: variantId }, query: { startAs: side } })
+    // TODO: Allow creating lobby slot
+    router.push({ name: 'draft-play', query: { startAs: side } })
   }
   
 </script>

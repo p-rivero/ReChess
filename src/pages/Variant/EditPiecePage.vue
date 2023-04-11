@@ -29,7 +29,7 @@
         <div class="column is-6 pr-2">
           <button
             class="button is-primary is-fullwidth"
-            @click="$router.push({name: 'edit-variant'})"
+            @click="$router.push({name: 'edit-draft'})"
           >
             <div class="sz-icon icon-check color-white" />
             <span>Done</span>
