@@ -145,7 +145,7 @@ test('cannot create lobby slot if not authenticated', async () => {
     set('unverified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
   )
   await assertFails(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', 'other_id')
+    set('verified', slot, 'variants', 'variant_id', 'lobby', 'bob_id')
   )
   await assertSucceeds(
     set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
@@ -357,13 +357,202 @@ test('requested color must be correct', async () => {
 
 // STEP 2: Challenger joins the lobby slot
 
+test('can join as challenger', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('alice')
+  
+  await assertSucceeds(
+    update('verified', {
+      challengerId: MY_ID,
+      challengerDisplayName: 'My name',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+})
+
+test('challenger must be authenticated', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('alice')
+  
+  await assertFails(
+    update('unverified', {
+      challengerId: MY_ID,
+      challengerDisplayName: 'My name',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+  await assertFails(
+    update('verified', {
+      challengerId: 'bob_id',
+      challengerDisplayName: 'Bob',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+  await assertSucceeds(
+    update('verified', {
+      challengerId: MY_ID,
+      challengerDisplayName: 'My name',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+})
+
+test('challenger must be different from creator', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('myself')
+  
+  await assertFails(
+    update('verified', {
+      challengerId: MY_ID,
+      challengerDisplayName: 'My name',
+    }, 'variants', 'variant_id', 'lobby', MY_ID)
+  )
+})
+
+test('challenger name must be correct', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('alice')
+  
+  await assertFails(
+    update('verified', {
+      challengerId: MY_ID,
+      challengerDisplayName: 'A wrong name',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+})
+
+test('challenger must set both fields at same time', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('alice')
+  
+  await assertFails(
+    update('verified', {
+      challengerId: MY_ID,
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+  await assertFails(
+    update('verified', {
+      challengerDisplayName: 'My name',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+  await assertSucceeds(
+    update('verified', {
+      challengerId: MY_ID,
+      challengerDisplayName: 'My name',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+})
+
+test('cannot join if a challenger is already set', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('alice', 'bob')
+  
+  await assertFails(
+    update('verified', {
+      challengerId: MY_ID,
+      challengerDisplayName: 'My name',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+})
+
+test('cannot join a slot that does not exist', async () => {
+  await setupUsersAndVariant()
+  
+  await assertFails(
+    update('verified', {
+      challengerId: MY_ID,
+      challengerDisplayName: 'My name',
+    }, 'variants', 'variant_id', 'lobby', 'wrong_id')
+  )
+})
+
+test('challenger cannot edit game doc', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('alice')
+  
+  await assertFails(
+    update('verified', {
+      gameDocId: 'some_id',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+  await assertFails(
+    update('verified', {
+      challengerId: MY_ID,
+      challengerDisplayName: 'My name',
+      gameDocId: 'some_id',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+  await assertSucceeds(
+    update('verified', {
+      challengerId: MY_ID,
+      challengerDisplayName: 'My name',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+})
 
 
+test('challenger can leave slot', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('alice', 'myself')
+
+  await assertSucceeds(
+    update('verified', {
+      challengerId: null,
+      challengerDisplayName: null,
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+})
+
+test('challenger cannot kick other challenger', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('alice', 'bob')
+
+  await assertFails(
+    update('verified', {
+      challengerId: null,
+      challengerDisplayName: null,
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+})
+
+test('slot creator can reject challenger', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('myself', 'bob')
+
+  await assertSucceeds(
+    update('verified', {
+      challengerId: null,
+      challengerDisplayName: null,
+    }, 'variants', 'variant_id', 'lobby', MY_ID)
+  )
+})
+
+test('when leaving must remove all fields', async () => {
+  await setupUsersAndVariant()
+  await setupLobbySlot('alice', 'myself')
+
+  await assertFails(
+    update('verified', {
+      challengerId: null,
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+  await assertFails(
+    update('verified', {
+      challengerDisplayName: null,
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+  await assertFails(
+    update('verified', {
+      challengerId: null,
+      challengerDisplayName: null,
+      gameDocId: 'some_id',
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+  await assertSucceeds(
+    update('verified', {
+      challengerId: null,
+      challengerDisplayName: null,
+    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+  )
+})
 
 
-/*
-- can update slot as challenger
-- challenger must be verified
-- challenger must be different from creator
-- challenger must be self
-*/
+// STEP 3: Game is created
+
+//
