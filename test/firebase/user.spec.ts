@@ -346,7 +346,7 @@ test('can edit display name after creating user', async () => {
   await setupUser()
     
   await assertSucceeds(
-    update('verified', 'name', 'this is my new name', 'users', MY_ID)
+    update('verified', { 'name': 'this is my new name' }, 'users', MY_ID)
   )
   const user = await get('verified', 'users', MY_ID)
   if (!user.exists()) throw new Error('user not found')
@@ -355,20 +355,20 @@ test('can edit display name after creating user', async () => {
 
 test('cannot edit display name before renameAllowedAt', async () => {
   await setupUser()
-  await update('admin', 'IMMUTABLE.renameAllowedAt', afterSeconds(100), 'users', MY_ID )
+  await update('admin', { 'IMMUTABLE.renameAllowedAt': afterSeconds(100) }, 'users', MY_ID )
     
   await assertFails(
-    update('verified', 'name', 'this is my new name', 'users', MY_ID)
+    update('verified', { 'name': 'this is my new name' }, 'users', MY_ID)
   )
 })
 
 test('can edit display name after renameAllowedAt', async () => {
   await setupUser()
-  await update('admin', 'IMMUTABLE.renameAllowedAt', now(), 'users', MY_ID )
+  await update('admin', { 'IMMUTABLE.renameAllowedAt': now() }, 'users', MY_ID )
   await new Promise(resolve => setTimeout(resolve, 500))
     
   await assertSucceeds(
-    update('verified', 'name', 'this is my new name', 'users', MY_ID)
+    update('verified', { 'name': 'this is my new name' }, 'users', MY_ID)
   )
   const user = await get('verified', 'users', MY_ID)
   if (!user.exists()) throw new Error('user not found')
@@ -379,7 +379,7 @@ test('can edit about field', async () => {
   await setupUser()
     
   await assertSucceeds(
-    update('verified', 'about', 'this is my description', 'users', MY_ID)
+    update('verified', { 'about': 'this is my description' }, 'users', MY_ID)
   )
   const user = await get('verified', 'users', MY_ID)
   if (!user.exists()) throw new Error('user not found')
@@ -390,7 +390,7 @@ test('can edit image', async () => {
   await setupUser()
     
   await assertSucceeds(
-    update('verified', 'profileImg', 'another.png', 'users', MY_ID)
+    update('verified', { 'profileImg': 'another.png' }, 'users', MY_ID)
   )
   const user = await get('verified', 'users', MY_ID)
   if (!user.exists()) throw new Error('user not found')
@@ -402,17 +402,17 @@ test('cannot edit immutable fields', async () => {
   
   // Actual data has not changed, so this should succeed
   await assertSucceeds(
-    update('verified', 'IMMUTABLE.username', 'my_username', 'users', MY_ID)
+    update('verified', { 'IMMUTABLE.username': 'my_username' }, 'users', MY_ID)
   )
   
   await assertFails(
-    update('verified', 'IMMUTABLE.username', 'new_username', 'users', MY_ID)
+    update('verified', { 'IMMUTABLE.username': 'new_username' }, 'users', MY_ID)
   )
   await assertFails(
-    update('verified', 'IMMUTABLE.numWins', 10, 'users', MY_ID)
+    update('verified', { 'IMMUTABLE.numWins': 10 }, 'users', MY_ID)
   )
   await assertFails(
-    update('verified', 'IMMUTABLE.renameAllowedAt', afterSeconds(2), 'users', MY_ID)
+    update('verified', { 'IMMUTABLE.renameAllowedAt': afterSeconds(2) }, 'users', MY_ID)
   )
 })
 
@@ -420,9 +420,13 @@ test('cannot edit immutable private fields', async () => {
   await setupUser()
   
   await assertFails(
-    update('verified', 'IMMUTABLE.email', 'new@mail.com', 'users', MY_ID, 'private', 'doc')
+    update('verified', { 'IMMUTABLE.email': 'new@mail.com' }, 'users', MY_ID, 'private', 'doc')
   )
   await assertFails(
-    update('verified', 'IMMUTABLE.banned', true, 'users', MY_ID, 'private', 'doc')
+    update('verified', { 'IMMUTABLE.banned': true }, 'users', MY_ID, 'private', 'doc')
+  )
+  // Data has not changed, so this should succeed
+  await assertSucceeds(
+    update('verified', { 'IMMUTABLE.banned': false }, 'users', MY_ID, 'private', 'doc')
   )
 })

@@ -11,7 +11,7 @@ import {
   deleteDoc,
   getDocs,
 } from 'firebase/firestore'
-import type { CollectionReference, FieldValue, Query, DocumentData } from '@firebase/firestore-types'
+import type { CollectionReference, FieldValue, Query, DocumentData, UpdateData } from '@firebase/firestore-types'
 import { DocumentSnapshot, QuerySnapshot, WriteBatch, Timestamp, DocumentReference, updateDoc, writeBatch, serverTimestamp } from '@firebase/firestore'
 
 /**
@@ -31,7 +31,7 @@ export type TestUtilsSignature = {
   // Set the data of a document
   set: (authType: AuthType, data: DocumentData, path: string, ...pathSegments: string[]) => Promise<void>
   // Replaces a single field or sub-field ('foo.bar') of the document. Fails if the document does not exist
-  update: (authType: AuthType, field: string, data: unknown, path: string, ...pathSegments: string[]) => Promise<void>
+  update: (authType: AuthType, data: UpdateData, path: string, ...pathSegments: string[]) => Promise<void>
   // Add a new document to a collection
   add: (authType: AuthType, data: DocumentData, path: string, ...pathSegments: string[]) => Promise<DocumentData>
   // Remove a single document
@@ -122,13 +122,13 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
     await setDoc(document, data)
   }
   
-  async function update(authType: AuthType|RulesTestContext, field: string, data: unknown, path: string, ...pathSegments: string[]): Promise<void> {
+  async function update(authType: AuthType|RulesTestContext, data: UpdateData, path: string, ...pathSegments: string[]): Promise<void> {
     if (authType === 'admin') {
-      await testEnv.withSecurityRulesDisabled(context => update(context, field, data, path, ...pathSegments))
+      await testEnv.withSecurityRulesDisabled(context => update(context, data, path, ...pathSegments))
       return
     }
     const document = doc(getAuth(authType), path, ...pathSegments)
-    await updateDoc(document, field, data)
+    await updateDoc(document, data)
   }
   
   async function add(authType: AuthType|RulesTestContext, data: DocumentData, path: string, ...pathSegments: string[]): Promise<DocumentReference> {

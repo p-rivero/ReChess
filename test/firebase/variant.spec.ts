@@ -230,10 +230,10 @@ test('cannot edit variant', async () => {
   await set('admin', variant, 'variants', 'variant_id')
   
   await assertFails(
-    update('verified', 'name', 'New name', 'variants', 'variant_id')
+    update('verified', { name: 'New name' }, 'variants', 'variant_id')
   )
   await assertFails(
-    update('verified', 'description', 'New description', 'variants', 'variant_id')
+    update('verified', { description: 'New description' }, 'variants', 'variant_id')
   )
 })
 
