@@ -119,7 +119,7 @@
             @click="draftStore.backupFile"
           >
             <div class="sz-icon icon-download color-theme" />
-            <span>Back up</span>
+            Back up
           </button>
         </div>
         <div class="column pl-2">
@@ -130,7 +130,7 @@
           >
             <FileDropArea @file-dropped="loadFile" />
             <div class="sz-icon icon-upload color-theme" />
-            <span>Upload</span>
+            Restore
           </button>
         </div>
       </div>
@@ -437,8 +437,9 @@
       harder to find your variant. Consider changing the name.'
     showPopup(
       'Are you sure you want to publish this variant?',
-      'You cannot remove it or edit elements that affect gameplay. However, you are able to change \
-      its name and description.' + nameExistsWarning,
+      'You **cannot edit** or **delete** a variant after it has been published. \n\nMake sure that \
+      all the pieces behave the way you expect and the variant name and description are correct.'
+        + nameExistsWarning,
       'yes-no',
       async () => {
         loading.value = true
