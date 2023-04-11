@@ -69,14 +69,33 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
   ])
 }
 
-export async function setupLobbySlot(set: TestUtilsSignature['set'], creator: GameUser, challenger?: GameUser, gameDocId?: string) {
+export async function setupExtraVariant(set: TestUtilsSignature['set'], variantId: string) {
+  const variant: VariantDoc = {
+    name: 'Extra variant',
+    description: 'Extra variant description',
+    creationTime: serverTimestamp(),
+    creatorDisplayName: 'Alice',
+    creatorId: 'alice_id',
+    numUpvotes: 0,
+    initialState: '{}',
+  }
+  await set('admin', variant, 'variants', variantId)
+}
+
+export async function setupLobbySlot(
+  set: TestUtilsSignature['set'],
+  creator: GameUser,
+  challenger?: GameUser,
+  gameDocId?: string,
+  requestedColor: 'white' | 'black' | 'random' = 'random'
+) {
   const [creatorId, creatorDisplayName] = idAndName(creator)
   const [challengerId, challengerDisplayName] = idAndName(challenger)
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName,
       timeCreated: serverTimestamp(),
-      requestedColor: 'random',
+      requestedColor,
     },
     challengerId,
     challengerDisplayName,
@@ -91,9 +110,10 @@ export async function setupGameDoc(
   black: GameUser,
   requestedColor: 'white' | 'black' | 'random' = 'random',
   variantId = 'variant_id'
-) {
+): Promise<string> {
   const [whiteId, whiteDisplayName] = idAndName(white)
   const [blackId, blackDisplayName] = idAndName(black)
+  const game_id = `game_${whiteId}_${blackId}`
   const game: GameDoc = {
     moveHistory: '',
     playerToMove: 'white',
@@ -109,5 +129,6 @@ export async function setupGameDoc(
       requestedColor,
     },
   }
-  await set('admin', game, 'games', 'game_id')
+  await set('admin', game, 'games', game_id)
+  return game_id
 }
