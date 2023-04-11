@@ -1,90 +1,21 @@
 
-import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from './utils'
-import { setupJest } from './init'
+import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from '../utils'
+import { setupJest } from '../init'
+import * as gtu from './game-test-utils'
 
-import type { LobbySlotDoc, UserDoc, VariantDoc } from '@/firebase/db/schema'
+import type { LobbySlotDoc, VariantDoc } from '@/firebase/db/schema'
 
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
-let { get, query, set, update, add, remove, now, afterSeconds }: TestUtilsSignature = notInitialized()
+let { get, query, set, update, add, now, afterSeconds }: TestUtilsSignature = notInitialized()
 
-setupJest('lobby-tests', env => {
-  ({ get, query, set, update, add, remove, now, afterSeconds } = setupTestUtils(env, MY_ID, MY_EMAIL))
+setupJest('lobby-tests-1', env => {
+  ({ get, query, set, update, add, now, afterSeconds } = setupTestUtils(env, MY_ID, MY_EMAIL))
 })
 
-
-async function setupUsersAndVariant() {
-  const alice: UserDoc = {
-    name: 'Alice',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'alice',
-      numWins: 0,
-      renameAllowedAt: null,
-    },
-  }
-  const bob: UserDoc = {
-    name: 'Bob',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'bob',
-      numWins: 0,
-      renameAllowedAt: null,
-    },
-  }
-  const my_user: UserDoc = {
-    name: 'My name',
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'my_username',
-      numWins: 0,
-      renameAllowedAt: null,
-    },
-  }
-  const variant: VariantDoc = {
-    name: 'My variant',
-    description: 'Variant description',
-    creationTime: now(),
-    creatorDisplayName: 'Alice',
-    creatorId: 'alice_id',
-    numUpvotes: 0,
-    initialState: '{}',
-  }
-  await Promise.all([
-    set('admin', alice, 'users', 'alice_id'),
-    set('admin', bob, 'users', 'bob_id'),
-    set('admin', my_user, 'users', MY_ID),
-    set('admin', variant, 'variants', 'variant_id'),
-  ])
-}
-
-async function setupLobbySlot(creator: 'alice'|'bob'|'myself', challenger: 'alice'|'bob'|'myself'|null = null, gameDocId: string|null = null) {
-  const [creatorId, creatorDisplayName] =
-    creator === 'alice' ? ['alice_id', 'Alice'] :
-    creator === 'bob' ? ['bob_id', 'Bob'] :
-    [MY_ID, 'My name']
-  const [challengerId, challengerDisplayName] =
-    challenger === 'alice' ? ['alice_id', 'Alice'] :
-    challenger === 'bob' ? ['bob_id', 'Bob'] :
-    challenger === 'myself' ? [MY_ID, 'My name'] :
-    [null, null]
-  const slot: LobbySlotDoc = {
-    IMMUTABLE: {
-      creatorDisplayName,
-      timeCreated: now(),
-      requestedColor: 'random',
-    },
-    challengerId,
-    challengerDisplayName,
-    gameDocId,
-  }
-  await set('admin', slot, 'variants', 'variant_id', 'lobby', creatorId)
-}
-
+const setupUsersAndVariant = () => gtu.setupUsersAndVariant(set)
+const setupLobbySlot = (creator: gtu.SlotUser, challenger?: gtu.SlotUser, gameDocId?: string) => gtu.setupLobbySlot(set, creator, challenger, gameDocId)
 
 
 test('anyone can read lobby entries for a variant', async () => {
@@ -551,8 +482,3 @@ test('when leaving must remove all fields', async () => {
     }, 'variants', 'variant_id', 'lobby', 'alice_id')
   )
 })
-
-
-// STEP 3: Game is created
-
-//

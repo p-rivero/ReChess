@@ -1,6 +1,6 @@
 
-import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from './utils'
-import { setupJest } from './init'
+import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from '../utils'
+import { setupJest } from '../init'
 
 import type {
   UsernameDoc,
