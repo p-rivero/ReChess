@@ -13,7 +13,6 @@
       v-for="variant of variantList"
       :key="variant.uid"
       :variant="variant"
-      @play-clicked="playPopup?.show(variant.uid)"
     />
     <div
       v-if="variantList.length === 0"
@@ -25,8 +24,6 @@
       <div class="icon-sad color-theme sz-2 is-flex-shrink-0" />
     </div>
   </div>
-  
-  <PlayPopup ref="playPopup" />
 </template>
 
 <script setup lang="ts">
@@ -35,7 +32,6 @@
   import { useVariantStore } from '@/stores/variant'
   import { useAuthStore } from '@/stores/auth-user'
   import VariantCard from '@/components/Variant/View/VariantCard.vue'
-  import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import { updateTitle } from '@/utils/web-utils'
   import type { PublishedVariant } from '@/protochess/types'
   
@@ -44,7 +40,6 @@
   const route = useRoute()
   const router = useRouter()
   
-  const playPopup = ref<InstanceType<typeof PlayPopup>>()
   const variantList = ref<PublishedVariant[] | 'not fetched'>('not fetched')
   
   // When the route changes, reload the variant list

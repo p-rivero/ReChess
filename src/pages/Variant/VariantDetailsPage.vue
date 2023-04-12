@@ -48,7 +48,7 @@
       <div class="column mt-2 is-5 is-narrow">
         <button
           class="button is-primary is-fullwidth mb-4"
-          @click="playPopup?.show(variant?.uid)"
+          @click="$router.push({ name: 'variant-lobby', params: {variantId: variant?.uid} })"
         >
           <div class="sz-icon icon-knight color-white" />
           Play
@@ -91,7 +91,6 @@
       </div>
     </div>
   </div>
-  <PlayPopup ref="playPopup" />
   <PieceDetailsPopup
     v-if="variant"
     ref="pieceDetailsPopup"
@@ -111,7 +110,6 @@
   import { useUserStore } from '@/stores/user'
   import type { PublishedVariant } from '@/protochess/types'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
-  import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import PieceDetailsPopup from '@/components/Variant/View/PieceDetailsPopup.vue'
   import UpvoteButton from '@/components/Variant/View/UpvoteButton.vue'
   import PiecesSummary from '@/components/Variant/PiecesSummary.vue'
@@ -131,7 +129,6 @@
   
   const variant = ref<PublishedVariant>()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
-  const playPopup = ref<InstanceType<typeof PlayPopup>>()
   const pieceDetailsPopup = ref<InstanceType<typeof PieceDetailsPopup>>()
     
   watchEffect(async () => {
@@ -203,6 +200,7 @@
       const reps = variant.value.globalRules.repetitionsDraw
       r.push(`If you repeat the same position ${nTimes(reps)}, the game is a draw.`)
     }
+    r.push('Click the pieces below to learn how they move.')
     
     return r
   })

@@ -34,7 +34,6 @@
       :matches="searchResult.matches"
       :current-search-score="searchResult.searchScore"
       :order-by="orderBy"
-      @play-clicked="variant => playPopup?.show(variant.uid)"
       @update-score="score => searchResult.sortScore = score"
     />
     <div
@@ -56,11 +55,8 @@
       v-for="(variant, index) of variantStore.variantList"
       :key="index"
       :variant="variant"
-      @play-clicked="playPopup?.show(variant.uid)"
     />
   </div>
-  
-  <PlayPopup ref="playPopup" />
 </template>
 
 <script setup lang="ts">
@@ -73,7 +69,6 @@
   import SearchCard from '@/components/Variant/Search/SearchCard.vue'
   import SearchOrderDropdown from '@/components/Variant/Search/SearchOrderDropdown.vue'
   import { DEFAULT_ORDER } from '@/components/Variant/Search/SearchOrderDropdown.vue'
-  import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { updateTitle } from '@/utils/web-utils'
   import { searchVariants } from '@/utils/chess/variant-search'
@@ -81,7 +76,6 @@
   
   const variantStore = useVariantStore()
   const authStore = useAuthStore()
-  const playPopup = ref<InstanceType<typeof PlayPopup>>()
     
   const searching = ref(false)
   const searchResults = ref<VariantIndexResult[]>([])

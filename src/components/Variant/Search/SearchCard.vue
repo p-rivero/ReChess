@@ -8,7 +8,6 @@
     v-if="loadedVariant"
     :variant="loadedVariant"
     :highlight-matches="matches"
-    @play-clicked="emit('play-clicked', loadedVariant!)"
   />
   <SearchCardPlaceholder
     v-else
@@ -35,7 +34,6 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'play-clicked', variant: PublishedVariant): void
     (event: 'update-score', score: number): void
   }>()
   

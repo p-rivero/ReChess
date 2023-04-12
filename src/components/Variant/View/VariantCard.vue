@@ -49,7 +49,7 @@
       <div class="column">
         <button
           class="button is-fullwidth"
-          @click="emit('play-clicked')"
+          @click="$router.push({ name: 'variant-lobby', params: {variantId: variant.uid} })"
         >
           <div class="sz-icon icon-knight color-theme" />
           Play
@@ -89,10 +89,6 @@
   const props = defineProps<{
     variant: PublishedVariant
     highlightMatches?: {start: number, end: number}[]
-  }>()
-  
-  const emit = defineEmits<{
-    (event: 'play-clicked'): void
   }>()
   
   onMounted(async () => {
