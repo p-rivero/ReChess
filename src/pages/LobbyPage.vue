@@ -1,6 +1,38 @@
 <template>
-  <p class="is-size-2 mb-2 is-break-word">
+  <p class="is-size-2 mb-6 is-break-word">
     Play {{ variant?.displayName }}
+  </p>
+  
+  <p class="is-size-5 mb-2 has-text-weight-semibold">
+    Play offline
+  </p>
+  
+  <div class="field is-grouped is-grouped-multiline mb-5">
+    <button
+      class="button mr-2 mb-2"
+      @click="playPopup?.show(side => router.push({ name: 'play-offline', query: {startAs: side} }))"
+    >
+      <div class="sz-icon icon-cpu color-theme" />
+      Against computer
+    </button>
+    <button
+      class="button"
+      @click="router.push({ name: 'play-offline', query: {mode: 'otb'} })"
+    >
+      <div class="sz-icon icon-people color-theme" />
+      Over the board
+    </button>
+  </div>
+  
+  <p class="is-size-5 mb-2 has-text-weight-semibold">
+    Play online
+  </p>
+  
+  <p class="is-size-5 mb-2 has-text-weight-semibold">
+    Ongoing games
+  </p>
+  <p>
+    TODO
   </p>
   
   <PlayPopup ref="playPopup" />
@@ -26,6 +58,7 @@
   const variant = ref<PublishedVariant>()
   const playPopup = ref<InstanceType<typeof PlayPopup>>()
     
+  // When the route changes, update the variant
   watchEffect(async () => {
     if (!route.params.variantId || typeof route.params.variantId !== 'string') {
       // Variant ID is missing, redirect to home page

@@ -269,6 +269,14 @@
 }
 
 
+/* people.svg */
+.icon-people {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/people.svg");
+  mask-image: url("@/assets/img/icons/people.svg");
+}
+
+
 /* report.svg */
 .icon-report {
   @extend .icon-common;

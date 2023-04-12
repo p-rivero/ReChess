@@ -97,7 +97,7 @@
           <button
             class="button is-fullwidth"
             :disabled="hasError || loading"
-            @click="$router.push({name: 'draft-analysis'})"
+            @click="router.push({name: 'draft-analysis'})"
           >
             <div class="sz-icon icon-analysis color-theme" />
             <span>Analysis board</span>
@@ -107,7 +107,7 @@
           <button
             class="button is-fullwidth"
             :disabled="hasError || loading"
-            @click="playPopup?.show()"
+            @click="playPopup?.show(side => router.push({ name: 'draft-play', query: {startAs: side} }))"
           >
             <div class="sz-icon icon-cpu color-theme" />
             <span>Play vs. engine</span>
@@ -249,7 +249,7 @@
       <PiecesSummary
         :editable="true"
         :state="draftStore.state"
-        @piece-click="pieceIndex => $router.push({ name: 'edit-piece', params: { pieceIndex } })"
+        @piece-click="pieceIndex => router.push({ name: 'edit-piece', params: { pieceIndex } })"
         @delete-click="pieceIndex => deletePiece(pieceIndex)"
         @new-click="createNewPiece"
         @reorder="movePieceType"

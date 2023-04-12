@@ -1,8 +1,9 @@
 <template>
   <BoardWithGui
-    :white="startAs === 'white' ? 'human' : 'engine'"
-    :black="startAs === 'black' ? 'human' : 'engine'"
+    :white="startAs === 'white' ? 'human' : otherPlayer"
+    :black="startAs === 'black' ? 'human' : otherPlayer"
     :has-gauge="false"
+    :invert-enemy-direction="otherPlayer === 'human'"
     @game-over="gameOver"
     @player-changed="newMove"
   />
@@ -18,14 +19,12 @@
   
   const route = useRoute()
   const startAs: Player = chooseColor()
+  const otherPlayer = getOpponent()
   let messageShown = false
   
   // Decide which color to play as, based on the 'startAs' query parameter
   function chooseColor(): Player {
     const DEFAULT_COLOR = 'white'
-    if (!route.query.startAs || typeof route.query.startAs !== 'string') {
-      return DEFAULT_COLOR
-    }
     if (route.query.startAs === 'white' || route.query.startAs === 'black') {
       return route.query.startAs
     }
@@ -34,6 +33,16 @@
     }
     // Invalid value
     return DEFAULT_COLOR
+  }
+  
+  // Get the opponent
+  function getOpponent(): 'human' | 'engine' {
+    if (route.query.mode === 'otb') {
+      return 'human'
+    } else {
+      return 'engine'
+    }
+    // TODO: Add online opponent
   }
   
   function gameOver(flag: MakeMoveFlag, winner: MakeMoveWinner, playerToMove: Player) {

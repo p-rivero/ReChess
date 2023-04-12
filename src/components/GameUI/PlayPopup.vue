@@ -69,17 +69,17 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
   
-  const router = useRouter()
+  type OnSelectCallback = (side: 'white' | 'black' | 'random') => void
+  
   const popup = ref<HTMLElement>()
   const buttonRandom = ref<HTMLButtonElement>()
   // Undefined when playing the stored variant draft
-  let _variantId: string | undefined
+  let onSelect: OnSelectCallback
   
   defineExpose({
-    show(id?: string) {
-      _variantId = id
+    show(callback: OnSelectCallback) {
+      onSelect = callback
       popup.value?.classList.add('is-active')
       document.documentElement.classList.add('is-clipped')
       buttonRandom.value?.focus()
@@ -94,9 +94,7 @@
   
   function play(side: 'white' | 'black' | 'random') {
     closePopup()
-    // Go to play page
-    // TODO: Allow creating lobby slot
-    router.push({ name: 'draft-play', query: { startAs: side } })
+    onSelect?.(side)
   }
   
 </script>

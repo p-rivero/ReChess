@@ -5,7 +5,7 @@
     :class="{ 'is-clickable': $route.name !== 'user-profile' }"
     @click="onAccountClick"
   >
-    <div class="ml-3 mr-2 account-image-container is-align-self-center">
+    <div class="ml-3 mr-2 account-image-container is-align-self-center is-flex-shrink-0">
       <img
         v-if="authStore.loggedUser.profileImg"
         class="h-100 h-100"

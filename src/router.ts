@@ -9,7 +9,8 @@ export type AppRouteNames =
   | 'variant-details'
   | 'variant-lobby'
   | 'variant-analysis'
-  | 'view-game'
+  | 'play-offline'
+  | 'play-online'
   | 'edit-draft'
   | 'edit-piece'
   | 'draft-play'
@@ -47,7 +48,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { title: 'Analysis Board' },
   },
   {
-    name: 'view-game',
+    name: 'play-offline',
+    path: '/variant/:variantId/play',
+    component: () => import('@/pages/PlayPage.vue'),
+  },
+  {
+    name: 'play-online',
     path: '/game/:gameId',
     component: () => import('@/pages/PlayPage.vue'),
   },
