@@ -39,23 +39,23 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'variant-lobby',
     path: '/variant/:variantId/lobby',
-    component: () => import('@/pages/LobbyPage.vue'),
+    component: () => import('@/pages/Game/LobbyPage.vue'),
   },
   {
     name: 'variant-analysis',
     path: '/variant/:variantId/analysis',
-    component: () => import('@/pages/AnalysisPage.vue'),
+    component: () => import('@/pages/Game/AnalysisPage.vue'),
     meta: { title: 'Analysis Board' },
   },
   {
     name: 'play-offline',
     path: '/variant/:variantId/play',
-    component: () => import('@/pages/PlayPage.vue'),
+    component: () => import('@/pages/Game/PlayPage.vue'),
   },
   {
     name: 'play-online',
     path: '/game/:gameId',
-    component: () => import('@/pages/PlayPage.vue'),
+    component: () => import('@/pages/Game/PlayPage.vue'),
   },
   
   
@@ -74,12 +74,12 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'draft-play',
     path: '/draft/play',
-    component: () => import('@/pages/PlayPage.vue'),
+    component: () => import('@/pages/Game/PlayPage.vue'),
   },
   {
     name: 'draft-analysis',
     path: '/draft/analysis',
-    component: () => import('@/pages/AnalysisPage.vue'),
+    component: () => import('@/pages/Game/AnalysisPage.vue'),
     meta: { title: 'Analysis Board' },
   },
   
@@ -87,17 +87,17 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'user-profile',
     path: '/user/:username',
-    component: () => import('@/pages/UserProfilePage.vue'),
+    component: () => import('@/pages/User/UserProfilePage.vue'),
   },
   {
     name: 'user-published-variants',
     path: '/user/:username/variants',
-    component: () => import('@/pages/UserPublishedVariantsPage.vue'),
+    component: () => import('@/pages/User/UserPublishedVariantsPage.vue'),
   },
   {
     name: 'user-upvoted-variants',
     path: '/user/:username/upvoted',
-    component: () => import('@/pages/UserUpvotedVariantsPage.vue'),
+    component: () => import('@/pages/User/UserUpvotedVariantsPage.vue'),
   },
   
   
