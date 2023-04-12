@@ -22,7 +22,7 @@
             :free-mode="true"
             :cursor-pointer="selectedPieceId !== 'none'"
             @clicked="togglePiece"
-            @user-moved="movePiece"
+            @user-moved="refreshFen"
           />
         </div>
       </div>
@@ -37,7 +37,11 @@
           :max="16"
           :default="8"
           :start-value="draftStore.state.boardHeight"
-          @changed="draftStore.setHeight"
+          @changed="h => {
+            board?.getPositionsWhere(p => p[1] >= h).forEach(p => board?.removePiece(p))
+            refreshFen()
+            draftStore.state.boardHeight = h
+          }"
         />
         <div class="field-label-both">
           <label>x</label>
@@ -48,7 +52,11 @@
           :max="16"
           :default="8"
           :start-value="draftStore.state.boardWidth"
-          @changed="draftStore.setWidth"
+          @changed="w => {
+            board?.getPositionsWhere(p => p[0] >= w).forEach(p => board?.removePiece(p))
+            refreshFen()
+            draftStore.state.boardWidth = w
+          }"
         />
       </div>
       
@@ -279,7 +287,6 @@
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { useRouter } from 'vue-router'
   import { importFile } from '@/utils/file-io'
-  import { fenToPlacements, getPieceAt, placementsToFen, removePiecesByIds } from '@/utils/chess/fen'
   
   const draftStore = useVariantDraftStore()
   const authStore = useAuthStore()
@@ -314,11 +321,11 @@
       'Are you sure you want to delete this piece? This cannot be undone.',
       'yes-no',
       () => {
-        const ids = draftStore.state.pieceTypes[pieceIndex].ids
+        const removedIds = draftStore.state.pieceTypes[pieceIndex].ids
         draftStore.state.pieceTypes.splice(pieceIndex, 1)
-        let fen = draftStore.state.fen
-        fen = removePiecesByIds(fen, [ids[0] ?? '', ids[1] ?? ''])
-        draftStore.state.fen = fen
+        board.value?.getPositionsWhere((_, id) => removedIds.includes(id))
+          .forEach(p => board.value?.removePiece(p))
+        refreshFen()
       }
     )
   }
@@ -339,9 +346,9 @@
   function getClickMode(coords: [number, number]): 'add'|'remove' {
     // If selectedPieceId === 'delete', the click mode doesn't matter
     if (selectedPieceId.value === 'wall') {
-      return getPieceAt(draftStore.state.fen, coords) === '*' ? 'remove' : 'add'
+      return board.value?.getPieceAt(coords) === '*' ? 'remove' : 'add'
     } else {
-      return getPieceAt(draftStore.state.fen, coords) === selectedPieceId.value ? 'remove' : 'add'
+      return board.value?.getPieceAt(coords) === selectedPieceId.value ? 'remove' : 'add'
     }
   }
   
@@ -354,16 +361,14 @@
     if (!mode) throw new Error('Mode must be specified')
     // No piece selected, don't interact with board
     if (selectedPieceId.value === 'none') return
-    let placements = fenToPlacements(draftStore.state.fen)
 
-    const placementIndex = placements.findIndex(piece => piece.x === coords[0] && piece.y === coords[1])
-    const pieceId = placementIndex !== -1 ? placements[placementIndex].pieceId : null
+    const pieceId = board.value?.getPieceAt(coords)
     const hasWall = pieceId === '*'
     
     if (selectedPieceId.value === 'delete') {
       // Delete button selected: override click mode and remove all pieces and walls at this square
-      placements = placements.filter(piece => piece.x !== coords[0] || piece.y !== coords[1])
-      draftStore.state.fen = placementsToFen(placements)
+      board.value?.removePiece(coords)
+      refreshFen()
       return
     }
     
@@ -371,38 +376,14 @@
     if (mode === 'remove') {
       // Remove mode: only remove the selected piece (or walls)
       if (pieceId === selectedId) {
-        placements.splice(placementIndex, 1)
+        board.value?.removePiece(coords)
       }
     } else {
       // Add mode: add the selected piece (or walls) only if there's no wall there
       if (hasWall) return
-      if (pieceId) placements.splice(placementIndex, 1)
-      placements.push({
-        x: coords[0],
-        y: coords[1],
-        pieceId: selectedId,
-      })
+      board.value?.addPiece(coords, selectedId)
     }
-    draftStore.state.fen = placementsToFen(placements)
-  }
-  
-  function movePiece(from: [number, number], to: [number, number]) {
-    let placements = fenToPlacements(draftStore.state.fen)
-    // If there's a wall at the destination, don't move the piece
-    if (placements.some(p => p.x === to[0] && p.y === to[1] && p.pieceId === '*')) {
-      updateBoardAndError()
-      return
-    }
-    // If there's a piece at the destination, remove it
-    placements = placements.filter(p => p.x !== to[0] || p.y !== to[1])
-    // Move the piece
-    const pieceIndex = placements.findIndex(p => p.x === from[0] && p.y === from[1])
-    if (pieceIndex === -1) {
-      throw new Error('Could not find piece to move')
-    }
-    placements[pieceIndex].x = to[0]
-    placements[pieceIndex].y = to[1]
-    draftStore.state.fen = placementsToFen(placements)
+    refreshFen()
   }
   
   function clearBoard() {
@@ -466,6 +447,10 @@
   function movePieceType(oldIndex: number, newIndex: number) {
     const piece = draftStore.state.pieceTypes.splice(oldIndex, 1)[0]
     draftStore.state.pieceTypes.splice(newIndex, 0, piece)
+  }
+  
+  function refreshFen() {
+    draftStore.state.fen = board.value?.getFen() ?? ''
   }
 </script>
 

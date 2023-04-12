@@ -8,7 +8,6 @@ import { clone, object_equals } from '@/utils/ts-utils'
 import { parseVariantJson } from '@/utils/chess/variant-json'
 import { VariantDB } from '@/firebase/db'
 import { useAuthStore } from '@/stores/auth-user'
-import { fenToPlacements, placementsToFen } from '@/utils/chess/fen'
 
 export const useVariantDraftStore = defineStore('variant-draft', () => {
   
@@ -34,18 +33,6 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     // Clone the default piece and add it to the list of pieces
     const newPiece = clone(DEFAULT_PIECE)
     state.value.pieceTypes.push(newPiece)
-  }
-  function setWidth(width: number) {
-    state.value.boardWidth = width
-    let placements = fenToPlacements(state.value.fen)
-    placements = placements.filter(piece => piece.x < width)
-    state.value.fen = placementsToFen(placements)
-  }
-  function setHeight(height: number) {
-    state.value.boardHeight = height
-    let placements = fenToPlacements(state.value.fen)
-    placements = placements.filter(piece => piece.y < height)
-    state.value.fen = placementsToFen(placements)
   }
   
   
@@ -106,7 +93,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     state.value = clone(DEFAULT_DRAFT)
   }
 
-  return { state, addPiece, setWidth, setHeight, backupFile, loadFile, publish, nameExists, hasDraft,
+  return { state, addPiece, backupFile, loadFile, publish, nameExists, hasDraft,
     seeCreateHint, hideCreateHint, discardDraft }
 })
 

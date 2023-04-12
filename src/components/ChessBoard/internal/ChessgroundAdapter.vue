@@ -76,6 +76,9 @@
   // Expose a subset of the chessground API to the parent component
   defineExpose({
     setConfig(config: Config){ chessgroundApi?.set(config) },
+    getFen(){ return chessgroundApi?.getFen() },
+    getPieceAtKey(key: cg.Key){ return chessgroundApi?.getPieceAtKey(key) },
+    getKeysWhere(condition: cg.FilterKeys){ return chessgroundApi?.getKeysWhere(condition) },
     toggleOrientation(){ chessgroundApi?.toggleOrientation() },
     movePiece(from: cg.Key, to: cg.Key){ chessgroundApi?.move(from, to) },
     setPieces(diff: cg.PiecesDiff){ chessgroundApi?.setPieces(diff) },

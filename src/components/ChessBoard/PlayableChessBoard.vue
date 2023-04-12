@@ -80,7 +80,7 @@
     },
     
     // Move a piece from one position to another, and optionally promote it
-    makeMove(from: [number, number], to: [number, number], promotion?: {color: Player, id: string}) {
+    makeMove(from: [number, number], to: [number, number], promotion?: string) {
       board.value?.makeMove(from, to, promotion)
     },
     

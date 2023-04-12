@@ -28,7 +28,7 @@
 
 
 <script setup lang="ts">
-  import type { MoveList, MoveInfo, Player, StateDiff, Variant, InitialState } from '@/protochess/types'
+  import type { MoveList, MoveInfo, StateDiff, Variant, InitialState } from '@/protochess/types'
   import type * as cg from 'chessgroundx/types'
   import { positionToKey, keyToPosition } from '@/utils/chess/chess-coords'
   import type { Config } from 'chessgroundx/config'
@@ -148,6 +148,26 @@
       incrementalUpdateConfig(newConfig)
     },
     
+    // Returns the current FEN
+    getFen(): string {
+      return board.value?.getFen() ?? ''
+    },
+    
+    // Returns the piece at the given position
+    getPieceAt(position: [number, number]): string | undefined {
+      const key = positionToKey(position)
+      return board.value?.getPieceAtKey(key)
+    },
+    
+    // Returns the list of positions that meet a given condition
+    getPositionsWhere(condition: (pos: [number, number], id: string) => boolean): [number, number][] {
+      const conditionKey = (key: cg.Key, piece: cg.Piece) => {
+        return condition(keyToPosition(key), mappingReverse(piece))
+      }
+      const keys = board.value?.getKeysWhere(conditionKey) ?? []
+      return keys.map(keyToPosition)
+    },
+    
     // Set the board, but only the parts that can change during a game
     setStateDiff(diff: StateDiff) {
       let newConfig: Config = {}
@@ -176,16 +196,29 @@
     },
     
     // Move a piece from one position to another, and optionally promote it
-    makeMove(from: [number, number], to: [number, number], promotion?: {color: Player, id: string}) {
+    makeMove(from: [number, number], to: [number, number], promotion?: string) {
       const fromKey = positionToKey(from)
       const toKey = positionToKey(to)
       board.value?.movePiece(fromKey, toKey)
       if (promotion !== undefined) {
-        const role = idToRole(promotion.id)
-        const piecesDiff: Map<cg.Key, cg.Piece> = new Map()
-        piecesDiff.set(toKey, { color: promotion.color, role, promoted: true })
-        board.value?.setPieces(piecesDiff)
+        this.addPiece(to, promotion)
       }
+    },
+    
+    // Add a new piece to the board, at a given position
+    addPiece(position: [number, number], pieceId: string) {
+      const key = positionToKey(position)
+      const piecesDiff: cg.PiecesDiff = new Map()
+      piecesDiff.set(key, mappingLookup(pieceId))
+      board.value?.setPieces(piecesDiff)
+    },
+    
+    // Remove a piece from the board, at a given position
+    removePiece(position: [number, number]) {
+      const key = positionToKey(position)
+      const piecesDiff: cg.PiecesDiff = new Map()
+      piecesDiff.set(key, undefined)
+      board.value?.setPieces(piecesDiff)
     },
     
     // Highlight last move
@@ -246,10 +279,6 @@
     },
   })
   
-  function idToRole(id: string): cg.Role {
-    return `${id}-piece` as cg.Role
-  }
-  
   function extractImages(state: Variant): PieceImages {
     const images: PieceImages = {
       white: [],
@@ -288,18 +317,35 @@
   
   // Convert a custom ID to a chessgroundx piece
   function mappingLookup(id: string): cg.Piece {
+    // Wall
+    if (id === '*') return { role: '_-piece', color: 'none' }
+    
     const mapping = currentBoardConfig.mapping ?? { whitePieces: [], blackPieces: [] }
     const whiteIndex = mapping.whitePieces.indexOf(id)
     if (whiteIndex >= 0) {
       const mappedLetter = String.fromCharCode('a'.charCodeAt(0) + whiteIndex)
-      return { color: 'white', role: idToRole(mappedLetter) }
+      return { color: 'white', role: `${mappedLetter}-piece` as cg.Role }
     }
     const blackIndex = mapping.blackPieces.indexOf(id)
     if (blackIndex >= 0) {
       const mappedLetter = String.fromCharCode('a'.charCodeAt(0) + blackIndex)
-      return { color: 'black', role: idToRole(mappedLetter) }
+      return { color: 'black', role: `${mappedLetter}-piece` as cg.Role }
     }
     throw new Error(`Unknown piece id: ${id}`)
+  }
+  // Convert a chessgroundx piece to a custom ID
+  function mappingReverse(piece: cg.Piece): string {
+    // Wall
+    if (piece.role === '_-piece') return '*'
+    
+    const mapping = currentBoardConfig.mapping ?? { whitePieces: [], blackPieces: [] }
+    const index = piece.role.charCodeAt(0) - 'a'.charCodeAt(0)
+    if (piece.color === 'white') {
+      return mapping.whitePieces[index]
+    } else if (piece.color === 'black') {
+      return mapping.blackPieces[index]
+    }
+    throw new Error(`Unknown piece: ${piece}`)
   }
 
 </script>
