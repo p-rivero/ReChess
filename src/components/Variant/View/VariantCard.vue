@@ -6,16 +6,19 @@
     >
       <div
         ref="container"
-        class="board-container"
+        class="board-container is-flex is-align-items-center"
       >
-        <ViewableChessBoard
-          ref="board"
-          :white-pov="true"
-          :view-only="true"
-          :show-coordinates="false"
-          :capture-wheel-events="false"
-          :disable-refresh="true"
-        />
+        <div class="w-100">
+          <ViewableChessBoard
+            ref="board"
+            max-height="20rem"
+            :white-pov="true"
+            :view-only="true"
+            :show-coordinates="false"
+            :capture-wheel-events="false"
+            :disable-refresh="true"
+          />
+        </div>
       </div>
       <div class="mt-3 is-size-5 has-text-weight-semibold is-break-word">
         <HighlightWords
@@ -142,7 +145,5 @@
   }
   .board-container {
     min-height: 7rem;
-    display: flex;
-    align-items: center;
   }
 </style>

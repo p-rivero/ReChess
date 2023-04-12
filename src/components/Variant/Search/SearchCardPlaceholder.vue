@@ -6,6 +6,7 @@
     >
       <ViewableChessBoard
         ref="board"
+        max-height="20rem"
         :white-pov="true"
         :view-only="true"
         :show-coordinates="false"

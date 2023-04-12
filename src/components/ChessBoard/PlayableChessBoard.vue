@@ -7,25 +7,23 @@
 
 
 <template>
-  <!-- Important: The container element must have INLINE style="width: 100%" -->
-  <div
-    ref="container"
-    class="board-container"
-    style="width: 100%"
-  >
-    <ViewableChessBoard
-      ref="board"
-      class="board"
-      :white-pov="whitePov"
-      :view-only="false"
-      :show-coordinates="true"
-      :capture-wheel-events="true"
-      :invert-enemy-direction="invertEnemyDirection"
-      :cursor-pointer="cursorPointer"
-      @user-moved="userMovedCallback"
-      @wheel="onWheel"
-    />
-    <PromotionPopup ref="promotionPopup" />
+  <div class="w-100">
+    <div class="board-container">
+      <ViewableChessBoard
+        ref="board"
+        class="board"
+        max-height="inherit"
+        :white-pov="whitePov"
+        :view-only="false"
+        :show-coordinates="true"
+        :capture-wheel-events="true"
+        :invert-enemy-direction="invertEnemyDirection"
+        :cursor-pointer="cursorPointer"
+        @user-moved="userMovedCallback"
+        @wheel="onWheel"
+      />
+      <PromotionPopup ref="promotionPopup" />
+    </div>
   </div>
 </template>
 
@@ -33,8 +31,7 @@
   import type { MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player, Variant, StateDiff } from '@/protochess/types'
   import { getProtochess } from '@/protochess'
   import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
-  import { remToPx } from '@/utils/web-utils'
-  import { computed, onMounted, onUnmounted, ref } from 'vue'
+  import { computed, ref } from 'vue'
   import ViewableChessBoard from './ViewableChessBoard.vue'
   import PromotionPopup from '@/components/GameUI/PromotionPopup.vue'
   
@@ -58,9 +55,9 @@
   // If both or no players are humans, default to white
   const whitePov = computed(() => props.white == 'human' || props.black != 'human')
   const cursorPointer = ref(false)
+  const aspectRatio = ref(1)
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
-  const container = ref<HTMLElement>()
   const promotionPopup = ref<InstanceType<typeof PromotionPopup>>()
   
   const moveHistory = new MoveHistoryManager(false)
@@ -74,6 +71,7 @@
       
       board.value?.setState(variant)
       board.value?.setStateDiff(stateDiff)
+      aspectRatio.value = variant.boardWidth / variant.boardHeight
       updateMovableSquares(stateDiff)
       
       promotionPopup.value?.initialize(variant)
@@ -123,12 +121,8 @@
       // Choose promotion
       if (!promotionPopup.value) throw new Error('Promotion popup not initialized')
       let promoPromise = promotionPopup.value.pickPromotion(to, possiblePromotions)
-      // Make sure the popup is visible
-      setTimeout(resizeAndRedraw)
       // Wait for the user to choose a promotion
       let promoIndex = await promoPromise
-      // Restore the board to its original size
-      setTimeout(resizeAndRedraw)
       if (promoIndex === undefined) {
         // User cancelled
         await synchronizeBoardState()
@@ -239,38 +233,14 @@
     }
     emit('piece-moved', undefined, undefined, entry.result)
   }
-  
-  // Ensure the entire board is visible on screen (make width smaller if board height is too big)
-  function handleResize() {
-    if (!container.value) return
-    // 4rem for header, 1rem for top padding, 1rem for bottom padding
-    const maxHeight = window.innerHeight - remToPx(6)
-    const currentHeight = container.value.scrollHeight
-    const currentWidthStyle = container.value.style.width
-    // Important: The container element must have inline style="width: 100%"
-    const currentWidthPercent = parseFloat(currentWidthStyle.slice(0, -1))
-    const maxWidthPercent = currentWidthPercent * (maxHeight / currentHeight)
-    container.value.style.width = `${Math.min(100, maxWidthPercent)}%`
-  }
-  onMounted(() => {
-    resizeAndRedraw()
-    window.addEventListener('resize', handleResize)
-  })
-  onUnmounted(() => window.removeEventListener('resize', handleResize))
-  
-  function resizeAndRedraw() {
-    // Might need to resize twice for all elements to be visible
-    handleResize()
-    handleResize()
-    board.value?.redraw()
-  }
-  
 </script>
 
 <style scoped lang="scss">
   .board-container {
     // Needed for promotion popup
     position: relative;
-    // Don't set width 100% here, make sure it's inline
+    margin: auto;
+    aspect-ratio: v-bind(aspectRatio);
+    max-height: calc(100vh - 6rem);
   }
 </style>

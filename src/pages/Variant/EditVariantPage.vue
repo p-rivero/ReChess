@@ -6,20 +6,23 @@
 <template>
   <div class="columns is-desktop reverse-columns">
     <div class="column is-narrow left-column">
-      <div class="is-flex is-justify-content-center mb-4 board-container">
-        <ViewableChessBoard
-          ref="board"
-          style="z-index: 20"
-          :white-pov="true"
-          :view-only="selectedPieceId !== 'none'"
-          :show-coordinates="true"
-          :capture-wheel-events="false"
-          :get-click-mode="getClickMode"
-          :free-mode="true"
-          :cursor-pointer="selectedPieceId !== 'none'"
-          @clicked="togglePiece"
-          @user-moved="movePiece"
-        />
+      <div class="mb-4 board-container is-flex is-align-items-center">
+        <div class="w-100">
+          <ViewableChessBoard
+            ref="board"
+            style="z-index: 20"
+            max-height="30.5rem"
+            :white-pov="true"
+            :view-only="selectedPieceId !== 'none'"
+            :show-coordinates="true"
+            :capture-wheel-events="false"
+            :get-click-mode="getClickMode"
+            :free-mode="true"
+            :cursor-pointer="selectedPieceId !== 'none'"
+            @clicked="togglePiece"
+            @user-moved="movePiece"
+          />
+        </div>
       </div>
       
       <div class="is-flex is-align-items-center mb-4">

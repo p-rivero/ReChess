@@ -10,6 +10,7 @@
   <ChessgroundAdapter
     :key="boardUpdateKey"
     ref="board"
+    :style="{ maxHeight }"
     :width="currentWidth"
     :height="currentHeight"
     :white-pov="whitePov"
@@ -37,6 +38,7 @@
 
   const props = defineProps<{
     whitePov: boolean
+    maxHeight: string
     viewOnly?: boolean
     freeMode?: boolean
     showCoordinates: boolean

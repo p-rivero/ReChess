@@ -6,7 +6,7 @@
 -->
 
 <template>
-  <div class="chessboard w-100 h-100">
+  <div class="chessboard">
     <div
       ref="board"
       class="cg-board-wrap"
@@ -64,15 +64,6 @@
   const DARK_COLOR = '#b58863'
   const backgroundSvg = chessboardSvg(props.width, props.height, LIGHT_COLOR, DARK_COLOR)
   const boardBackground = `url("data:image/svg+xml;utf8,${backgroundSvg}")`
-  
-  const sizePercentPerSquare = 100 / Math.max(props.width, props.height)
-  const componentHeightPercent = props.height * sizePercentPerSquare
-  const componentWidthPercent = props.width * sizePercentPerSquare
-  // Don't compare with 100% because of floating point errors
-  const [wrapWidth, wrapHeight] =
-    (componentWidthPercent > 99.9) ?
-      [100, componentHeightPercent] :
-      [componentWidthPercent, 100]
   
   // Coordinates text colors
   const bottomLeftTextColor = props.height % 2 === 0 ? LIGHT_COLOR : DARK_COLOR
@@ -166,16 +157,14 @@
 <style lang="css">
   
   .chessboard {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    aspect-ratio: v-bind("width / height");
+    margin: auto;
+    max-height: inherit;
   }
 
   .cg-wrap {
-    padding-right: v-bind("`${wrapWidth}%`");
-    padding-bottom: v-bind("`${wrapHeight}%`");
     position: relative;
-    display: block;
+    height: 100%;
   }
   
   cg-board {

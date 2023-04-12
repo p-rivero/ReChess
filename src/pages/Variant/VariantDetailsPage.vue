@@ -81,6 +81,7 @@
           <ViewableChessBoard
             ref="board"
             class="not-clickable"
+            max-height="40rem"
             :white-pov="true"
             :view-only="true"
             :show-coordinates="true"
