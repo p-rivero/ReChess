@@ -21,8 +21,8 @@
       :show-coordinates="true"
       :capture-wheel-events="true"
       :invert-enemy-direction="invertEnemyDirection"
+      :cursor-pointer="cursorPointer"
       @user-moved="userMovedCallback"
-      
       @wheel="onWheel"
     />
     <PromotionPopup ref="promotionPopup" />
@@ -34,7 +34,7 @@
   import { getProtochess } from '@/protochess'
   import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
   import { remToPx } from '@/utils/web-utils'
-  import { onMounted, onUnmounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref } from 'vue'
   import ViewableChessBoard from './ViewableChessBoard.vue'
   import PromotionPopup from '@/components/GameUI/PromotionPopup.vue'
   
@@ -56,7 +56,8 @@
   
   
   // If both or no players are humans, default to white
-  const whitePov = props.white == 'human' || props.black != 'human'
+  const whitePov = computed(() => props.white == 'human' || props.black != 'human')
+  const cursorPointer = ref(false)
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const container = ref<HTMLElement>()
@@ -192,6 +193,7 @@
     const moveWhite = props.white == 'human' && state.playerToMove == 0
     const moveBlack = props.black == 'human' && state.playerToMove == 1
     board.value?.setMovable(moveWhite, moveBlack, moves)
+    cursorPointer.value = moveWhite || moveBlack
     
     const nextPlayer = state.playerToMove == 0 ? props.white : props.black
     if (nextPlayer == 'engine') {
@@ -233,6 +235,7 @@
       updateMovableSquares(stateDiff)
     } else {
       board.value?.setMovable(false, false, [])
+      cursorPointer.value = false
     }
     emit('piece-moved', undefined, undefined, entry.result)
   }

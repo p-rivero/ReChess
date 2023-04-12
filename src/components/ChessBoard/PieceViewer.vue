@@ -1,15 +1,15 @@
 <template>
   <ChessgroundAdapter
     ref="board"
-    :width="props.width"
-    :height="props.height"
+    :width="width"
+    :height="height"
     :white-pov="true"
     :view-only="true"
     :initial-config="boardConfig"
     :piece-images="{white: [['P', image]], black: []}"
     :capture-wheel-events="false"
     :get-click-mode="getClickModeProxy"
-    
+    :cursor-pointer="cursorPointer"
     @clicked="clicked"
   />
 </template>
@@ -29,6 +29,7 @@
     width: number
     height: number
     position: 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+    cursorPointer?: boolean
     getClickMode?: (position: [number, number]) => 'add'|'remove'
   }>()
   

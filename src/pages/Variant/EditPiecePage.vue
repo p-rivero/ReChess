@@ -13,6 +13,7 @@
           ref="board"
           class="mb-5"
           style="z-index: 11;"
+          :cursor-pointer="selectedDelta !== 'none'"
           :piece="piece"
           :get-click-mode="getClickMode"
           @clicked="editDelta"
@@ -548,11 +549,5 @@
   
   .invisible {
     visibility: hidden;
-  }
-</style>
-
-<style>
-  cg-board {
-    cursor: v-bind("selectedDelta === 'none' ? 'default' : 'pointer'");
   }
 </style>

@@ -16,6 +16,7 @@
           :capture-wheel-events="false"
           :get-click-mode="getClickMode"
           :free-mode="true"
+          :cursor-pointer="selectedPieceId !== 'none'"
           @clicked="togglePiece"
           @user-moved="movePiece"
         />
@@ -508,11 +509,5 @@
   
   .width-5rem {
     width: 5rem;
-  }
-</style>
-
-<style>
-  cg-board {
-    cursor: v-bind("selectedPieceId === 'none' ? 'default' : 'pointer'");
   }
 </style>

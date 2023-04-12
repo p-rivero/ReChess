@@ -9,7 +9,7 @@
       :height="height"
       :position="position"
       :get-click-mode="getClickMode"
-      
+      :cursor-pointer="cursorPointer"
       @clicked="(delta, mode) => emit('clicked', delta, mode)"
     />
     
@@ -70,6 +70,7 @@
   
   const props = defineProps<{
     piece: FullPieceDef
+    cursorPointer?: boolean
     getClickMode?: (position: [number, number]) => 'add'|'remove'
   }>()
   const { piece } = toRefs(props)

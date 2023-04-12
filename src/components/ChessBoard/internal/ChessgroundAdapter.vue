@@ -40,6 +40,7 @@
     pieceImages: PieceImages
     captureWheelEvents: boolean
     disableRefresh?: boolean
+    cursorPointer?: boolean
     getClickMode?: (key: cg.Key) => 'add'|'remove'
   }>()
   
@@ -62,9 +63,7 @@
   const LIGHT_COLOR = '#f0d9b5'
   const DARK_COLOR = '#b58863'
   const backgroundSvg = chessboardSvg(props.width, props.height, LIGHT_COLOR, DARK_COLOR)
-  const boardBackground = 'url("data:image/svg+xml;utf8,' + backgroundSvg + '")'
-  const squareWidthPercent = 100 / props.width + '%'
-  const squareHeightPercent = 100 / props.height + '%'
+  const boardBackground = `url("data:image/svg+xml;utf8,${backgroundSvg}")`
   
   const sizePercentPerSquare = 100 / Math.max(props.width, props.height)
   const componentHeightPercent = props.height * sizePercentPerSquare
@@ -72,8 +71,8 @@
   // Don't compare with 100% because of floating point errors
   const [wrapWidth, wrapHeight] =
     (componentWidthPercent > 99.9) ?
-      ['100%', `${componentHeightPercent}%`] :
-      [`${componentWidthPercent}%`, '100%']
+      [100, componentHeightPercent] :
+      [componentWidthPercent, 100]
   
   // Coordinates text colors
   const bottomLeftTextColor = props.height % 2 === 0 ? LIGHT_COLOR : DARK_COLOR
@@ -173,8 +172,8 @@
   }
 
   .cg-wrap {
-    padding-right: v-bind(wrapWidth);
-    padding-bottom: v-bind(wrapHeight);
+    padding-right: v-bind("`${wrapWidth}%`");
+    padding-bottom: v-bind("`${wrapHeight}%`");
     position: relative;
     display: block;
   }
@@ -191,14 +190,14 @@
     user-select: none;
     line-height: 0;
     background-size: cover;
-    cursor: pointer;
+    cursor: v-bind("cursorPointer ? 'pointer' : 'default'");
   }
   cg-board square {
     position: absolute;
     top: 0;
     left: 0;
-    width: v-bind(squareWidthPercent);
-    height: v-bind(squareHeightPercent);
+    width: v-bind("100 / width + '%'");
+    height: v-bind("100 / height + '%'");
     pointer-events: none;
   }
   cg-board square.move-dest {
@@ -237,8 +236,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: v-bind(squareWidthPercent);
-    height: v-bind(squareHeightPercent);
+    width: v-bind("100 / width + '%'");
+    height: v-bind("100 / height + '%'");
     background-size: cover;
     z-index: 2;
     will-change: transform;

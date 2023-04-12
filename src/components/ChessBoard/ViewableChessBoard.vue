@@ -18,6 +18,7 @@
     :capture-wheel-events="captureWheelEvents"
     :get-click-mode="getClickModeProxy"
     :disable-refresh="disableRefresh"
+    :cursor-pointer="cursorPointer"
     
     @clicked="(key, mode) => emit('clicked', keyToPosition(key), mode)"
     @wheel="up => emit('wheel', up)"
@@ -42,6 +43,7 @@
     captureWheelEvents: boolean
     disableRefresh?: boolean
     invertEnemyDirection?: boolean
+    cursorPointer?: boolean
     getClickMode?: (position: [number, number]) => 'add'|'remove'
   }>()
   
