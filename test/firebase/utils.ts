@@ -11,7 +11,7 @@ import {
   deleteDoc,
   getDocs,
 } from 'firebase/firestore'
-import type { CollectionReference, FieldValue, Query, DocumentData, UpdateData } from '@firebase/firestore-types'
+import type { CollectionReference, Query, DocumentData, UpdateData } from '@firebase/firestore-types'
 import { DocumentSnapshot, QuerySnapshot, WriteBatch, Timestamp, DocumentReference, updateDoc, writeBatch, serverTimestamp } from '@firebase/firestore'
 
 /**
@@ -37,7 +37,7 @@ export type TestUtilsSignature = {
   // Remove a single document
   remove: (authType: AuthType, path: string, ...pathSegments: string[]) => Promise<void>
   // Returns the current server timestamp
-  now: () => FieldValue
+  now: () => Timestamp
   // Returns a timestamp that is some seconds in the future
   afterSeconds: (seconds: number) => Timestamp
   // Start a batch write
@@ -153,8 +153,8 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
     await deleteDoc(document)
   }
   
-  function now(): FieldValue {
-    return serverTimestamp()
+  function now(): Timestamp {
+    return serverTimestamp() as Timestamp
   }
   
   function afterSeconds(seconds: number): Timestamp {

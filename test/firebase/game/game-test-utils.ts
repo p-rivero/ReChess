@@ -8,7 +8,7 @@ const MY_ID = 'my_id'
 const VARIANT_DOC: Readonly<VariantDoc> = {
   name: 'My variant',
   description: 'Variant description',
-  creationTime: serverTimestamp(),
+  creationTime: serverTimestamp() as Timestamp,
   creatorDisplayName: 'Alice',
   creatorId: 'alice_id',
   numUpvotes: 0,
@@ -73,7 +73,7 @@ export async function setupExtraVariant(set: TestUtilsSignature['set'], variantI
   const variant: VariantDoc = {
     name: 'Extra variant',
     description: 'Extra variant description',
-    creationTime: serverTimestamp(),
+    creationTime: serverTimestamp() as Timestamp,
     creatorDisplayName: 'Alice',
     creatorId: 'alice_id',
     numUpvotes: 0,
@@ -94,7 +94,7 @@ export async function setupLobbySlot(
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName,
-      timeCreated: serverTimestamp(),
+      timeCreated: serverTimestamp() as Timestamp,
       requestedColor,
     },
     challengerId,

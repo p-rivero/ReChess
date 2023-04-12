@@ -2,7 +2,7 @@ import { db } from '@/firebase'
 import type { UserUpvotesDoc, VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
 import type { Variant } from '@/protochess/types'
 
-import { collection, addDoc, getDoc, doc, getDocs, setDoc, deleteDoc, serverTimestamp, query, where, getCountFromServer, orderBy } from 'firebase/firestore'
+import { collection, addDoc, getDoc, doc, getDocs, setDoc, deleteDoc, serverTimestamp, query, where, getCountFromServer, orderBy, Timestamp } from 'firebase/firestore'
 
 // Attempts to create a new variant in the database and returns the variant ID. Throws an error if the write fails.
 export async function createVariant(userId: string, displayName: string, variant: Variant): Promise<string> {
@@ -11,7 +11,7 @@ export async function createVariant(userId: string, displayName: string, variant
     // May not match the initial state. When fetching the state, the name and description are overwritten with this fields
     name: variant.displayName.trim(),
     description: variant.description,
-    creationTime: serverTimestamp(),
+    creationTime: serverTimestamp() as Timestamp,
     creatorDisplayName: displayName,
     creatorId: userId,
     numUpvotes: 0,
@@ -60,7 +60,9 @@ export async function hasUserUpvoted(userId: string | undefined, variantId: stri
 // Upvotes the variant for the user
 export async function upvoteVariant(userId: string, variantId: string): Promise<void> {
   // Add the user's upvote. A cloud function will increment the variant's upvotes
-  const upvoteDoc: UserUpvotesDoc = { timeUpvoted: serverTimestamp() }
+  const upvoteDoc: UserUpvotesDoc = {
+    timeUpvoted: serverTimestamp() as Timestamp,
+  }
   setDoc(doc(db, 'users', userId, 'upvotedVariants', variantId), upvoteDoc)
 }
 

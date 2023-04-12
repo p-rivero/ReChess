@@ -113,11 +113,10 @@ export const useVariantStore = defineStore('variant', () => {
       console.error('Illegal variant document', doc)
       return undefined
     }
-    const creationTimestamp = doc.creationTime as Timestamp
     const pv: PublishedVariant = {
       ...variant,
       uid: id,
-      creationTime: creationTimestamp.toDate(),
+      creationTime: doc.creationTime.toDate(),
       creatorDisplayName: doc.creatorDisplayName,
       creatorId: doc.creatorId ?? undefined,
       numUpvotes: doc.numUpvotes,

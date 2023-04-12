@@ -1,5 +1,5 @@
 
-import { FieldValue, Timestamp } from 'firebase/firestore'
+import { Timestamp } from 'firebase/firestore'
 
 // WARNING: The Firebase client requires null instead of undefined
 // Use "| null" instead of "?" for optional fields
@@ -33,7 +33,7 @@ export interface UserPrivateDoc {
 
 // users/{userID}/upvotedVariants/{variantId}
 export interface UserUpvotesDoc {
-  timeUpvoted: FieldValue | Timestamp
+  timeUpvoted: Timestamp
 }
 
 
@@ -41,7 +41,7 @@ export interface UserUpvotesDoc {
 export interface VariantDoc {
   name: string
   description: string
-  creationTime: FieldValue | Timestamp
+  creationTime: Timestamp
   creatorDisplayName: string
   creatorId: string | null
   numUpvotes: number
@@ -65,7 +65,7 @@ export interface VariantIndexDoc {
 export interface LobbySlotDoc {
   IMMUTABLE: {
     creatorDisplayName: string
-    timeCreated: FieldValue | Timestamp
+    timeCreated: Timestamp
     requestedColor: 'white' | 'black' | 'random'
   }
   challengerId: string | null
