@@ -7,10 +7,12 @@
   <div class="columns is-desktop reverse-columns">
     <div class="column is-narrow left-column">
       <div class="mb-4 board-container is-flex is-align-items-center">
-        <div class="w-100">
+        <div
+          class="w-100"
+          style="z-index: 20"
+        >
           <ViewableChessBoard
             ref="board"
-            style="z-index: 20"
             max-height="30.5rem"
             :white-pov="true"
             :view-only="selectedPieceId !== 'none'"
@@ -400,6 +402,7 @@
     }
     placements[pieceIndex].x = to[0]
     placements[pieceIndex].y = to[1]
+    draftStore.state.fen = placementsToFen(placements)
   }
   
   function clearBoard() {
