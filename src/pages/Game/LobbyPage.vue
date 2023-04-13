@@ -3,11 +3,11 @@
     Play {{ variant?.displayName }}
   </p>
   
-  <p class="is-size-5 mb-2 has-text-weight-semibold">
+  <p class="is-size-5 mb-3 has-text-weight-semibold">
     Play offline
   </p>
   
-  <div class="field is-grouped is-grouped-multiline mb-5">
+  <div class="field is-grouped is-grouped-multiline">
     <button
       class="button mr-2 mb-2"
       @click="playPopup?.show(side => router.push({ name: 'play-offline', query: {startAs: side} }))"
@@ -24,11 +24,71 @@
     </button>
   </div>
   
-  <p class="is-size-5 mb-2 has-text-weight-semibold">
-    Play online
+  <p class="is-size-5 pt-6 mb-3 has-text-weight-semibold">
+    Online lobby
   </p>
   
-  <p class="is-size-5 mb-2 has-text-weight-semibold">
+  <div
+    v-for="slot of slots"
+    :key="slot.creatorId"
+    class="mx-0 my-5 px-2 py-2 card columns"
+  >
+    <div class="column is-6 is-flex is-align-items-center">
+      <div class="sz-icon icon-user color-theme" />
+      <p class="adjust-text is-break-word">
+        {{ slot.creatorDisplayName }}
+      </p>
+      <div
+        class="pl-3 pr-2 py-2 is-clickable"
+        @click="userClicked(slot.creatorId)"
+      >
+        <div class="sz-icon icon-external-link color-primary-dark" />
+      </div>
+    </div>
+    <div
+      v-if="slot.requestedColor === 'random'"
+      class="column is-3 is-flex is-align-items-center"
+    >
+      <div class="sz-icon icon-dice color-theme" />
+      <p class="adjust-text">
+        Random side
+      </p>
+    </div>
+    <div
+      v-else
+      class="column is-3 is-flex is-align-items-center"
+    >
+      <div class="sz-icon icon-king-big color-theme" />
+      <p class="mr-1 adjust-text">
+        You play as
+        <strong>
+          {{ slot.requestedColor === 'white' ? 'Black' : 'White' }}
+        </strong>
+      </p>
+    </div>
+    <div class="column is-3">
+      <button class="button is-fullwidth is-primary">
+        <div class="sz-icon icon-knight color-white" />
+        Join
+      </button>
+    </div>
+  </div>
+  
+  <div
+    v-if="slots.length === 0"
+    :style="{ visibility: fetched ? 'visible' : 'hidden' }"
+    class="py-2 is-flex is-align-items-center is-justify-content-center"
+  >
+    <div class="sz-2 mr-2 icon-sad color-theme" />
+    There's no one here yet. Be the first to create a game!
+  </div>
+  
+  <button class="button is-primary mt-2">
+    <div class="sz-icon icon-add color-white" />
+    Create a new game
+  </button>
+  
+  <p class="is-size-5 pt-6 mb-3 has-text-weight-semibold">
     Ongoing games
   </p>
   <p>
@@ -40,11 +100,12 @@
 
 
 <script setup lang="ts">
-  import { ref, watchEffect } from 'vue'
+  import { onUnmounted, ref, watchEffect } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   
   import { useVariantStore } from '@/stores/variant'
   import { useUserStore } from '@/stores/user'
+  import { useLobbyStore, type LobbySlot } from '@/stores/lobby'
   import type { PublishedVariant } from '@/protochess/types'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import { updateTitle } from '@/utils/web-utils'
@@ -54,10 +115,13 @@
   const route = useRoute()
   const variantStore = useVariantStore()
   const userStore = useUserStore()
+  const lobbyStore = useLobbyStore()
   
   const variant = ref<PublishedVariant>()
   const playPopup = ref<InstanceType<typeof PlayPopup>>()
-    
+  const slots = ref<LobbySlot[]>([])
+  const fetched = ref(false)
+  
   // When the route changes, update the variant
   watchEffect(async () => {
     if (!route.params.variantId || typeof route.params.variantId !== 'string') {
@@ -76,6 +140,11 @@
     
     variant.value = newVariant
     updateTitle('Play ' + newVariant.displayName)
+    
+    lobbyStore.setUpdateListener(newVariant.uid, s => {
+      slots.value = s
+      fetched.value = true
+    })
   })
   
   async function userClicked(userId: string) {
@@ -84,12 +153,20 @@
     if (!user) {
       throw new Error('Could not find user with id ' + userId)
     }
-    router.push({ name: 'user-profile', params: { username: user.username } })
+    const location = router.resolve({ name: 'user-profile', params: { username: user.username } })
+    // Open the user's profile in a new tab
+    window.open(location.href, '_blank')
   }
+  
+  onUnmounted(() => {
+    lobbyStore.removeUpdateListener()
+  })
   
 </script>
 
 <style scoped lang="scss">
-
+  .adjust-text {
+    margin-top: 0.1rem;
+  }
 
 </style>

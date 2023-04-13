@@ -157,6 +157,14 @@
 }
 
 
+/* dice.svg */
+.icon-dice {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/dice.svg");
+  mask-image: url("@/assets/img/icons/dice.svg");
+}
+
+
 /* download.svg */
 .icon-download {
   @extend .icon-common;
@@ -170,6 +178,14 @@
   @extend .icon-common;
   -webkit-mask-image: url("@/assets/img/icons/edit.svg");
   mask-image: url("@/assets/img/icons/edit.svg");
+}
+
+
+/* external-link.svg */
+.icon-external-link {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/external-link.svg");
+  mask-image: url("@/assets/img/icons/external-link.svg");
 }
 
 
@@ -234,6 +250,14 @@
   @extend .icon-common;
   -webkit-mask-image: url("@/assets/img/icons/key.svg");
   mask-image: url("@/assets/img/icons/key.svg");
+}
+
+
+/* king-big.svg */
+.icon-king-big {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/king-big.svg");
+  mask-image: url("@/assets/img/icons/king-big.svg");
 }
 
 
