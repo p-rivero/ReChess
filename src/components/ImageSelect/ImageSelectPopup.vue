@@ -34,6 +34,7 @@
             class="button is-primary"
             @click="selectFile"
           >
+            <div class="sz-icon icon-upload color-white" />
             Upload image
           </button>
           <button
@@ -44,6 +45,7 @@
               closePopup()
             }"
           >
+            <div class="sz-icon icon-trash color-theme" />
             Delete existing image
           </button>
         </div>
@@ -62,12 +64,14 @@
             class="button is-primary"
             @click="onUploadClick"
           >
+            <div class="sz-icon icon-upload color-white" />
             Upload
           </button>
           <button
             class="button"
             @click="closePopup"
           >
+            <div class="sz-icon icon-cross color-theme" />
             Cancel
           </button>
         </div>
