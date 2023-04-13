@@ -74,7 +74,7 @@
         <button
           v-if="challenger"
           class="button"
-          @click="rejectChallenger"
+          @click="emit('reject-challenger')"
         >
           <div class="sz-icon icon-cross color-theme" />
           Reject
@@ -114,6 +114,9 @@
     challengerJoined(info: ChallengerInfo) {
       challenger.value = info
     },
+    challengerLeft() {
+      challenger.value = undefined
+    },
     hide: closePopup,
   })
   
@@ -140,17 +143,12 @@
     }
   }
   
-  function rejectChallenger() {
-    challenger.value = undefined
-    emit('reject-challenger')
-  }
-  
   
   function capitalizeColor(color: RequestedColor) {
     switch (color) {
     case 'white': return 'as White'
     case 'black': return 'as Black'
-    case 'random': return 'a random color'
+    case 'random': return 'a random side'
     }
   }
   

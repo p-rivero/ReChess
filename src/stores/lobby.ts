@@ -34,9 +34,12 @@ export const useLobbyStore = defineStore('lobby', () => {
   
   // Callbacks
   let unsubscribe = EMPTY_FN
-  let lobbyCreated: (a: RequestedColor) => void = EMPTY_FN
-  let challengerJoined: (info: ChallengerInfo) => void = EMPTY_FN
-  let lobbyDeleted = EMPTY_FN
+  let lobbyCreatedCallback: (a: RequestedColor) => void = EMPTY_FN
+  let challengerJoinedCallback: (info: ChallengerInfo) => void = EMPTY_FN
+  let challengerLeftCallback = EMPTY_FN
+  let joinSlotCallback: (id: string, name: string) => void = EMPTY_FN
+  let leaveslotCallback = EMPTY_FN
+  let lobbyDeletedCallback = EMPTY_FN
   
   // Get real time updates for the slots in a lobby
   function setUpdateListener(variantId: string, callback: LobbyUpdateCallback) {
@@ -59,29 +62,48 @@ export const useLobbyStore = defineStore('lobby', () => {
       // If one of the slots is from the current user, show the waiting popup
       let found = false
       slots.filter(s => s.creatorIsCurrentUser).forEach(s => {
-        lobbyCreated(s.requestedColor)
+        lobbyCreatedCallback(s.requestedColor)
         if (s.challengerId) {
-          challengerJoined({
+          challengerJoinedCallback({
             id: s.challengerId,
             name: s.challengerDisplayName ?? '[error]',
             image: s.challengerImage,
           })
+        } else {
+          challengerLeftCallback()
         }
         found = true
       })
-      if (!found) lobbyDeleted()
+      if (!found) lobbyDeletedCallback()
+      
+      // If the current user is joining a lobby, show the waiting popup
+      found = false
+      slots.filter(s => s.challengerIsCurrentUser).forEach(s => {
+        joinSlotCallback(s.creatorId, s.creatorDisplayName)
+        found = true
+      })
+      if (!found) leaveslotCallback()
     })
     currentId = variantId
   }
   
   function onLobbyCreated(callback: (color:RequestedColor)=>void) {
-    lobbyCreated = callback
+    lobbyCreatedCallback = callback
   }
   function onChallengerJoined(callback: (info: ChallengerInfo)=>void) {
-    challengerJoined = callback
+    challengerJoinedCallback = callback
+  }
+  function onChallengerLeft(callback: ()=>void) {
+    challengerLeftCallback = callback
+  }
+  function onJoinSlot(callback: (id: string, name: string)=>void) {
+    joinSlotCallback = callback
+  }
+  function onLeaveSlot(callback: ()=>void) {
+    leaveslotCallback = callback
   }
   function onLobbyDeleted(callback: ()=>void) {
-    lobbyDeleted = callback
+    lobbyDeletedCallback = callback
   }
   
   // Unsubscribe from lobby updates
@@ -89,9 +111,12 @@ export const useLobbyStore = defineStore('lobby', () => {
     unsubscribe()
     currentId = null
     unsubscribe = EMPTY_FN
-    lobbyCreated = EMPTY_FN
-    challengerJoined = EMPTY_FN
-    lobbyDeleted = EMPTY_FN
+    lobbyCreatedCallback = EMPTY_FN
+    challengerJoinedCallback = EMPTY_FN
+    challengerLeftCallback = EMPTY_FN
+    joinSlotCallback = EMPTY_FN
+    leaveslotCallback = EMPTY_FN
+    lobbyDeletedCallback = EMPTY_FN
   }
   
   function readDocument(docId: string, doc: LobbySlotDoc): LobbySlot {
@@ -157,6 +182,26 @@ export const useLobbyStore = defineStore('lobby', () => {
     await LobbyDB.updateChallenger(variantId, authStore.loggedUser.uid, null, null, null)
   }
   
-  return { setUpdateListener, onLobbyCreated, onChallengerJoined, onLobbyDeleted, removeListeners,
-    createSlot, joinSlot, cancelSlot, acceptChallenger, rejectChallenger }
+  // Leave a lobby (as challenger)
+  async function cancelJoining(variantId: string, creatorId: string) {
+    await LobbyDB.updateChallenger(variantId, creatorId, null, null, null)
+  }
+  
+  return {
+    setUpdateListener,
+    onLobbyCreated,
+    onChallengerJoined,
+    onChallengerLeft,
+    onLobbyDeleted,
+    onJoinSlot,
+    onLeaveSlot,
+    removeListeners,
+    
+    createSlot,
+    joinSlot,
+    cancelSlot,
+    acceptChallenger,
+    rejectChallenger,
+    cancelJoining,
+  }
 })

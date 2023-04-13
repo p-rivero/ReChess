@@ -76,6 +76,10 @@
     @accept-challenger="acceptChallengerClicked"
     @reject-challenger="rejectChallengerClicked"
   />
+  <LobbyJoiningPopup
+    ref="joiningPopup"
+    @cancel="cancelJoiningClicked"
+  />
 </template>
 
 
@@ -94,6 +98,7 @@
   import { updateTitle } from '@/utils/web-utils'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import LobbySlotView from '@/components/Lobby/LobbySlotView.vue'
+  import LobbyJoiningPopup from '@/components/Lobby/LobbyJoiningPopup.vue'
   
 
   const router = useRouter()
@@ -106,6 +111,7 @@
   const variant = ref<PublishedVariant>()
   const playPopup = ref<InstanceType<typeof PlayPopup>>()
   const waitPopup = ref<InstanceType<typeof LobbyWaitingPopup>>()
+  const joiningPopup = ref<InstanceType<typeof LobbyJoiningPopup>>()
   const slots = ref<LobbySlot[]>([])
   const fetched = ref(false)
   
@@ -140,6 +146,15 @@
     })
     lobbyStore.onChallengerJoined(challenger => {
       waitPopup.value?.challengerJoined(challenger)
+    })
+    lobbyStore.onChallengerLeft(() => {
+      waitPopup.value?.challengerLeft()
+    })
+    lobbyStore.onJoinSlot((id, name) => {
+      joiningPopup.value?.show(id, name)
+    })
+    lobbyStore.onLeaveSlot(() => {
+      joiningPopup.value?.hide()
     })
   })
   
@@ -214,6 +229,20 @@
       console.error(e)
       showPopup(
         'Unable to reject',
+        'There has been an unexpected error. Please try again later.',
+        'ok'
+      )
+    }
+  }
+  
+  async function cancelJoiningClicked(creatorId: string) {
+    if (!variant.value) throw new Error('Variant must be set')
+    try {
+      await lobbyStore.cancelJoining(variant.value.uid, creatorId)
+    } catch (e) {
+      console.error(e)
+      showPopup(
+        'Unable to cancel',
         'There has been an unexpected error. Please try again later.',
         'ok'
       )

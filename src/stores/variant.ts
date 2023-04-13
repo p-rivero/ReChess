@@ -6,7 +6,6 @@ import { VariantDB } from '@/firebase/db'
 import { parseVariantJson } from '@/utils/chess/variant-json'
 import type { VariantDoc } from '@/firebase/db/schema'
 import { useAuthStore } from '@/stores/auth-user'
-import type { Timestamp } from '@firebase/firestore'
 
 export const useVariantStore = defineStore('variant', () => {
   
