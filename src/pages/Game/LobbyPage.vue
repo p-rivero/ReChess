@@ -34,92 +34,11 @@
     :key="slot.creatorId"
     class="mx-0 my-5 card columns"
   >
-    <div class="column is-6 is-flex is-align-items-center">
-      <img
-        v-if="slot.creatorImage"
-        class="sz-3 mr-3 image is-rounded"
-        :src="slot.creatorImage"
-        draggable="false"
-        alt="Profile image"
-      >
-      <div
-        v-else
-        class="sz-3 mr-3 icon-user color-theme"
-      />
-      
-      <p class="adjust-text is-break-word is-size-5">
-        {{ slot.creatorDisplayName }}
-      </p>
-      <div
-        class="pl-3 pr-2 py-2 is-clickable"
-        @click="userClicked(slot.creatorId)"
-      >
-        <div class="sz-icon icon-external-link color-primary-dark" />
-      </div>
-    </div>
-    
-    
-    <div
-      v-if="!slot.isFromCurrentUser && slot.requestedColor === 'random'"
-      class="column is-3 is-flex is-align-items-center"
-    >
-      <div class="sz-icon icon-dice color-theme" />
-      <p class="adjust-text">
-        Random side
-      </p>
-    </div>
-    <div
-      v-else-if="!slot.isFromCurrentUser"
-      class="column is-3 is-flex is-align-items-center"
-    >
-      <div class="sz-icon icon-king-big color-theme" />
-      <p class="mr-1 adjust-text">
-        You play as
-        <strong>
-          {{ slot.requestedColor === 'white' ? 'Black' : 'White' }}
-        </strong>
-      </p>
-    </div>
-      
-    <div
-      v-if="!slot.isFromCurrentUser && !slot.challengerId"
-      class="column is-3 is-flex is-align-items-center"
-    >
-      <button
-        class="button is-fullwidth is-primary"
-        @click="joinSlotClicked(slot.creatorId)"
-      >
-        <div class="sz-icon icon-knight color-white" />
-        Join
-      </button>
-    </div>
-    <div
-      v-else-if="!slot.isFromCurrentUser && slot.challengerId === authStore.loggedUser?.uid"
-      class="column is-3 is-flex is-align-items-center"
-    >
-      <button
-        class="button is-fullwidth is-primary"
-        disabled
-      >
-        <div class="sz-icon icon-knight color-white" />
-        Joining...
-      </button>
-    </div>
-    <div
-      v-else-if="!slot.isFromCurrentUser"
-      class="column is-3 is-flex is-align-items-center"
-    >
-      <p class="is-break-word adjust-text">
-        <strong>{{ slot.challengerDisplayName }}</strong> is joining...
-      </p>
-    </div>
-    
-    <div
-      v-if="slot.isFromCurrentUser"
-      class="column is-6 is-flex is-align-items-center is-justify-content-center"
-    >
-      Other players can join your game
-    </div>
+    <LobbySlotView
+      :lobby-slot="slot"
+      @user-clicked="userClicked"
+      @join-slot="joinSlotClicked"
+    />
   </div>
   
   
@@ -170,10 +89,11 @@
   import { useLobbyStore, type LobbySlot } from '@/stores/lobby'
   import type { PublishedVariant } from '@/protochess/types'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
-  import LobbyWaitingPopup from '@/components/GameUI/LobbyWaitingPopup.vue'
+  import LobbyWaitingPopup from '@/components/Lobby/LobbyWaitingPopup.vue'
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { updateTitle } from '@/utils/web-utils'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import LobbySlotView from '@/components/Lobby/LobbySlotView.vue'
   
 
   const router = useRouter()

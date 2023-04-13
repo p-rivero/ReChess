@@ -5,7 +5,9 @@ import type { LobbySlotDoc, RequestedColor } from '@/firebase/db/schema'
 import { useAuthStore } from './auth-user'
 
 export type LobbySlot = {
-  isFromCurrentUser: boolean
+  creatorIsCurrentUser: boolean
+  challengerIsCurrentUser: boolean
+  
   timeCreated: Date
   creatorId: string
   creatorDisplayName: string
@@ -56,7 +58,7 @@ export const useLobbyStore = defineStore('lobby', () => {
       callback(slots)
       // If one of the slots is from the current user, show the waiting popup
       let found = false
-      slots.filter(s => s.isFromCurrentUser).forEach(s => {
+      slots.filter(s => s.creatorIsCurrentUser).forEach(s => {
         lobbyCreated(s.requestedColor)
         if (s.challengerId) {
           challengerJoined({
@@ -96,8 +98,10 @@ export const useLobbyStore = defineStore('lobby', () => {
     const timeCreated = doc.IMMUTABLE.timeCreated instanceof Timestamp ?
       doc.IMMUTABLE.timeCreated.toDate() :
       new Date()
+    const hasChallenger = !!doc.challengerId
     return {
-      isFromCurrentUser: docId === authStore.loggedUser?.uid,
+      creatorIsCurrentUser: docId === authStore.loggedUser?.uid,
+      challengerIsCurrentUser: hasChallenger && (doc.challengerId === authStore.loggedUser?.uid),
       timeCreated: timeCreated,
       creatorId: docId,
       creatorDisplayName: doc.IMMUTABLE.creatorDisplayName,
