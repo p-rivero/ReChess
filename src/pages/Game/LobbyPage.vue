@@ -76,7 +76,7 @@
     >
       <button
         class="button is-fullwidth is-primary"
-        @click="joinSlotClicked"
+        @click="joinSlotClicked(slot.creatorId)"
       >
         <div class="sz-icon icon-knight color-white" />
         Join
@@ -97,8 +97,10 @@
     :style="{ visibility: fetched ? 'visible' : 'hidden' }"
     class="py-2 is-flex is-align-items-center is-justify-content-center"
   >
-    <div class="sz-2 mr-2 icon-sad color-theme" />
-    There's no one here yet. Be the first to create a game!
+    <div class="sz-2 mr-2 icon-cactus color-theme" />
+    <p class="adjust-text">
+      There's no one here yet. Be the first to create a game!
+    </p>
   </div>
   
   <button
@@ -120,7 +122,9 @@
   <PlayPopup ref="playPopup" />
   <LobbyWaitingPopup
     ref="waitPopup"
-    @cancel="lobbyStore.cancelSlot(variant!.uid)"
+    @cancel="cancelGameClicked"
+    @accept-challenger="acceptChallengerClicked"
+    @reject-challenger="rejectChallengerClicked"
   />
 </template>
 
@@ -138,6 +142,7 @@
   import LobbyWaitingPopup from '@/components/GameUI/LobbyWaitingPopup.vue'
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { updateTitle } from '@/utils/web-utils'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
   
 
   const router = useRouter()
@@ -182,6 +187,9 @@
     lobbyStore.onLobbyDeleted(() => {
       waitPopup.value?.hide()
     })
+    lobbyStore.onChallengerJoined((id, name) => {
+      waitPopup.value?.challengerJoined(id, name)
+    })
   })
   
   onUnmounted(() => {
@@ -194,19 +202,71 @@
       requestSignIn()
       return
     }
-    const currentVariant = variant.value
-    if (!currentVariant) {
-      throw new Error('Variant must be set')
-    }
-    playPopup.value?.show(side => lobbyStore.createSlot(currentVariant.uid, side))
+    playPopup.value?.show(async side => {
+      if (!variant.value) throw new Error('Variant must be set')
+      // When the user selects a side, try to create the slot
+      try {
+        await lobbyStore.createSlot(variant.value.uid, side)
+      } catch (e) {
+        console.error(e)
+        showPopup(
+          'Unable to create game',
+          'There has been an unexpected error while creating the game. Please try again later.',
+          'ok'
+        )
+      }
+    })
   }
   
-  async function joinSlotClicked() {
+  async function joinSlotClicked(id: string) {
     if (!authStore.loggedUser) {
       requestSignIn()
       return
     }
+    if (!variant.value) throw new Error('Variant must be set')
+    try {
+      await lobbyStore.joinSlot(variant.value.uid, id)
+    } catch (e) {
+      console.error(e)
+      showPopup(
+        'Unable to join game',
+        'There has been an unexpected error while joining the game. Please try again later.',
+        'ok'
+      )
+    }
+  }
+  
+  async function cancelGameClicked() {
+    if (!variant.value) throw new Error('Variant must be set')
+    try {
+      await lobbyStore.cancelSlot(variant.value.uid)
+    } catch (e) {
+      console.error(e)
+      showPopup(
+        'Unable to cancel game',
+        'There has been an unexpected error while canceling the game. Please try again later.',
+        'ok'
+      )
+    }
+  }
+  
+  async function acceptChallengerClicked(id: string) {
+    console.log('Accepting challenger', id)
     // TODO
+  }
+  
+  async function rejectChallengerClicked() {
+    if (!variant.value) throw new Error('Variant must be set')
+    try {
+      await lobbyStore.rejectChallenger(variant.value.uid)
+    } catch (e) {
+      console.error(e)
+      showPopup(
+        'Unable to reject',
+        'There has been an unexpected error. Please try again later.',
+        'ok'
+      )
+    }
   }
   
   async function userClicked(userId: string) {

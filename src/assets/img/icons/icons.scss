@@ -117,6 +117,14 @@
 }
 
 
+/* cactus.svg */
+.icon-cactus {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/cactus.svg");
+  mask-image: url("@/assets/img/icons/cactus.svg");
+}
+
+
 /* check.svg */
 .icon-check {
   @extend .icon-common;
