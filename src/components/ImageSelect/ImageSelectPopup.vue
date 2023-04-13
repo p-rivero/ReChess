@@ -101,7 +101,7 @@
   const props = defineProps<{
     showDeleteButton: () => boolean
     uploadedImageWidth: number
-    cache: CacheHeader
+    cache?: CacheHeader
   }>()
   
   defineExpose({
@@ -141,7 +141,7 @@
   }
   
   async function onUploadClick() {
-    const blobUrl = await imageCrop.value?.getCroppedPng()
+    const blobUrl = await imageCrop.value?.getCroppedImage()
     if (!blobUrl) {
       throw new Error('Could not get cropped image')
     }

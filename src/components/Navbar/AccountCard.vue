@@ -8,7 +8,7 @@
     <div class="ml-3 mr-2 account-image-container is-align-self-center is-flex-shrink-0">
       <img
         v-if="authStore.loggedUser.profileImg"
-        class="h-100 h-100"
+        class="h-100 h-100 image is-rounded"
         :src="authStore.loggedUser.profileImg"
         draggable="false"
         alt="Profile image"
@@ -59,7 +59,6 @@
     height: 1.8rem;
     width: 1.8rem;
     img {
-      border-radius: 50%;
       max-height: 1.8rem;
       object-fit: cover;
     }

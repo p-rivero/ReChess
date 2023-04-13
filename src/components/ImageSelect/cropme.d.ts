@@ -58,7 +58,7 @@ declare module 'cropme' {
     type?: CropmeOutputType
     width?: Integer
     scale?: number // If scale is set, width will be ignored
-    mimetype?: string
+    mimetype?: `image/${'jpeg' | 'png' | 'webp'}`
     quality?: number // Between 0 and 1, works only with image/jpeg or image/webp
   }
   

@@ -39,10 +39,6 @@
   import { ref, toRefs } from 'vue'
   import { autoCropSvg, autoCropImage } from '@/utils/image-crop'
   
-  // Cache is public because averyone can see all piece images. Since the file name is based
-  // on the SHA-256 hash, we can cache it forever because we are not expecting hash collisions.
-  const PIECE_IMG_CACHE = 'public, max-age=31536000, immutable'
-  
   // Piece images go in their own bucket so that that we can run the
   // checkPieceHash cloud function only when needed
   const PIECE_IMG_BUCKET = 'piece-images'
@@ -93,7 +89,7 @@
         return
       }
       // Otherwise, upload the image
-      await uploadBlob(file, PIECE_IMG_BUCKET, filePath, PIECE_IMG_CACHE)
+      await uploadBlob(file, PIECE_IMG_BUCKET, filePath)
       const url = await getUrl(PIECE_IMG_BUCKET, filePath)
       if (!url) throw new Error('Failed to get URL for image that was just uploaded')
       emit('image-changed', url)

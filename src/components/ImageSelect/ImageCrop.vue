@@ -35,7 +35,7 @@
   
   defineExpose({
     setBlob: (blob: Blob) => cropme?.bind(blob),
-    getCroppedPng: () => cropme?.cropPng(props.outputImageWidth),
+    getCroppedImage: () => cropme?.cropImage(props.outputImageWidth),
   })
 </script>
 

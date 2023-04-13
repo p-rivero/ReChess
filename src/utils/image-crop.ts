@@ -82,7 +82,7 @@ export async function autoCropImage(image: Blob, resizeWidth: number, cropWhite 
   croppedCtx.imageSmoothingQuality = 'high'
   croppedCtx.drawImage(ctx.canvas, box.x, box.y, box.size, box.size, 0, 0, resizeWidth, resizeWidth)
   
-  // Return the trimmed image as WebP blob
+  // Return the trimmed image as WebP blob (quality 0.8)
   return new Promise(resolve => {
     croppedCanvas.toBlob(b => {
       if (!b) {
@@ -91,7 +91,7 @@ export async function autoCropImage(image: Blob, resizeWidth: number, cropWhite 
         return
       }
       resolve(b)
-    }, 'image/webp')
+    }, 'image/webp', 0.8)
   })
 }
 

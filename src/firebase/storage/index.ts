@@ -7,6 +7,8 @@ import { FirebaseError } from '@firebase/util'
 
 export type CacheHeader = `${'public' | 'private'}, max-age=${number}${', immutable' | ''}`
 
+const DEFAULT_CACHE: CacheHeader = 'public, max-age=31536000, immutable'
+
 export type Bucket = 'default' | 'piece-images'
 
 /**
@@ -15,10 +17,14 @@ export type Bucket = 'default' | 'piece-images'
  * @param {Blob} file The file to upload
  * @param {string} filePath The path to upload the file to
  * @param {CacheHeader} cache The cache header to set on the file.
- * For example: `public, max-age=31536000` (publicly readable file, cached for 1 year)
+ * By default: `public, max-age=31536000, immutable` (publicly readable file, cached for 1 year).
+ *
+ * Unless you need the cache to be private, you should not change this. The download URI contains
+ * an access token that depends on the file contents, so we can cache indefinitely and re-download
+ * as soon as the file changes.
  * @throws {Error} If the user is not logged in or if the upload fails
  */
-export async function uploadBlob(file: Blob, bucket: Bucket, filePath: string, cache: CacheHeader): Promise<UploadResult> {
+export async function uploadBlob(file: Blob, bucket: Bucket, filePath: string, cache = DEFAULT_CACHE): Promise<UploadResult> {
   const authStore = useAuthStore()
   const storage = getStorageRef(bucket)
   const user = authStore.loggedUser

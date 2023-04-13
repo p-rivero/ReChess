@@ -44,9 +44,10 @@ export class CircleCropme {
     })
   }
   
-  cropPng(width: number) {
+  cropImage(width: number) {
     return this.cropme.crop({
       type: 'blob',
+      mimetype: 'image/webp',
       width,
     })
   }
