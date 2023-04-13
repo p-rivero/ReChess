@@ -1,5 +1,5 @@
 import { serverTimestamp } from 'firebase/firestore'
-import type { GameDoc, LobbySlotDoc, UserDoc, VariantDoc } from '@/firebase/db/schema'
+import type { RequestedColor, GameDoc, LobbySlotDoc, UserDoc, VariantDoc } from '@/firebase/db/schema'
 import type { TestUtilsSignature } from '../utils'
 import type { Timestamp } from 'firebase/firestore'
 
@@ -87,7 +87,7 @@ export async function setupLobbySlot(
   creator: GameUser,
   challenger?: GameUser,
   gameDocId?: string,
-  requestedColor: 'white' | 'black' | 'random' = 'random'
+  requestedColor: RequestedColor = 'random'
 ) {
   const [creatorId, creatorDisplayName] = idAndName(creator)
   const [challengerId, challengerDisplayName] = idAndName(challenger)
@@ -108,7 +108,7 @@ export async function setupGameDoc(
   set: TestUtilsSignature['set'],
   white: GameUser,
   black: GameUser,
-  requestedColor: 'white' | 'black' | 'random' = 'random',
+  requestedColor: RequestedColor = 'random',
   variantId = 'variant_id'
 ): Promise<string> {
   const [whiteId, whiteDisplayName] = idAndName(white)

@@ -5,6 +5,8 @@ import { Timestamp } from 'firebase/firestore'
 // Use "| null" instead of "?" for optional fields
 
 
+export type RequestedColor = 'white' | 'black' | 'random'
+
 // usernames/{username}
 export interface UsernameDoc {
   userId: string
@@ -66,7 +68,7 @@ export interface LobbySlotDoc {
   IMMUTABLE: {
     creatorDisplayName: string
     timeCreated: Timestamp
-    requestedColor: 'white' | 'black' | 'random'
+    requestedColor: RequestedColor
   }
   challengerId: string | null
   challengerDisplayName: string | null
@@ -91,7 +93,7 @@ export interface GameDoc {
     blackDisplayName: string
     blackId: string | null
     // For the challenger to check if the creator is lying about the requested color
-    requestedColor: 'white' | 'black' | 'random'
+    requestedColor: RequestedColor
   }
 }
 

@@ -68,9 +68,10 @@
 
 
 <script setup lang="ts">
+  import type { RequestedColor } from '@/firebase/db/schema'
   import { ref } from 'vue'
   
-  type OnSelectCallback = (side: 'white' | 'black' | 'random') => void
+  type OnSelectCallback = (side: RequestedColor) => void
   
   const popup = ref<HTMLElement>()
   const buttonRandom = ref<HTMLButtonElement>()
@@ -92,7 +93,7 @@
     document.documentElement.classList.remove('is-clipped')
   }
   
-  function play(side: 'white' | 'black' | 'random') {
+  function play(side: RequestedColor) {
     closePopup()
     onSelect?.(side)
   }
