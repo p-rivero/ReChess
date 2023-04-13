@@ -45,10 +45,10 @@
           >
           <div
             v-else
-            class="sz-3 mr-2 icon-user color-theme"
+            class="sz-3 mr-2 icon-user color-theme is-flex-shrink-0"
           />
           
-          <p class="is-size-4">
+          <p class="is-size-4 is-break-word">
             <strong>{{ challenger.name }}</strong> wants to join
           </p>
         </div>

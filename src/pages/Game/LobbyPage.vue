@@ -82,8 +82,8 @@
     </div>
       
     <div
-      v-if="!slot.isFromCurrentUser"
-      class="column is-3"
+      v-if="!slot.isFromCurrentUser && !slot.challengerId"
+      class="column is-3 is-flex is-align-items-center"
     >
       <button
         class="button is-fullwidth is-primary"
@@ -93,9 +93,29 @@
         Join
       </button>
     </div>
+    <div
+      v-else-if="!slot.isFromCurrentUser && slot.challengerId === authStore.loggedUser?.uid"
+      class="column is-3 is-flex is-align-items-center"
+    >
+      <button
+        class="button is-fullwidth is-primary"
+        disabled
+      >
+        <div class="sz-icon icon-knight color-white" />
+        Joining...
+      </button>
+    </div>
+    <div
+      v-else-if="!slot.isFromCurrentUser"
+      class="column is-3 is-flex is-align-items-center"
+    >
+      <p class="is-break-word adjust-text">
+        <strong>{{ slot.challengerDisplayName }}</strong> is joining...
+      </p>
+    </div>
     
     <div
-      v-else
+      v-if="slot.isFromCurrentUser"
       class="column is-6 is-flex is-align-items-center is-justify-content-center"
     >
       Other players can join your game

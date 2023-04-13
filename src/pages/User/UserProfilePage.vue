@@ -90,7 +90,7 @@
         </div>
       </div>
       
-      <div class="field is-grouped is-grouped-multiline mb-2">
+      <div class="field is-grouped is-grouped-multiline mb-5">
         <button
           class="button mr-4 mb-1"
           @click="router.push({ name: 'user-published-variants', params: { username: user?.username } })"
