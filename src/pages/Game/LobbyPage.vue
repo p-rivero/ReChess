@@ -24,6 +24,7 @@
     </button>
   </div>
   
+  
   <p class="is-size-5 pt-6 mb-3 has-text-weight-semibold">
     Online lobby
   </p>
@@ -45,8 +46,10 @@
         <div class="sz-icon icon-external-link color-primary-dark" />
       </div>
     </div>
+    
+    
     <div
-      v-if="slot.requestedColor === 'random'"
+      v-if="!slot.isFromCurrentUser && slot.requestedColor === 'random'"
       class="column is-3 is-flex is-align-items-center"
     >
       <div class="sz-icon icon-dice color-theme" />
@@ -55,7 +58,7 @@
       </p>
     </div>
     <div
-      v-else
+      v-else-if="!slot.isFromCurrentUser"
       class="column is-3 is-flex is-align-items-center"
     >
       <div class="sz-icon icon-king-big color-theme" />
@@ -66,13 +69,28 @@
         </strong>
       </p>
     </div>
-    <div class="column is-3">
-      <button class="button is-fullwidth is-primary">
+      
+    <div
+      v-if="!slot.isFromCurrentUser"
+      class="column is-3"
+    >
+      <button
+        class="button is-fullwidth is-primary"
+        @click="joinSlotClicked"
+      >
         <div class="sz-icon icon-knight color-white" />
         Join
       </button>
     </div>
+    
+    <div
+      v-else
+      class="column is-6 is-flex is-align-items-center is-justify-content-center"
+    >
+      Other players can join your game
+    </div>
   </div>
+  
   
   <div
     v-if="slots.length === 0"
@@ -83,10 +101,14 @@
     There's no one here yet. Be the first to create a game!
   </div>
   
-  <button class="button is-primary mt-2">
+  <button
+    class="button is-primary mt-2"
+    @click="createGameClicked"
+  >
     <div class="sz-icon icon-add color-white" />
     Create a new game
   </button>
+  
   
   <p class="is-size-5 pt-6 mb-3 has-text-weight-semibold">
     Ongoing games
@@ -96,6 +118,10 @@
   </p>
   
   <PlayPopup ref="playPopup" />
+  <LobbyWaitingPopup
+    ref="waitPopup"
+    @cancel="lobbyStore.cancelSlot(variant!.uid)"
+  />
 </template>
 
 
@@ -105,20 +131,25 @@
   
   import { useVariantStore } from '@/stores/variant'
   import { useUserStore } from '@/stores/user'
+  import { useAuthStore } from '@/stores/auth-user'
   import { useLobbyStore, type LobbySlot } from '@/stores/lobby'
   import type { PublishedVariant } from '@/protochess/types'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
+  import LobbyWaitingPopup from '@/components/GameUI/LobbyWaitingPopup.vue'
+  import { requestSignIn } from '@/components/Auth/auth-manager'
   import { updateTitle } from '@/utils/web-utils'
   
 
   const router = useRouter()
   const route = useRoute()
   const variantStore = useVariantStore()
+  const authStore = useAuthStore()
   const userStore = useUserStore()
   const lobbyStore = useLobbyStore()
   
   const variant = ref<PublishedVariant>()
   const playPopup = ref<InstanceType<typeof PlayPopup>>()
+  const waitPopup = ref<InstanceType<typeof LobbyWaitingPopup>>()
   const slots = ref<LobbySlot[]>([])
   const fetched = ref(false)
   
@@ -145,7 +176,38 @@
       slots.value = s
       fetched.value = true
     })
+    lobbyStore.onLobbyCreated(color => {
+      waitPopup.value?.show(color)
+    })
+    lobbyStore.onLobbyDeleted(() => {
+      waitPopup.value?.hide()
+    })
   })
+  
+  onUnmounted(() => {
+    lobbyStore.removeListeners()
+  })
+  
+  
+  async function createGameClicked() {
+    if (!authStore.loggedUser) {
+      requestSignIn()
+      return
+    }
+    const currentVariant = variant.value
+    if (!currentVariant) {
+      throw new Error('Variant must be set')
+    }
+    playPopup.value?.show(side => lobbyStore.createSlot(currentVariant.uid, side))
+  }
+  
+  async function joinSlotClicked() {
+    if (!authStore.loggedUser) {
+      requestSignIn()
+      return
+    }
+    // TODO
+  }
   
   async function userClicked(userId: string) {
     // Get the username of the creator
@@ -158,15 +220,4 @@
     window.open(location.href, '_blank')
   }
   
-  onUnmounted(() => {
-    lobbyStore.removeUpdateListener()
-  })
-  
 </script>
-
-<style scoped lang="scss">
-  .adjust-text {
-    margin-top: 0.1rem;
-  }
-
-</style>

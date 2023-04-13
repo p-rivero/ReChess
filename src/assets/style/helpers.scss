@@ -52,6 +52,11 @@
     display: flex;
 }
 
+// Move text slightly down to align with icons
+.adjust-text {
+    margin-top: 0.1rem;
+}
+
 .content ul {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
