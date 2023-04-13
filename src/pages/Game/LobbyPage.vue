@@ -32,11 +32,22 @@
   <div
     v-for="slot of slots"
     :key="slot.creatorId"
-    class="mx-0 my-5 px-2 py-2 card columns"
+    class="mx-0 my-5 card columns"
   >
     <div class="column is-6 is-flex is-align-items-center">
-      <div class="sz-icon icon-user color-theme" />
-      <p class="adjust-text is-break-word">
+      <img
+        v-if="slot.creatorImage"
+        class="sz-3 mr-3 image is-rounded"
+        :src="slot.creatorImage"
+        draggable="false"
+        alt="Profile image"
+      >
+      <div
+        v-else
+        class="sz-3 mr-3 icon-user color-theme"
+      />
+      
+      <p class="adjust-text is-break-word is-size-5">
         {{ slot.creatorDisplayName }}
       </p>
       <div
@@ -187,8 +198,8 @@
     lobbyStore.onLobbyDeleted(() => {
       waitPopup.value?.hide()
     })
-    lobbyStore.onChallengerJoined((id, name) => {
-      waitPopup.value?.challengerJoined(id, name)
+    lobbyStore.onChallengerJoined(challenger => {
+      waitPopup.value?.challengerJoined(challenger)
     })
   })
   

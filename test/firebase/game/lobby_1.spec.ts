@@ -27,6 +27,7 @@ test('anyone can read lobby entries for a variant', async () => {
   expect(snapshot.data().IMMUTABLE.creatorDisplayName).toBe('Alice')
   expect(snapshot.data().challengerId).toBe('bob_id')
   expect(snapshot.data().challengerDisplayName).toBe('Bob')
+  expect(snapshot.data().challengerImageUrl).toBe('http://example.com/bob.jpg')
   
   const queryResult = await query('not logged', 'variants/variant_id/lobby')
   expect(queryResult.size).toBe(1)
@@ -44,11 +45,13 @@ test('can create lobby slot', async () => {
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
     },
     challengerId: null,
     challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: null,
   }
   await assertSucceeds(
@@ -62,11 +65,13 @@ test('cannot create lobby slot if not authenticated', async () => {
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
     },
     challengerId: null,
     challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: null,
   }
   await assertFails(
@@ -86,11 +91,13 @@ test('cannot create lobby slot for a variant that does not exist', async () => {
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
     },
     challengerId: null,
     challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: null,
   }
   await assertFails(
@@ -105,11 +112,13 @@ test('cannot create 2 entries for the same variant', async () => {
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
     },
     challengerId: null,
     challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: null,
   }
   await assertFails(
@@ -127,11 +136,13 @@ test('can create 2 entries for different variants', async () => {
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
     },
     challengerId: null,
     challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: null,
   }
   await assertSucceeds(
@@ -149,11 +160,13 @@ test('2 creators can create entries for the same variant', async () => {
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
     },
     challengerId: null,
     challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: null,
   }
   await assertSucceeds(
@@ -167,11 +180,13 @@ test('cannot create slot with challenger already set', async () => {
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
     },
     challengerId: 'alice_id',
     challengerDisplayName: 'Alice',
+    challengerImageUrl: 'http://example.com/alice.jpg',
     gameDocId: null,
   }
   await assertFails(
@@ -179,6 +194,7 @@ test('cannot create slot with challenger already set', async () => {
   )
   slot.challengerId = null
   slot.challengerDisplayName = null
+  slot.challengerImageUrl = null
   await assertSucceeds(
     set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
   )
@@ -190,11 +206,13 @@ test('cannot create slot with game id already set', async () => {
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
     },
     challengerId: null,
     challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: 'game_id',
   }
   await assertFails(
@@ -212,11 +230,13 @@ test('creator display name must be correct', async () => {
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'NOT My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'random',
     },
     challengerId: null,
     challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: null,
   }
   await assertFails(
@@ -228,17 +248,43 @@ test('creator display name must be correct', async () => {
   )
 })
 
+test('creator profile image must be correct', async () => {
+  await setupUsersAndVariant(set)
+  
+  const slot: LobbySlotDoc = {
+    IMMUTABLE: {
+      creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/ANOTHER_PERSON.jpg',
+      timeCreated: now(),
+      requestedColor: 'random',
+    },
+    challengerId: null,
+    challengerDisplayName: null,
+    challengerImageUrl: null,
+    gameDocId: null,
+  }
+  await assertFails(
+    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+  )
+  slot.IMMUTABLE.creatorImageUrl = 'http://example.com/myself.jpg'
+  await assertSucceeds(
+    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+  )
+})
+
 test('time created must be correct', async () => {
   await setupUsersAndVariant(set)
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: afterSeconds(123),
       requestedColor: 'black',
     },
     challengerId: null,
     challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: null,
   }
   await assertFails(
@@ -256,11 +302,13 @@ test('requested color must be correct', async () => {
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName: 'My name',
+      creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'wrong_color' as 'white',
     },
     challengerId: null,
     challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: null,
   }
   await assertFails(

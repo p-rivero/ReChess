@@ -67,11 +67,13 @@ export interface VariantIndexDoc {
 export interface LobbySlotDoc {
   IMMUTABLE: {
     creatorDisplayName: string
+    creatorImageUrl: string | null
     timeCreated: Timestamp | FieldValue
     requestedColor: RequestedColor
   }
   challengerId: string | null
   challengerDisplayName: string | null
+  challengerImageUrl: string | null
   // null if the creator has not accepted the challenge yet
   gameDocId: string | null
 }

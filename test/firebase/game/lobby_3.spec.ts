@@ -134,6 +134,7 @@ test('cannot remove or modify challenger when setting game id', async () => {
       gameDocId: game_id,
       challengerId: null,
       challengerDisplayName: null,
+      challengerImageUrl: null,
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
   await assertFails(
@@ -141,6 +142,7 @@ test('cannot remove or modify challenger when setting game id', async () => {
       gameDocId: game_id,
       challengerId: 'alice_id',
       challengerDisplayName: 'Alice',
+      challengerImageUrl: 'http://example.com/alice.jpg',
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
   // Data has not changed, so this should succeed
@@ -149,6 +151,7 @@ test('cannot remove or modify challenger when setting game id', async () => {
       gameDocId: game_id,
       challengerId: 'bob_id',
       challengerDisplayName: 'Bob',
+      challengerImageUrl: 'http://example.com/bob.jpg',
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
 })
@@ -167,6 +170,7 @@ test('cannot remove or modify challenger after game id is set', async () => {
     update('verified', {
       challengerId: 'alice_id',
       challengerDisplayName: 'Alice',
+      challengerImageUrl: 'http://example.com/alice.jpg',
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
   // ID was already set, so this should fail even though the data is the same
@@ -174,6 +178,7 @@ test('cannot remove or modify challenger after game id is set', async () => {
     update('verified', {
       challengerId: 'bob_id',
       challengerDisplayName: 'Bob',
+      challengerImageUrl: 'http://example.com/bob.jpg',
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
 })

@@ -28,7 +28,7 @@ function isServerTimestamp(field) {
 }
 
 // Checks that two maps are equal
-function mapEq(objA, objB) {
+function unchanged(objA, objB) {
   return objA.diff(objB).affectedKeys().size() == 0;
 }
 // Checks that a map has all the required fields and no extra extra fields
@@ -51,6 +51,12 @@ function startsWith(str, prefix) {
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    function fetchUser(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data;
+    }
+    function fetchGame(gameId) {
+      return get(/databases/$(database)/documents/games/$(gameId)).data;
+    }
     function usernameIsTaken(username) {
       return exists(/databases/$(database)/documents/usernames/$(username));
     }
@@ -60,9 +66,8 @@ service cloud.firestore {
         username.size() <= 25 &&
         username.matches('^[a-zA-Z0-9_]+$');
     }
-    // Returns the expected display name for the given user id
-    function expectedDisplayName(userId) {
-      let userDoc = get(/databases/$(database)/documents/users/$(userId)).data;
+    // Returns the expected display name for the given user (use fetchUser() to get the user document)
+    function expectedDisplayName(userDoc) {
       return userDoc.name == null ? '@' + userDoc.IMMUTABLE.username : userDoc.name;
     }
     
@@ -138,7 +143,7 @@ service cloud.firestore {
         return
           isUserDoc(new) &&
           loggedAs(userId) &&
-          mapEq(old.IMMUTABLE, new.IMMUTABLE) &&
+          unchanged(old.IMMUTABLE, new.IMMUTABLE) &&
           // If the user changed their name, check that they waited long enough
           (old.name != new.name ? (
             old.IMMUTABLE.renameAllowedAt == null ||
@@ -175,7 +180,7 @@ service cloud.firestore {
           return
             isPrivateUserDoc(new) &&
             loggedAs(userId) &&
-            mapEq(old.IMMUTABLE, new.IMMUTABLE);
+            unchanged(old.IMMUTABLE, new.IMMUTABLE);
         }
         
         allow read: if loggedAs(userId);
@@ -235,11 +240,12 @@ service cloud.firestore {
       }
       function allowCreateVariant() {
         let doc = request.resource.data;
+        let creatorDoc = fetchUser(doc.creatorId);
         return
           isVariantDoc(doc) &&
           // Creator can be null if their account has been deleted, but not when creating the variant
           loggedAs(doc.creatorId) &&
-          doc.creatorDisplayName == expectedDisplayName(doc.creatorId) &&
+          doc.creatorDisplayName == expectedDisplayName(creatorDoc) &&
           isServerTimestamp(doc.creationTime) &&
           doc.numUpvotes == 0;
       }
@@ -252,14 +258,23 @@ service cloud.firestore {
       match /lobby/{creatorUserId} {
         function isLobbySlotDoc(doc) {
           return
-            hasFields(doc, ['IMMUTABLE'], ['challengerId', 'challengerDisplayName', 'gameDocId']) &&
-            hasFields(doc.IMMUTABLE, ['creatorDisplayName', 'timeCreated', 'requestedColor'], []) &&
+            hasFields(doc, ['IMMUTABLE'], ['challengerId', 'challengerDisplayName', 'challengerImageUrl', 'gameDocId']) &&
+            hasFields(doc.IMMUTABLE, ['creatorDisplayName', 'timeCreated', 'requestedColor'], ['creatorImageUrl']) &&
             doc.IMMUTABLE.creatorDisplayName is string &&
             doc.IMMUTABLE.timeCreated is timestamp &&
             doc.IMMUTABLE.requestedColor in ['white', 'black', 'random'] &&
+            (doc.IMMUTABLE.creatorImageUrl == null || doc.IMMUTABLE.creatorImageUrl is string) &&
             (doc.challengerId == null || doc.challengerId is string) &&
             (doc.challengerDisplayName == null || doc.challengerDisplayName is string) &&
+            (doc.challengerImageUrl == null || doc.challengerImageUrl is string) &&
             (doc.gameDocId == null || doc.gameDocId is string);
+        }
+        function checkUserNameAndImage(userId, expectedName, expectedImage) {
+          // Fetch the user doc only when strictly necessary
+          let userDoc = fetchUser(userId);
+          return
+            expectedName == expectedDisplayName(userDoc) &&
+            expectedImage == userDoc.profileImg;
         }
         function allowCreateLobbySlot() {
           let doc = request.resource.data;
@@ -267,15 +282,16 @@ service cloud.firestore {
             isLobbySlotDoc(doc) &&
             loggedAs(creatorUserId) &&
             exists(/databases/$(database)/documents/variants/$(variantId)) &&
-            doc.IMMUTABLE.creatorDisplayName == expectedDisplayName(creatorUserId) &&
+            checkUserNameAndImage(creatorUserId, doc.IMMUTABLE.creatorDisplayName, doc.IMMUTABLE.creatorImageUrl) &&
             isServerTimestamp(doc.IMMUTABLE.timeCreated) &&
             // Creator initializes the slot with no challenger
             doc.challengerId == null &&
             doc.challengerDisplayName == null &&
+            doc.challengerImageUrl == null &&
             doc.gameDocId == null;
         }
         function validateCreatedGame(lobbyDoc) {
-          let gameDoc = get(/databases/$(database)/documents/games/$(lobbyDoc.gameDocId)).data;
+          let gameDoc = fetchGame(lobbyDoc.gameDocId);
           return
             gameDoc.IMMUTABLE.variantId == variantId &&
             gameDoc.IMMUTABLE.requestedColor == lobbyDoc.IMMUTABLE.requestedColor &&
@@ -286,15 +302,15 @@ service cloud.firestore {
           let new = request.resource.data;
           return
             isLobbySlotDoc(new) &&
-            mapEq(old.IMMUTABLE, new.IMMUTABLE) &&
+            unchanged(old.IMMUTABLE, new.IMMUTABLE) &&
             // Challenger clicks "Join"
             ((
               loggedAs(new.challengerId) &&
               old.challengerId == null &&
               old.gameDocId == null &&
               new.challengerId != creatorUserId &&
-              new.challengerDisplayName == expectedDisplayName(new.challengerId) &&
-              new.gameDocId == null
+              new.gameDocId == null &&
+              checkUserNameAndImage(new.challengerId, new.challengerDisplayName, new.challengerImageUrl)
             )
             // Challenger clicks "Cancel", or creator rejects challenger
             || (
@@ -302,6 +318,7 @@ service cloud.firestore {
               old.gameDocId == null &&
               new.challengerId == null &&
               new.challengerDisplayName == null &&
+              new.challengerImageUrl == null &&
               new.gameDocId == null
             )
             // Creator accepts challenger
@@ -311,6 +328,7 @@ service cloud.firestore {
               new.gameDocId != null &&
               new.challengerId == old.challengerId &&
               new.challengerDisplayName == old.challengerDisplayName &&
+              new.challengerImageUrl == old.challengerImageUrl &&
               validateCreatedGame(new)
             ));
         }
@@ -364,7 +382,7 @@ service cloud.firestore {
         let new = request.resource.data;
         return
           isGameDoc(new) &&
-          mapEq(old.IMMUTABLE, new.IMMUTABLE) &&
+          unchanged(old.IMMUTABLE, new.IMMUTABLE) &&
           // Only allow appending to the move history
           startsWith(new.moveHistory, old.moveHistory) &&
           // Must pass the turn to the other player

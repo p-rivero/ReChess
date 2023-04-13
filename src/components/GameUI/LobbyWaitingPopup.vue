@@ -36,6 +36,18 @@
           v-if="challenger"
           class="w-100 is-flex is-align-items-center is-justify-content-center"
         >
+          <img
+            v-if="challenger.image"
+            class="sz-3 mr-2 image is-rounded"
+            :src="challenger.image"
+            draggable="false"
+            alt="Profile image"
+          >
+          <div
+            v-else
+            class="sz-3 mr-2 icon-user color-theme"
+          />
+          
           <p class="is-size-4">
             <strong>{{ challenger.name }}</strong> wants to join
           </p>
@@ -84,12 +96,13 @@
 
 <script setup lang="ts">
   import type { RequestedColor } from '@/firebase/db/schema'
+  import type { ChallengerInfo } from '@/stores/lobby'
   import { ref } from 'vue'
   
   const popup = ref<HTMLElement>()
   const autofocusButton = ref<HTMLButtonElement>()
   const color = ref<RequestedColor>('random')
-  const challenger = ref<{id: string, name: string}>()
+  const challenger = ref<ChallengerInfo>()
   
   defineExpose({
     show(requestedColor: RequestedColor) {
@@ -98,8 +111,8 @@
       document.documentElement.classList.add('is-clipped')
       autofocusButton.value?.focus()
     },
-    challengerJoined(id: string, name: string) {
-      challenger.value = { id, name }
+    challengerJoined(info: ChallengerInfo) {
+      challenger.value = info
     },
     hide: closePopup,
   })

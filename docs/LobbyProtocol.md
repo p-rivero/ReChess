@@ -21,6 +21,8 @@ This means that other players cannot enter the lobby slot until the slot creator
 
 - Message 7 could theoretically arrive before message 4. This would be an edge case, since 4 is sent automatically while 7 requires user input (message 6). If this happened, 4.1 would also return `{challengerId, challengerName}` and the UI should display the corresponding popup to the slot creator.
 
+- The actual protocol used is slightly more complex than the one described here, since it also includes the `creatorImageUrl` and `challengerImageUrl` fields, and it could be extended to include more information in the future. However, the way it works is the same as described here.
+
 ## Failure case
 
 Messages 1-7 are the same as in the success case, but the slot creator decides to deny the incoming player and then cancels the lobby slot.

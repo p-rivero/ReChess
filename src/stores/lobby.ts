@@ -7,11 +7,18 @@ import { useAuthStore } from './auth-user'
 export type LobbySlot = {
   isFromCurrentUser: boolean
   timeCreated: Date
-  creatorDisplayName: string
   creatorId: string
+  creatorDisplayName: string
+  creatorImage?: string
   requestedColor: RequestedColor
-  challengerDisplayName?: string
   challengerId?: string
+  challengerDisplayName?: string
+  challengerImage?: string
+}
+export type ChallengerInfo = {
+  id: string
+  name: string
+  image?: string
 }
 
 export type LobbyUpdateCallback = (lobby: LobbySlot[]) => void
@@ -26,7 +33,7 @@ export const useLobbyStore = defineStore('lobby', () => {
   // Callbacks
   let unsubscribe = EMPTY_FN
   let lobbyCreated: (a: RequestedColor) => void = EMPTY_FN
-  let challengerJoined: (id: string, name: string) => void = EMPTY_FN
+  let challengerJoined: (info: ChallengerInfo) => void = EMPTY_FN
   let lobbyDeleted = EMPTY_FN
   
   // Get real time updates for the slots in a lobby
@@ -51,7 +58,13 @@ export const useLobbyStore = defineStore('lobby', () => {
       let found = false
       slots.filter(s => s.isFromCurrentUser).forEach(s => {
         lobbyCreated(s.requestedColor)
-        if (s.challengerId) challengerJoined(s.challengerId, s.challengerDisplayName ?? '[error]')
+        if (s.challengerId) {
+          challengerJoined({
+            id: s.challengerId,
+            name: s.challengerDisplayName ?? '[error]',
+            image: s.challengerImage,
+          })
+        }
         found = true
       })
       if (!found) lobbyDeleted()
@@ -62,7 +75,7 @@ export const useLobbyStore = defineStore('lobby', () => {
   function onLobbyCreated(callback: (color:RequestedColor)=>void) {
     lobbyCreated = callback
   }
-  function onChallengerJoined(callback: (id: string, name: string)=>void) {
+  function onChallengerJoined(callback: (info: ChallengerInfo)=>void) {
     challengerJoined = callback
   }
   function onLobbyDeleted(callback: ()=>void) {
@@ -86,11 +99,13 @@ export const useLobbyStore = defineStore('lobby', () => {
     return {
       isFromCurrentUser: docId === authStore.loggedUser?.uid,
       timeCreated: timeCreated,
-      creatorDisplayName: doc.IMMUTABLE.creatorDisplayName,
       creatorId: docId,
+      creatorDisplayName: doc.IMMUTABLE.creatorDisplayName,
+      creatorImage: doc.IMMUTABLE.creatorImageUrl ?? undefined,
       requestedColor: doc.IMMUTABLE.requestedColor,
-      challengerDisplayName: doc.challengerDisplayName ?? undefined,
       challengerId: doc.challengerId ?? undefined,
+      challengerDisplayName: doc.challengerDisplayName ?? undefined,
+      challengerImage: doc.challengerImageUrl ?? undefined,
     }
   }
   
@@ -100,7 +115,10 @@ export const useLobbyStore = defineStore('lobby', () => {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to join a lobby slot')
     }
-    await LobbyDB.createSlot(variantId, authStore.loggedUser.uid, authStore.loggedUser.displayName, requestedColor)
+    const id = authStore.loggedUser.uid
+    const name = authStore.loggedUser.displayName
+    const img = authStore.loggedUser.profileImg ?? null
+    await LobbyDB.createSlot(variantId, id, name, img, requestedColor)
   }
   
   // Join an existing lobby slot
@@ -108,7 +126,10 @@ export const useLobbyStore = defineStore('lobby', () => {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to join a lobby slot')
     }
-    await LobbyDB.updateChallenger(variantId, creatorId, authStore.loggedUser.uid, authStore.loggedUser.displayName)
+    const id = authStore.loggedUser.uid
+    const name = authStore.loggedUser.displayName
+    const img = authStore.loggedUser.profileImg ?? null
+    await LobbyDB.updateChallenger(variantId, creatorId, id, name, img)
   }
   
   // Delete a lobby slot
@@ -120,7 +141,7 @@ export const useLobbyStore = defineStore('lobby', () => {
   }
   
   // Accept the incoming challenger
-  async function acceptChallenger(variantId: string) {
+  async function acceptChallenger(_variantId: string) {
     // TODO
   }
   
@@ -129,7 +150,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to join a lobby slot')
     }
-    await LobbyDB.updateChallenger(variantId, authStore.loggedUser.uid, null, null)
+    await LobbyDB.updateChallenger(variantId, authStore.loggedUser.uid, null, null, null)
   }
   
   return { setUpdateListener, onLobbyCreated, onChallengerJoined, onLobbyDeleted, removeListeners,

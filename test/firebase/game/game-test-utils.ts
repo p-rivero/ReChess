@@ -19,14 +19,14 @@ const VARIANT_DOC: Readonly<VariantDoc> = {
 export type GameUser = 'alice' | 'bob' | 'myself'
 
   
-function idAndName(user: GameUser): [string, string]
-function idAndName(user: GameUser | undefined): [string | null, string | null]
-function idAndName(user: GameUser | undefined): [string | null, string | null] {
+function userInfo(user: GameUser): [string, string, string]
+function userInfo(user: GameUser | undefined): [string | null, string | null, string | null]
+function userInfo(user: GameUser | undefined): [string | null, string | null, string | null] {
   switch (user) {
-    case 'alice': return ['alice_id', 'Alice']
-    case 'bob': return ['bob_id', 'Bob']
-    case 'myself': return [MY_ID, 'My name']
-    default: return [null, null]
+    case 'alice': return ['alice_id', 'Alice', 'http://example.com/alice.jpg']
+    case 'bob': return ['bob_id', 'Bob', 'http://example.com/bob.jpg']
+    case 'myself': return [MY_ID, 'My name', 'http://example.com/myself.jpg']
+    default: return [null, null, null]
   }
 }
 
@@ -34,7 +34,7 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
   const alice: UserDoc = {
     name: 'Alice',
     about: '',
-    profileImg: null,
+    profileImg: 'http://example.com/alice.jpg',
     IMMUTABLE: {
       username: 'alice',
       numWins: 0,
@@ -44,7 +44,7 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
   const bob: UserDoc = {
     name: 'Bob',
     about: '',
-    profileImg: null,
+    profileImg: 'http://example.com/bob.jpg',
     IMMUTABLE: {
       username: 'bob',
       numWins: 0,
@@ -54,7 +54,7 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
   const my_user: UserDoc = {
     name: 'My name',
     about: '',
-    profileImg: null,
+    profileImg: 'http://example.com/myself.jpg',
     IMMUTABLE: {
       username: 'my_username',
       numWins: 0,
@@ -89,16 +89,18 @@ export async function setupLobbySlot(
   gameDocId?: string,
   requestedColor: RequestedColor = 'random'
 ) {
-  const [creatorId, creatorDisplayName] = idAndName(creator)
-  const [challengerId, challengerDisplayName] = idAndName(challenger)
+  const [creatorId, creatorDisplayName, creatorImage] = userInfo(creator)
+  const [challengerId, challengerDisplayName, challengerImage] = userInfo(challenger)
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
       creatorDisplayName,
+      creatorImageUrl: creatorImage,
       timeCreated: serverTimestamp() as Timestamp,
       requestedColor,
     },
     challengerId,
     challengerDisplayName,
+    challengerImageUrl: challengerImage,
     gameDocId: gameDocId ?? null,
   }
   await set('admin', slot, 'variants', 'variant_id', 'lobby', creatorId)
@@ -111,8 +113,8 @@ export async function setupGameDoc(
   requestedColor: RequestedColor = 'random',
   variantId = 'variant_id'
 ): Promise<string> {
-  const [whiteId, whiteDisplayName] = idAndName(white)
-  const [blackId, blackDisplayName] = idAndName(black)
+  const [whiteId, whiteDisplayName] = userInfo(white)
+  const [blackId, blackDisplayName] = userInfo(black)
   const game_id = `game_${whiteId}_${blackId}`
   const game: GameDoc = {
     moveHistory: '',

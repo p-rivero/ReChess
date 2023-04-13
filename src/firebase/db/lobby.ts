@@ -7,15 +7,23 @@ export function getLobbySlots(variantId: string) {
 }
 
 // Creates a new lobby slot in the database
-export async function createSlot(variantId: string, creatorId: string, creatorName: string, color: RequestedColor): Promise<LobbySlotDoc> {
+export async function createSlot(
+  variantId: string,
+  creatorId: string,
+  creatorName: string,
+  creatorImage: string | null,
+  color: RequestedColor
+): Promise<LobbySlotDoc> {
   const newDoc: LobbySlotDoc = {
     IMMUTABLE: {
       timeCreated: serverTimestamp(),
       creatorDisplayName: creatorName,
+      creatorImageUrl: creatorImage,
       requestedColor: color,
     },
-    challengerDisplayName: null,
     challengerId: null,
+    challengerDisplayName: null,
+    challengerImageUrl: null,
     gameDocId: null,
   }
   await setDoc(doc(db, 'variants', variantId, 'lobby', creatorId), newDoc)
@@ -23,10 +31,17 @@ export async function createSlot(variantId: string, creatorId: string, creatorNa
 }
 
 // Joins an existing slot in the database, or removes the challenger
-export async function updateChallenger(variantId: string, creatorId: string, challengerId: string|null, challengerName: string|null) {
+export async function updateChallenger(
+  variantId: string,
+  creatorId: string,
+  challengerId: string | null,
+  challengerName: string | null,
+  challengerImage: string | null
+) {
   const update = {
-    challengerDisplayName: challengerName,
     challengerId: challengerId,
+    challengerDisplayName: challengerName,
+    challengerImageUrl: challengerImage,
   }
   await updateDoc(doc(db, 'variants', variantId, 'lobby', creatorId), update)
   console.log('Updated lobby slot', variantId, creatorId, update)
