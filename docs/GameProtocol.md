@@ -5,6 +5,7 @@ This document describes the protocol used by the clients to communicate between 
 Validation of the move legality can be CPU-intensive, so instead the backend only enforces the following rules:
 - The move history is a space-separated list of moves. Each move has the correct format (like `e2e4` or `e7e8=q`).
 - The move history cannot be rewritten or deleted (only appended to).
+- Only 1 move can be appended to the history at a time.
 - Only the player whose turn it is can make a move. They must also set the turn to the other player's color.
 
 The moves are validated by the clients, who must reach a consensus on whether a given move history is valid (if both players are using the same unmodified chess engine, no illegal moves should ever be made).

@@ -390,14 +390,18 @@ service cloud.firestore {
           ));
           // Don't check immutable fields, they are set by a cloud function
       }
+      function numMoves(history) {
+        return history.split(' ').size();
+      }
       function allowUpdateGame() {
         let old = resource.data;
         let new = request.resource.data;
         return
           isGameDoc(new) &&
           unchanged(old.IMMUTABLE, new.IMMUTABLE) &&
-          // Only allow appending to the move history
+          // Only allow appending 1 move to the move history
           startsWith(new.moveHistory, old.moveHistory) &&
+          numMoves(new.moveHistory) == numMoves(old.moveHistory) + 1 &&
           // Must pass the turn to the other player
           new.playerToMove != old.playerToMove &&
           // Must be logged in as the player whose turn it is

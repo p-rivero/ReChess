@@ -143,7 +143,11 @@ export async function setupGameDoc(
 export async function setMoveHistory(
   update: TestUtilsSignature['update'],
   gameId: string,
-  moveHistory: string
+  moveHistory: string,
+  playerToMove: 'white' | 'black' | 'game-over'
 ) {
-  await update('admin', { moveHistory }, 'games', gameId)
+  await update('admin', {
+    moveHistory,
+    playerToMove,
+  }, 'games', gameId)
 }
