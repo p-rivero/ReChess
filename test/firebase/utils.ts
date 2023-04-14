@@ -176,7 +176,14 @@ export async function assertSucceeds<T>(pr: Promise<T>): Promise<T> {
   try {
     return await originalAssertSucceeds(pr)
   } catch (e) {
-    throw new Error('Call failed: ' + e)
+    const err = `${e}`
+    // 6 lines below are shown in the terminal
+    //
+    // ---------------------------------------
+    throw new Error(err)
+    // EXPECTED CALL TO SUCCEED, BUT IT FAILED
+    // ---------------------------------------
+    //
   }
 }
 export { assertFails } from '@firebase/rules-unit-testing'

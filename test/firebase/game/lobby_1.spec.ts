@@ -1,17 +1,14 @@
 
 import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from '../utils'
 import { setupJest } from '../init'
-import { setupUsersAndVariant, setupLobbySlot, setupExtraVariant } from './game-test-utils'
+import { MY_ID, ALICE_ID, BOB_ID, VARIANT_ID, setupUsersAndVariant, setupLobbySlot, setupExtraVariant, setupGameDoc } from './game-test-utils'
 
 import type { LobbySlotDoc } from '@/firebase/db/schema'
-
-const MY_ID = 'my_id'
-const MY_EMAIL = 'my@email.com'
 
 let { get, query, set, add, now, afterSeconds }: TestUtilsSignature = notInitialized()
 
 setupJest('lobby-tests-1', env => {
-  ({ get, query, set, add, now, afterSeconds } = setupTestUtils(env, MY_ID, MY_EMAIL))
+  ({ get, query, set, add, now, afterSeconds } = setupTestUtils(env, MY_ID, 'my@email.com'))
 })
 
 
@@ -19,13 +16,13 @@ test('anyone can read lobby entries for a variant', async () => {
   await setupUsersAndVariant(set)
   await setupLobbySlot(set, 'alice', 'bob')
   
-  const snapshot = await get('not logged', 'variants', 'variant_id', 'lobby', 'alice_id')
+  const snapshot = await get('not logged', 'variants', VARIANT_ID, 'lobby', ALICE_ID)
     
   if (!snapshot.exists()) {
     throw new Error('Document does not exist')
   }
   expect(snapshot.data().IMMUTABLE.creatorDisplayName).toBe('Alice')
-  expect(snapshot.data().challengerId).toBe('bob_id')
+  expect(snapshot.data().challengerId).toBe(BOB_ID)
   expect(snapshot.data().challengerDisplayName).toBe('Bob')
   expect(snapshot.data().challengerImageUrl).toBe('http://example.com/bob.jpg')
   
@@ -55,7 +52,7 @@ test('can create lobby slot', async () => {
     gameDocId: null,
   }
   await assertSucceeds(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
@@ -75,13 +72,13 @@ test('cannot create lobby slot if not authenticated', async () => {
     gameDocId: null,
   }
   await assertFails(
-    set('unverified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('unverified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
   await assertFails(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', 'bob_id')
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', BOB_ID)
   )
   await assertSucceeds(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
@@ -122,10 +119,10 @@ test('cannot create 2 entries for the same variant', async () => {
     gameDocId: null,
   }
   await assertFails(
-    add('verified', slot, 'variants', 'variant_id', 'lobby')
+    add('verified', slot, 'variants', VARIANT_ID, 'lobby')
   )
   await assertFails(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
@@ -146,7 +143,7 @@ test('can create 2 entries for different variants', async () => {
     gameDocId: null,
   }
   await assertSucceeds(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
   await assertSucceeds(
     set('verified', slot, 'variants', 'variant_id_2', 'lobby', MY_ID)
@@ -170,7 +167,7 @@ test('2 creators can create entries for the same variant', async () => {
     gameDocId: null,
   }
   await assertSucceeds(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
@@ -184,24 +181,25 @@ test('cannot create slot with challenger already set', async () => {
       timeCreated: now(),
       requestedColor: 'white',
     },
-    challengerId: 'alice_id',
+    challengerId: ALICE_ID,
     challengerDisplayName: 'Alice',
     challengerImageUrl: 'http://example.com/alice.jpg',
     gameDocId: null,
   }
   await assertFails(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
   slot.challengerId = null
   slot.challengerDisplayName = null
   slot.challengerImageUrl = null
   await assertSucceeds(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
 test('cannot create slot with game id already set', async () => {
   await setupUsersAndVariant(set)
+  const gameId = await setupGameDoc(set, 'myself', 'bob', 'white', 'white')
   
   const slot: LobbySlotDoc = {
     IMMUTABLE: {
@@ -213,14 +211,14 @@ test('cannot create slot with game id already set', async () => {
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: 'game_id',
+    gameDocId: gameId,
   }
   await assertFails(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
   slot.gameDocId = null
   await assertSucceeds(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
@@ -240,11 +238,11 @@ test('creator display name must be correct', async () => {
     gameDocId: null,
   }
   await assertFails(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
   slot.IMMUTABLE.creatorDisplayName = 'My name'
   await assertSucceeds(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
@@ -264,11 +262,11 @@ test('creator profile image must be correct', async () => {
     gameDocId: null,
   }
   await assertFails(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
   slot.IMMUTABLE.creatorImageUrl = 'http://example.com/myself.jpg'
   await assertSucceeds(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
@@ -288,11 +286,11 @@ test('time created must be correct', async () => {
     gameDocId: null,
   }
   await assertFails(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
   slot.IMMUTABLE.timeCreated = now()
   await assertSucceeds(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
@@ -312,10 +310,10 @@ test('requested color must be correct', async () => {
     gameDocId: null,
   }
   await assertFails(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
   slot.IMMUTABLE.requestedColor = 'white'
   await assertSucceeds(
-    set('verified', slot, 'variants', 'variant_id', 'lobby', MY_ID)
+    set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })

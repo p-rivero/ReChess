@@ -3,14 +3,17 @@ import type { RequestedColor, GameDoc, LobbySlotDoc, UserDoc, VariantDoc } from 
 import type { TestUtilsSignature } from '../utils'
 import type { Timestamp } from 'firebase/firestore'
 
-const MY_ID = 'my_id'
+export const MY_ID = 'my_id'
+export const ALICE_ID = 'alice_id'
+export const BOB_ID = 'bob_id'
+export const VARIANT_ID = 'variant_id'
 
 const VARIANT_DOC: Readonly<VariantDoc> = {
   name: 'My variant',
   description: 'Variant description',
   creationTime: serverTimestamp() as Timestamp,
   creatorDisplayName: 'Alice',
-  creatorId: 'alice_id',
+  creatorId: ALICE_ID,
   numUpvotes: 0,
   initialState: '{}',
 }
@@ -23,8 +26,8 @@ function userInfo(user: GameUser): [string, string, string]
 function userInfo(user: GameUser | undefined): [string | null, string | null, string | null]
 function userInfo(user: GameUser | undefined): [string | null, string | null, string | null] {
   switch (user) {
-    case 'alice': return ['alice_id', 'Alice', 'http://example.com/alice.jpg']
-    case 'bob': return ['bob_id', 'Bob', 'http://example.com/bob.jpg']
+    case 'alice': return [ALICE_ID, 'Alice', 'http://example.com/alice.jpg']
+    case 'bob': return [BOB_ID, 'Bob', 'http://example.com/bob.jpg']
     case 'myself': return [MY_ID, 'My name', 'http://example.com/myself.jpg']
     default: return [null, null, null]
   }
@@ -62,10 +65,10 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
     },
   }
   await Promise.all([
-    set('admin', alice, 'users', 'alice_id'),
-    set('admin', bob, 'users', 'bob_id'),
+    set('admin', alice, 'users', ALICE_ID),
+    set('admin', bob, 'users', BOB_ID),
     set('admin', my_user, 'users', MY_ID),
-    set('admin', VARIANT_DOC, 'variants', 'variant_id'),
+    set('admin', VARIANT_DOC, 'variants', VARIANT_ID),
   ])
 }
 
@@ -75,7 +78,7 @@ export async function setupExtraVariant(set: TestUtilsSignature['set'], variantI
     description: 'Extra variant description',
     creationTime: serverTimestamp() as Timestamp,
     creatorDisplayName: 'Alice',
-    creatorId: 'alice_id',
+    creatorId: ALICE_ID,
     numUpvotes: 0,
     initialState: '{}',
   }
@@ -103,16 +106,16 @@ export async function setupLobbySlot(
     challengerImageUrl: challengerImage,
     gameDocId: gameDocId ?? null,
   }
-  await set('admin', slot, 'variants', 'variant_id', 'lobby', creatorId)
+  await set('admin', slot, 'variants', VARIANT_ID, 'lobby', creatorId)
 }
 
 export async function setupGameDoc(
   set: TestUtilsSignature['set'],
   white: GameUser,
   black: GameUser,
+  playerToMove: 'white' | 'black' | 'game-over',
   requestedColor: RequestedColor = 'random',
-  variantId = 'variant_id',
-  playerToMove: 'white' | 'black' | 'game-over' = 'white'
+  variantId = VARIANT_ID
 ): Promise<string> {
   const [whiteId, whiteDisplayName] = userInfo(white)
   const [blackId, blackDisplayName] = userInfo(black)

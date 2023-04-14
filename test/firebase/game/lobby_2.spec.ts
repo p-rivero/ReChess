@@ -1,15 +1,12 @@
 
 import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from '../utils'
 import { setupJest } from '../init'
-import { setupUsersAndVariant, setupLobbySlot } from './game-test-utils'
-
-const MY_ID = 'my_id'
-const MY_EMAIL = 'my@email.com'
+import { MY_ID, ALICE_ID, BOB_ID, VARIANT_ID, setupUsersAndVariant, setupLobbySlot } from './game-test-utils'
 
 let { set, update }: TestUtilsSignature = notInitialized()
 
 setupJest('lobby-tests-2', env => {
-  ({ set, update } = setupTestUtils(env, MY_ID, MY_EMAIL))
+  ({ set, update } = setupTestUtils(env, MY_ID, 'my@email.com'))
 })
 
 
@@ -24,7 +21,7 @@ test('can join as challenger', async () => {
       challengerId: MY_ID,
       challengerDisplayName: 'My name',
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
 })
 
@@ -37,20 +34,20 @@ test('challenger must be authenticated', async () => {
       challengerId: MY_ID,
       challengerDisplayName: 'My name',
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertFails(
     update('verified', {
-      challengerId: 'bob_id',
+      challengerId: BOB_ID,
       challengerDisplayName: 'Bob',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertSucceeds(
     update('verified', {
       challengerId: MY_ID,
       challengerDisplayName: 'My name',
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
 })
 
@@ -63,7 +60,7 @@ test('challenger must be different from creator', async () => {
       challengerId: MY_ID,
       challengerDisplayName: 'My name',
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', MY_ID)
+    }, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
@@ -76,7 +73,7 @@ test('challenger name must be correct', async () => {
       challengerId: MY_ID,
       challengerDisplayName: 'A wrong name',
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
 })
 
@@ -88,26 +85,26 @@ test('challenger must all fields at same time', async () => {
     update('verified', {
       challengerId: MY_ID,
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertFails(
     update('verified', {
       challengerDisplayName: 'My name',
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertFails(
     update('verified', {
       challengerId: MY_ID,
       challengerDisplayName: 'My name',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertSucceeds(
     update('verified', {
       challengerId: MY_ID,
       challengerDisplayName: 'My name',
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
 })
 
@@ -120,7 +117,7 @@ test('cannot join if a challenger is already set', async () => {
       challengerId: MY_ID,
       challengerDisplayName: 'My name',
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
 })
 
@@ -132,7 +129,7 @@ test('cannot join a slot that does not exist', async () => {
       challengerId: MY_ID,
       challengerDisplayName: 'My name',
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', 'wrong_id')
+    }, 'variants', VARIANT_ID, 'lobby', 'wrong_id')
   )
 })
 
@@ -143,7 +140,7 @@ test('challenger cannot edit game doc', async () => {
   await assertFails(
     update('verified', {
       gameDocId: 'some_id',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertFails(
     update('verified', {
@@ -151,14 +148,14 @@ test('challenger cannot edit game doc', async () => {
       challengerDisplayName: 'My name',
       challengerImageUrl: 'http://example.com/myself.jpg',
       gameDocId: 'some_id',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertSucceeds(
     update('verified', {
       challengerId: MY_ID,
       challengerDisplayName: 'My name',
       challengerImageUrl: 'http://example.com/myself.jpg',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
 })
 
@@ -172,7 +169,7 @@ test('challenger can leave slot', async () => {
       challengerId: null,
       challengerDisplayName: null,
       challengerImageUrl: null,
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
 })
 
@@ -185,7 +182,7 @@ test('challenger cannot kick other challenger', async () => {
       challengerId: null,
       challengerDisplayName: null,
       challengerImageUrl: null,
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
 })
 
@@ -198,7 +195,7 @@ test('slot creator can reject challenger', async () => {
       challengerId: null,
       challengerDisplayName: null,
       challengerImageUrl: null,
-    }, 'variants', 'variant_id', 'lobby', MY_ID)
+    }, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
 
@@ -210,19 +207,19 @@ test('when leaving must remove all fields', async () => {
     update('verified', {
       challengerId: null,
       challengerImageUrl: null,
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertFails(
     update('verified', {
       challengerDisplayName: null,
       challengerImageUrl: null,
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertFails(
     update('verified', {
       challengerId: null,
       challengerDisplayName: null,
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertFails(
     update('verified', {
@@ -230,13 +227,13 @@ test('when leaving must remove all fields', async () => {
       challengerDisplayName: null,
       challengerImageUrl: null,
       gameDocId: 'some_id',
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertSucceeds(
     update('verified', {
       challengerId: null,
       challengerDisplayName: null,
       challengerImageUrl: null,
-    }, 'variants', 'variant_id', 'lobby', 'alice_id')
+    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
 })
