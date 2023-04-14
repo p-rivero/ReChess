@@ -44,7 +44,6 @@ export async function updateChallenger(
     challengerImageUrl: challengerImage,
   }
   await updateDoc(doc(db, 'variants', variantId, 'lobby', creatorId), update)
-  console.log('Updated lobby slot', variantId, creatorId, update)
 }
 
 // Deletes a lobby slot in the database

@@ -45,7 +45,6 @@ export const useLobbyStore = defineStore('lobby', () => {
   function setUpdateListener(variantId: string, callback: LobbyUpdateCallback) {
     if (currentId === variantId) return
     
-    console.log('setUpdateListener', variantId)
     // If subscribed to a different lobby, unsubscribe first
     unsubscribe()
     

@@ -213,7 +213,7 @@
         />
       </div>
       
-      <label class="label">Promote:</label>
+      <label class="label">Promotion:</label>
       <label>Promote when landing on:</label>
       <CoordPillList
         class="mb-5"
