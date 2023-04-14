@@ -94,7 +94,6 @@ export interface GameDoc {
     whiteId: string | null
     blackDisplayName: string
     blackId: string | null
-    // For the challenger to check if the creator is lying about the requested color
     requestedColor: RequestedColor
   }
 }

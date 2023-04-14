@@ -39,7 +39,10 @@ function hasFields(obj, required, optional) {
 
 // Returns true if the input string starts with the given prefix
 function startsWith(str, prefix) {
-  return str.size() >= prefix.size() && str[0 : prefix.size()] == prefix;
+  return prefix.size() == 0 || (
+    str.size() >= prefix.size() &&
+    str[0 : prefix.size()] == prefix
+  );
 }
 
 // Prints the input to the debug log and returns true
@@ -290,12 +293,22 @@ service cloud.firestore {
             doc.challengerImageUrl == null &&
             doc.gameDocId == null;
         }
+        // Checks that the game sent to the challenger is (probably) the same as the one created by the
+        // cloud function at the creator's request. It's not a perfect check, but it should make cheating
+        // very difficult.
         function validateCreatedGame(lobbyDoc) {
           let gameDoc = fetchGame(lobbyDoc.gameDocId);
           return
             gameDoc.IMMUTABLE.variantId == variantId &&
             gameDoc.IMMUTABLE.requestedColor == lobbyDoc.IMMUTABLE.requestedColor &&
-            gameDoc.IMMUTABLE.timeCreated > lobbyDoc.IMMUTABLE.timeCreated;
+            gameDoc.IMMUTABLE.timeCreated > lobbyDoc.IMMUTABLE.timeCreated &&
+            ((
+              gameDoc.IMMUTABLE.whiteId == creatorUserId &&
+              gameDoc.IMMUTABLE.blackId == lobbyDoc.challengerId
+            ) || (
+              gameDoc.IMMUTABLE.whiteId == lobbyDoc.challengerId &&
+              gameDoc.IMMUTABLE.blackId == creatorUserId
+            ));
         }
         function allowUpdateLobbySlot() {
           let old = resource.data;
@@ -369,7 +382,7 @@ service cloud.firestore {
           doc.moveHistory is string &&
           doc.moveHistory.size() <= 10000 &&
           doc.moveHistory.matches(HISTORY_REGEX) &&
-          (doc.winnner == null ? (
+          (doc.winner == null ? (
             doc.playerToMove in ['white', 'black']
           ) : (
             doc.playerToMove == 'game-over' &&

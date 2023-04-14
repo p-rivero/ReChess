@@ -19,11 +19,11 @@ setupJest('lobby-tests-3', env => {
 test('slot creator can set game id', async () => {
   await setupUsersAndVariant(set)
   await setupLobbySlot(set, 'myself', 'bob')
-  const game_id = await setupGameDoc(set, 'myself', 'bob')
+  const gameId = await setupGameDoc(set, 'myself', 'bob')
 
   await assertSucceeds(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
 })
@@ -31,11 +31,11 @@ test('slot creator can set game id', async () => {
 test('challenger cannot set game id', async () => {
   await setupUsersAndVariant(set)
   await setupLobbySlot(set, 'alice', 'myself')
-  const game_id = await setupGameDoc(set, 'alice', 'myself')
+  const gameId = await setupGameDoc(set, 'alice', 'myself')
 
   await assertFails(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
     }, 'variants', 'variant_id', 'lobby', 'alice_id')
   )
 })
@@ -56,17 +56,17 @@ test('game doc must have same variant', async () => {
   await setupUsersAndVariant(set)
   await setupLobbySlot(set, 'myself', 'bob') // Slot is set to variant_id
   await setupExtraVariant(set, 'another_variant')
-  const game_id = await setupGameDoc(set, 'myself', 'bob', 'random', 'another_variant')
+  let gameId = await setupGameDoc(set, 'myself', 'bob', 'random', 'another_variant')
 
   await assertFails(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
-  await setupGameDoc(set, 'myself', 'bob', 'random', 'variant_id')
+  gameId = await setupGameDoc(set, 'myself', 'bob', 'random', 'variant_id')
   await assertSucceeds(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
 })
@@ -74,29 +74,55 @@ test('game doc must have same variant', async () => {
 test('game doc must have same requested side', async () => {
   await setupUsersAndVariant(set)
   await setupLobbySlot(set, 'myself', 'bob', undefined, 'random')
-  const game_id = await setupGameDoc(set, 'myself', 'bob', 'white')
+  let gameId = await setupGameDoc(set, 'myself', 'bob', 'white')
 
   await assertFails(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
-  await setupGameDoc(set, 'myself', 'bob', 'random')
+  gameId = await setupGameDoc(set, 'myself', 'bob', 'random')
   await assertSucceeds(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
 })
 
 test('game doc must be created after lobby slot', async () => {
   await setupUsersAndVariant(set)
-  const game_id = await setupGameDoc(set, 'myself', 'bob')
+  const gameId = await setupGameDoc(set, 'myself', 'bob')
   await setupLobbySlot(set, 'myself', 'bob')
 
   await assertFails(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
+    }, 'variants', 'variant_id', 'lobby', MY_ID)
+  )
+})
+
+test('game doc must have same players', async () => {
+  await setupUsersAndVariant(set)
+  await setupLobbySlot(set, 'myself', 'bob')
+  
+  let gameId = await setupGameDoc(set, 'myself', 'alice')
+  await assertFails(
+    update('verified', {
+      gameDocId: gameId,
+    }, 'variants', 'variant_id', 'lobby', MY_ID)
+  )
+  
+  gameId = await setupGameDoc(set, 'alice', 'bob')
+  await assertFails(
+    update('verified', {
+      gameDocId: gameId,
+    }, 'variants', 'variant_id', 'lobby', MY_ID)
+  )
+  
+  gameId = await setupGameDoc(set, 'bob', 'myself')
+  await assertSucceeds(
+    update('verified', {
+      gameDocId: gameId,
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
 })
@@ -104,11 +130,11 @@ test('game doc must be created after lobby slot', async () => {
 test('cannot remove or modify game id after it is set', async () => {
   await setupUsersAndVariant(set)
   await setupLobbySlot(set, 'myself', 'bob')
-  const game_id = await setupGameDoc(set, 'myself', 'bob')
+  const gameId = await setupGameDoc(set, 'myself', 'bob')
 
   await assertSucceeds(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
   await assertFails(
@@ -119,7 +145,7 @@ test('cannot remove or modify game id after it is set', async () => {
   // ID was already set, so this should fail even though the data is the same
   await assertFails(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
 })
@@ -127,11 +153,11 @@ test('cannot remove or modify game id after it is set', async () => {
 test('cannot remove or modify challenger when setting game id', async () => {
   await setupUsersAndVariant(set)
   await setupLobbySlot(set, 'myself', 'bob')
-  const game_id = await setupGameDoc(set, 'myself', 'bob')
+  const gameId = await setupGameDoc(set, 'myself', 'bob')
 
   await assertFails(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
       challengerId: null,
       challengerDisplayName: null,
       challengerImageUrl: null,
@@ -139,7 +165,7 @@ test('cannot remove or modify challenger when setting game id', async () => {
   )
   await assertFails(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
       challengerId: 'alice_id',
       challengerDisplayName: 'Alice',
       challengerImageUrl: 'http://example.com/alice.jpg',
@@ -148,7 +174,7 @@ test('cannot remove or modify challenger when setting game id', async () => {
   // Data has not changed, so this should succeed
   await assertSucceeds(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
       challengerId: 'bob_id',
       challengerDisplayName: 'Bob',
       challengerImageUrl: 'http://example.com/bob.jpg',
@@ -159,11 +185,11 @@ test('cannot remove or modify challenger when setting game id', async () => {
 test('cannot remove or modify challenger after game id is set', async () => {
   await setupUsersAndVariant(set)
   await setupLobbySlot(set, 'myself', 'bob')
-  const game_id = await setupGameDoc(set, 'myself', 'bob')
+  const gameId = await setupGameDoc(set, 'myself', 'bob')
   
   await assertSucceeds(
     update('verified', {
-      gameDocId: game_id,
+      gameDocId: gameId,
     }, 'variants', 'variant_id', 'lobby', MY_ID)
   )
   await assertFails(

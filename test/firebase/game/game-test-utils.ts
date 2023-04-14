@@ -111,15 +111,17 @@ export async function setupGameDoc(
   white: GameUser,
   black: GameUser,
   requestedColor: RequestedColor = 'random',
-  variantId = 'variant_id'
+  variantId = 'variant_id',
+  playerToMove: 'white' | 'black' | 'game-over' = 'white'
 ): Promise<string> {
   const [whiteId, whiteDisplayName] = userInfo(white)
   const [blackId, blackDisplayName] = userInfo(black)
-  const game_id = `game_${whiteId}_${blackId}`
+  const randomInt = Math.floor(Math.random() * 100000)
+  const game_id = `game_${whiteId}_${blackId}_${randomInt}`
   const game: GameDoc = {
     moveHistory: '',
-    playerToMove: 'white',
-    winner: null,
+    playerToMove,
+    winner: playerToMove === 'game-over' ? 'white' : null,
     IMMUTABLE: {
       timeCreated: serverTimestamp() as Timestamp,
       variantId,
@@ -133,4 +135,12 @@ export async function setupGameDoc(
   }
   await set('admin', game, 'games', game_id)
   return game_id
+}
+
+export async function setMoveHistory(
+  update: TestUtilsSignature['update'],
+  gameId: string,
+  moveHistory: string
+) {
+  await update('admin', { moveHistory }, 'games', gameId)
 }
