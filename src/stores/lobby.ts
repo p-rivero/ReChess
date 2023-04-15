@@ -38,7 +38,7 @@ export const useLobbyStore = defineStore('lobby', () => {
   let challengerJoinedCallback: (info: ChallengerInfo) => void = EMPTY_FN
   let challengerLeftCallback = EMPTY_FN
   let joinSlotCallback: (id: string, name: string) => void = EMPTY_FN
-  let leaveslotCallback = EMPTY_FN
+  let leaveSlotCallback = EMPTY_FN
   let lobbyDeletedCallback = EMPTY_FN
   
   // Get real time updates for the slots in a lobby
@@ -52,36 +52,39 @@ export const useLobbyStore = defineStore('lobby', () => {
     
     unsubscribe = onSnapshot(lobby, snap => {
       const slots: LobbySlot[] = []
+      // Update the list of slots
       snap.forEach(docSnap => {
         const docId = docSnap.id
         const doc = docSnap.data() as LobbySlotDoc
         slots.push(readDocument(docId, doc))
       })
       callback(slots)
+      
       // If one of the slots is from the current user, show the waiting popup
-      let found = false
-      slots.filter(s => s.creatorIsCurrentUser).forEach(s => {
-        lobbyCreatedCallback(s.requestedColor)
-        if (s.challengerId) {
+      const mySlot = slots.find(s => s.creatorIsCurrentUser)
+      if (mySlot) {
+        lobbyCreatedCallback(mySlot.requestedColor)
+        // If my slot has a challenger, show their info
+        if (mySlot.challengerId) {
           challengerJoinedCallback({
-            id: s.challengerId,
-            name: s.challengerDisplayName ?? '[error]',
-            image: s.challengerImage,
+            id: mySlot.challengerId,
+            name: mySlot.challengerDisplayName ?? '[error]',
+            image: mySlot.challengerImage,
           })
         } else {
           challengerLeftCallback()
         }
-        found = true
-      })
-      if (!found) lobbyDeletedCallback()
+      } else {
+        lobbyDeletedCallback()
+      }
       
       // If the current user is joining a lobby, show the waiting popup
-      found = false
-      slots.filter(s => s.challengerIsCurrentUser).forEach(s => {
-        joinSlotCallback(s.creatorId, s.creatorDisplayName)
-        found = true
-      })
-      if (!found) leaveslotCallback()
+      const joinedSlot = slots.find(s => s.challengerIsCurrentUser)
+      if (joinedSlot) {
+        joinSlotCallback(joinedSlot.creatorId, joinedSlot.creatorDisplayName)
+      } else {
+        leaveSlotCallback()
+      }
     })
     currentId = variantId
   }
@@ -99,7 +102,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     joinSlotCallback = callback
   }
   function onLeaveSlot(callback: ()=>void) {
-    leaveslotCallback = callback
+    leaveSlotCallback = callback
   }
   function onLobbyDeleted(callback: ()=>void) {
     lobbyDeletedCallback = callback
@@ -114,7 +117,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     challengerJoinedCallback = EMPTY_FN
     challengerLeftCallback = EMPTY_FN
     joinSlotCallback = EMPTY_FN
-    leaveslotCallback = EMPTY_FN
+    leaveSlotCallback = EMPTY_FN
     lobbyDeletedCallback = EMPTY_FN
   }
   
