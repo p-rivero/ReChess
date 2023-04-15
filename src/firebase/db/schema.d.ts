@@ -47,7 +47,7 @@ export interface VariantDoc {
   creatorDisplayName: string
   creatorId: string | null
   numUpvotes: number
-  // JSON string that corresponds to the Variant interface in src/protochess/types.ts
+  // JSON string that corresponds to the Variant interface in src/protochess/types.d.ts
   // Validated client-side (on every fetch), since server-side validation would require importing
   // the protochess wasm module on the cloud function
   // Also, this object could be quite big and we don't want firebase to create any indexes its fields

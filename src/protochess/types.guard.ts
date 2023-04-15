@@ -1,5 +1,5 @@
 /*
- * Generated type guards for "types.ts".
+ * Generated type guards for "types.d.ts".
  * WARNING: Do not manually change this file.
  */
 import type { MakeMoveResult, MoveInfo, MoveList, StateDiff, InitialState, GameState, Variant, PublishedVariant, PieceDefinition, GetBestMoveResult, GetBestMoveTimeoutResult } from "./types";

@@ -8,7 +8,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --config .config/.eslintrc.cjs",
     "test": "jest --config .config/jest.config.js",
     "pre-compile": "run-p build-wasm generate-type-guard generate-icons minify-svg",
-    "generate-type-guard": "ts-auto-guard ./src/protochess/types.ts && sed -i 's/import {/import type {/g' ./src/protochess/types.guard.ts",
+    "generate-type-guard": "ts-auto-guard ./src/protochess/types.d.ts && sed -i 's/import {/import type {/g' ./src/protochess/types.guard.ts",
     "generate-icons": "./src/assets/img/icons/generate-icons.sh",
     "minify-svg": "svgo -f src/assets -r -q --multipass",
     "build-wasm": "make all use-pathname --directory protochess-engine/protochess-engine-wasm",
