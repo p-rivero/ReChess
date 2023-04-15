@@ -90,16 +90,17 @@ export interface GameDoc {
     timeCreated: Timestamp
     variantId: string
     variant: VariantDoc
-    whiteDisplayName: string
     whiteId: string | null
-    blackDisplayName: string
+    whiteDisplayName: string
     blackId: string | null
+    blackDisplayName: string
     requestedColor: RequestedColor
   }
 }
 
 // cancelledGames/{gameId}
 export interface CancelledGameDoc extends GameDoc {
-  cancelledById: string
+  cancelledByUserId: string
   cancelReason: string
+  cancelTime: Timestamp
 }
