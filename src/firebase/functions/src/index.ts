@@ -1,5 +1,6 @@
 import { region } from 'firebase-functions'
 import { callFunction } from './helpers'
+import { FUNCTIONS_REGION } from './config'
 
 // Lazy load each cloud function to reduce cold start time
 // (dynamic imoprts are only loaded once per process, not on each function call)
@@ -11,7 +12,7 @@ import { callFunction } from './helpers'
 // FILE-UPLOAD
 
 export const checkPieceHash =
-region('europe-west1')
+region(FUNCTIONS_REGION)
   .storage
   .bucket('rechess-web-piece-images')
   .object()
@@ -23,7 +24,7 @@ region('europe-west1')
 // GAME
 
 export const cancelGame =
-region('europe-west1')
+region(FUNCTIONS_REGION)
   .runWith({ enforceAppCheck: true })
   .https
   .onCall((data, context) => {
@@ -31,7 +32,7 @@ region('europe-west1')
   })
 
 export const createGame =
-region('europe-west1')
+region(FUNCTIONS_REGION)
   .runWith({ enforceAppCheck: true })
   .https
   .onCall((data, context) => {
@@ -42,7 +43,7 @@ region('europe-west1')
 // USER
 
 export const deleteUser =
-region('europe-west1')
+region(FUNCTIONS_REGION)
   .auth
   .user()
   .onDelete((user) => {
@@ -50,7 +51,7 @@ region('europe-west1')
   })
 
 export const renameUser =
-region('europe-west1')
+region(FUNCTIONS_REGION)
   .firestore
   .document('users/{userId}')
   .onUpdate((change, context) => {
@@ -61,7 +62,7 @@ region('europe-west1')
 // VARIANT
 
 export const decrementVariantUpvotes =
-region('europe-west1')
+region(FUNCTIONS_REGION)
   .firestore
   .document('users/{userId}/upvotedVariants/{variantId}')
   .onDelete((_snap, context) => {
@@ -69,7 +70,7 @@ region('europe-west1')
   })
 
 export const incrementVariantUpvotes =
-region('europe-west1')
+region(FUNCTIONS_REGION)
   .firestore
   .document('users/{userId}/upvotedVariants/{variantId}')
   .onCreate((_snap, context) => {
@@ -77,7 +78,7 @@ region('europe-west1')
   })
 
 export const updateVariantIndex =
-region('europe-west1')
+region(FUNCTIONS_REGION)
   .firestore
   .document('variants/{variantId}')
   .onCreate((snap) => {
