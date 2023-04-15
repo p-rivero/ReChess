@@ -197,6 +197,22 @@
 }
 
 
+/* eye-off.svg */
+.icon-eye-off {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/eye-off.svg");
+  mask-image: url("@/assets/img/icons/eye-off.svg");
+}
+
+
+/* eye.svg */
+.icon-eye {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/eye.svg");
+  mask-image: url("@/assets/img/icons/eye.svg");
+}
+
+
 /* github.svg */
 .icon-github {
   @extend .icon-common;

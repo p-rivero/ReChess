@@ -115,7 +115,7 @@
   }
   .logo {
     // Prevent jump when loading the logo
-    width: 10.4rem;
+    width: 11rem;
     height: 2rem;
     background-size: contain;
     background-repeat: no-repeat;

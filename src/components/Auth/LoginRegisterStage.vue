@@ -76,21 +76,35 @@
     
     <div class="mb-5">
       <label class="label">Password</label>
-      <SmartTextInput
-        type="password"
-        placeholder="Password"
-        :error-handler="errorHandler"
-        :refresh-handler-on-input="true"
-        :validator="text => {
-          if (text === '' && !isStrict) return undefined
-          if (text === '') return 'The password is required'
-          if (text.length < 6 && isRegister) return 'Password must be at least 6 characters long'
-        }"
-        :emit-changed-when-error="true"
-        :start-text="password"
-        @changed="text => password = text"
-        @enter-pressed="signInClick"
-      />
+      <p class="control has-icons-right">
+        <SmartTextInput
+          :type="revealPasswords ? 'text' : 'password'"
+          placeholder="Password"
+          :error-handler="errorHandler"
+          :refresh-handler-on-input="true"
+          :validator="text => {
+            if (text === '' && !isStrict) return undefined
+            if (text === '') return 'The password is required'
+            if (text.length < 6 && isRegister) return 'Password must be at least 6 characters long'
+          }"
+          :emit-changed-when-error="true"
+          :start-text="password"
+          @changed="text => password = text"
+          @enter-pressed="signInClick"
+        />
+        <span
+          class="icon is-small is-right is-clickable"
+          @click="revealPasswords = !revealPasswords"
+        >
+          <div
+            class="sz-icon color-theme"
+            :class="{
+              'icon-eye': !revealPasswords,
+              'icon-eye-off': revealPasswords,
+            }"
+          />
+        </span>
+      </p>
     </div>
     
     <div
@@ -98,20 +112,35 @@
       class="mb-5"
     >
       <label class="label">Repeat password</label>
-      <SmartTextInput
-        type="password"
-        placeholder="Password"
-        :error-handler="errorHandler"
-        :refresh-handler-on-input="true"
-        :validator="text => {
-          if (!isRegister) return undefined
-          if (text === '' && !isStrict) return undefined
-          if (text.length < 6 || text !== password) return 'Passwords must match and be at least 6 characters long'
-        }"
-        :start-text="passwordRepeat"
-        @changed="text => passwordRepeat = text"
-        @enter-pressed="signInClick"
-      />
+      <p class="control has-icons-right">
+        <SmartTextInput
+          ref="passwordRepeatRef"
+          :type="revealPasswords ? 'text' : 'password'"
+          placeholder="Password"
+          :error-handler="errorHandler"
+          :refresh-handler-on-input="true"
+          :validator="text => {
+            if (!isRegister) return undefined
+            if (text === '' && !isStrict) return undefined
+            if (text.length < 6 || text !== password) return 'Passwords must match and be at least 6 characters long'
+          }"
+          :start-text="passwordRepeat"
+          @changed="text => passwordRepeat = text"
+          @enter-pressed="signInClick"
+        />
+        <span
+          class="icon is-small is-right is-clickable"
+          @click="revealPasswords = !revealPasswords"
+        >
+          <div
+            class="sz-icon color-theme"
+            :class="{
+              'icon-eye': !revealPasswords,
+              'icon-eye-off': revealPasswords,
+            }"
+          />
+        </span>
+      </p>
     </div>
     
     <div class="mb-4 is-flex">
@@ -190,6 +219,7 @@
   
   const emailRef = ref<InstanceType<typeof SmartTextInput>>()
   const usernameRef = ref<InstanceType<typeof SmartTextInput>>()
+  const passwordRepeatRef = ref<InstanceType<typeof SmartTextInput>>()
   const email = ref('')
   const username = ref('')
   const password = ref('')
@@ -197,6 +227,7 @@
   const isRegister = ref(false)
   const isStrict = ref(false)
   const loading = ref(false)
+  const revealPasswords = ref(false)
   
   const authStore = useAuthStore()
   const usernameStatus = ref<'available' | 'taken' | 'unknown'>('unknown')
@@ -216,10 +247,13 @@
       isStrict.value = false
       isRegister.value = false
       loading.value = false
+      revealPasswords.value = false
       resetPasswordHint.value = 'hidden'
       username.value = ''
       passwordRepeat.value = ''
       usernameStatus.value = 'unknown'
+      usernameRef.value?.setText('')
+      passwordRepeatRef.value?.setText('')
     },
   })
   
