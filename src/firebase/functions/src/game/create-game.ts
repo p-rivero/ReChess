@@ -50,7 +50,7 @@ export default async function(data: any, context: CallableContext): Promise<{gam
   const lobbySlotRef = db.collection('variants').doc(variantId).collection('lobby').doc(creatorId)
   const lobbySlotSnapshot = await lobbySlotRef.get()
   if (!lobbySlotSnapshot.exists) {
-    throw new HttpsError('not-found', 'The lobby slot does not exist.')
+    throw new HttpsError('failed-precondition', 'The lobby slot does not exist: ' + lobbySlotRef.path)
   }
   
   // Check that the lobby slot has a challenger and no game ID

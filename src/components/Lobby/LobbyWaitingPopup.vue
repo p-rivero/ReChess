@@ -32,8 +32,14 @@
           </p>
         </div>
         
+        <p
+          v-if="!challenger"
+          class="w-100 has-text-centered"
+        >
+          We'll let you know when someone wants to join your game.
+        </p>
         <div
-          v-if="challenger"
+          v-else-if="!challenger.gameCreated"
           class="w-100 is-flex is-align-items-center is-justify-content-center"
         >
           <img
@@ -52,12 +58,14 @@
             <strong>{{ challenger.name }}</strong> wants to join
           </p>
         </div>
-        <p
+        <div
           v-else
-          class="w-100 has-text-centered"
+          class="w-100 is-flex is-align-items-center is-justify-content-center"
         >
-          We'll let you know when someone wants to join your game.
-        </p>
+          <p class="is-size-4 is-break-word">
+            Waiting for <strong>{{ challenger.name }}</strong> to enter...
+          </p>
+        </div>
       </section>
       
       
@@ -72,7 +80,7 @@
         </button>
         
         <button
-          v-if="challenger"
+          v-if="challenger && !challenger.gameCreated"
           class="button"
           @click="emit('reject-challenger')"
         >
@@ -81,9 +89,9 @@
         </button>
         
         <button
-          v-if="challenger"
+          v-if="challenger && !challenger.gameCreated"
           class="button is-primary"
-          @click="acceptChallenger"
+          @click="emit('accept-challenger')"
         >
           <div class="sz-icon icon-check color-white" />
           Start game
@@ -122,7 +130,7 @@
   
   const emit = defineEmits<{
     (event: 'cancel'): void
-    (event: 'accept-challenger', id: string): void
+    (event: 'accept-challenger'): void
     (event: 'reject-challenger'): void
   }>()
   
@@ -134,13 +142,6 @@
   function cancel() {
     emit('cancel')
     closePopup()
-  }
-  
-  function acceptChallenger() {
-    if (challenger.value) {
-      emit('accept-challenger', challenger.value.id)
-      closePopup()
-    }
   }
   
   

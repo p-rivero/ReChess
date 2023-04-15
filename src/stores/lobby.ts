@@ -16,11 +16,12 @@ export type LobbySlot = {
   challengerId?: string
   challengerDisplayName?: string
   challengerImage?: string
+  gameDocId?: string
 }
 export type ChallengerInfo = {
-  id: string
   name: string
   image?: string
+  gameCreated: boolean
 }
 
 export type LobbyUpdateCallback = (lobby: LobbySlot[]) => void
@@ -35,11 +36,12 @@ export const useLobbyStore = defineStore('lobby', () => {
   // Callbacks
   let unsubscribe = EMPTY_FN
   let lobbyCreatedCallback: (a: RequestedColor) => void = EMPTY_FN
+  let lobbyDeletedCallback = EMPTY_FN
   let challengerJoinedCallback: (info: ChallengerInfo) => void = EMPTY_FN
   let challengerLeftCallback = EMPTY_FN
   let joinSlotCallback: (id: string, name: string) => void = EMPTY_FN
   let leaveSlotCallback = EMPTY_FN
-  let lobbyDeletedCallback = EMPTY_FN
+  let gameCreatedCallback: (gameId: string, variantId: string, creatorId: string) => void = EMPTY_FN
   
   // Get real time updates for the slots in a lobby
   function setUpdateListener(variantId: string, callback: LobbyUpdateCallback) {
@@ -67,9 +69,9 @@ export const useLobbyStore = defineStore('lobby', () => {
         // If my slot has a challenger, show their info
         if (mySlot.challengerId) {
           challengerJoinedCallback({
-            id: mySlot.challengerId,
             name: mySlot.challengerDisplayName ?? '[error]',
             image: mySlot.challengerImage,
+            gameCreated: mySlot.gameDocId !== undefined,
           })
         } else {
           challengerLeftCallback()
@@ -79,9 +81,13 @@ export const useLobbyStore = defineStore('lobby', () => {
       }
       
       // If the current user is joining a lobby, show the waiting popup
+      // and redirect to the game when it's created
       const joinedSlot = slots.find(s => s.challengerIsCurrentUser)
       if (joinedSlot) {
         joinSlotCallback(joinedSlot.creatorId, joinedSlot.creatorDisplayName)
+        if (joinedSlot.gameDocId) {
+          gameCreatedCallback(joinedSlot.gameDocId, variantId, joinedSlot.creatorId)
+        }
       } else {
         leaveSlotCallback()
       }
@@ -91,6 +97,9 @@ export const useLobbyStore = defineStore('lobby', () => {
   
   function onLobbyCreated(callback: (color:RequestedColor)=>void) {
     lobbyCreatedCallback = callback
+  }
+  function onLobbyDeleted(callback: ()=>void) {
+    lobbyDeletedCallback = callback
   }
   function onChallengerJoined(callback: (info: ChallengerInfo)=>void) {
     challengerJoinedCallback = callback
@@ -104,8 +113,8 @@ export const useLobbyStore = defineStore('lobby', () => {
   function onLeaveSlot(callback: ()=>void) {
     leaveSlotCallback = callback
   }
-  function onLobbyDeleted(callback: ()=>void) {
-    lobbyDeletedCallback = callback
+  function onGameCreated(callback: (gameId: string, variantId: string, creatorId: string)=>void) {
+    gameCreatedCallback = callback
   }
   
   // Unsubscribe from lobby updates
@@ -137,6 +146,7 @@ export const useLobbyStore = defineStore('lobby', () => {
       challengerId: doc.challengerId ?? undefined,
       challengerDisplayName: doc.challengerDisplayName ?? undefined,
       challengerImage: doc.challengerImageUrl ?? undefined,
+      gameDocId: doc.gameDocId ?? undefined,
     }
   }
   
@@ -144,12 +154,17 @@ export const useLobbyStore = defineStore('lobby', () => {
   // Create a new lobby slot
   async function createSlot(variantId: string, requestedColor: RequestedColor) {
     if (!authStore.loggedUser) {
-      throw new Error('User must be logged in to join a lobby slot')
+      throw new Error('User must be logged in to create a lobby slot')
     }
     const id = authStore.loggedUser.uid
     const name = authStore.loggedUser.displayName
     const img = authStore.loggedUser.profileImg ?? null
     await LobbyDB.createSlot(variantId, id, name, img, requestedColor)
+  }
+  
+  // Delete a lobby slot
+  async function removeSlot(variantId: string, creatorId: string) {
+    await LobbyDB.deleteSlot(variantId, creatorId)
   }
   
   // Join an existing lobby slot
@@ -166,20 +181,23 @@ export const useLobbyStore = defineStore('lobby', () => {
   // Delete a lobby slot
   async function cancelSlot(variantId: string) {
     if (!authStore.loggedUser) {
-      throw new Error('User must be logged in to join a lobby slot')
+      throw new Error('User must be logged in to cancel a lobby slot')
     }
     await LobbyDB.removeSlot(variantId, authStore.loggedUser.uid)
   }
   
-  // Accept the incoming challenger
-  async function acceptChallenger(_variantId: string) {
-    // TODO
+  // Accept the incoming challenger, return the ID of the new game
+  async function acceptChallenger(variantId: string): Promise<string> {
+    if (!authStore.loggedUser) {
+      throw new Error('User must be logged in to create a game')
+    }
+    return LobbyDB.createGame(variantId, authStore.loggedUser.uid)
   }
   
   // Reject the incoming challenger
   async function rejectChallenger(variantId: string) {
     if (!authStore.loggedUser) {
-      throw new Error('User must be logged in to join a lobby slot')
+      throw new Error('User must be logged in to reject a challenger')
     }
     await LobbyDB.updateChallenger(variantId, authStore.loggedUser.uid, null, null, null)
   }
@@ -192,14 +210,16 @@ export const useLobbyStore = defineStore('lobby', () => {
   return {
     setUpdateListener,
     onLobbyCreated,
+    onLobbyDeleted,
     onChallengerJoined,
     onChallengerLeft,
-    onLobbyDeleted,
+    onGameCreated,
     onJoinSlot,
     onLeaveSlot,
     removeListeners,
     
     createSlot,
+    removeSlot,
     joinSlot,
     cancelSlot,
     acceptChallenger,

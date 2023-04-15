@@ -156,6 +156,17 @@
     lobbyStore.onLeaveSlot(() => {
       joiningPopup.value?.hide()
     })
+    lobbyStore.onGameCreated((gameId, variantId, creatorId) => {
+      router.push({ name: 'play-online', params: { gameId } })
+      lobbyStore.removeSlot(variantId, creatorId).catch(e => {
+        console.error(e)
+        showPopup(
+          'Unable to remove slot',
+          'There has been an unexpected error while cleaning up the lobby. Please try again later.',
+          'ok'
+        )
+      })
+    })
   })
   
   onUnmounted(() => {
@@ -216,9 +227,19 @@
     }
   }
   
-  async function acceptChallengerClicked(id: string) {
-    console.log('Accepting challenger', id)
-    // TODO
+  async function acceptChallengerClicked() {
+    if (!variant.value) throw new Error('Variant must be set')
+    try {
+      const gameId = await lobbyStore.acceptChallenger(variant.value.uid)
+      router.push({ name: 'play-online', params: { gameId } })
+    } catch (e) {
+      console.error(e)
+      showPopup(
+        'Unable to accept',
+        'There has been an unexpected error. Please try again later.',
+        'ok'
+      )
+    }
   }
   
   async function rejectChallengerClicked() {
