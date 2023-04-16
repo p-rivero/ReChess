@@ -93,6 +93,7 @@
           @enter-pressed="signInClick"
         />
         <span
+          v-show="password.length > 0"
           class="icon is-small is-right is-clickable"
           @click="revealPasswords = !revealPasswords"
         >
@@ -124,11 +125,13 @@
             if (text === '' && !isStrict) return undefined
             if (text.length < 6 || text !== password) return 'Passwords must match and be at least 6 characters long'
           }"
+          :emit-changed-when-error="true"
           :start-text="passwordRepeat"
           @changed="text => passwordRepeat = text"
           @enter-pressed="signInClick"
         />
         <span
+          v-show="passwordRepeat.length > 0"
           class="icon is-small is-right is-clickable"
           @click="revealPasswords = !revealPasswords"
         >
