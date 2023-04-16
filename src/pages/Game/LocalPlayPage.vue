@@ -14,7 +14,7 @@
   
   const route = useRoute()
   const startAs: Player = chooseColor()
-  const otherPlayer = getOpponent()
+  const otherPlayer: 'human' | 'engine' = route.query.mode === 'otb' ? 'human' : 'engine'
   
   // Decide which color to play as, based on the 'startAs' query parameter
   function chooseColor(): Player {
@@ -27,15 +27,6 @@
     }
     // Invalid value
     return DEFAULT_COLOR
-  }
-  
-  // Decide who is the opponent
-  function getOpponent(): 'human' | 'engine' {
-    if (route.query.mode === 'otb') {
-      return 'human'
-    } else {
-      return 'engine'
-    }
   }
   
 </script>

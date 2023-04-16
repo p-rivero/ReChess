@@ -30,8 +30,7 @@ const EMPTY_FN = () => { /* do nothing */ }
 
 export const useLobbyStore = defineStore('lobby', () => {
   const authStore = useAuthStore()
-  // Avoid subscribing to the same lobby twice
-  let currentId: string | null = null
+  let currentVariantId: string | null = null
   
   // Callbacks
   let unsubscribe = EMPTY_FN
@@ -41,11 +40,11 @@ export const useLobbyStore = defineStore('lobby', () => {
   let challengerLeftCallback = EMPTY_FN
   let joinSlotCallback: (id: string, name: string) => void = EMPTY_FN
   let leaveSlotCallback = EMPTY_FN
-  let gameCreatedCallback: (gameId: string, variantId: string, creatorId: string) => void = EMPTY_FN
+  let gameCreatedCallback: (gameId: string, creatorId: string) => void = EMPTY_FN
   
   // Get real time updates for the slots in a lobby
   function setUpdateListener(variantId: string, callback: LobbyUpdateCallback) {
-    if (currentId === variantId) return
+    if (currentVariantId === variantId) return
     
     // If subscribed to a different lobby, unsubscribe first
     unsubscribe()
@@ -86,13 +85,13 @@ export const useLobbyStore = defineStore('lobby', () => {
       if (joinedSlot) {
         joinSlotCallback(joinedSlot.creatorId, joinedSlot.creatorDisplayName)
         if (joinedSlot.gameDocId) {
-          gameCreatedCallback(joinedSlot.gameDocId, variantId, joinedSlot.creatorId)
+          gameCreatedCallback(joinedSlot.gameDocId, joinedSlot.creatorId)
         }
       } else {
         leaveSlotCallback()
       }
     })
-    currentId = variantId
+    currentVariantId = variantId
   }
   
   function onLobbyCreated(callback: (color:RequestedColor)=>void) {
@@ -113,14 +112,14 @@ export const useLobbyStore = defineStore('lobby', () => {
   function onLeaveSlot(callback: ()=>void) {
     leaveSlotCallback = callback
   }
-  function onGameCreated(callback: (gameId: string, variantId: string, creatorId: string)=>void) {
+  function onGameCreated(callback: (gameId: string, creatorId: string)=>void) {
     gameCreatedCallback = callback
   }
   
   // Unsubscribe from lobby updates
   function removeListeners() {
     unsubscribe()
-    currentId = null
+    currentVariantId = null
     unsubscribe = EMPTY_FN
     lobbyCreatedCallback = EMPTY_FN
     challengerJoinedCallback = EMPTY_FN
@@ -152,59 +151,80 @@ export const useLobbyStore = defineStore('lobby', () => {
   
   
   // Create a new lobby slot
-  async function createSlot(variantId: string, requestedColor: RequestedColor) {
+  async function createSlot(requestedColor: RequestedColor) {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to create a lobby slot')
     }
+    if (!currentVariantId) {
+      throw new Error('Must call setUpdateListener before createSlot')
+    }
     const id = authStore.loggedUser.uid
     const name = authStore.loggedUser.displayName
     const img = authStore.loggedUser.profileImg ?? null
-    await LobbyDB.createSlot(variantId, id, name, img, requestedColor)
+    await LobbyDB.createSlot(currentVariantId, id, name, img, requestedColor)
   }
   
   // Delete a lobby slot
-  async function removeSlot(variantId: string, creatorId: string) {
-    await LobbyDB.deleteSlot(variantId, creatorId)
+  async function removeSlot(creatorId: string) {
+    if (!currentVariantId) {
+      throw new Error('Must call setUpdateListener before removeSlot')
+    }
+    await LobbyDB.deleteSlot(currentVariantId, creatorId)
   }
   
   // Join an existing lobby slot
-  async function joinSlot(variantId: string, creatorId: string) {
+  async function joinSlot(creatorId: string) {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to join a lobby slot')
+    }
+    if (!currentVariantId) {
+      throw new Error('Must call setUpdateListener before joinSlot')
     }
     const id = authStore.loggedUser.uid
     const name = authStore.loggedUser.displayName
     const img = authStore.loggedUser.profileImg ?? null
-    await LobbyDB.updateChallenger(variantId, creatorId, id, name, img)
+    await LobbyDB.updateChallenger(currentVariantId, creatorId, id, name, img)
   }
   
   // Delete a lobby slot
-  async function cancelSlot(variantId: string) {
+  async function cancelSlot() {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to cancel a lobby slot')
     }
-    await LobbyDB.removeSlot(variantId, authStore.loggedUser.uid)
+    if (!currentVariantId) {
+      throw new Error('Must call setUpdateListener before cancelSlot')
+    }
+    await LobbyDB.removeSlot(currentVariantId, authStore.loggedUser.uid)
   }
   
   // Accept the incoming challenger, return the ID of the new game
-  async function acceptChallenger(variantId: string): Promise<string> {
+  async function acceptChallenger(): Promise<string> {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to create a game')
     }
-    return LobbyDB.createGame(variantId, authStore.loggedUser.uid)
+    if (!currentVariantId) {
+      throw new Error('Must call setUpdateListener before acceptChallenger')
+    }
+    return LobbyDB.createGame(currentVariantId, authStore.loggedUser.uid)
   }
   
   // Reject the incoming challenger
-  async function rejectChallenger(variantId: string) {
+  async function rejectChallenger() {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to reject a challenger')
     }
-    await LobbyDB.updateChallenger(variantId, authStore.loggedUser.uid, null, null, null)
+    if (!currentVariantId) {
+      throw new Error('Must call setUpdateListener before rejectChallenger')
+    }
+    await LobbyDB.updateChallenger(currentVariantId, authStore.loggedUser.uid, null, null, null)
   }
   
   // Leave a lobby (as challenger)
-  async function cancelJoining(variantId: string, creatorId: string) {
-    await LobbyDB.updateChallenger(variantId, creatorId, null, null, null)
+  async function cancelJoining(creatorId: string) {
+    if (!currentVariantId) {
+      throw new Error('Must call setUpdateListener before cancelJoining')
+    }
+    await LobbyDB.updateChallenger(currentVariantId, creatorId, null, null, null)
   }
   
   return {

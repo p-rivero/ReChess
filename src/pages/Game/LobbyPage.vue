@@ -156,9 +156,9 @@
     lobbyStore.onLeaveSlot(() => {
       joiningPopup.value?.hide()
     })
-    lobbyStore.onGameCreated((gameId, variantId, creatorId) => {
+    lobbyStore.onGameCreated((gameId, creatorId) => {
       router.push({ name: 'play-online', params: { gameId } })
-      lobbyStore.removeSlot(variantId, creatorId).catch(e => {
+      lobbyStore.removeSlot(creatorId).catch(e => {
         console.error(e)
         showPopup(
           'Unable to remove slot',
@@ -180,10 +180,9 @@
       return
     }
     playPopup.value?.show(async side => {
-      if (!variant.value) throw new Error('Variant must be set')
       // When the user selects a side, try to create the slot
       try {
-        await lobbyStore.createSlot(variant.value.uid, side)
+        await lobbyStore.createSlot(side)
       } catch (e) {
         console.error(e)
         showPopup(
@@ -200,9 +199,8 @@
       requestSignIn()
       return
     }
-    if (!variant.value) throw new Error('Variant must be set')
     try {
-      await lobbyStore.joinSlot(variant.value.uid, id)
+      await lobbyStore.joinSlot(id)
     } catch (e) {
       console.error(e)
       showPopup(
@@ -214,9 +212,8 @@
   }
   
   async function cancelGameClicked() {
-    if (!variant.value) throw new Error('Variant must be set')
     try {
-      await lobbyStore.cancelSlot(variant.value.uid)
+      await lobbyStore.cancelSlot()
     } catch (e) {
       console.error(e)
       showPopup(
@@ -228,9 +225,8 @@
   }
   
   async function acceptChallengerClicked() {
-    if (!variant.value) throw new Error('Variant must be set')
     try {
-      const gameId = await lobbyStore.acceptChallenger(variant.value.uid)
+      const gameId = await lobbyStore.acceptChallenger()
       router.push({ name: 'play-online', params: { gameId } })
     } catch (e) {
       console.error(e)
@@ -243,9 +239,8 @@
   }
   
   async function rejectChallengerClicked() {
-    if (!variant.value) throw new Error('Variant must be set')
     try {
-      await lobbyStore.rejectChallenger(variant.value.uid)
+      await lobbyStore.rejectChallenger()
     } catch (e) {
       console.error(e)
       showPopup(
@@ -257,9 +252,8 @@
   }
   
   async function cancelJoiningClicked(creatorId: string) {
-    if (!variant.value) throw new Error('Variant must be set')
     try {
-      await lobbyStore.cancelJoining(variant.value.uid, creatorId)
+      await lobbyStore.cancelJoining(creatorId)
     } catch (e) {
       console.error(e)
       showPopup(
