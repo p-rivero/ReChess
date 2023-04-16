@@ -93,12 +93,12 @@
   import { useLobbyStore, type LobbySlot } from '@/stores/lobby'
   import type { PublishedVariant } from '@/protochess/types'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
-  import LobbyWaitingPopup from '@/components/Lobby/LobbyWaitingPopup.vue'
+  import LobbyWaitingPopup from '@/components/Lobby/LobbyCreatorPopup.vue'
+  import LobbyJoiningPopup from '@/components/Lobby/LobbyChallengerPopup.vue'
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { updateTitle } from '@/utils/web-utils'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import LobbySlotView from '@/components/Lobby/LobbySlotView.vue'
-  import LobbyJoiningPopup from '@/components/Lobby/LobbyJoiningPopup.vue'
   
 
   const router = useRouter()
