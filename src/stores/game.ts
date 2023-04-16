@@ -2,13 +2,14 @@ import { onSnapshot } from '@firebase/firestore'
 import { GameDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
 import type { GameDoc } from '@/firebase/db/schema'
-import type { Player, Variant } from '@/protochess/types'
+import type { MoveInfo, Player, Variant } from '@/protochess/types'
 import { readVariantDoc } from './variant'
 import { useAuthStore } from './auth-user'
 
 export type Game = {
   variant: Variant
-  moveHistory: string[]
+  moveHistory: MoveInfo[]
+  moveHistoryString: string // Stringified version of moveHistory
   playerToMove: 'white' | 'black' | 'game-over'
   winner?: 'white' | 'black' | 'draw'
   
@@ -95,27 +96,53 @@ export const useGameStore = defineStore('game', () => {
     to: [number, number],
     promotion: string | undefined,
     playerToMove: Player,
-    winner: 'white' | 'black' | 'draw' | null
+    winner: 'white' | 'black' | 'draw' | undefined
   ) {
     if (!currentGameId) throw new Error('No game is being listened to')
     // Append the new move to the move history
-    const moveStr = stringifyMove(from, to, promotion)
-    const history = game.moveHistory.concat(moveStr).join(' ')
-    const player = winner ? 'game-over' : playerToMove
-    await GameDB.updateGame(currentGameId, history, player, winner)
+    game.moveHistory.push({ from, to, promotion })
+    game.moveHistoryString += stringifyMove(from, to, promotion)
+    game.playerToMove = winner ? 'game-over' : playerToMove
+    game.winner = winner
+    // Update the game in the database
+    await GameDB.updateGame(currentGameId, game.moveHistoryString, game.playerToMove, game.winner)
   }
   
   
   function readDocument(doc: GameDoc, variant: Variant): Game {
+    const moveHistory: MoveInfo[] = []
+    for (const move of doc.moveHistory.split(' ')) {
+      if (move.length === 0) continue
+      moveHistory.push(parseMove(move))
+    }
     return {
       variant,
-      moveHistory: doc.moveHistory.split(' ').filter(s => s !== ''),
+      moveHistory,
+      moveHistoryString: doc.moveHistory,
       playerToMove: doc.playerToMove,
       winner: doc.winner ?? undefined,
       whiteName: doc.IMMUTABLE.whiteDisplayName,
       blackName: doc.IMMUTABLE.blackDisplayName,
       loggedUserIsWhite: authStore.loggedUser?.uid === doc.IMMUTABLE.whiteId,
       loggedUserIsBlack: authStore.loggedUser?.uid === doc.IMMUTABLE.blackId,
+    }
+  }
+  
+  function parseMove(move: string): MoveInfo {
+    const moveRegex = /^([a-p])([0-9]{1,2})([a-p])([0-9]{1,2})(=..?)?$/
+    const match = move.match(moveRegex)
+    if (!match) throw new Error(`Invalid move string: "${move}"`)
+    const [, fromFile, fromRank, toFile, toRank, promotion] = match
+    const fromX = fromFile.charCodeAt(0) - 'a'.charCodeAt(0)
+    const fromY = parseInt(fromRank) - 1
+    const toX = toFile.charCodeAt(0) - 'a'.charCodeAt(0)
+    const toY = parseInt(toRank) - 1
+    // Skip '='
+    const promotionId = promotion ? promotion[1] : undefined
+    return {
+      from: [fromX, fromY],
+      to: [toX, toY],
+      promotion: promotionId,
     }
   }
   

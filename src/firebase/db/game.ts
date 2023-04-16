@@ -9,13 +9,12 @@ export async function updateGame(
   gameId: string,
   moveHistory: string,
   playerToMove: 'white' | 'black' | 'game-over',
-  winner: 'white' | 'black' | 'draw' | null
+  winner: 'white' | 'black' | 'draw' | undefined
 ) {
   const update = {
     moveHistory,
     playerToMove,
-    winner: winner,
+    winner: winner ?? null,
   }
-  console.log('Updating game', gameId, update)
   await updateDoc(getGameRef(gameId), update)
 }

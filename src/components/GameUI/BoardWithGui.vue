@@ -32,7 +32,7 @@
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
   import { showPopupImportant } from '@/components/PopupMsg/popup-manager'
   import { getProtochess } from '@/protochess'
-  import type { MakeMoveFlag, MakeMoveWinner, Player, Variant } from '@/protochess/types'
+  import type { MakeMoveFlag, MakeMoveWinner, Player, Variant, MoveInfo } from '@/protochess/types'
   import { debounce } from '@/utils/ts-utils'
   import { updateTitle } from '@/utils/web-utils'
   import { gameOverMessage } from '@/utils/chess/game-over-message'
@@ -43,7 +43,6 @@
   let gameOverPopupShown = false
   
   const props = defineProps<{
-    variant: Variant | undefined
     white: 'human' | 'engine' | 'none'
     black: 'human' | 'engine' | 'none'
     hasGauge?: boolean
@@ -61,28 +60,24 @@
   }>()
   
   defineExpose({
+    async setVariant(variant: Variant, history: MoveInfo[] = []) {
+      const protochess = await getProtochess()
+      // Set the board state and make sure it's valid
+      // Since the page has just loaded, the move history is empty
+      await board.value?.setState(variant, history)
+      try {
+        await protochess.validatePosition()
+      } catch (e) {
+        console.error(e)
+        emit('invalid-variant')
+        return
+      }
+      gameOverPopupShown = false
+      if (props.hasGauge) {
+        await updateEvaluation()
+      }
+    },
     playerToMove,
-  })
-  
-  
-  // Reload the variant when needed
-  watch(props, async () => {
-    if (!props.variant) return
-    const protochess = await getProtochess()
-    // Set the board state and make sure it's valid
-    // Since the page has just loaded, the move history is empty
-    await board.value?.setState(props.variant, [])
-    try {
-      await protochess.validatePosition()
-    } catch (e) {
-      console.error(e)
-      emit('invalid-variant')
-      return
-    }
-    gameOverPopupShown = false
-    if (props.hasGauge) {
-      await updateEvaluation()
-    }
   })
   
   watch(playerToMove, () => {
