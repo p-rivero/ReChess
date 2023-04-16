@@ -24,8 +24,6 @@ export type ChallengerInfo = {
   gameCreated: boolean
 }
 
-export type LobbyUpdateCallback = (lobby: LobbySlot[]) => void
-
 const EMPTY_FN = () => { /* do nothing */ }
 
 export const useLobbyStore = defineStore('lobby', () => {
@@ -34,6 +32,7 @@ export const useLobbyStore = defineStore('lobby', () => {
   
   // Callbacks
   let unsubscribe = EMPTY_FN
+  let lobbyLoadedCallback: (lobby: LobbySlot[]) => void = EMPTY_FN
   let lobbyCreatedCallback: (a: RequestedColor) => void = EMPTY_FN
   let lobbyDeletedCallback = EMPTY_FN
   let challengerJoinedCallback: (info: ChallengerInfo) => void = EMPTY_FN
@@ -43,7 +42,8 @@ export const useLobbyStore = defineStore('lobby', () => {
   let gameCreatedCallback: (gameId: string, creatorId: string) => void = EMPTY_FN
   
   // Get real time updates for the slots in a lobby
-  function setUpdateListener(variantId: string, callback: LobbyUpdateCallback) {
+  // Call this function after setting the callbacks
+  function listenForUpdates(variantId: string) {
     if (currentVariantId === variantId) return
     
     // If subscribed to a different lobby, unsubscribe first
@@ -59,7 +59,7 @@ export const useLobbyStore = defineStore('lobby', () => {
         const doc = docSnap.data() as LobbySlotDoc
         slots.push(readDocument(docId, doc))
       })
-      callback(slots)
+      lobbyLoadedCallback(slots)
       
       // If one of the slots is from the current user, show the waiting popup
       const mySlot = slots.find(s => s.creatorIsCurrentUser)
@@ -94,6 +94,9 @@ export const useLobbyStore = defineStore('lobby', () => {
     currentVariantId = variantId
   }
   
+  function onLobbyLoaded(callback: (lobby: LobbySlot[]) => void) {
+    lobbyLoadedCallback = callback
+  }
   function onLobbyCreated(callback: (color:RequestedColor)=>void) {
     lobbyCreatedCallback = callback
   }
@@ -228,7 +231,8 @@ export const useLobbyStore = defineStore('lobby', () => {
   }
   
   return {
-    setUpdateListener,
+    onLobbyLoaded,
+    listenForUpdates,
     onLobbyCreated,
     onLobbyDeleted,
     onChallengerJoined,

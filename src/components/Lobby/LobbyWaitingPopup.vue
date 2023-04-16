@@ -91,9 +91,17 @@
         <button
           v-if="challenger && !challenger.gameCreated"
           class="button is-primary"
-          @click="emit('accept-challenger')"
+          :class="{ 'is-loading': loading }"
+          :disabled="loading"
+          @click="() => {
+            loading = true
+            emit('accept-challenger')
+          }"
         >
-          <div class="sz-icon icon-check color-white" />
+          <div
+            v-show="!loading"
+            class="sz-icon icon-check color-white"
+          />
           Start game
         </button>
       </footer>
@@ -111,10 +119,12 @@
   const autofocusButton = ref<HTMLButtonElement>()
   const color = ref<RequestedColor>('random')
   const challenger = ref<ChallengerInfo>()
+  const loading = ref(false)
   
   defineExpose({
     show(requestedColor: RequestedColor) {
       color.value = requestedColor
+      loading.value = false
       popup.value?.classList.add('is-active')
       document.documentElement.classList.add('is-clipped')
       autofocusButton.value?.focus()

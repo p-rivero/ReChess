@@ -134,8 +134,8 @@
     variant.value = newVariant
     updateTitle('Play ' + newVariant.displayName)
     
-    lobbyStore.setUpdateListener(newVariant.uid, s => {
-      slots.value = s
+    lobbyStore.onLobbyLoaded(slotList => {
+      slots.value = slotList
       fetched.value = true
     })
     lobbyStore.onLobbyCreated(color => {
@@ -167,6 +167,9 @@
         )
       })
     })
+    
+    // This will call the listeners above
+    lobbyStore.listenForUpdates(newVariant.uid)
   })
   
   onUnmounted(() => {

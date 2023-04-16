@@ -58,7 +58,7 @@
 
 <script setup lang="ts">
   import type { MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
-  import { getMessage } from '@/utils/chess/game-over-message'
+  import { gameOverMessage } from '@/utils/chess/game-over-message'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { ref } from 'vue'
   
@@ -106,7 +106,7 @@
         blackBarHeight.value = '50%'
       }
       depthText.value = 'Game over'
-      explainText.value = getMessage(flag, playerToMove)
+      explainText.value = gameOverMessage(flag, playerToMove)
     },
   })
   
