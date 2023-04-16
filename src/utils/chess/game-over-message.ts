@@ -5,7 +5,7 @@ import type { MakeMoveFlag, Player } from '@/protochess/types'
  * @param {MakeMoveFlag} flag The flag that caused the game to end
  * @param {Player} playerToMove The player that was to move when the game ended
  */
-export function getMessage(flag: MakeMoveFlag, playerToMove: Player): string {
+export function gameOverMessage(flag: MakeMoveFlag, playerToMove: Player): string {
   const playerUpper = playerToMove === 'white' ? 'White' : 'Black'
   if (flag === 'Checkmate') {
     return `**Checkmate:** ${playerUpper} has no legal moves and is in check.`

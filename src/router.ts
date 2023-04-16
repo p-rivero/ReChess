@@ -50,12 +50,12 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'play-offline',
     path: '/variant/:variantId/play',
-    component: () => import('@/pages/Game/PlayPage.vue'),
+    component: () => import('@/pages/Game/LocalPlayPage.vue'),
   },
   {
     name: 'play-online',
     path: '/game/:gameId',
-    component: () => import('@/pages/Game/PlayPage.vue'),
+    component: () => import('@/pages/Game/OnlinePlayPage.vue'),
   },
   
   
@@ -74,7 +74,7 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'draft-play',
     path: '/draft/play',
-    component: () => import('@/pages/Game/PlayPage.vue'),
+    component: () => import('@/pages/Game/LocalPlayPage.vue'),
   },
   {
     name: 'draft-analysis',

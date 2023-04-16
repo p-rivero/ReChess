@@ -7,7 +7,7 @@
         :black="black"
         :invert-enemy-direction="invertEnemyDirection"
         @piece-moved="pieceMoved"
-        @player-changed="p => emit('player-changed', p)"
+        @player-changed="updatePlayerToMove"
       />
       <EvaluationGauge
         v-if="hasGauge"
@@ -20,76 +20,58 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
+  import { ref, watch } from 'vue'
   import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
   import type { CustomMoveCallback } from '@/components/ChessBoard/PlayableChessBoard.vue'
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
+  import { showPopupImportant } from '@/components/PopupMsg/popup-manager'
   import { getProtochess } from '@/protochess'
-  import { useVariantDraftStore } from '@/stores/variant-draft'
-  import { useVariantStore } from '@/stores/variant'
   import type { MakeMoveFlag, MakeMoveWinner, Player, Variant } from '@/protochess/types'
   import { debounce } from '@/utils/ts-utils'
+  import { updateTitle } from '@/utils/web-utils'
+  import { gameOverMessage } from '@/utils/chess/game-over-message'
   
-  const route = useRoute()
-  const router = useRouter()
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
+  let gameOverPopupShown = false
   
   const props = defineProps<{
+    variant: Variant | undefined
     white: 'human' | 'engine' | CustomMoveCallback
     black: 'human' | 'engine' | CustomMoveCallback
-    hasGauge: boolean
+    hasGauge?: boolean
     invertEnemyDirection?: boolean
+    updateTitle?: boolean
+    showGameOverPopup?: boolean
   }>()
   
   
   const emit = defineEmits<{
-    (event: 'piece-moved', from?: [number, number], to?: [number, number]): void
+    (event: 'invalid-variant'): void
+    (event: 'piece-move', from?: [number, number], to?: [number, number]): void
     (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner, playerToMove: Player): void
-    (event: 'player-changed', playerToMove: Player): void
   }>()
   
-  onMounted(async () => {
+  
+  // Reload the variant when needed
+  watch(props, async () => {
+    if (!props.variant) return
     const protochess = await getProtochess()
-    const variant = await getVariant()
-    if (!variant) return
     // Set the board state and make sure it's valid
     // Since the page has just loaded, the move history is empty
-    await board.value?.setState(variant, [])
+    await board.value?.setState(props.variant, [])
     try {
       await protochess.validatePosition()
     } catch (e) {
       console.error(e)
-      // Invalid position, redirect to home page
-      router.push({ name: 'home' })
+      emit('invalid-variant')
+      return
     }
+    gameOverPopupShown = false
     if (props.hasGauge) {
       await updateEvaluation()
     }
   })
-  
-  
-  // If the variantId parameter is missing, use the stored draft variant
-  async function getVariant(): Promise<Variant|undefined> {
-    const variantId = route.params.variantId
-    if (variantId && typeof variantId === 'string') {
-      return getVariantFromServer(variantId)
-    }
-    const draftStore = useVariantDraftStore()
-    const draft = draftStore.state
-    return draft
-  }
-  async function getVariantFromServer(id: string): Promise<Variant|undefined> {
-    const variantStore = useVariantStore()
-    const variant = await variantStore.getVariant(id)
-    // Variant ID is incorrect (or the uploader of this variant is malicious), redirect to home page
-    if (!variant) {
-      router.push({ name: 'home' })
-      return
-    }
-    return variant
-  }
   
   
   const updateEvalDebounced = debounce(updateEvaluation, 500)
@@ -100,7 +82,7 @@
     if (!result && props.hasGauge) {
       await updateEvalDebounced()
     }
-    emit ('piece-moved', from, to)
+    emit ('piece-move', from, to)
   }
   
   async function gameOver(flag: MakeMoveFlag, winner: MakeMoveWinner) {
@@ -116,6 +98,23 @@
       gauge.value?.gameOver(flag, winner, playerToMove)
     }
     emit('game-over', flag, winner, playerToMove)
+    if (props.showGameOverPopup && !gameOverPopupShown) {
+      showGameOverPopup(flag, winner, playerToMove)
+      gameOverPopupShown = true
+    }
+  }
+  function showGameOverPopup(flag: MakeMoveFlag, winner: MakeMoveWinner, playerToMove: Player) {
+    const title =
+      winner === 'white' ? 'White wins!' :
+      winner === 'black' ? 'Black wins!' :
+      'It\'s a Draw!'
+    const message = gameOverMessage(flag, playerToMove)
+    
+    // Wait some time before showing the popup, so that the user can see the
+    // final position of the game.
+    setTimeout(() => {
+      showPopupImportant(title, message, 'ok')
+    }, 700)
   }
   
   async function updateEvaluation() {
@@ -126,6 +125,16 @@
     
     gauge.value?.updateEvaluation(mv.evaluation, mv.depth, player === 'black')
     board.value?.drawArrow(mv.from, mv.to, 'analysis', mv.promotion)
+  }
+  
+  function updatePlayerToMove(playerToMove: Player) {
+    if (!props.updateTitle) return
+    const currentPlayer = playerToMove === 'white' ? props.white : props.black
+    if (currentPlayer === 'human') {
+      updateTitle('Your turn')
+    } else {
+      updateTitle('Waiting for opponent')
+    }
   }
 </script>
 
