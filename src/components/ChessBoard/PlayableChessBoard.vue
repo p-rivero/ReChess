@@ -35,13 +35,9 @@
   import ViewableChessBoard from './ViewableChessBoard.vue'
   import PromotionPopup from '@/components/GameUI/PromotionPopup.vue'
   
-  export interface CustomMoveCallback {
-    (playerToMove: Player): Promise<MoveInfo>
-  }
-  
   const props = defineProps<{
-    white: 'human' | 'engine' | CustomMoveCallback
-    black: 'human' | 'engine' | CustomMoveCallback
+    white: 'human' | 'engine' | 'none'
+    black: 'human' | 'engine' | 'none'
     invertEnemyDirection?: boolean
   }>()
   
@@ -192,9 +188,6 @@
     const nextPlayer = state.playerToMove == 0 ? props.white : props.black
     if (nextPlayer == 'engine') {
       makeEngineMove()
-    } else if (typeof nextPlayer == 'function') {
-      const move = await nextPlayer(state.playerToMove == 0 ? 'white' : 'black')
-      synchronizeBoardState(move)
     }
   }
   

@@ -231,8 +231,9 @@ export const useLobbyStore = defineStore('lobby', () => {
   }
   
   return {
-    onLobbyLoaded,
     listenForUpdates,
+    removeListeners,
+    onLobbyLoaded,
     onLobbyCreated,
     onLobbyDeleted,
     onChallengerJoined,
@@ -240,7 +241,6 @@ export const useLobbyStore = defineStore('lobby', () => {
     onGameCreated,
     onJoinSlot,
     onLeaveSlot,
-    removeListeners,
     
     createSlot,
     removeSlot,

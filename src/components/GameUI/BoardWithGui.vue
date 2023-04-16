@@ -22,7 +22,6 @@
 <script setup lang="ts">
   import { ref, watch } from 'vue'
   import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
-  import type { CustomMoveCallback } from '@/components/ChessBoard/PlayableChessBoard.vue'
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
   import { showPopupImportant } from '@/components/PopupMsg/popup-manager'
   import { getProtochess } from '@/protochess'
@@ -37,8 +36,8 @@
   
   const props = defineProps<{
     variant: Variant | undefined
-    white: 'human' | 'engine' | CustomMoveCallback
-    black: 'human' | 'engine' | CustomMoveCallback
+    white: 'human' | 'engine' | 'none'
+    black: 'human' | 'engine' | 'none'
     hasGauge?: boolean
     invertEnemyDirection?: boolean
     updateTitle?: boolean

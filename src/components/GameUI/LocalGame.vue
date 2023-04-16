@@ -6,6 +6,7 @@
     :has-gauge="hasGauge"
     :invert-enemy-direction="invertEnemyDirection"
     :update-title="updateTitle"
+    :show-game-over-popup="showGameOverPopup"
     
     @invalid-variant="invalidVariant"
     @piece-move="(from, to) => emit('piece-moved', from, to)"
@@ -15,7 +16,6 @@
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import type { CustomMoveCallback } from '@/components/ChessBoard/PlayableChessBoard.vue'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useVariantStore } from '@/stores/variant'
   import type { Variant } from '@/protochess/types'
@@ -28,11 +28,12 @@
   const variant = ref<Variant>()
   
   defineProps<{
-    white: 'human' | 'engine' | CustomMoveCallback
-    black: 'human' | 'engine' | CustomMoveCallback
+    white: 'human' | 'engine'
+    black: 'human' | 'engine'
     hasGauge?: boolean
     invertEnemyDirection?: boolean
     updateTitle?: boolean
+    showGameOverPopup?: boolean
   }>()
   
   
@@ -58,7 +59,7 @@
     showPopup(
       'Invalid variant',
       'This variant seems to be invalid, it may have been uploaded using an incompatible version \
-        of the app or by a malicious user. You were redirected to the home page.',
+        of the site or by a malicious user. You were redirected to the home page.',
       'ok'
     )
     router.push({ name: 'home' })

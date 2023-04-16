@@ -32,7 +32,7 @@ export const useVariantStore = defineStore('variant', () => {
     // Convert each pair of documents into a PublishedVariant
     const result = []
     for (const [i, [doc, id]] of docsWithId.entries()) {
-      const state = readDocument(doc, userUpvoted[i], id)
+      const state = readVariantDoc(doc, userUpvoted[i], id)
       if (state) result.push(state)
       else console.warn('Invalid variant document', doc)
     }
@@ -65,7 +65,7 @@ export const useVariantStore = defineStore('variant', () => {
     ]).then(([doc, userUpvoted]) => {
       // Convert the documents into a PublishedVariant
       if (!doc) return undefined
-      return readDocument(doc, userUpvoted, id)
+      return readVariantDoc(doc, userUpvoted, id)
     })
   }
   
@@ -76,7 +76,7 @@ export const useVariantStore = defineStore('variant', () => {
     const userUpvoted = await Promise.all(docsWithId.map(hasUpvoted))
     const result = []
     for (const [i, [doc, id]] of docsWithId.entries()) {
-      const state = readDocument(doc, userUpvoted[i], id)
+      const state = readVariantDoc(doc, userUpvoted[i], id)
       if (state) result.push(state)
     }
     return result
@@ -87,7 +87,7 @@ export const useVariantStore = defineStore('variant', () => {
     const docsWithId = await VariantDB.getUpvotedVariants(upvoterId)
     const result: PublishedVariant[] = []
     for (const [doc, id] of docsWithId) {
-      const state = readDocument(doc, true, id)
+      const state = readVariantDoc(doc, true, id)
       if (state) result.push(state)
     }
     return result
@@ -105,28 +105,6 @@ export const useVariantStore = defineStore('variant', () => {
     }
   }
   
-  
-  function readDocument(doc: VariantDoc, userUpvoted: boolean, id: string): PublishedVariant | undefined {
-    const variant = parseVariantJson(doc.initialState)
-    if (!variant) {
-      console.error('Illegal variant document', doc)
-      return undefined
-    }
-    const pv: PublishedVariant = {
-      ...variant,
-      uid: id,
-      creationTime: doc.creationTime.toDate(),
-      creatorDisplayName: doc.creatorDisplayName,
-      creatorId: doc.creatorId ?? undefined,
-      numUpvotes: doc.numUpvotes,
-      loggedUserUpvoted: userUpvoted,
-      // Overwrite the existing name and description with the ones from the document
-      displayName: doc.name,
-      description: doc.description,
-    }
-    return pv
-  }
-  
   function hasUpvoted(variant: [VariantDoc, string]): Promise<boolean> {
     const variantId = variant[1]
     return VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, variantId)
@@ -134,3 +112,25 @@ export const useVariantStore = defineStore('variant', () => {
   
   return { refreshList, getVariant, getVariantsFromCreator, getUpvotedVariants, upvote, variantList }
 })
+
+
+export function readVariantDoc(doc: VariantDoc, userUpvoted: boolean, id: string): PublishedVariant | undefined {
+  const variant = parseVariantJson(doc.initialState)
+  if (!variant) {
+    console.error('Illegal variant document', doc)
+    return undefined
+  }
+  const pv: PublishedVariant = {
+    ...variant,
+    uid: id,
+    creationTime: doc.creationTime.toDate(),
+    creatorDisplayName: doc.creatorDisplayName,
+    creatorId: doc.creatorId ?? undefined,
+    numUpvotes: doc.numUpvotes,
+    loggedUserUpvoted: userUpvoted,
+    // Overwrite the existing name and description with the ones from the document
+    displayName: doc.name,
+    description: doc.description,
+  }
+  return pv
+}

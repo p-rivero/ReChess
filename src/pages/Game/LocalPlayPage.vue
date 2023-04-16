@@ -4,6 +4,7 @@
     :black="startAs === 'black' ? 'human' : otherPlayer"
     :invert-enemy-direction="otherPlayer === 'human'"
     :update-title="otherPlayer !== 'human'"
+    :show-game-over-popup="true"
   />
 </template>
 
