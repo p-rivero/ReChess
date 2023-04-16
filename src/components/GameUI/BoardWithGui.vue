@@ -6,8 +6,15 @@
         :white="white"
         :black="black"
         :invert-enemy-direction="invertEnemyDirection"
-        @piece-moved="pieceMoved"
-        @player-changed="updatePlayerToMove"
+        @new-move="(from, to, promotion, result) => {
+          updateResult(result)
+          emit('new-move', from, to, promotion, result?.winner)
+        }"
+        @on-scroll="result => {
+          updateResult(result)
+          emit('browse-history', result?.winner)
+        }"
+        @player-changed="p => playerToMove = p"
       />
       <EvaluationGauge
         v-if="hasGauge"
@@ -32,6 +39,7 @@
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
+  const playerToMove = ref<Player>('white')
   let gameOverPopupShown = false
   
   const props = defineProps<{
@@ -47,9 +55,14 @@
   
   const emit = defineEmits<{
     (event: 'invalid-variant'): void
-    (event: 'piece-move', from?: [number, number], to?: [number, number]): void
+    (event: 'new-move', from: [number, number], to: [number, number], promotion?: string, winner?: Player|'none'): void
+    (event: 'browse-history', winner?: Player|'none'): void
     (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner, playerToMove: Player): void
   }>()
+  
+  defineExpose({
+    playerToMove,
+  })
   
   
   // Reload the variant when needed
@@ -72,16 +85,25 @@
     }
   })
   
+  watch(playerToMove, () => {
+    if (!props.updateTitle) return
+    const currentPlayer = playerToMove.value === 'white' ? props.white : props.black
+    if (currentPlayer === 'human') {
+      updateTitle('Your turn')
+    } else {
+      updateTitle('Waiting for opponent')
+    }
+  })
+  
   
   const updateEvalDebounced = debounce(updateEvaluation, 500)
-  async function pieceMoved(from?: [number, number], to?: [number, number], result?: {flag: MakeMoveFlag, winner: MakeMoveWinner}) {
-    if (result !== undefined) {
+  async function updateResult(result?: {flag: MakeMoveFlag, winner: MakeMoveWinner}) {
+    if (result) {
       await gameOver(result.flag, result.winner)
     }
     if (!result && props.hasGauge) {
       await updateEvalDebounced()
     }
-    emit ('piece-move', from, to)
   }
   
   async function gameOver(flag: MakeMoveFlag, winner: MakeMoveWinner) {
@@ -124,16 +146,6 @@
     
     gauge.value?.updateEvaluation(mv.evaluation, mv.depth, player === 'black')
     board.value?.drawArrow(mv.from, mv.to, 'analysis', mv.promotion)
-  }
-  
-  function updatePlayerToMove(playerToMove: Player) {
-    if (!props.updateTitle) return
-    const currentPlayer = playerToMove === 'white' ? props.white : props.black
-    if (currentPlayer === 'human') {
-      updateTitle('Your turn')
-    } else {
-      updateTitle('Waiting for opponent')
-    }
   }
 </script>
 

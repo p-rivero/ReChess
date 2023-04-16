@@ -41,9 +41,10 @@
     invertEnemyDirection?: boolean
   }>()
   
-  type Result = {flag: MakeMoveFlag, winner: MakeMoveWinner}
+  type GameResult = {flag: MakeMoveFlag, winner: MakeMoveWinner}
   const emit = defineEmits<{
-    (event: 'piece-moved', from?: [number, number], to?: [number, number], result?: Result): void
+    (event: 'new-move', from: [number, number], to: [number, number], promotion?: string, result?: GameResult): void
+    (event: 'on-scroll', result?: GameResult): void
     (event: 'player-changed', playerToMove: Player): void
   }>()
   
@@ -150,29 +151,30 @@
   }
   
   // Synchonize the board state with the protochess engine
-  // If playMoveBefore is specified, it will be played before synchronizing the state
-  async function synchronizeBoardState(playMoveBefore?: MoveInfo) {
+  // If playMove is specified, it will be played before synchronizing the state
+  async function synchronizeBoardState(playMove?: MoveInfo) {
     const protochess = await getProtochess()
     // 'N/A' if no move was played, undefined if a move was played but the game hasn't ended
-    let moveResult: Result | undefined | 'N/A' = 'N/A'
-    if (playMoveBefore) {
+    let gameResult: GameResult | undefined | 'N/A' = 'N/A'
+    if (playMove) {
       // Play the move before synchronizing the state
-      const result = await protochess.makeMove(playMoveBefore)
-      board.value?.setLastMove(playMoveBefore)
+      const result = await protochess.makeMove(playMove)
+      board.value?.setLastMove(playMove)
       // Handle the result, if the game has ended don't emit piece-moved
-      moveResult = handleResult(result)
+      gameResult = handleResult(result)
     }
     const stateDiff = await protochess.getStateDiff()
     board.value?.setStateDiff(stateDiff)
     
     // Move was played, emit piece-moved and store history
-    if (moveResult !== 'N/A') {
-      if (!playMoveBefore) throw new Error('playMoveBefore is undefined')
-      moveHistory.newMove(playMoveBefore, moveResult)
-      emit('piece-moved', playMoveBefore.from, playMoveBefore.to, moveResult)
+    if (gameResult !== 'N/A') {
+      if (!playMove) throw new Error('playMove is undefined')
+      moveHistory.newMove(playMove, gameResult)
+      // Important: update the player before emitting new-move (otherwise, the player sent to the server will be wrong)
       emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
+      emit('new-move', playMove.from, playMove.to, playMove.promotion, gameResult)
       // Game has ended, don't continue
-      if (moveResult) return
+      if (gameResult) return
     }
     
     updateMovableSquares(stateDiff)
@@ -191,7 +193,7 @@
     }
   }
   
-  function handleResult(result: MakeMoveResult): Result | undefined {
+  function handleResult(result: MakeMoveResult): GameResult | undefined {
     // Show effect for exploded squares
     board.value?.explode(result.exploded)
     if (result.flag === 'Ok') return undefined
@@ -224,7 +226,7 @@
       board.value?.setMovable(false, false, [])
       cursorPointer.value = false
     }
-    emit('piece-moved', undefined, undefined, entry.result)
+    emit('on-scroll', entry.result)
   }
 </script>
 
