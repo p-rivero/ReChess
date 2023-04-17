@@ -42,7 +42,6 @@ export const useGameStore = defineStore('game', () => {
     const gameRef = GameDB.getGameRef(gameId)
     
     unsubscribe = onSnapshot(gameRef, snap => {
-      let reloadRequired = false
       if (!snap.exists()) throw new Error('Game does not exist')
       const gameDoc = snap.data() as GameDoc
       
@@ -55,18 +54,12 @@ export const useGameStore = defineStore('game', () => {
           return
         }
         currentGameVariant = variant
-        reloadRequired = true
       }
       const game = readDocument(gameDoc, currentGameVariant)
-      
-      // When the user makes a move, the game is updated and onSnapshot is called with the values we just set.
-      // We don't need to re-update the board in this case.
-      const skipCallback = game.loggedUserIsWhite && game.playerToMove === 'black'
-        || game.loggedUserIsBlack && game.playerToMove === 'white'
-      // If this is the first load, always update the board.
-      if (!skipCallback || reloadRequired) {
-        gameChangedCallback(game)
-      }
+      // When the user moves a piece, this callback will be called even though
+      // the state was not changed. However, if the same user has 2 tabs open, this
+      // behavior is necessary to keep both tabs in sync.
+      gameChangedCallback(game)
     })
     currentGameId = gameId
   }
