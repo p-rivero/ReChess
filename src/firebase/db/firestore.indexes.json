@@ -15,5 +15,24 @@
       ]
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [
+    {
+      "collectionGroup": "games",
+      "fieldPath": "IMMUTABLE.variant.initialState",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "games",
+      "fieldPath": "moveHistory",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "variants",
+      "fieldPath": "initialState",
+      "ttl": false,
+      "indexes": []
+    }
+  ]
 }
