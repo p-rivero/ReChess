@@ -64,9 +64,15 @@
       const protochess = await getProtochess()
       // Set the board state and make sure it's valid
       // Since the page has just loaded, the move history is empty
-      await board.value?.setState(variant, history)
       try {
-        await protochess.validatePosition()
+        const result = await board.value?.setState(variant, history)
+        if (result) {
+          // Game over, show the popup
+          await gameOver(result.flag, result.winner)
+        } else {
+          // In the middle of a game, check that the position is valid
+          await protochess.validatePosition()
+        }
       } catch (e) {
         console.error(e)
         emit('invalid-variant')
@@ -136,11 +142,14 @@
   async function updateEvaluation() {
     board.value?.clearArrows('analysis')
     const protochess = await getProtochess()
-    const mv = await protochess.getBestMoveTimeout(1)
-    const player = await protochess.playerToMove()
-    
-    gauge.value?.updateEvaluation(mv.evaluation, mv.depth, player === 'black')
-    board.value?.drawArrow(mv.from, mv.to, 'analysis', mv.promotion)
+    try {
+      const mv = await protochess.getBestMoveTimeout(1)
+      const player = await protochess.playerToMove()
+      gauge.value?.updateEvaluation(mv.evaluation, mv.depth, player === 'black')
+      board.value?.drawArrow(mv.from, mv.to, 'analysis', mv.promotion)
+    } catch (e) {
+      console.info('Evaluation failed:', e)
+    }
   }
 </script>
 

@@ -5,6 +5,7 @@ import type { GameDoc } from '@/firebase/db/schema'
 import type { MoveInfo, Player, Variant } from '@/protochess/types'
 import { readVariantDoc } from './variant'
 import { useAuthStore } from './auth-user'
+import { object_equals } from '@/utils/ts-utils'
 
 export type Game = {
   variant: Variant
@@ -23,12 +24,14 @@ const EMPTY_FN = () => { /* do nothing */ }
 
 export const useGameStore = defineStore('game', () => {
   let currentGameId: string | null = null
-  let currentGameVariant: Variant | null = null
+  let currentGame: Game | null = null
+  let currentVariant: Variant | null = null
   const authStore = useAuthStore()
   
   // Callbacks
   let unsubscribe = EMPTY_FN
   let gameChangedCallback: (game: Game) => void = EMPTY_FN
+  let gameNotExistsCallback = EMPTY_FN
   let invalidVariantCallback = EMPTY_FN
   
   // Get real time updates for the moves in a game
@@ -42,30 +45,38 @@ export const useGameStore = defineStore('game', () => {
     const gameRef = GameDB.getGameRef(gameId)
     
     unsubscribe = onSnapshot(gameRef, snap => {
-      if (!snap.exists()) throw new Error('Game does not exist')
+      if (!snap.exists()) {
+        gameNotExistsCallback()
+        return
+      }
       const gameDoc = snap.data() as GameDoc
       
       // Don't parse the variant doc every time a move is made
       // Only parse it when the game is first loaded
-      if (currentGameVariant == null) {
+      if (currentVariant == null) {
         const variant = readVariantDoc(gameDoc.IMMUTABLE.variant, false, '')
         if (!variant) {
           invalidVariantCallback()
           return
         }
-        currentGameVariant = variant
+        currentVariant = variant
       }
-      const game = readDocument(gameDoc, currentGameVariant)
-      // When the user moves a piece, this callback will be called even though
-      // the state was not changed. However, if the same user has 2 tabs open, this
-      // behavior is necessary to keep both tabs in sync.
-      gameChangedCallback(game)
+      const newGame = readDocument(gameDoc, currentVariant)
+      // If the same user has 2 tabs open, we need to check which ones are outdated
+      // and call the callback only when needed
+      if (!object_equals(newGame, currentGame)) {
+        gameChangedCallback(newGame)
+        currentGame = newGame
+      }
     })
     currentGameId = gameId
   }
   
   function onGameChanged(callback: (game: Game) => void) {
     gameChangedCallback = callback
+  }
+  function onGameNotExists(callback: () => void) {
+    gameNotExistsCallback = callback
   }
   function onInvalidVariant(callback: () => void) {
     invalidVariantCallback = callback
@@ -76,29 +87,30 @@ export const useGameStore = defineStore('game', () => {
   function removeListeners() {
     unsubscribe()
     currentGameId = null
-    currentGameVariant = null
+    currentVariant = null
+    currentGame = null
     unsubscribe = EMPTY_FN
     gameChangedCallback = EMPTY_FN
+    gameNotExistsCallback = EMPTY_FN
     invalidVariantCallback = EMPTY_FN
   }
   
   
   async function movePiece(
-    game: Game,
     from: [number, number],
     to: [number, number],
     promotion: string | undefined,
     playerToMove: Player,
     winner: 'white' | 'black' | 'draw' | undefined
   ) {
-    if (!currentGameId) throw new Error('No game is being listened to')
+    if (!currentGameId || !currentGame) throw new Error('No game is being listened to')
     // Append the new move to the move history
-    game.moveHistory.push({ from, to, promotion })
-    game.moveHistoryString += stringifyMove(from, to, promotion)
-    game.playerToMove = winner ? 'game-over' : playerToMove
-    game.winner = winner
+    currentGame.moveHistory.push({ from, to, promotion })
+    currentGame.moveHistoryString += stringifyMove(from, to, promotion)
+    currentGame.playerToMove = winner ? 'game-over' : playerToMove
+    currentGame.winner = winner
     // Update the game in the database
-    await GameDB.updateGame(currentGameId, game.moveHistoryString, game.playerToMove, game.winner)
+    await GameDB.updateGame(currentGameId, currentGame.moveHistoryString, currentGame.playerToMove, currentGame.winner)
   }
   
   
@@ -155,6 +167,7 @@ export const useGameStore = defineStore('game', () => {
     listenForUpdates,
     removeListeners,
     onGameChanged,
+    onGameNotExists,
     onInvalidVariant,
     
     movePiece,

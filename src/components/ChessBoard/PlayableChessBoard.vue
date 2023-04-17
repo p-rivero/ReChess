@@ -61,9 +61,9 @@
   
   defineExpose({
     // Set the state of the board
-    async setState(variant: Variant, history: MoveInfo[]) {
+    async setState(variant: Variant, history: MoveInfo[]): Promise<GameResult|undefined> {
       const protochess = await getProtochess()
-      await protochess.setState({ initialState: variant, moveHistory: history })
+      const result = await protochess.setState({ initialState: variant, moveHistory: history })
       const stateDiff = await protochess.getStateDiff()
       
       board.value?.setState(variant, stateDiff)
@@ -76,6 +76,8 @@
       promotionPopup.value?.initialize(variant)
       moveHistory.initialize({ initialState: variant, moveHistory: history })
       emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
+      
+      return handleResult(result)
     },
     
     // Move a piece from one position to another, and optionally promote it

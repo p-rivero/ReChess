@@ -4,6 +4,7 @@
     :white="isWhite ? 'human' : 'none'"
     :black="isBlack ? 'human' : 'none'"
     :update-title="isWhite || isBlack"
+    :show-game-over-popup="isWhite || isBlack"
     
     @new-move="newMove"
     @invalid-variant="illegalPosition"
@@ -13,7 +14,7 @@
 <script setup lang="ts">
   import BoardWithGui from '@/components/GameUI/BoardWithGui.vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useGameStore, type Game } from '@/stores/game'
+  import { useGameStore } from '@/stores/game'
   import type { Player } from '@/protochess/types'
   import { onUnmounted, ref, watchEffect } from 'vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
@@ -28,8 +29,6 @@
   const isWhite = ref(false)
   const isBlack = ref(false)
   
-  let currentGame: Game | null = null
-  
   // When the route changes, update the game
   watchEffect(() => {
     if (!route.params.gameId || typeof route.params.gameId !== 'string') {
@@ -39,13 +38,16 @@
     }
     
     gameStore.onGameChanged(game => {
-      currentGame = game
       board.value?.setVariant(game.variant, game.moveHistory)
       isWhite.value = game.loggedUserIsWhite
       isBlack.value = game.loggedUserIsBlack
       if (!isWhite.value && !isBlack.value) {
         updateTitle(`Spectating ${game.whiteName} vs ${game.blackName}`)
       }
+    })
+    
+    gameStore.onGameNotExists(() => {
+      router.push({ name: 'home' })
     })
     
     gameStore.onInvalidVariant(() => {
@@ -75,14 +77,13 @@
   async function newMove(from: [number, number], to: [number, number], promotion?: string, winner?: Player|'none') {
     // Error checking
     if (!board.value) throw new Error('Board is not defined')
-    if (!currentGame) throw new Error('Game must be set before sending a move')
     // Convert winner from Player|'none'|undefined to Player|'draw'|null
     const winner2 = (winner === 'none') ? 'draw' : winner
     // Get the player to move from the board
     const playerToMove = board.value.playerToMove
     if (!playerToMove) throw new Error('Player to move is not defined')
     try {
-      await gameStore.movePiece(currentGame, from, to, promotion, playerToMove, winner2)
+      await gameStore.movePiece(from, to, promotion, playerToMove, winner2)
     } catch (e) {
       console.error(e)
       showPopup(
