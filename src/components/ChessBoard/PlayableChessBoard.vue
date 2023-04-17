@@ -124,13 +124,14 @@
       // Wait for the user to choose a promotion
       let promoIndex = await promoPromise
       if (promoIndex === undefined) {
-        // User cancelled
-        await synchronizeBoardState()
+        // User cancelled, undo the move
+        const stateDiff = await protochess.getStateDiff()
+        board.value?.setStateDiff(stateDiff)
         return
       }
       promotion = possiblePromotions[promoIndex]
     }
-    await synchronizeBoardState({ from, to, promotion })
+    await playMove({ from, to, promotion })
   }
   
   // Called in order to make the computer play its move
@@ -146,40 +147,31 @@
       const bestMove = await protochess.getBestMoveTimeout(timeoutSeconds)
       const waitTime = Math.max(0, minWaitTime - (Date.now() - startTime))
       await new Promise(resolve => setTimeout(resolve, waitTime))
-      await synchronizeBoardState(bestMove)
+      await playMove(bestMove)
     } catch (e) {
       // Unable to find a move, probably because the game has ended
       console.info('Unable to find a move, game may have ended:', e)
     }
   }
   
-  // Synchonize the board state with the protochess engine
-  // If playMove is specified, it will be played before synchronizing the state
-  async function synchronizeBoardState(playMove?: MoveInfo) {
+  // Plays a move on the engine and updates the UI
+  async function playMove(mv: MoveInfo) {
     const protochess = await getProtochess()
-    // 'N/A' if no move was played, undefined if a move was played but the game hasn't ended
-    let gameResult: GameResult | undefined | 'N/A' = 'N/A'
-    if (playMove) {
-      // Play the move before synchronizing the state
-      const result = await protochess.makeMove(playMove)
-      board.value?.setLastMove(playMove)
-      // Handle the result, if the game has ended don't emit piece-moved
-      gameResult = handleResult(result)
-    }
+    // Play the move on the engine
+    const result = await protochess.makeMove(mv)
     const stateDiff = await protochess.getStateDiff()
+    // Syncronize the UI
+    const gameResult = handleResult(result)
     board.value?.setStateDiff(stateDiff)
+    board.value?.setLastMove(mv)
     
-    // Move was played, emit piece-moved and store history
-    if (gameResult !== 'N/A') {
-      if (!playMove) throw new Error('playMove is undefined')
-      moveHistory.newMove(playMove, gameResult)
-      // Important: update the player before emitting new-move (otherwise, the player sent to the server will be wrong)
-      emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
-      emit('new-move', playMove.from, playMove.to, playMove.promotion, gameResult)
-      // Game has ended, don't continue
-      if (gameResult) return
-    }
+    moveHistory.newMove(mv, gameResult)
+    // Important: update the player before emitting new-move (otherwise, the player sent to the server will be wrong)
+    emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
+    emit('new-move', mv.from, mv.to, mv.promotion, gameResult)
     
+    // If game has ended, don't continue
+    if (gameResult) return
     updateMovableSquares(stateDiff)
   }
   async function updateMovableSquares(state: StateDiff) {
