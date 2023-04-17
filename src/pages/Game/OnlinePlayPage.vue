@@ -38,7 +38,6 @@
     }
     
     gameStore.onGameChanged(game => {
-      console.log('Game changed', game)
       currentGame = game
       board.value?.setVariant(game.variant, game.moveHistory)
       whitePlayer.value = game.loggedUserIsWhite ? 'human' : 'none'

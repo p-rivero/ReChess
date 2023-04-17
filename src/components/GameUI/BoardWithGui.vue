@@ -39,7 +39,7 @@
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
-  const playerToMove = ref<Player>('white')
+  const playerToMove = ref<Player>()
   let gameOverPopupShown = false
   
   const props = defineProps<{

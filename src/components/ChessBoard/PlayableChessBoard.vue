@@ -75,7 +75,7 @@
       
       promotionPopup.value?.initialize(variant)
       moveHistory.initialize({ initialState: variant, moveHistory: history })
-      emit('player-changed', variant.playerToMove === 0 ? 'white' : 'black')
+      emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
     },
     
     // Move a piece from one position to another, and optionally promote it
