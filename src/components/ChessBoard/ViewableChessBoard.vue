@@ -119,7 +119,7 @@
   
   defineExpose({
     // Set the state of the board
-    setState(state: Variant) {
+    setState(state: Variant, diff?: StateDiff) {
       if (state.boardWidth < 2 || state.boardHeight < 2) {
         throw new Error('Minimum board size is 2x2')
       }
@@ -141,9 +141,10 @@
         boardUpdateKey.value += 1
       }
       // Convert the state to a chessgroundx Config
-      newConfig.turnColor = state.playerToMove == 0 ? 'white' : 'black'
-      newConfig.check = false
-      newConfig.fen = state.fen
+      const playerIndex = diff ? diff.playerToMove : state.playerToMove
+      newConfig.turnColor = playerIndex == 0 ? 'white' : 'black'
+      newConfig.check = diff ? diff.inCheck : false
+      newConfig.fen = diff ? diff.fen : state.fen
       newConfig.kingRoles = getLeaderIds(state)
       incrementalUpdateConfig(newConfig)
     },

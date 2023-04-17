@@ -31,7 +31,7 @@
   import type { MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player, Variant, StateDiff } from '@/protochess/types'
   import { getProtochess } from '@/protochess'
   import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
-  import { computed, ref } from 'vue'
+  import { computed, ref, nextTick } from 'vue'
   import ViewableChessBoard from './ViewableChessBoard.vue'
   import PromotionPopup from '@/components/GameUI/PromotionPopup.vue'
   
@@ -66,13 +66,15 @@
       await protochess.setState({ initialState: variant, moveHistory: history })
       const stateDiff = await protochess.getStateDiff()
       
-      board.value?.setState(variant)
-      board.value?.setStateDiff(stateDiff)
+      board.value?.setState(variant, stateDiff)
+      if (history.length > 0) {
+        nextTick(() => board.value?.setLastMove(history[history.length - 1]))
+      }
       aspectRatio.value = variant.boardWidth / variant.boardHeight
       updateMovableSquares(stateDiff)
       
       promotionPopup.value?.initialize(variant)
-      moveHistory.initialize(variant)
+      moveHistory.initialize({ initialState: variant, moveHistory: history })
       emit('player-changed', variant.playerToMove === 0 ? 'white' : 'black')
     },
     

@@ -4,16 +4,14 @@ import { clone } from '@/utils/ts-utils'
 
 export type MoveResult = { flag: MakeMoveFlag, winner: MakeMoveWinner }
 
-export type MoveHistoryQueryResult = { state: GameState, result?: MoveResult, lastMove?: MoveInfo } | null
+export type MoveHistoryQueryResult = { state: GameState, result?: MoveResult, lastMove?: MoveInfo }
 
 type MoveHistoryEntry = {
   // The move that was made to reach the state. Undefined in the initial state.
-  move: MoveInfo
+  move?: MoveInfo
   // The result of the move (for updating the game result)
   result?: MoveResult
 }
-
-const DUMMY_MOVE: Readonly<MoveInfo> = { from: [0, 0], to: [0, 0] }
 
 export class MoveHistoryManager {
   private initialState: Readonly<InitialState> | null = null
@@ -27,11 +25,16 @@ export class MoveHistoryManager {
   }
   
   // Starts a new history
-  public initialize(initialState: Readonly<InitialState>, initialFen?: string) {
-    this.initialState = initialState
-    this.initialFen = initialFen
-    this.history = [{ move: clone(DUMMY_MOVE), result: undefined }]
+  public initialize(state: Readonly<GameState>, result?: MoveResult) {
+    this.initialState = state.initialState
+    this.initialFen = state.initialFen
+    this.history = [{ move: undefined, result: undefined }]
     this.currentIndex = 0
+    for (const move of state.moveHistory) {
+      this.newMove(move)
+    }
+    // If result is defined, update the last move's result
+    if (result) this.history[this.currentIndex].result = result
   }
   
   // Returns true if the user can currently make a move
@@ -48,43 +51,47 @@ export class MoveHistoryManager {
       // TODO
       return
     }
-    this.history.push({ move, result })
+    this.history.push({ move: clone(move), result })
     this.currentIndex++
   }
 
   // Returns the state reached by undoing the last move, null if there is none
-  public undo(): MoveHistoryQueryResult {
+  public undo(): MoveHistoryQueryResult | null {
     if (this.currentIndex > 0) {
       this.currentIndex--
-      return {
-        state: this.buildStateFromCurrentIndex(),
-        result: this.history[this.currentIndex].result,
-        lastMove: this.history[this.currentIndex].move,
-      }
+      return this.buildResultFromCurrentIndex()
     }
     return null
   }
 
   // Returns the state reached by redoing the last move, null if there is none
-  public redo(): MoveHistoryQueryResult {
+  public redo(): MoveHistoryQueryResult | null {
     if (this.currentIndex < this.history.length - 1) {
       this.currentIndex++
-      return {
-        state: this.buildStateFromCurrentIndex(),
-        result: this.history[this.currentIndex].result,
-        lastMove: this.history[this.currentIndex].move,
-      }
+      return this.buildResultFromCurrentIndex()
     }
     return null
   }
+
   
+  private buildResultFromCurrentIndex(): MoveHistoryQueryResult {
+    return {
+      state: this.buildStateFromCurrentIndex(),
+      result: this.history[this.currentIndex].result,
+      lastMove: this.history[this.currentIndex].move,
+    }
+  }
+      
   // Creates a GameState object with a move history that ends at the current index (inclusive)
   private buildStateFromCurrentIndex(): GameState {
     return {
       initialState: clone(this.initialState) as InitialState,
       initialFen: this.initialFen,
       // End index is inclusive, add 1
-      moveHistory: this.history.slice(1, this.currentIndex+1).map(entry => entry.move),
+      moveHistory: this.history.slice(1, this.currentIndex+1).map(entry => {
+        if (!entry.move) throw new Error('MoveHistoryManager: entry.move is undefined')
+        return entry.move
+      }),
     }
   }
 }

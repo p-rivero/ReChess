@@ -1,6 +1,6 @@
 <template>
   <BoardWithGui
-    :variant="variant"
+    ref="board"
     :white="white"
     :black="black"
     :has-gauge="hasGauge"
@@ -9,7 +9,6 @@
     :show-game-over-popup="showGameOverPopup"
     
     @invalid-variant="invalidVariant"
-    @piece-move="(from, to) => emit('piece-moved', from, to)"
   />
 </template>
 
@@ -25,7 +24,7 @@
   const route = useRoute()
   const router = useRouter()
   
-  const variant = ref<Variant>()
+  const board = ref<InstanceType<typeof BoardWithGui>>()
   
   defineProps<{
     white: 'human' | 'engine'
@@ -34,11 +33,6 @@
     invertEnemyDirection?: boolean
     updateTitle?: boolean
     showGameOverPopup?: boolean
-  }>()
-  
-  
-  const emit = defineEmits<{
-    (event: 'piece-moved', from?: [number, number], to?: [number, number]): void
   }>()
   
   onMounted(async () => {
@@ -52,7 +46,7 @@
       router.push({ name: 'home' })
       return
     }
-    variant.value = fetchedVariant
+    board.value?.setVariant(fetchedVariant)
   })
   
   function invalidVariant() {
