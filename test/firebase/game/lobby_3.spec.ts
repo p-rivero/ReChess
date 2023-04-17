@@ -220,7 +220,7 @@ test('cannot remove slot that does not exist', async () => {
 
 test('creator can remove lobby slot before challenger joins', async () => {
   await setupUsersAndVariant(set)
-  await setupLobbySlot(set, 'myself', undefined)
+  await setupLobbySlot(set, 'myself')
   
   await assertSucceeds(
     remove('verified', 'variants', VARIANT_ID, 'lobby', MY_ID)

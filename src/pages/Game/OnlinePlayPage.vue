@@ -80,6 +80,7 @@
     const winner2 = (winner === 'none') ? 'draw' : winner
     // Get the player to move from the board
     const playerToMove = board.value.playerToMove
+    if (!playerToMove) throw new Error('Player to move is not defined')
     try {
       await gameStore.movePiece(currentGame, from, to, promotion, playerToMove, winner2)
     } catch (e) {
