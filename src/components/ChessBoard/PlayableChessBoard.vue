@@ -166,8 +166,8 @@
     const gameResult = handleResult(result)
     board.value?.setStateDiff(stateDiff)
     board.value?.setLastMove(mv)
+    moveHistory.newMove(mv)
     
-    moveHistory.newMove(mv, gameResult)
     // Important: update the player before emitting new-move (otherwise, the player sent to the server will be wrong)
     emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
     emit('new-move', mv.from, mv.to, mv.promotion, gameResult)
@@ -205,7 +205,7 @@
     if (!entry) return
     
     // Update the state of the engine and the board
-    await protochess.setState(entry.state)
+    const result = await protochess.setState(entry.state)
     const stateDiff = await protochess.getStateDiff()
     board.value?.setStateDiff(stateDiff)
     
@@ -223,7 +223,8 @@
       board.value?.setMovable(false, false, [])
       cursorPointer.value = false
     }
-    emit('on-scroll', entry.result)
+    const gameResult = handleResult(result)
+    emit('on-scroll', gameResult)
   }
 </script>
 
