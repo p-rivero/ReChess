@@ -115,6 +115,8 @@
   const slots = ref<LobbySlot[]>([])
   const fetched = ref(false)
   
+  // TODO: Detect page close and leave lobby
+  
   // When the route changes, update the variant
   watchEffect(async () => {
     if (!route.params.variantId || typeof route.params.variantId !== 'string') {

@@ -119,7 +119,8 @@
     if (possiblePromotions.length > 0) {
       // Choose promotion
       if (!promotionPopup.value) throw new Error('Promotion popup not initialized')
-      let promoPromise = promotionPopup.value.pickPromotion(to, possiblePromotions)
+      const flip = !whitePov.value
+      let promoPromise = promotionPopup.value.pickPromotion(to, flip, possiblePromotions)
       // Wait for the user to choose a promotion
       let promoIndex = await promoPromise
       if (promoIndex === undefined) {
