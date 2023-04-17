@@ -101,13 +101,13 @@ async function init(): Promise<t.Protochess> {
       return { ...moveEval, depth: result.depth }
     },
     
-    async setState(state: t.GameState): Promise<void> {
-      // Clone the state object manually to avoid errors when passing it to wasm
-      const stateClone = clone(state)
-      const ret = await wasm.wasmObject.setState(stateClone)
-      if (typeof ret !== 'undefined') {
-        throw new Error(`Unexpected return value: ${ret}`)
+    async setState(state: t.GameState): Promise<t.MakeMoveResult> {
+      const stateCopy = clone(state)
+      const result = await wasm.wasmObject.setState(stateCopy)
+      if (!guard.isMakeMoveResult(result)) {
+        throw new Error(`Expected MakeMoveResult, got ${result}`)
       }
+      return result
     },
     
     async loadFen(fen: string): Promise<void> {

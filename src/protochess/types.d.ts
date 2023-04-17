@@ -27,8 +27,9 @@ export interface Protochess {
   getBestMoveTimeout(time: number): Promise<MoveInfoWithEvalDepth>,
   /** Set the current state, formed by an InitialState, and the list of moves that were played.
     * If a FEN is provided, it will be applied before the moves.
-    * After calling `setState()`, use `getStateDiff()` to update the GUI */
-  setState(state: GameState): Promise<void>,
+    * After calling `setState()`, use `getStateDiff()` to update the GUI.
+    * Returns the result of the **last move** in the move history, or `Ok` if there was none. */
+  setState(state: GameState): Promise<MakeMoveResult>,
   /** Load a user-provided FEN string. See FullFen for the format.
     * After calling `loadFen()`, use `getStateDiff()` to update the GUI */
   loadFen(fen: FullFen): Promise<void>,
