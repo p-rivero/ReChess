@@ -1,9 +1,9 @@
 <template>
   <BoardWithGui
     ref="board"
-    :white="whitePlayer"
-    :black="blackPlayer"
-    :update-title="true"
+    :white="isWhite ? 'human' : 'none'"
+    :black="isBlack ? 'human' : 'none'"
+    :update-title="isWhite || isBlack"
     
     @new-move="newMove"
     @invalid-variant="illegalPosition"
@@ -17,6 +17,7 @@
   import type { Player } from '@/protochess/types'
   import { onUnmounted, ref, watchEffect } from 'vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { updateTitle } from '@/utils/web-utils'
   
   const route = useRoute()
   const router = useRouter()
@@ -24,8 +25,8 @@
   
   const board = ref<InstanceType<typeof BoardWithGui>>()
   // For the remote player, use 'none' and set the state manually
-  const whitePlayer = ref<'human'|'none'>('none')
-  const blackPlayer = ref<'human'|'none'>('none')
+  const isWhite = ref(false)
+  const isBlack = ref(false)
   
   let currentGame: Game | null = null
   
@@ -40,8 +41,11 @@
     gameStore.onGameChanged(game => {
       currentGame = game
       board.value?.setVariant(game.variant, game.moveHistory)
-      whitePlayer.value = game.loggedUserIsWhite ? 'human' : 'none'
-      blackPlayer.value = game.loggedUserIsWhite ? 'none' : 'human'
+      isWhite.value = game.loggedUserIsWhite
+      isBlack.value = game.loggedUserIsBlack
+      if (!isWhite.value && !isBlack.value) {
+        updateTitle(`Spectating ${game.whiteName} vs ${game.blackName}`)
+      }
     })
     
     gameStore.onInvalidVariant(() => {
