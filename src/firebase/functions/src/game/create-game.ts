@@ -84,15 +84,15 @@ export default async function(data: any, context: CallableContext): Promise<{gam
   
   // Here it's safe to use Math.random instead of crypto because this is not a cryptographic
   // operation, we just want users to be assigned each side approximately half the time
-  const creatorHasWhite = 
+  const creatorPlaysAsWhite = 
     slotDoc.IMMUTABLE.requestedColor === 'white' ||
     (slotDoc.IMMUTABLE.requestedColor === 'random' && Math.random() < 0.5)
     
-  const [whiteId, whiteDisplayName] = creatorHasWhite ? 
+  const [whiteId, whiteDisplayName] = creatorPlaysAsWhite ? 
     [creatorId, slotDoc.IMMUTABLE.creatorDisplayName] :
     [slotDoc.challengerId, slotDoc.challengerDisplayName]
     
-  const [blackId, blackDisplayName] = creatorHasWhite ?
+  const [blackId, blackDisplayName] = creatorPlaysAsWhite ?
     [slotDoc.challengerId, slotDoc.challengerDisplayName] :
     [creatorId, slotDoc.IMMUTABLE.creatorDisplayName]
   

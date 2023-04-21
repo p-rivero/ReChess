@@ -90,9 +90,9 @@ export interface GameDoc {
     timeCreated: Timestamp
     variantId: string
     variant: VariantDoc
-    whiteId: string | null
+    whiteId: string
     whiteDisplayName: string
-    blackId: string | null
+    blackId: string
     blackDisplayName: string
     requestedColor: RequestedColor
   }
