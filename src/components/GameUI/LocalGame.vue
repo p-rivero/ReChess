@@ -46,7 +46,7 @@
       router.push({ name: 'home' })
       return
     }
-    board.value?.setVariant(fetchedVariant)
+    board.value?.setState(fetchedVariant)
   })
   
   function invalidVariant() {

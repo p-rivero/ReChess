@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player, Variant, StateDiff } from '@/protochess/types'
+  import type { MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player, StateDiff, VariantGameState } from '@/protochess/types'
   import { getProtochess } from '@/protochess'
   import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
   import { computed, ref, nextTick } from 'vue'
@@ -61,20 +61,21 @@
   
   defineExpose({
     // Set the state of the board
-    async setState(variant: Variant, history: MoveInfo[]): Promise<GameResult|undefined> {
+    async setState(state: VariantGameState): Promise<GameResult|undefined> {
       const protochess = await getProtochess()
-      const result = await protochess.setState({ initialState: variant, moveHistory: history })
+      const result = await protochess.setState(state)
       const stateDiff = await protochess.getStateDiff()
+      const variant = state.initialState
       
       board.value?.setState(variant, stateDiff)
-      if (history.length > 0) {
-        nextTick(() => board.value?.setLastMove(history[history.length - 1]))
+      if (state.moveHistory.length > 0) {
+        nextTick(() => board.value?.setLastMove(state.moveHistory[state.moveHistory.length - 1]))
       }
       aspectRatio.value = variant.boardWidth / variant.boardHeight
       updateMovableSquares(stateDiff)
       
       promotionPopup.value?.initialize(variant)
-      moveHistory.initialize({ initialState: variant, moveHistory: history })
+      moveHistory.initialize({ initialState: variant, moveHistory: state.moveHistory })
       emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
       
       return handleResult(result)

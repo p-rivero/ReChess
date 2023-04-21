@@ -40,7 +40,11 @@
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
   const playerToMove = ref<Player>()
+  // Only show the game over popup once
   let gameOverPopupShown = false
+  // Only show the popup when going from 'playing' to 'game-over', not when
+  // going from 'none' to 'game-over' (which happens when the page is loaded)
+  let previousState: 'playing' | 'game-over' | 'none' = 'none'
   
   const props = defineProps<{
     white: 'human' | 'engine' | 'none'
@@ -60,25 +64,26 @@
   }>()
   
   defineExpose({
-    async setVariant(variant: Variant, history: MoveInfo[] = []) {
+    async setState(variant: Variant, history: MoveInfo[] = [], fen?: string) {
       const protochess = await getProtochess()
       // Set the board state and make sure it's valid
       // Since the page has just loaded, the move history is empty
       try {
-        const result = await board.value?.setState(variant, history)
+        const state = { initialState: variant, moveHistory: history, initialFen: fen }
+        const result = await board.value?.setState(state)
         if (result) {
           // Game over, show the popup
-          await gameOver(result.flag, result.winner)
+          await updateResult(result)
         } else {
-          // In the middle of a game, check that the position is valid
+          // If in the middle of a game, check that the position is valid
           await protochess.validatePosition()
+          await updateResult()
         }
       } catch (e) {
         console.error(e)
         emit('invalid-variant')
         return
       }
-      gameOverPopupShown = false
       if (props.hasGauge) {
         await updateEvaluation()
       }
@@ -89,7 +94,9 @@
   watch(playerToMove, () => {
     if (!props.updateTitle) return
     const currentPlayer = playerToMove.value === 'white' ? props.white : props.black
-    if (currentPlayer === 'human') {
+    if (gameOverPopupShown) {
+      updateTitle('Game over')
+    } else if (currentPlayer === 'human') {
       updateTitle('Your turn')
     } else {
       updateTitle('Waiting for opponent')
@@ -101,6 +108,8 @@
   async function updateResult(result?: {flag: MakeMoveFlag, winner: MakeMoveWinner}) {
     if (result) {
       await gameOver(result.flag, result.winner)
+    } else {
+      previousState = 'playing'
     }
     if (!result && props.hasGauge) {
       await updateEvalDebounced()
@@ -114,17 +123,23 @@
     if (!board.value) {
       throw new Error('Reference to board is undefined')
     }
+    
     const playerToMove = await board.value.playerToMove()
     board.value.clearArrows('analysis')
     if (props.hasGauge) {
       gauge.value?.gameOver(flag, winner, playerToMove)
     }
-    emit('game-over', flag, winner, playerToMove)
-    if (props.showGameOverPopup && !gameOverPopupShown) {
+    if (props.showGameOverPopup && previousState === 'playing' && !gameOverPopupShown) {
       showGameOverPopup(flag, winner, playerToMove)
-      gameOverPopupShown = true
     }
+    
+    previousState = 'game-over'
+    // Even if the popup was not shown initially, prevent it from being shown again
+    gameOverPopupShown = true
+    updateTitle('Game over')
+    emit('game-over', flag, winner, playerToMove)
   }
+  
   function showGameOverPopup(flag: MakeMoveFlag, winner: MakeMoveWinner, playerToMove: Player) {
     const title =
       winner === 'white' ? 'White wins!' :

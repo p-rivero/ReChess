@@ -133,6 +133,10 @@ export interface PublishedVariant extends Variant {
   loggedUserUpvoted: boolean,
 }
 
+export interface VariantGameState extends GameState {
+  initialState: Variant,
+}
+
 
 // Piece properties that affect the game logic
 /** @see {isPieceDefinition} ts-auto-guard:type-guard */

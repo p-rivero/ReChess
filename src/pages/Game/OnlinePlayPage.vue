@@ -38,11 +38,11 @@
     }
     
     gameStore.onGameChanged(game => {
-      board.value?.setVariant(game.variant, game.moveHistory)
+      board.value?.setState(game.variant, game.moveHistory)
       isWhite.value = game.loggedUserIsWhite
       isBlack.value = game.loggedUserIsBlack
       if (!isWhite.value && !isBlack.value) {
-        updateTitle(`Spectating ${game.whiteName} vs ${game.blackName}`)
+        updateTitle(`${game.whiteName} vs ${game.blackName}`)
       }
     })
     
