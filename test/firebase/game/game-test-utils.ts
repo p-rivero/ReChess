@@ -126,6 +126,7 @@ export async function setupGameDoc(
     playerToMove,
     winner: playerToMove === 'game-over' ? 'white' : null,
     IMMUTABLE: {
+      players: [whiteId, blackId],
       timeCreated: serverTimestamp() as Timestamp,
       variantId,
       variant: VARIANT_DOC,

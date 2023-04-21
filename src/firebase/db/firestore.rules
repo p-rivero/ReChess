@@ -378,7 +378,7 @@ service cloud.firestore {
         let HISTORY_REGEX = '^([a-p][0-9]{1,2}[a-p][0-9]{1,2}(=..?)? )*$';
         return
           hasFields(doc, ['moveHistory', 'playerToMove', 'IMMUTABLE'], ['winner']) &&
-          hasFields(doc.IMMUTABLE, ['timeCreated', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName', 'requestedColor'], ['whiteId', 'blackId']) &&
+          hasFields(doc.IMMUTABLE, ['timeCreated', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName', 'requestedColor', 'players'], ['whiteId', 'blackId']) &&
           doc.moveHistory is string &&
           doc.moveHistory.size() <= 10000 &&
           doc.moveHistory.matches(HISTORY_REGEX) &&

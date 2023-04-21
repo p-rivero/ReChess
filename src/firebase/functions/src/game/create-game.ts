@@ -111,6 +111,7 @@ export default async function(data: any, context: CallableContext): Promise<{gam
       blackId,
       blackDisplayName,
       requestedColor: slotDoc.IMMUTABLE.requestedColor,
+      players: [whiteId, blackId],
     }
   }
   const gameRef = await db.collection('games').add(newGame)

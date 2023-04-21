@@ -87,6 +87,7 @@ export interface GameDoc {
   winner: 'white' | 'black' | 'draw' | null
   // Set by the cloud function when creating the game
   IMMUTABLE: {
+    players: [string, string]
     timeCreated: Timestamp
     variantId: string
     variant: VariantDoc
