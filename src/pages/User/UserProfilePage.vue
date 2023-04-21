@@ -52,7 +52,7 @@
         />
       </div>
       <div class="is-flex is-align-items-center mb-4">
-        <div class="sz-2 icon-at color-theme is-flex-shrink-0" />
+        <div class="sz-2 icon-at color-theme" />
         <p class="is-size-5 ml-2 is-break-word">
           {{ user.username }}
         </p>
@@ -62,7 +62,7 @@
         class="is-flex is-align-items-center mb-4"
       >
         <div
-          class="sz-2 color-theme is-flex-shrink-0"
+          class="sz-2 color-theme"
           :class="{
             'icon-mail': user.signInProvider === 'password',
             'icon-google': user.signInProvider === 'google.com',

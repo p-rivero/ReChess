@@ -22,7 +22,7 @@
       <p class="is-size-5 mr-4 has-text-centered is-break-word">
         {{ user.displayName }} hasn't published any variants
       </p>
-      <div class="icon-sad color-theme sz-2 is-flex-shrink-0" />
+      <div class="icon-sad color-theme sz-2" />
     </div>
   </div>
 </template>

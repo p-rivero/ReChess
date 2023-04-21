@@ -8,10 +8,12 @@
 .sz-2 {
     width: 2rem !important;
     height: 2rem !important;
+    flex-shrink: 0;
 }
 .sz-3 {
     width: 3rem !important;
     height: 3rem !important;
+    flex-shrink: 0;
 }
 
 .h-100 {

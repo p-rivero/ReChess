@@ -1,9 +1,9 @@
 <template>
   <div class="column is-4 is-flex is-align-items-center is-justify-content-center">
-    <div class="sz-2 mr-2 has-background-light rounded-corners">
+    <div class="sz-2 mr-2 px-1 has-background-light rounded-corners">
       <div
         v-if="gameSlot.playerToMove === 'white'"
-        class="sz-100 icon-king color-black"
+        class="sz-100 icon-knight color-black"
       />
     </div>
     <p class="adjust-text is-break-word is-size-5 has-text-centered">
@@ -22,10 +22,10 @@
   </div>
   
   <div class="column is-4 is-flex is-align-items-center is-justify-content-center">
-    <div class="sz-2 mr-2 has-background-dark rounded-corners">
+    <div class="sz-2 mr-2 px-1 has-background-dark rounded-corners">
       <div
         v-if="gameSlot.playerToMove === 'black'"
-        class="sz-100 icon-king color-white"
+        class="sz-100 icon-knight color-white"
       />
     </div>
     <p class="adjust-text is-break-word is-size-5 has-text-centered">

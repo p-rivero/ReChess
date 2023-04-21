@@ -51,7 +51,7 @@
           >
           <div
             v-else
-            class="sz-3 mr-2 icon-user color-theme is-flex-shrink-0"
+            class="sz-3 mr-2 icon-user color-theme"
           />
           
           <p class="is-size-4 is-break-word">
