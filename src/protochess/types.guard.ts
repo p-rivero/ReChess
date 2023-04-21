@@ -2,7 +2,7 @@
  * Generated type guards for "types.d.ts".
  * WARNING: Do not manually change this file.
  */
-import type { MakeMoveResult, MoveInfo, MoveList, StateDiff, InitialState, GameState, Variant, PublishedVariant, PieceDefinition, GetBestMoveResult, GetBestMoveTimeoutResult } from "./types";
+import type { MakeMoveResult, MoveInfo, MoveList, StateDiff, InitialState, GameState, Variant, PublishedVariant, PieceDefinition, MoveInfoWithEvalDepth2 } from "./types";
 
 export function isMakeMoveResult(obj: unknown): obj is MakeMoveResult {
     const typedObj = obj as MakeMoveResult
@@ -257,19 +257,8 @@ export function isPieceDefinition(obj: unknown): obj is PieceDefinition {
     )
 }
 
-export function isGetBestMoveResult(obj: unknown): obj is GetBestMoveResult {
-    const typedObj = obj as GetBestMoveResult
-    return (
-        (typedObj !== null &&
-            typeof typedObj === "object" ||
-            typeof typedObj === "function") &&
-        isMoveInfo(typedObj["moveInfo"]) as boolean &&
-        typeof typedObj["evaluation"] === "number"
-    )
-}
-
-export function isGetBestMoveTimeoutResult(obj: unknown): obj is GetBestMoveTimeoutResult {
-    const typedObj = obj as GetBestMoveTimeoutResult
+export function isMoveInfoWithEvalDepth2(obj: unknown): obj is MoveInfoWithEvalDepth2 {
+    const typedObj = obj as MoveInfoWithEvalDepth2
     return (
         (typedObj !== null &&
             typeof typedObj === "object" ||

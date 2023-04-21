@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 import { plugin as VueInputAutowidth } from 'vue-input-autowidth'
 import App from '@/App.vue'
 import { router } from '@/router'
-import { getProtochess, initializeProtochess, protochessSupportsThreads } from '@/protochess'
+import { getProtochess, initializeProtochess } from '@/protochess'
 
 
 import '@/assets/style/background.scss'
@@ -22,9 +22,8 @@ app.use(VueInputAutowidth)
 app.mount('#app')
 
 // Temporary code until threads work as expected
-protochessSupportsThreads().then(async supportsThreads => {
-  if (supportsThreads) {
-    const protochess = await getProtochess()
+getProtochess().then(async protochess => {
+  if (protochess.isMultiThreaded()) {
     await protochess.setNumThreads(4)
   }
 })

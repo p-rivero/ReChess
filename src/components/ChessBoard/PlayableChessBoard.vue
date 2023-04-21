@@ -140,13 +140,13 @@
   async function makeEngineMove() {
     const protochess = await getProtochess()
     // TODO: Allow the user to choose the search timeout
-    const timeoutSeconds = 2
+    const timeoutMs = 1000
     
     // The engine can return a move almost immediately. Wait a second to make it feel more natural
     const minWaitTime = 1000
     const startTime = Date.now()
     try {
-      const bestMove = await protochess.getBestMoveTimeout(timeoutSeconds)
+      const bestMove = await protochess.getBestMoveTimeout(timeoutMs, info => console.log(info))
       const waitTime = Math.max(0, minWaitTime - (Date.now() - startTime))
       await new Promise(resolve => setTimeout(resolve, waitTime))
       await playMove(bestMove)
