@@ -30,7 +30,7 @@
   </p>
   
   <div
-    v-for="slot of slots"
+    v-for="slot of lobbySlots"
     :key="slot.creatorId"
     class="mx-0 my-5 card columns"
   >
@@ -43,8 +43,8 @@
   
   
   <div
-    v-if="slots.length === 0"
-    :style="{ visibility: fetched ? 'visible' : 'hidden' }"
+    v-if="lobbySlots.length === 0"
+    :style="{ visibility: lobbyFetched ? 'visible' : 'hidden' }"
     class="py-2 is-flex is-align-items-center is-justify-content-center"
   >
     <div class="sz-2 mr-2 icon-cactus color-theme" />
@@ -62,12 +62,22 @@
   </button>
   
   
-  <p class="is-size-5 pt-6 mb-3 has-text-weight-semibold">
+  <p
+    v-if="ongoingSlots.length > 0"
+    class="is-size-5 pt-6 mb-3 has-text-weight-semibold"
+  >
     Ongoing games
   </p>
-  <p>
-    TODO
-  </p>
+  <div
+    v-for="slot of ongoingSlots"
+    :key="slot.gameId"
+    class="mx-0 my-5 card columns"
+  >
+    <OngoingGameView
+      :game-slot="slot"
+      @user-clicked="userClicked"
+    />
+  </div>
   
   <PlayPopup ref="playPopup" />
   <LobbyWaitingPopup
@@ -90,7 +100,7 @@
   import { useVariantStore } from '@/stores/variant'
   import { useUserStore } from '@/stores/user'
   import { useAuthStore } from '@/stores/auth-user'
-  import { useLobbyStore, type LobbySlot } from '@/stores/lobby'
+  import { useLobbyStore, type LobbySlot, type OngoingGameSlot } from '@/stores/lobby'
   import type { PublishedVariant } from '@/protochess/types'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import LobbyWaitingPopup from '@/components/Lobby/LobbyCreatorPopup.vue'
@@ -99,6 +109,7 @@
   import { updateTitle } from '@/utils/web-utils'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import LobbySlotView from '@/components/Lobby/LobbySlotView.vue'
+  import OngoingGameView from '@/components/Lobby/OngoingGameView.vue'
   
 
   const router = useRouter()
@@ -112,8 +123,10 @@
   const playPopup = ref<InstanceType<typeof PlayPopup>>()
   const waitPopup = ref<InstanceType<typeof LobbyWaitingPopup>>()
   const joiningPopup = ref<InstanceType<typeof LobbyJoiningPopup>>()
-  const slots = ref<LobbySlot[]>([])
-  const fetched = ref(false)
+    
+  const lobbySlots = ref<LobbySlot[]>([])
+  const lobbyFetched = ref(false)
+  const ongoingSlots = ref<OngoingGameSlot[]>([])
   
   // TODO: Detect page close and leave lobby
   
@@ -137,8 +150,11 @@
     updateTitle('Play ' + newVariant.displayName)
     
     lobbyStore.onLobbyLoaded(slotList => {
-      slots.value = slotList
-      fetched.value = true
+      lobbySlots.value = slotList
+      lobbyFetched.value = true
+    })
+    lobbyStore.onOngoingLoaded(slotList => {
+      ongoingSlots.value = slotList
     })
     lobbyStore.onLobbyCreated(color => {
       waitPopup.value?.show(color)

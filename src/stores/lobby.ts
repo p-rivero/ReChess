@@ -1,12 +1,12 @@
 import { Timestamp, onSnapshot } from '@firebase/firestore'
 import { LobbyDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
-import type { LobbySlotDoc, RequestedColor } from '@/firebase/db/schema'
+import type { GameDoc, LobbySlotDoc, RequestedColor } from '@/firebase/db/schema'
 import { useAuthStore } from './auth-user'
 
 export type LobbySlot = {
-  creatorIsCurrentUser: boolean
-  challengerIsCurrentUser: boolean
+  currentUserIsCreator: boolean
+  currentUserIsChallenger: boolean
   
   timeCreated: Date
   creatorId: string
@@ -18,6 +18,19 @@ export type LobbySlot = {
   challengerImage?: string
   gameDocId?: string
 }
+
+export type OngoingGameSlot = {
+  currentUserIsPlayer: boolean
+  
+  gameId: string
+  playerToMove: 'white' | 'black' | 'game-over'
+  timeCreated: Date
+  whiteId: string
+  whiteDisplayName: string
+  blackId: string
+  blackDisplayName: string
+}
+
 export type ChallengerInfo = {
   name: string
   image?: string
@@ -33,6 +46,7 @@ export const useLobbyStore = defineStore('lobby', () => {
   // Callbacks
   let unsubscribe = EMPTY_FN
   let lobbyLoadedCallback: (lobby: LobbySlot[]) => void = EMPTY_FN
+  let ongoingLoadedCallback: (lobby: OngoingGameSlot[]) => void = EMPTY_FN
   let lobbyCreatedCallback: (a: RequestedColor) => void = EMPTY_FN
   let lobbyDeletedCallback = EMPTY_FN
   let challengerJoinedCallback: (info: ChallengerInfo) => void = EMPTY_FN
@@ -49,20 +63,18 @@ export const useLobbyStore = defineStore('lobby', () => {
     // If subscribed to a different lobby, unsubscribe first
     unsubscribe()
     
-    const lobby = LobbyDB.getLobbySlots(variantId)
-    
-    unsubscribe = onSnapshot(lobby, snap => {
+    const unsubscribeLobby = onSnapshot(LobbyDB.getLobbySlots(variantId), snap => {
       const slots: LobbySlot[] = []
       // Update the list of slots
       snap.forEach(docSnap => {
         const docId = docSnap.id
         const doc = docSnap.data() as LobbySlotDoc
-        slots.push(readDocument(docId, doc))
+        slots.push(readLobbyDocument(docId, doc))
       })
       lobbyLoadedCallback(slots)
       
       // If one of the slots is from the current user, show the waiting popup
-      const mySlot = slots.find(s => s.creatorIsCurrentUser)
+      const mySlot = slots.find(s => s.currentUserIsCreator)
       if (mySlot) {
         lobbyCreatedCallback(mySlot.requestedColor)
         // If my slot has a challenger, show their info
@@ -81,7 +93,7 @@ export const useLobbyStore = defineStore('lobby', () => {
       
       // If the current user is joining a lobby, show the waiting popup
       // and redirect to the game when it's created
-      const joinedSlot = slots.find(s => s.challengerIsCurrentUser)
+      const joinedSlot = slots.find(s => s.currentUserIsChallenger)
       if (joinedSlot) {
         joinSlotCallback(joinedSlot.creatorId, joinedSlot.creatorDisplayName)
         if (joinedSlot.gameDocId) {
@@ -91,11 +103,34 @@ export const useLobbyStore = defineStore('lobby', () => {
         leaveSlotCallback()
       }
     })
+    const unsubscribeOngoing = onSnapshot(LobbyDB.getOngoingGames(variantId), snap => {
+      const slots: OngoingGameSlot[] = []
+      snap.forEach(docSnap => {
+        const docId = docSnap.id
+        const doc = docSnap.data() as GameDoc
+        slots.push(readOngoingGameDocument(docId, doc))
+      })
+      // Move my games to the top
+      const myId = authStore.loggedUser?.uid
+      const myGames = slots.filter(s => s.whiteId === myId || s.blackId === myId)
+      const otherGames = slots.filter(s => s.whiteId !== myId && s.blackId !== myId)
+      slots.length = 0
+      slots.push(...myGames, ...otherGames)
+      ongoingLoadedCallback(slots)
+    })
+    
+    unsubscribe = () => {
+      unsubscribeLobby()
+      unsubscribeOngoing()
+    }
     currentVariantId = variantId
   }
   
   function onLobbyLoaded(callback: (lobby: LobbySlot[]) => void) {
     lobbyLoadedCallback = callback
+  }
+  function onOngoingLoaded(callback: (lobby: OngoingGameSlot[]) => void) {
+    ongoingLoadedCallback = callback
   }
   function onLobbyCreated(callback: (color:RequestedColor)=>void) {
     lobbyCreatedCallback = callback
@@ -124,6 +159,8 @@ export const useLobbyStore = defineStore('lobby', () => {
     unsubscribe()
     currentVariantId = null
     unsubscribe = EMPTY_FN
+    lobbyLoadedCallback = EMPTY_FN
+    ongoingLoadedCallback = EMPTY_FN
     lobbyCreatedCallback = EMPTY_FN
     challengerJoinedCallback = EMPTY_FN
     challengerLeftCallback = EMPTY_FN
@@ -132,14 +169,14 @@ export const useLobbyStore = defineStore('lobby', () => {
     lobbyDeletedCallback = EMPTY_FN
   }
   
-  function readDocument(docId: string, doc: LobbySlotDoc): LobbySlot {
+  function readLobbyDocument(docId: string, doc: LobbySlotDoc): LobbySlot {
     const timeCreated = doc.IMMUTABLE.timeCreated instanceof Timestamp ?
       doc.IMMUTABLE.timeCreated.toDate() :
       new Date()
     const hasChallenger = !!doc.challengerId
     return {
-      creatorIsCurrentUser: docId === authStore.loggedUser?.uid,
-      challengerIsCurrentUser: hasChallenger && (doc.challengerId === authStore.loggedUser?.uid),
+      currentUserIsCreator: docId === authStore.loggedUser?.uid,
+      currentUserIsChallenger: hasChallenger && (doc.challengerId === authStore.loggedUser?.uid),
       timeCreated: timeCreated,
       creatorId: docId,
       creatorDisplayName: doc.IMMUTABLE.creatorDisplayName,
@@ -149,6 +186,21 @@ export const useLobbyStore = defineStore('lobby', () => {
       challengerDisplayName: doc.challengerDisplayName ?? undefined,
       challengerImage: doc.challengerImageUrl ?? undefined,
       gameDocId: doc.gameDocId ?? undefined,
+    }
+  }
+  
+  function readOngoingGameDocument(docId: string, doc: GameDoc): OngoingGameSlot {
+    const myId = authStore.loggedUser?.uid
+    const isPlayer = doc.IMMUTABLE.whiteId === myId || doc.IMMUTABLE.blackId === myId
+    return {
+      currentUserIsPlayer: isPlayer,
+      gameId: docId,
+      playerToMove: doc.playerToMove,
+      timeCreated: doc.IMMUTABLE.timeCreated.toDate(),
+      whiteId: doc.IMMUTABLE.whiteId,
+      whiteDisplayName: doc.IMMUTABLE.whiteDisplayName,
+      blackId: doc.IMMUTABLE.blackId,
+      blackDisplayName: doc.IMMUTABLE.blackDisplayName,
     }
   }
   
@@ -234,6 +286,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     listenForUpdates,
     removeListeners,
     onLobbyLoaded,
+    onOngoingLoaded,
     onLobbyCreated,
     onLobbyDeleted,
     onChallengerJoined,

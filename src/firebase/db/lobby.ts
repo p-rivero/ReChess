@@ -1,9 +1,21 @@
 import { db, createGame as dbCreateGame } from '@/firebase'
-import { collection, setDoc, serverTimestamp, doc, deleteDoc, query, orderBy, updateDoc } from '@firebase/firestore'
+import { collection, setDoc, serverTimestamp, doc, deleteDoc, query, where, orderBy, updateDoc } from '@firebase/firestore'
 import type { LobbySlotDoc, RequestedColor } from './schema'
 
 export function getLobbySlots(variantId: string) {
-  return query(collection(db, 'variants', variantId, 'lobby'), orderBy('IMMUTABLE.timeCreated'))
+  return query(
+    collection(db, 'variants', variantId, 'lobby'),
+    orderBy('IMMUTABLE.timeCreated')
+  )
+}
+
+export function getOngoingGames(variantId: string) {
+  return query(
+    collection(db, 'games'),
+    where('IMMUTABLE.variantId', '==', variantId),
+    where('winner', '==', null),
+    orderBy('IMMUTABLE.timeCreated')
+  )
 }
 
 // Creates a new lobby slot in the database
