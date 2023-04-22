@@ -23,8 +23,18 @@ export interface UserDoc {
     renameAllowedAt: Timestamp | null
     numGamesPlayed: number
     numWinPoints: number
-    last5Games: string // JSON of GameDoc[], updated by cloud function
+    last5Games: string // JSON of GameSummary[], updated by cloud function
   }
+}
+export interface GameSummary {
+  gameId: string
+  variantId: string
+  variantName: string
+  timeCreated: Timestamp
+  playedSide: 'white' | 'black'
+  result: 'win' | 'loss' | 'draw'
+  opponentId: string
+  opponentName: string
 }
 
 // users/{userId}/private/doc

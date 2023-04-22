@@ -40,6 +40,14 @@ region(FUNCTIONS_REGION)
   })
 
 
+export const finishGame =
+region(FUNCTIONS_REGION)
+  .firestore
+  .document('games/{gameId}/gameOverTrigger/doc')
+  .onCreate((_snap, context) => {
+    return callFunction(import('./game/finish-game'), context.params.gameId)
+  })
+
 // USER
 
 export const deleteUser =
