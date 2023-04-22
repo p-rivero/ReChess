@@ -22,8 +22,10 @@ async function createUserAndVariant(creatorId = 'some_id') {
     profileImg: null,
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const variant: VariantDoc = {

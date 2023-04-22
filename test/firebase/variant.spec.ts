@@ -21,8 +21,10 @@ async function setupUser(name: string | null = 'My name') {
     profileImg: null,
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   await set('admin', user, 'users', MY_ID)

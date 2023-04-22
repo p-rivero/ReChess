@@ -40,8 +40,10 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
     profileImg: 'http://example.com/alice.jpg',
     IMMUTABLE: {
       username: 'alice',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const bob: UserDoc = {
@@ -50,8 +52,10 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
     profileImg: 'http://example.com/bob.jpg',
     IMMUTABLE: {
       username: 'bob',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const my_user: UserDoc = {
@@ -60,8 +64,10 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
     profileImg: 'http://example.com/myself.jpg',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   await Promise.all([
@@ -135,6 +141,7 @@ export async function setupGameDoc(
       blackDisplayName,
       blackId,
       requestedColor,
+      calledFinishGame: false,
     },
   }
   await set('admin', game, 'games', game_id)

@@ -176,7 +176,7 @@
       <div class="is-flex is-align-items-center mb-4">
         <div class="sz-2 icon-star color-theme" />
         <p class="is-size-5 ml-2">
-          {{ user.numWins }} points
+          {{ user.numWinPoints }} points
         </p>
       </div>
       <div

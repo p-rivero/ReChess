@@ -7,7 +7,9 @@ import type { Timestamp } from '@firebase/firestore'
 export class User {
   public readonly uid: string
   public readonly username: string
-  public readonly numWins: number
+  public readonly numGamesPlayed: number
+  public readonly numWinPoints: number
+  public readonly last5GamesStr: string
   public name?: string
   public about: string
   public profileImg?: string
@@ -23,8 +25,10 @@ export class User {
     this.name = name
     this.about = doc.about
     this.profileImg = profileImg
-    this.numWins = doc.IMMUTABLE.numWins
     this.renameAllowedAt = doc.IMMUTABLE.renameAllowedAt
+    this.numGamesPlayed = doc.IMMUTABLE.numGamesPlayed
+    this.numWinPoints = doc.IMMUTABLE.numWinPoints
+    this.last5GamesStr = doc.IMMUTABLE.last5Games
     
     this.displayName = this.name ?? `@${this.username}`
   }
@@ -70,8 +74,10 @@ export const useUserStore = defineStore('user', () => {
       profileImg: user.profileImg ?? null,
       IMMUTABLE: {
         username: user.username,
-        numWins: user.numWins,
         renameAllowedAt: user.renameAllowedAt,
+        numGamesPlayed: user.numGamesPlayed,
+        numWinPoints: user.numWinPoints,
+        last5Games: user.last5GamesStr,
       },
     }
     await UserDB.updateUser(user.uid, doc)

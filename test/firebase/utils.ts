@@ -54,6 +54,9 @@ export class Batch {
   set(data: DocumentData, path: string, ...pathSegments: string[]) {
     this.batch.set(doc(this.db, path, ...pathSegments), data)
   }
+  update(data: UpdateData, path: string, ...pathSegments: string[]) {
+    this.batch.update(doc(this.db, path, ...pathSegments), data)
+  }
   remove(path: string, ...pathSegments: string[]) {
     this.batch.delete(doc(this.db, path, ...pathSegments))
   }

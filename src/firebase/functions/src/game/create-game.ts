@@ -18,8 +18,7 @@ import type { Timestamp } from 'firebase/firestore'
  * - There is no lobby slot for the given variant and creator
  * - The lobby slot has no challenger
  */
-export default async function(data: any, context: CallableContext): Promise<{gameId: string}> {
-  
+export default async function(data: unknown, context: CallableContext): Promise<{gameId: string}> {
   // Check user authentication
   if (!context.app) {
     throw new HttpsError('unauthenticated', 'The function must be called from an App Check verified app.')
@@ -27,12 +26,9 @@ export default async function(data: any, context: CallableContext): Promise<{gam
   if (!context.auth) {
     throw new HttpsError('unauthenticated', 'The function must be called while authenticated.')
   }
-  if (context.auth.uid !== data.creatorId) {
-    throw new HttpsError('permission-denied', 'The function must be called by the user that created the lobby slot.')
-  }
   
   // Validate input
-  const { variantId, creatorId } = data
+  const { variantId, creatorId } = data as { variantId: unknown, creatorId: unknown }
   if (!variantId || !creatorId) {
     throw new HttpsError('invalid-argument', 'The function must be called with a variantId and creatorId.')
   }
@@ -41,6 +37,9 @@ export default async function(data: any, context: CallableContext): Promise<{gam
   }
   if (typeof creatorId !== 'string') {
     throw new HttpsError('invalid-argument', 'The creatorId must be a string.')
+  }
+  if (context.auth.uid !== creatorId) {
+    throw new HttpsError('permission-denied', 'The function must be called by the user that created the lobby slot.')
   }
   
   const admin = await useAdmin()
@@ -84,11 +83,11 @@ export default async function(data: any, context: CallableContext): Promise<{gam
   
   // Here it's safe to use Math.random instead of crypto because this is not a cryptographic
   // operation, we just want users to be assigned each side approximately half the time
-  const creatorPlaysAsWhite = 
+  const creatorPlaysAsWhite =
     slotDoc.IMMUTABLE.requestedColor === 'white' ||
     (slotDoc.IMMUTABLE.requestedColor === 'random' && Math.random() < 0.5)
     
-  const [whiteId, whiteDisplayName] = creatorPlaysAsWhite ? 
+  const [whiteId, whiteDisplayName] = creatorPlaysAsWhite ?
     [creatorId, slotDoc.IMMUTABLE.creatorDisplayName] :
     [slotDoc.challengerId, slotDoc.challengerDisplayName]
     
@@ -112,7 +111,8 @@ export default async function(data: any, context: CallableContext): Promise<{gam
       blackDisplayName,
       requestedColor: slotDoc.IMMUTABLE.requestedColor,
       players: [whiteId, blackId],
-    }
+      calledFinishGame: false,
+    },
   }
   const gameRef = await db.collection('games').add(newGame)
   

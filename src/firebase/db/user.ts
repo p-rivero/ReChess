@@ -12,8 +12,10 @@ export async function createUser(user: User, username: string): Promise<UserDoc>
     profileImg: user.photoURL,
     IMMUTABLE: {
       username: username,
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   if (!user.email) throw new Error('User must have an email')

@@ -20,8 +20,10 @@ export interface UserDoc {
   profileImg: string | null
   IMMUTABLE: {
     username: string
-    numWins: number
     renameAllowedAt: Timestamp | null
+    numGamesPlayed: number
+    numWinPoints: number
+    last5Games: string // JSON of GameDoc[], updated by cloud function
   }
 }
 
@@ -78,6 +80,7 @@ export interface LobbySlotDoc {
   gameDocId: string | null
 }
 
+
 // games/{gameId}
 export interface GameDoc {
   // Space-separared list of moves like "e2e4" or "e7e8=Q". Validated by the opponent.
@@ -96,7 +99,14 @@ export interface GameDoc {
     blackId: string
     blackDisplayName: string
     requestedColor: RequestedColor
+    calledFinishGame: boolean
   }
+}
+
+// games/{gameId}/gameOverTrigger/doc
+export interface GameOverTriggerDoc {
+  // This document is used to trigger a cloud function when a game ends
+  gameOverTime: Timestamp
 }
 
 // cancelledGames/{gameId}

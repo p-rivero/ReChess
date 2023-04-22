@@ -16,8 +16,7 @@ import type { Timestamp } from 'firebase/firestore'
  * @param {CallableContext} context The context of the function call
  * @return {Promise<void>} A promise that resolves when the function completes
  */
-export default async function(data: any, context: CallableContext): Promise<void> {
-  
+export default async function(data: unknown, context: CallableContext): Promise<void> {
   // Check user authentication
   if (!context.app) {
     throw new HttpsError('unauthenticated', 'The function must be called from an App Check verified app.')
@@ -27,7 +26,7 @@ export default async function(data: any, context: CallableContext): Promise<void
   }
   
   // Validate input
-  const { gameId, reason } = data
+  const { gameId, reason } = data as { gameId: unknown, reason: unknown }
   if (!gameId || !reason) {
     throw new HttpsError('invalid-argument', 'The function must be called with a variantId and creatorId.')
   }

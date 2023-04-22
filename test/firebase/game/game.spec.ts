@@ -3,10 +3,10 @@ import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestU
 import { setupJest } from '../init'
 import { MY_ID, setupUsersAndVariant, setupGameDoc, setMoveHistory } from './game-test-utils'
 
-let { get, query, set, update }: TestUtilsSignature = notInitialized()
+let { get, query, set, update, startBatch, now }: TestUtilsSignature = notInitialized()
 
 setupJest('game-tests', env => {
-  ({ get, query, set, update } = setupTestUtils(env, MY_ID, 'my@email.com'))
+  ({ get, query, set, update, startBatch, now } = setupTestUtils(env, MY_ID, 'my@email.com'))
 })
 
 test('anyone can read ongoing and finished games', async () => {
@@ -287,25 +287,46 @@ test('winner must be set if and only if the game is over', async () => {
   const gameId = await setupGameDoc(set, 'myself', 'bob', 'white')
   await setMoveHistory(update, gameId, 'e2e4 e7e5 ', 'white')
   
-  await assertFails(
-    update('verified', {
-      moveHistory: 'e2e4 e7e5 g1f3 ',
-      playerToMove: 'game-over',
-    }, 'games', gameId)
-  )
+  // Set winner and trigger a Game Over (needs to set playerToMove too)
+  let batch = startBatch('verified')
+  batch.update({
+    moveHistory: 'e2e4 e7e5 g1f3 ',
+    winner: 'black',
+  }, 'games', gameId)
+  batch.set({
+    gameOverTime: now(),
+  }, 'games', gameId, 'gameOverTrigger', 'doc')
+  await assertFails(batch.commit())
   
-  await assertFails(
-    update('verified', {
-      moveHistory: 'e2e4 e7e5 g1f3 ',
-      winner: 'black',
-    }, 'games', gameId)
-  )
+  // Set playerToMove and trigger a Game Over (needs to set winner too)
+  batch = startBatch('verified')
+  batch.update({
+    moveHistory: 'e2e4 e7e5 g1f3 ',
+    playerToMove: 'game-over',
+  }, 'games', gameId)
+  batch.set({
+    gameOverTime: now(),
+  }, 'games', gameId, 'gameOverTrigger', 'doc')
+  await assertFails(batch.commit())
   
-  await assertSucceeds(
-    update('verified', {
-      moveHistory: 'e2e4 e7e5 g1f3 ',
-      playerToMove: 'game-over',
-      winner: 'black',
-    }, 'games', gameId)
-  )
+  // Set playerToMove and winner, without triggering a Game Over
+  batch = startBatch('verified')
+  batch.update({
+    moveHistory: 'e2e4 e7e5 g1f3 ',
+    playerToMove: 'game-over',
+    winner: 'black',
+  }, 'games', gameId)
+  await assertFails(batch.commit())
+  
+  // Set playerToMove and winner, and trigger a Game Over (OK)
+  batch = startBatch('verified')
+  batch.update({
+    moveHistory: 'e2e4 e7e5 g1f3 ',
+    playerToMove: 'game-over',
+    winner: 'black',
+  }, 'games', gameId)
+  batch.set({
+    gameOverTime: now(),
+  }, 'games', gameId, 'gameOverTrigger', 'doc')
+  await assertSucceeds(batch.commit())
 })

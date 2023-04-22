@@ -26,8 +26,10 @@ async function setupUser() {
     profileImg: null,
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -50,8 +52,10 @@ test('anyone can read created users', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   await set('admin', user, 'users', '1234')
@@ -77,8 +81,10 @@ test('can create a user if authenticated', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -103,8 +109,10 @@ test('cannot create a user if username is already taken', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -131,8 +139,10 @@ test('cannot create a user if not authenticated', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -156,8 +166,64 @@ test('cannot create a user with more than 0 wins', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 1,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 1,
+      last5Games: '[]',
+    },
+  }
+  const userPrivate: UserPrivateDoc = {
+    IMMUTABLE: {
+      email: MY_EMAIL,
+      banned: false,
+    },
+  }
+  const batch = startBatch('unverified')
+  batch.set(username, 'usernames', 'my_username')
+  batch.set(user, 'users', MY_ID)
+  batch.set(userPrivate, 'users', MY_ID, 'private', 'doc')
+  await assertFails(batch.commit())
+})
+
+test('cannot create a user with more than 0 played games', async () => {
+  const username: UsernameDoc = { userId: MY_ID }
+  const user: UserDoc = {
+    name: 'my new user',
+    about: '',
+    profileImg: 'example.com/img.png',
+    IMMUTABLE: {
+      username: 'my_username',
+      renameAllowedAt: null,
+      numGamesPlayed: 1,
+      numWinPoints: 0,
+      last5Games: '[]',
+    },
+  }
+  const userPrivate: UserPrivateDoc = {
+    IMMUTABLE: {
+      email: MY_EMAIL,
+      banned: false,
+    },
+  }
+  const batch = startBatch('unverified')
+  batch.set(username, 'usernames', 'my_username')
+  batch.set(user, 'users', MY_ID)
+  batch.set(userPrivate, 'users', MY_ID, 'private', 'doc')
+  await assertFails(batch.commit())
+})
+
+test('last5Games must be an empty array', async () => {
+  const username: UsernameDoc = { userId: MY_ID }
+  const user: UserDoc = {
+    name: 'my new user',
+    about: '',
+    profileImg: 'example.com/img.png',
+    IMMUTABLE: {
+      username: 'my_username',
+      renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[{}]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -181,8 +247,10 @@ test('cannot create a banned user', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -206,8 +274,10 @@ test('can create a user without name or profileImg', async () => {
     profileImg: null,
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -230,8 +300,10 @@ test('cannot create a user without also creating username', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -254,8 +326,10 @@ test('cannot create a user without also creating private doc', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const batch = startBatch('unverified')
@@ -272,8 +346,10 @@ test('cannot create more than one private doc', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -298,8 +374,10 @@ test('email must match auth token', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -323,8 +401,10 @@ test('renameAllowedAt must be null', async () => {
     profileImg: 'example.com/img.png',
     IMMUTABLE: {
       username: 'my_username',
-      numWins: 0,
       renameAllowedAt: afterSeconds(10),
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -409,7 +489,10 @@ test('cannot edit immutable fields', async () => {
     update('verified', { 'IMMUTABLE.username': 'new_username' }, 'users', MY_ID)
   )
   await assertFails(
-    update('verified', { 'IMMUTABLE.numWins': 10 }, 'users', MY_ID)
+    update('verified', { 'IMMUTABLE.numWinPoints': 10 }, 'users', MY_ID)
+  )
+  await assertFails(
+    update('verified', { 'IMMUTABLE.numGamesPlayed': 10 }, 'users', MY_ID)
   )
   await assertFails(
     update('verified', { 'IMMUTABLE.renameAllowedAt': afterSeconds(2) }, 'users', MY_ID)

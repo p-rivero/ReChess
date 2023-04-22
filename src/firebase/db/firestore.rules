@@ -106,7 +106,7 @@ service cloud.firestore {
       function isUserDoc(doc) {
         return
           hasFields(doc, ['about', 'IMMUTABLE'], ['name', 'profileImg']) &&
-          hasFields(doc.IMMUTABLE, ['username', 'numWins'], ['renameAllowedAt']) &&
+          hasFields(doc.IMMUTABLE, ['username', 'numGamesPlayed', 'numWinPoints', 'last5Games'], ['renameAllowedAt']) &&
           doc.about is string &&
           doc.about.size() <= 1000 &&
           (doc.name == null || (
@@ -120,10 +120,12 @@ service cloud.firestore {
             doc.profileImg.size() <= 600
           )) &&
           doc.IMMUTABLE.username is string &&
-          doc.IMMUTABLE.numWins is int &&
           (doc.IMMUTABLE.renameAllowedAt == null || (
             doc.IMMUTABLE.renameAllowedAt is timestamp
-          ));
+          )) &&
+          doc.IMMUTABLE.numGamesPlayed is int &&
+          doc.IMMUTABLE.numWinPoints is int &&
+          doc.IMMUTABLE.last5Games is string;
       }
       function allowCreateUser() {
         let doc = request.resource.data;
@@ -133,8 +135,10 @@ service cloud.firestore {
           // Username is correct and not taken
           isValidUsername(doc.IMMUTABLE.username) &&
           !usernameIsTaken(doc.IMMUTABLE.username) &&
-          doc.IMMUTABLE.numWins == 0 &&
           doc.IMMUTABLE.renameAllowedAt == null &&
+          doc.IMMUTABLE.numGamesPlayed == 0 &&
+          doc.IMMUTABLE.numWinPoints == 0 &&
+          doc.IMMUTABLE.last5Games == '[]' &&
           // User must be created in a batch with a username document
           getAfter(/databases/$(database)/documents/usernames/$(doc.IMMUTABLE.username)).data.userId == userId &&
           // User must be created in a batch with a private document
@@ -378,7 +382,7 @@ service cloud.firestore {
         let HISTORY_REGEX = '^([a-p][0-9]{1,2}[a-p][0-9]{1,2}(=..?)? )*$';
         return
           hasFields(doc, ['moveHistory', 'playerToMove', 'IMMUTABLE'], ['winner']) &&
-          hasFields(doc.IMMUTABLE, ['timeCreated', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName', 'requestedColor', 'players'], ['whiteId', 'blackId']) &&
+          hasFields(doc.IMMUTABLE, ['timeCreated', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName', 'requestedColor', 'players', 'calledFinishGame'], ['whiteId', 'blackId']) &&
           doc.moveHistory is string &&
           doc.moveHistory.size() <= 10000 &&
           doc.moveHistory.matches(HISTORY_REGEX) &&
@@ -405,13 +409,36 @@ service cloud.firestore {
           // Must pass the turn to the other player
           new.playerToMove != old.playerToMove &&
           // Must be logged in as the player whose turn it is
-          (old.playerToMove == 'white' && loggedAs(old.IMMUTABLE.whiteId) ||
-           old.playerToMove == 'black' && loggedAs(old.IMMUTABLE.blackId));
+          (
+            old.playerToMove == 'white' && loggedAs(old.IMMUTABLE.whiteId) ||
+            old.playerToMove == 'black' && loggedAs(old.IMMUTABLE.blackId)
+          ) &&
+          // If the game is over, make sure the gameOverTrigger has been created
+          (new.winner != null ? (
+            existsAfter(/databases/$(database)/documents/games/$(gameId)/gameOverTrigger/doc)
+          ) : true);
       }
       
       allow read;
       allow update: if allowUpdateGame();
       // Games can only be created and deleted by cloud functions
+      
+      // Document that triggers the cloud function finishGame() when created
+      match /gameOverTrigger/{docName} {
+        function allowCreateGameOverTrigger() {
+          let doc = request.resource.data;
+          let gameDoc = getAfter(/databases/$(database)/documents/games/$(gameId)).data;
+          return
+            docName == 'doc' &&
+            hasFields(doc, ['gameOverTime'], []) &&
+            doc.gameOverTime is timestamp &&
+            isServerTimestamp(doc.gameOverTime) &&
+            gameDoc.winner != null &&
+            gameDoc.playerToMove == 'game-over';
+        }
+        // Don't allow users to read, update, or delete this document, only create it
+        allow create: if allowCreateGameOverTrigger();
+      }
     }
     
     
