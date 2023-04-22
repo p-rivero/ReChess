@@ -104,7 +104,7 @@ export const useLobbyStore = defineStore('lobby', () => {
       }
     })
     const unsubscribeOngoing = onSnapshot(LobbyDB.getOngoingGames(variantId), snap => {
-      const slots: OngoingGameSlot[] = []
+      let slots: OngoingGameSlot[] = []
       snap.forEach(docSnap => {
         const docId = docSnap.id
         const doc = docSnap.data() as GameDoc
@@ -114,8 +114,7 @@ export const useLobbyStore = defineStore('lobby', () => {
       const myId = authStore.loggedUser?.uid
       const myGames = slots.filter(s => s.whiteId === myId || s.blackId === myId)
       const otherGames = slots.filter(s => s.whiteId !== myId && s.blackId !== myId)
-      slots.length = 0
-      slots.push(...myGames, ...otherGames)
+      slots = myGames.concat(otherGames)
       ongoingLoadedCallback(slots)
     })
     
