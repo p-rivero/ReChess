@@ -9,12 +9,7 @@
     <p class="adjust-text is-break-word is-size-5 has-text-centered">
       {{ gameSlot.whiteDisplayName }}
     </p>
-    <div
-      class="pl-3 pr-2 py-2 is-clickable"
-      @click="emit('user-clicked', gameSlot.whiteId)"
-    >
-      <div class="sz-icon icon-external-link color-primary-dark" />
-    </div>
+    <ExternalLinkButton @click="emit('user-clicked', gameSlot.whiteId)" />
   </div>
   
   <div class="column is-1 py-0 is-flex is-align-items-center is-justify-content-center">
@@ -31,12 +26,7 @@
     <p class="adjust-text is-break-word is-size-5 has-text-centered">
       {{ gameSlot.blackDisplayName }}
     </p>
-    <div
-      class="pl-3 pr-2 py-2 is-clickable"
-      @click="emit('user-clicked', gameSlot.blackId)"
-    >
-      <div class="sz-icon icon-external-link color-primary-dark" />
-    </div>
+    <ExternalLinkButton @click="emit('user-clicked', gameSlot.blackId)" />
   </div>
   
   <div class="column is-3 is-flex is-align-items-center">
@@ -57,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+  import ExternalLinkButton from '@/components/BasicWrappers/ExternalLinkButton.vue'
   import type { OngoingGameSlot } from '@/stores/lobby'
 
   defineProps<{

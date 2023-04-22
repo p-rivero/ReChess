@@ -2,20 +2,24 @@ import { onSnapshot } from '@firebase/firestore'
 import { GameDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
 import type { GameDoc } from '@/firebase/db/schema'
-import type { MoveInfo, Player, Variant } from '@/protochess/types'
+import type { MoveInfo, Player, PublishedVariant } from '@/protochess/types'
 import { readVariantDoc } from './variant'
 import { useAuthStore } from './auth-user'
 import { object_equals } from '@/utils/ts-utils'
 
 export type Game = {
-  variant: Variant
+  id: string
+  variant: PublishedVariant
   moveHistory: MoveInfo[]
   moveHistoryString: string // Stringified version of moveHistory
   playerToMove: 'white' | 'black' | 'game-over'
   winner?: 'white' | 'black' | 'draw'
+  createdAt: Date
   
   whiteName: string
+  whiteId: string
   blackName: string
+  blackId: string
   loggedUserIsWhite: boolean
   loggedUserIsBlack: boolean
 }
@@ -25,7 +29,7 @@ const EMPTY_FN = () => { /* do nothing */ }
 export const useGameStore = defineStore('game', () => {
   let currentGameId: string | null = null
   let currentGame: Game | null = null
-  let currentVariant: Variant | null = null
+  let currentVariant: PublishedVariant | null = null
   const authStore = useAuthStore()
   
   // Callbacks
@@ -54,14 +58,14 @@ export const useGameStore = defineStore('game', () => {
       // Don't parse the variant doc every time a move is made
       // Only parse it when the game is first loaded
       if (currentVariant == null) {
-        const variant = readVariantDoc(gameDoc.IMMUTABLE.variant, false, '')
+        const variant = readVariantDoc(gameDoc.IMMUTABLE.variant, false, gameDoc.IMMUTABLE.variantId)
         if (!variant) {
           invalidVariantCallback()
           return
         }
         currentVariant = variant
       }
-      const newGame = readDocument(gameDoc, currentVariant)
+      const newGame = readDocument(snap.id, gameDoc, currentVariant)
       // If the same user has 2 tabs open, we need to check which ones are outdated
       // and call the callback only when needed
       if (!object_equals(newGame, currentGame)) {
@@ -96,6 +100,7 @@ export const useGameStore = defineStore('game', () => {
   }
   
   
+  /** Makes a move on the current game, and optionally sets the winner of the game */
   async function movePiece(
     from: [number, number],
     to: [number, number],
@@ -114,20 +119,34 @@ export const useGameStore = defineStore('game', () => {
   }
   
   
-  function readDocument(doc: GameDoc, variant: Variant): Game {
+  /** Returns a list of games that the user has played */
+  async function getUserGames(userId: string): Promise<Game[]> {
+    const gameDocs = await GameDB.getUserGames(userId)
+    return gameDocs.map(([doc, id]) => {
+      const variant = readVariantDoc(doc.IMMUTABLE.variant, false, doc.IMMUTABLE.variantId)
+      if (!variant) throw new Error('Invalid variant')
+      return readDocument(id, doc, variant)
+    })
+  }
+  
+  function readDocument(id: string, doc: GameDoc, variant: PublishedVariant): Game {
     const moveHistory: MoveInfo[] = []
     for (const move of doc.moveHistory.split(' ')) {
       if (move.length === 0) continue
       moveHistory.push(parseMove(move))
     }
     return {
+      id,
       variant,
       moveHistory,
       moveHistoryString: doc.moveHistory,
       playerToMove: doc.playerToMove,
       winner: doc.winner ?? undefined,
+      createdAt: doc.IMMUTABLE.timeCreated.toDate(),
       whiteName: doc.IMMUTABLE.whiteDisplayName,
+      whiteId: doc.IMMUTABLE.whiteId,
       blackName: doc.IMMUTABLE.blackDisplayName,
+      blackId: doc.IMMUTABLE.blackId,
       loggedUserIsWhite: authStore.loggedUser?.uid === doc.IMMUTABLE.whiteId,
       loggedUserIsBlack: authStore.loggedUser?.uid === doc.IMMUTABLE.blackId,
     }
@@ -171,5 +190,6 @@ export const useGameStore = defineStore('game', () => {
     onInvalidVariant,
     
     movePiece,
+    getUserGames,
   }
 })

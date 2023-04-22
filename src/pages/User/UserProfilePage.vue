@@ -167,7 +167,35 @@
         </button>
       </div>
     </div>
-    <div class="column is-4" />
+    
+    
+    <!-- TODO: v-if="games.length > 0" -->
+    <div
+      class="column is-4 mt-3"
+    >
+      <div class="is-flex is-align-items-center mb-4">
+        <div class="sz-2 icon-star color-theme" />
+        <p class="is-size-5 ml-2">
+          {{ user.numWins }} points
+        </p>
+      </div>
+      <div
+        v-for="game of games"
+        :key="game.id + user.uid"
+        class="mx-0 my-5 card columns"
+      >
+        <ProfileGameView
+          :viewing-user-id="user.uid"
+          :game="game"
+        />
+      </div>
+      <button
+        class="button"
+        @click="fetchAllGames"
+      >
+        View more
+      </button>
+    </div>
   </div>
   <ImageSelectPopup
     ref="imageSelectPopup"
@@ -185,7 +213,7 @@
 
 <script setup lang="ts">
 
-  import { ref, watchEffect } from 'vue'
+  import { ref, watch, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   
   import { AuthUser, useAuthStore } from '@/stores/auth-user'
@@ -196,15 +224,19 @@
   import EditableTitle from '@/components/BasicWrappers/EditableTitle.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import ImageSelectPopup from '@/components/ImageSelect/ImageSelectPopup.vue'
+  import ProfileGameView from '@/components/Lobby/ProfileGameView.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { Timestamp } from '@firebase/firestore'
+  import { useGameStore, type Game } from '@/stores/game'
   
   const router = useRouter()
   const route = useRoute()
   const authStore = useAuthStore()
   const userStore = useUserStore()
+  const gameStore = useGameStore()
   
   const user = ref<User | AuthUser>()
+  const games = ref<Game[]>([])
   const hasError = ref(false)
   const showDangerZone = ref(false)
   const sendingResetPasswordEmail = ref(false)
@@ -213,7 +245,7 @@
   const errorHandler = new ErrorMessageHandler(hasError)
   
   // When the route or logged user changes, update the user
-  watchEffect(async () => {
+  async function updateUser() {
     const username = route.params.username
     if (!username || typeof username !== 'string') {
       // Invalid username, redirect to home page
@@ -225,6 +257,7 @@
       // User is logged in and is viewing their own profile
       user.value = authStore.loggedUser
       updateTitle(authStore.loggedUser.displayName)
+      games.value = [] // TODO: Include in user object
       return
     }
     
@@ -235,8 +268,12 @@
       return
     }
     user.value = fetchedUser
+    games.value = [] // TODO: Include in user object
     updateTitle(fetchedUser.displayName)
-  })
+  }
+  watch(route, updateUser)
+  watch(authStore, updateUser)
+  onMounted(updateUser)
   
   function myProfile(user: User | AuthUser): user is AuthUser {
     return authStore.loggedUser !== null && user.uid === authStore.loggedUser.uid
@@ -368,7 +405,13 @@
       router.push({ name: 'home' })
     })
   }
-
+  
+  async function fetchAllGames() {
+    // TODO: Add pagination
+    if (!user.value) throw new Error('User cannot be set to undefined')
+    games.value = await gameStore.getUserGames(user.value.uid)
+  }
+  
 </script>
 
 

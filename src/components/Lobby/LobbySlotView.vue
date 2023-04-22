@@ -15,16 +15,11 @@
     <p class="adjust-text is-break-word is-size-5">
       {{ lobbySlot.creatorDisplayName }}
     </p>
-    <div
-      class="pl-3 pr-2 py-2 is-clickable"
-      @click="emit('user-clicked', lobbySlot.creatorId)"
-    >
-      <div class="sz-icon icon-external-link color-primary-dark" />
-    </div>
+    <ExternalLinkButton @click="emit('user-clicked', lobbySlot.creatorId)" />
   </div>
     
   <div
-    v-if="!lobbySlot.creatorIsCurrentUser && lobbySlot.requestedColor === 'random'"
+    v-if="!lobbySlot.currentUserIsCreator && lobbySlot.requestedColor === 'random'"
     class="column is-3 is-flex is-align-items-center"
   >
     <div class="sz-icon icon-dice color-theme" />
@@ -33,7 +28,7 @@
     </p>
   </div>
   <div
-    v-else-if="!lobbySlot.creatorIsCurrentUser"
+    v-else-if="!lobbySlot.currentUserIsCreator"
     class="column is-3 is-flex is-align-items-center"
   >
     <div class="sz-icon icon-king-big color-theme" />
@@ -47,7 +42,7 @@
   
   
   <div
-    v-if="!lobbySlot.creatorIsCurrentUser && !lobbySlot.challengerId"
+    v-if="!lobbySlot.currentUserIsCreator && !lobbySlot.challengerId"
     class="column is-3 is-flex is-align-items-center"
   >
     <button
@@ -59,7 +54,7 @@
     </button>
   </div>
   <div
-    v-else-if="!lobbySlot.creatorIsCurrentUser && lobbySlot.challengerIsCurrentUser"
+    v-else-if="!lobbySlot.currentUserIsCreator && lobbySlot.currentUserIsChallenger"
     class="column is-3 is-flex is-align-items-center"
   >
     <button
@@ -71,7 +66,7 @@
     </button>
   </div>
   <div
-    v-else-if="!lobbySlot.creatorIsCurrentUser"
+    v-else-if="!lobbySlot.currentUserIsCreator"
     class="column is-3 is-flex is-align-items-center"
   >
     <p class="is-break-word adjust-text">
@@ -80,7 +75,7 @@
   </div>
     
   <div
-    v-if="lobbySlot.creatorIsCurrentUser"
+    v-if="lobbySlot.currentUserIsCreator"
     class="column is-6 is-flex is-align-items-center is-justify-content-center"
   >
     Other players can join your game
@@ -90,6 +85,7 @@
 
 <script setup lang="ts">
   import type { LobbySlot } from '@/stores/lobby'
+  import ExternalLinkButton from '@/components/BasicWrappers/ExternalLinkButton.vue'
 
   defineProps<{
     lobbySlot: LobbySlot
