@@ -30,7 +30,7 @@ export interface GameSummary {
   gameId: string
   variantId: string
   variantName: string
-  timeCreated: Timestamp
+  timeCreatedMs: number
   playedSide: 'white' | 'black'
   result: 'win' | 'loss' | 'draw'
   opponentId: string

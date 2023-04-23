@@ -1,6 +1,6 @@
 import type { GameDoc, GameSummary, UserDoc } from 'db/schema'
 import { useAdmin } from '../helpers'
-import { increment } from 'firebase/firestore'
+import { FieldValue } from 'firebase-admin/firestore'
 
 /**
  * Triggered when a game finishes successfully. Updates the denormalized
@@ -62,7 +62,7 @@ async function updateProfile(
   playerId: string
 ): Promise<void> {
   // Fetch the profile
-  const profileRef = db.collection('profiles').doc(playerId)
+  const profileRef = db.collection('users').doc(playerId)
   const profileSnapshot = await profileRef.get()
   if (!profileSnapshot.exists) {
     console.error('Profile does not exist: ' + playerId)
@@ -87,7 +87,7 @@ async function updateProfile(
     gameId,
     variantId: game.IMMUTABLE.variantId,
     variantName: game.IMMUTABLE.variant.name,
-    timeCreated: game.IMMUTABLE.timeCreated,
+    timeCreatedMs: game.IMMUTABLE.timeCreated.toMillis(),
     playedSide,
     result,
     opponentId,
@@ -101,8 +101,8 @@ async function updateProfile(
   
   // Update the profile
   await profileRef.update({
-    'IMMUTABLE.numGamesPlayed': increment(1),
-    'IMMUTABLE.winPoints': increment(earnedPoints),
+    'IMMUTABLE.numGamesPlayed': FieldValue.increment(1),
+    'IMMUTABLE.numWinPoints': FieldValue.increment(earnedPoints),
     'IMMUTABLE.last5Games': JSON.stringify(last5Games),
   })
 }

@@ -169,8 +169,8 @@
     </div>
     
     
-    <!-- TODO: v-if="games.length > 0" -->
     <div
+      v-if="games.length > 0"
       class="column is-4 mt-3"
     >
       <div class="is-flex is-align-items-center mb-4">
@@ -181,7 +181,7 @@
       </div>
       <div
         v-for="game of games"
-        :key="game.id + user.uid"
+        :key="game.gameId + user.uid"
         class="mx-0 my-5 card columns"
       >
         <ProfileGameView
@@ -226,8 +226,8 @@
   import ImageSelectPopup from '@/components/ImageSelect/ImageSelectPopup.vue'
   import ProfileGameView from '@/components/Lobby/ProfileGameView.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
-  import { Timestamp } from '@firebase/firestore'
-  import { useGameStore, type Game } from '@/stores/game'
+  import { useGameStore } from '@/stores/game'
+  import type { GameSummary } from '@/firebase/db/schema'
   
   const router = useRouter()
   const route = useRoute()
@@ -236,7 +236,7 @@
   const gameStore = useGameStore()
   
   const user = ref<User | AuthUser>()
-  const games = ref<Game[]>([])
+  const games = ref<GameSummary[]>([])
   const hasError = ref(false)
   const showDangerZone = ref(false)
   const sendingResetPasswordEmail = ref(false)
@@ -257,7 +257,7 @@
       // User is logged in and is viewing their own profile
       user.value = authStore.loggedUser
       updateTitle(authStore.loggedUser.displayName)
-      games.value = [] // TODO: Include in user object
+      games.value = JSON.parse(user.value.last5GamesStr)
       return
     }
     
@@ -268,7 +268,7 @@
       return
     }
     user.value = fetchedUser
-    games.value = [] // TODO: Include in user object
+    games.value = JSON.parse(user.value.last5GamesStr)
     updateTitle(fetchedUser.displayName)
   }
   watch(route, updateUser)
@@ -287,7 +287,7 @@
       // User has never changed their name, continue with the edit
       return true
     }
-    if (Date.now() < user.value.renameAllowedAt.toMillis()) {
+    if (Date.now() < user.value.renameAllowedAt.valueOf()) {
       showPopup(
         'Cannot edit display name',
         'To prevent spam, you can only change your display name once every **5 minutes**. Please try again later.',
@@ -318,7 +318,7 @@
     try {
       await userStore.storeUser(user.value)
       // Update the timestamp to prevent 2 consecutive edits
-      user.value.renameAllowedAt = Timestamp.fromMillis(Date.now() + 30 * 60 * 1000)
+      user.value.renameAllowedAt = new Date(Date.now() + 5 * 60 * 1000)
     } catch (e) {
       console.error(e)
       user.value.name = oldName

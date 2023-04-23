@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { UserDB } from '@/firebase/db'
 import type { UserDoc } from '@/firebase/db/schema'
-import type { Timestamp } from '@firebase/firestore'
 
 export class User {
   public readonly uid: string
@@ -13,7 +12,7 @@ export class User {
   public name?: string
   public about: string
   public profileImg?: string
-  public renameAllowedAt: Timestamp | null
+  public renameAllowedAt: Date | undefined
   public displayName: string
   
   constructor(id: string, doc: UserDoc) {
@@ -25,7 +24,7 @@ export class User {
     this.name = name
     this.about = doc.about
     this.profileImg = profileImg
-    this.renameAllowedAt = doc.IMMUTABLE.renameAllowedAt
+    this.renameAllowedAt = doc.IMMUTABLE.renameAllowedAt?.toDate()
     this.numGamesPlayed = doc.IMMUTABLE.numGamesPlayed
     this.numWinPoints = doc.IMMUTABLE.numWinPoints
     this.last5GamesStr = doc.IMMUTABLE.last5Games

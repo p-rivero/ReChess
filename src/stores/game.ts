@@ -1,7 +1,7 @@
 import { onSnapshot } from '@firebase/firestore'
 import { GameDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
-import type { GameDoc } from '@/firebase/db/schema'
+import type { GameDoc, GameSummary } from '@/firebase/db/schema'
 import type { MoveInfo, Player, PublishedVariant } from '@/protochess/types'
 import { readVariantDoc } from './variant'
 import { useAuthStore } from './auth-user'
@@ -120,12 +120,23 @@ export const useGameStore = defineStore('game', () => {
   
   
   /** Returns a list of games that the user has played */
-  async function getUserGames(userId: string): Promise<Game[]> {
+  async function getUserGames(userId: string): Promise<GameSummary[]> {
     const gameDocs = await GameDB.getUserGames(userId)
     return gameDocs.map(([doc, id]) => {
       const variant = readVariantDoc(doc.IMMUTABLE.variant, false, doc.IMMUTABLE.variantId)
       if (!variant) throw new Error('Invalid variant')
-      return readDocument(id, doc, variant)
+      
+      const side = doc.IMMUTABLE.whiteId === userId ? 'white' : 'black'
+      return {
+        gameId: id,
+        variantId: variant.uid,
+        variantName: variant.displayName,
+        timeCreatedMs: doc.IMMUTABLE.timeCreated.toMillis(),
+        playedSide: side,
+        result: doc.winner === side ? 'win' : doc.winner === 'draw' ? 'draw' : 'loss',
+        opponentId: side === 'white' ? doc.IMMUTABLE.blackId : doc.IMMUTABLE.whiteId,
+        opponentName: side === 'white' ? doc.IMMUTABLE.blackDisplayName : doc.IMMUTABLE.whiteDisplayName,
+      }
     })
   }
   
