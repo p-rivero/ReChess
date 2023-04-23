@@ -3,7 +3,7 @@
     v-if="user"
     class="columns"
   >
-    <div class="column is-8">
+    <div class="column is-7">
       <div class="is-flex is-align-items-center mb-5">
         <div
           class="mr-4 profile-image-container is-flex-shrink-0 is-flex-grow-0"
@@ -171,9 +171,9 @@
     
     <div
       v-if="games.length > 0"
-      class="column is-4 mt-3"
+      class="column is-5 mt-3"
     >
-      <div class="is-flex is-align-items-center mb-4">
+      <div class="is-flex is-align-items-center pb-3">
         <div class="sz-2 icon-star color-theme" />
         <p class="is-size-5 ml-2">
           {{ user.numWinPoints }} points
@@ -182,7 +182,7 @@
       <div
         v-for="game of games"
         :key="game.gameId + user.uid"
-        class="mx-0 my-5 card columns"
+        class="mx-0 my-5 card"
       >
         <ProfileGameView
           :viewing-user-id="user.uid"
@@ -190,6 +190,7 @@
         />
       </div>
       <button
+        v-if="games.length < user.numGamesPlayed"
         class="button"
         @click="fetchAllGames"
       >
