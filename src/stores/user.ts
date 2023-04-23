@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { UserDB } from '@/firebase/db'
-import type { UserDoc } from '@/firebase/db/schema'
+import type { GameSummary, UserDoc } from '@/firebase/db/schema'
 
 export class User {
   public readonly uid: string
@@ -14,6 +14,7 @@ export class User {
   public profileImg?: string
   public renameAllowedAt: Date | undefined
   public displayName: string
+  public latestGames: GameSummary[]
   
   constructor(id: string, doc: UserDoc) {
     const name = doc.name ?? undefined // null -> undefined
@@ -28,6 +29,7 @@ export class User {
     this.numGamesPlayed = doc.IMMUTABLE.numGamesPlayed
     this.numWinPoints = doc.IMMUTABLE.numWinPoints
     this.last5GamesStr = doc.IMMUTABLE.last5Games
+    this.latestGames = JSON.parse(this.last5GamesStr)
     
     this.displayName = this.name ?? `@${this.username}`
   }

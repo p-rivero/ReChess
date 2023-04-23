@@ -37,7 +37,7 @@ export async function getUserGames(userId: string): Promise<[GameDoc, string][]>
   const q = query(
     collection(db, 'games'),
     where('IMMUTABLE.players', 'array-contains', userId),
-    where('winner', '!=', null),
+    where('playerToMove', '==', 'game-over'),
     orderBy('IMMUTABLE.timeCreated', 'desc')
   )
   const snapshot = await getDocs(q)

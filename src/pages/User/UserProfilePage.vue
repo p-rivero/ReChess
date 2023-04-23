@@ -117,7 +117,7 @@
           :error-handler="errorHandler"
           :char-limit="1000"
           :validator="text => text.length > 1000 ? 'The About section must be at most 1000 characters long' : undefined"
-          @save="text => { user!.about = text; userStore.storeUser(user!) }"
+          @save="updateAbout"
         />
       </div>
       
@@ -170,7 +170,7 @@
     
     
     <div
-      v-if="games.length > 0"
+      v-if="user.latestGames.length > 0"
       class="column is-5 mt-3"
     >
       <div class="is-flex is-align-items-center pb-3">
@@ -180,7 +180,7 @@
         </p>
       </div>
       <div
-        v-for="game of games"
+        v-for="game of user.latestGames"
         :key="game.gameId + user.uid"
         class="mx-0 my-5 card"
       >
@@ -190,7 +190,7 @@
         />
       </div>
       <button
-        v-if="games.length < user.numGamesPlayed"
+        v-if="user.latestGames.length < user.numGamesPlayed"
         class="button"
         @click="fetchAllGames"
       >
@@ -228,7 +228,6 @@
   import ProfileGameView from '@/components/Lobby/ProfileGameView.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { useGameStore } from '@/stores/game'
-  import type { GameSummary } from '@/firebase/db/schema'
   
   const router = useRouter()
   const route = useRoute()
@@ -237,7 +236,6 @@
   const gameStore = useGameStore()
   
   const user = ref<User | AuthUser>()
-  const games = ref<GameSummary[]>([])
   const hasError = ref(false)
   const showDangerZone = ref(false)
   const sendingResetPasswordEmail = ref(false)
@@ -258,7 +256,6 @@
       // User is logged in and is viewing their own profile
       user.value = authStore.loggedUser
       updateTitle(authStore.loggedUser.displayName)
-      games.value = JSON.parse(user.value.last5GamesStr)
       return
     }
     
@@ -269,7 +266,6 @@
       return
     }
     user.value = fetchedUser
-    games.value = JSON.parse(user.value.last5GamesStr)
     updateTitle(fetchedUser.displayName)
   }
   watch(route, updateUser)
@@ -325,6 +321,23 @@
       user.value.name = oldName
       showPopup(
         'Cannot edit display name',
+        'There has been an unexpected error. Please try again later.',
+        'ok'
+      )
+    }
+  }
+  
+  async function updateAbout(newAbout: string) {
+    if (!user.value) throw new Error('User is undefined')
+    const oldAbout = user.value.about
+    user.value.about = newAbout
+    try {
+      await userStore.storeUser(user.value)
+    } catch (e) {
+      user.value.about = oldAbout
+      console.error(e)
+      showPopup(
+        'Cannot edit about',
         'There has been an unexpected error. Please try again later.',
         'ok'
       )
@@ -410,7 +423,7 @@
   async function fetchAllGames() {
     // TODO: Add pagination
     if (!user.value) throw new Error('User cannot be set to undefined')
-    games.value = await gameStore.getUserGames(user.value.uid)
+    user.value.latestGames = await gameStore.getUserGames(user.value.uid)
   }
   
 </script>
