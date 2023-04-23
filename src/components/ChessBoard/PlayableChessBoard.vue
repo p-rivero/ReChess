@@ -72,7 +72,7 @@
         nextTick(() => board.value?.setLastMove(state.moveHistory[state.moveHistory.length - 1]))
       }
       aspectRatio.value = variant.boardWidth / variant.boardHeight
-      updateMovableSquares(stateDiff)
+      updateMovableSquares(stateDiff, result.flag !== 'Ok')
       
       promotionPopup.value?.initialize(variant)
       moveHistory.initialize({ initialState: variant, moveHistory: state.moveHistory })
@@ -173,11 +173,14 @@
     emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
     emit('new-move', mv.from, mv.to, mv.promotion, gameResult)
     
-    // If game has ended, don't continue
-    if (gameResult) return
-    updateMovableSquares(stateDiff)
+    updateMovableSquares(stateDiff, !!gameResult)
   }
-  async function updateMovableSquares(state: StateDiff) {
+  async function updateMovableSquares(state: StateDiff, gameOver: boolean) {
+    if (gameOver) {
+      board.value?.setMovable(false, false, [])
+      cursorPointer.value = false
+      return
+    }
     const protochess = await getProtochess()
     const moves = await protochess.legalMoves()
     const moveWhite = props.white == 'human' && state.playerToMove == 0
@@ -218,13 +221,9 @@
     }
     
     // Update movable squares
-    if (moveHistory.canMakeMove()) {
-      updateMovableSquares(stateDiff)
-    } else {
-      board.value?.setMovable(false, false, [])
-      cursorPointer.value = false
-    }
     const gameResult = handleResult(result)
+    const canMove = !gameResult && moveHistory.canMakeMove()
+    updateMovableSquares(stateDiff, !canMove)
     emit('on-scroll', gameResult)
   }
 </script>
