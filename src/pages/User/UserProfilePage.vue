@@ -176,7 +176,7 @@
       <div class="is-flex is-align-items-center pb-3">
         <div class="sz-2 icon-star color-theme" />
         <p class="is-size-5 ml-2">
-          {{ user.numWinPoints }} points
+          {{ user.numWinPoints }} {{ user.numWinPoints === 1 ? 'point' : 'points' }}
         </p>
       </div>
       <div

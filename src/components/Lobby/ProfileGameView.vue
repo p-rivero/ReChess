@@ -1,7 +1,14 @@
 <template>
   <div class="columns is-align-items-center is-desktop mx-0">
     <div class="result-container column is-narrow pr-0 pl-2">
-      <div class="result-icon icon-star-fill color-theme mx-2" />
+      <div
+        class="result-icon color-theme mx-2"
+        :class="{
+          'icon-points-0': game.result === 'loss',
+          'icon-points-half': game.result === 'draw',
+          'icon-points-1': game.result === 'win',
+        }"
+      />
       {{ stringifyDate(game.timeCreatedMs) }}
     </div>
     

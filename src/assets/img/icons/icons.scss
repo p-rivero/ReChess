@@ -325,6 +325,30 @@
 }
 
 
+/* points-0.svg */
+.icon-points-0 {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/points-0.svg");
+  mask-image: url("@/assets/img/icons/points-0.svg");
+}
+
+
+/* points-1.svg */
+.icon-points-1 {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/points-1.svg");
+  mask-image: url("@/assets/img/icons/points-1.svg");
+}
+
+
+/* points-half.svg */
+.icon-points-half {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/points-half.svg");
+  mask-image: url("@/assets/img/icons/points-half.svg");
+}
+
+
 /* report.svg */
 .icon-report {
   @extend .icon-common;
