@@ -68,19 +68,9 @@ export const useUserStore = defineStore('user', () => {
   // Attempt to store a user in the database. This will only succeed if the
   // user is authenticated as the user being stored.
   async function storeUser(user: User): Promise<void> {
-    const doc: UserDoc = {
-      name: user.name || null, // undefined | "" -> null
-      about: user.about,
-      profileImg: user.profileImg ?? null,
-      IMMUTABLE: {
-        username: user.username,
-        renameAllowedAt: user.renameAllowedAt,
-        numGamesPlayed: user.numGamesPlayed,
-        numWinPoints: user.numWinPoints,
-        last5Games: user.last5GamesStr,
-      },
-    }
-    await UserDB.updateUser(user.uid, doc)
+    const name = user.name || null // undefined | "" -> null
+    const profileImg = user.profileImg ?? null
+    await UserDB.updateUser(user.uid, name, user.about, profileImg)
   }
   
   return { getUserById, getUserByUsername, storeUser }

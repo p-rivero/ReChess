@@ -53,12 +53,8 @@ export async function getUserById(uid: string): Promise<UserDoc | undefined> {
   return document.data() as UserDoc
 }
 
-// Store a user in the database
-export async function updateUser(uid: string, user: UserDoc): Promise<void> {
-  const editableFields = {
-    name: user.name,
-    about: user.about,
-    profileImg: user.profileImg,
-  }
+// Update a user's public data
+export async function updateUser(uid: string, name: string|null, about: string, profileImg: string|null): Promise<void> {
+  const editableFields = { name, about, profileImg }
   await updateDoc(doc(db, 'users', uid), editableFields)
 }

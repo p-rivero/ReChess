@@ -1,6 +1,6 @@
 import { db } from '@/firebase'
 import { doc, updateDoc } from '@firebase/firestore'
-import { query, collection, where, orderBy, getDocs } from 'firebase/firestore'
+import { query, collection, where, orderBy, getDocs, writeBatch, serverTimestamp } from 'firebase/firestore'
 import type { GameDoc } from './schema'
 
 export function getGameRef(gameId: string) {
@@ -18,7 +18,17 @@ export async function updateGame(
     playerToMove,
     winner: winner ?? null,
   }
-  await updateDoc(getGameRef(gameId), update)
+  if (winner) {
+    // The game is over, also trigger the game over cloud function
+    const batch = writeBatch(db)
+    batch.update(getGameRef(gameId), update)
+    const triggerRef = doc(db, 'games', gameId, 'gameOverTrigger', 'doc')
+    batch.set(triggerRef, { gameOverTime: serverTimestamp() })
+    await batch.commit()
+  } else {
+    // Normal game update
+    await updateDoc(getGameRef(gameId), update)
+  }
 }
 
 
