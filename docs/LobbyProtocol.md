@@ -10,7 +10,7 @@ The goal is to have a protocol that is simple to implement and that minimizes th
 >
 > The created document contains the immutable `requestedColor` field, which the backend sets to the color the slot creator chose. When the challenger gets the game document, they check if the field value matches what the slot creator claimed. If it doesn't (for example, it's `white` instead of `random`), the game is automatically canceled.
 
-## Success case
+## Success scenario
 
 ![Sequence diagram of a successful game creation](img/lobby.webp)
 
@@ -23,8 +23,8 @@ This means that other players cannot enter the lobby slot until the slot creator
 
 - The actual protocol used is slightly more complex than the one described here, since it also includes the `creatorImageUrl` and `challengerImageUrl` fields, and it could be extended to include more information in the future. However, the way it works is the same as described here.
 
-## Failure case
+## Failure scenario
 
-Messages 1-7 are the same as in the success case, but the slot creator decides to deny the incoming player and then cancels the lobby slot.
+Messages 1-7 are the same as in the success scenario, but the slot creator decides to deny the incoming player and then cancels the lobby slot.
 
 ![Sequence diagram of a failed game creation](img/lobby_fail.webp)

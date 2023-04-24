@@ -13,11 +13,11 @@ The moves are validated by the clients, who must reach a consensus on whether a 
 If one of the players detects an illegal move, the game is canceled and the backend deletes the game document. This means that a malicious player could cancel a game at any time, 
 but detecting this is trivial (since no games should ever get canceled, both players will immediately be suspicious and should be investigated).
 
-## Success case
+## Success scenario
 
 ![Sequence diagram of a successful move played](img/game.webp)
 
 
-## Failure case
+## Failure scenario
 
-It's the same as the success case, except that on one of the calls to `validateHistory()` (messages 3, 6, 9 and 12), the client detects an illegal move and calls the cloud function `cancelGame`.
+It's the same as the success scenario, except that on one of the calls to `validateHistory()` (messages 3, 6, 9 and 12), the client detects an illegal move and calls the cloud function `cancelGame`.
