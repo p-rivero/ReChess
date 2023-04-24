@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import type { UserDoc, UsernameDoc, UserPrivateDoc } from '@/firebase/db/schema'
+import type { UserDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
 
 import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore'
 import type { User } from '@firebase/auth'

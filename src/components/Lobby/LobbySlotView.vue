@@ -84,8 +84,8 @@
 
 
 <script setup lang="ts">
-  import type { LobbySlot } from '@/stores/lobby'
   import ExternalLinkButton from '@/components/BasicWrappers/ExternalLinkButton.vue'
+  import type { LobbySlot } from '@/stores/lobby'
 
   defineProps<{
     lobbySlot: LobbySlot

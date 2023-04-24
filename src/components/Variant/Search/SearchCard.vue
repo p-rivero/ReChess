@@ -18,12 +18,12 @@
 </template>
 
 <script setup lang="ts">
-  import type { Match, SearchOrder } from '@/utils/chess/variant-search'
   import { onMounted, ref, watch } from 'vue'
+  import { useVariantStore } from '@/stores/variant'
   import SearchCardPlaceholder from './SearchCardPlaceholder.vue'
   import VariantCard from '../View/VariantCard.vue'
+  import type { Match, SearchOrder } from '@/utils/chess/variant-search'
   import type { PublishedVariant } from '@/protochess/types'
-  import { useVariantStore } from '@/stores/variant'
   
   const props = defineProps<{
     variantId: string

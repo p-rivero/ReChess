@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
   import { nextTick, onMounted, ref } from 'vue'
-  import type { ErrorMessageHandler, ErrorHandlerUser } from '@/utils/errors/error-message-handler'
+  import type { ErrorHandlerUser, ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   
   const textInput = ref<HTMLInputElement>()
   const isError = ref<boolean>(false)

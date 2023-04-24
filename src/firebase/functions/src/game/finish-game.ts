@@ -1,6 +1,6 @@
-import type { GameDoc, GameSummary, UserDoc } from 'db/schema'
-import { useAdmin } from '../helpers'
 import { FieldValue } from 'firebase-admin/firestore'
+import { useAdmin } from '../helpers'
+import type { GameDoc, GameSummary, UserDoc } from 'db/schema'
 
 /**
  * Triggered when a game finishes successfully. Updates the denormalized
@@ -51,7 +51,8 @@ const WIN_POINTS = {
 /**
  * Updates the profile of a player after a game has finished.
  * @param {FirebaseFirestore.Firestore} db The Firestore database
- * @param {GameDoc} game The game that finished
+ * @param {string} gameId The UID of the game that finished
+ * @param {GameDoc} game The game that finished, corresponding to gameId
  * @param {string} playerId The player ID of the player whose profile should be updated
  * @return {Promise<void>} A promise that resolves when the function completes
  */
@@ -75,7 +76,7 @@ async function updateProfile(
   
   const result =
     game.winner === 'draw' ? 'draw' :
-    game.winner === playedSide ? 'win' : 'loss'
+      game.winner === playedSide ? 'win' : 'loss'
   
   const earnedPoints = WIN_POINTS[result]
   

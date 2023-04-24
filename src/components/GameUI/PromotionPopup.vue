@@ -18,8 +18,8 @@
 
 
 <script setup lang="ts">
-  import type { Variant } from '@/protochess/types'
   import { ref } from 'vue'
+  import type { Variant } from '@/protochess/types'
 
   let variant: Variant | null = null
   

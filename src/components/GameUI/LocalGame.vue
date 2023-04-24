@@ -14,12 +14,12 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { useRoute, useRouter } from 'vue-router'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useVariantStore } from '@/stores/variant'
-  import type { Variant } from '@/protochess/types'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import BoardWithGui from './BoardWithGui.vue'
+  import type { Variant } from '@/protochess/types'
   
   const route = useRoute()
   const router = useRouter()

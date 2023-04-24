@@ -1,5 +1,5 @@
+import { collection, deleteDoc, doc, orderBy, query, serverTimestamp, setDoc, updateDoc, where } from '@firebase/firestore'
 import { db, createGame as dbCreateGame } from '@/firebase'
-import { collection, setDoc, serverTimestamp, doc, deleteDoc, query, where, orderBy, updateDoc } from '@firebase/firestore'
 import type { LobbySlotDoc, RequestedColor } from './schema'
 
 export function getLobbySlots(variantId: string) {

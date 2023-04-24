@@ -27,15 +27,15 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
-  import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
-  import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
-  import { showPopupImportant } from '@/components/PopupMsg/popup-manager'
-  import { getProtochess } from '@/protochess'
-  import type { MakeMoveFlag, MakeMoveWinner, Player, Variant, MoveInfo } from '@/protochess/types'
   import { debounce } from '@/utils/ts-utils'
-  import { updateTitle } from '@/utils/web-utils'
   import { gameOverMessage } from '@/utils/chess/game-over-message'
+  import { getProtochess } from '@/protochess'
+  import { ref, watch } from 'vue'
+  import { showPopupImportant } from '@/components/PopupMsg/popup-manager'
+  import { updateTitle } from '@/utils/web-utils'
+  import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
+  import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
+  import type { MakeMoveFlag, MakeMoveWinner, MoveInfo, Player, Variant } from '@/protochess/types'
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()

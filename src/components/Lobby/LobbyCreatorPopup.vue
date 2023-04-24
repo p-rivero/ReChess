@@ -111,9 +111,9 @@
 
 
 <script setup lang="ts">
-  import type { RequestedColor } from '@/firebase/db/schema'
-  import type { ChallengerInfo } from '@/stores/lobby'
   import { ref } from 'vue'
+  import type { ChallengerInfo } from '@/stores/lobby'
+  import type { RequestedColor } from '@/firebase/db/schema'
   
   const popup = ref<HTMLElement>()
   const autofocusButton = ref<HTMLButtonElement>()

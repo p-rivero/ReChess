@@ -60,10 +60,10 @@
 </template>
 
 <script setup lang="ts">
-  import type { FullPieceDef, Player, Variant } from '@/protochess/types'
   import { ref } from 'vue'
-  import PieceImageView from '@/components/Variant/PieceImageView.vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import PieceImageView from '@/components/Variant/PieceImageView.vue'
+  import type { FullPieceDef, Player, Variant } from '@/protochess/types'
   
   const selectedId = ref<string|'wall'|'delete'|'none'>('none')
     

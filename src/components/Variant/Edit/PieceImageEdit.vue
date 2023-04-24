@@ -32,12 +32,12 @@
 
 
 <script setup lang="ts">
-  import { importFile, hashBlob } from '@/utils/file-io'
-  import { uploadBlob, getUrl } from '@/firebase/storage'
+  import { getUrl, uploadBlob } from '@/firebase/storage'
+  import { hashBlob, importFile } from '@/utils/file-io'
   import FileDropArea from '@/components/FileDropArea.vue'
   
+  import { autoCropImage, autoCropSvg } from '@/utils/image-crop'
   import { ref, toRefs } from 'vue'
-  import { autoCropSvg, autoCropImage } from '@/utils/image-crop'
   
   // Piece images go in their own bucket so that that we can run the
   // checkPieceHash cloud function only when needed

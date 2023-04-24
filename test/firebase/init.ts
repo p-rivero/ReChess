@@ -1,4 +1,4 @@
-import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing'
+import { type RulesTestEnvironment, initializeTestEnvironment } from '@firebase/rules-unit-testing'
 
 
 //! IMPORTANT: make sure the emulator is running (run "npm run dev" in another terminal)

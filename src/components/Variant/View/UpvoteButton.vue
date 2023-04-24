@@ -20,11 +20,11 @@
 
 <script setup lang="ts">
   import { computed, ref } from 'vue'
-  import type { PublishedVariant } from '@/protochess/types'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { requestSignIn } from '@/components/Auth/auth-manager'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { useVariantStore } from '@/stores/variant'
+  import type { PublishedVariant } from '@/protochess/types'
   
   const variantStore = useVariantStore()
   const authStore = useAuthStore()

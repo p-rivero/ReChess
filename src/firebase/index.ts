@@ -1,14 +1,14 @@
-import { FIREBASE_CONFIG, CAPTCHA_V3_PUBLIC_KEY, PIECE_IMAGES_BUCKET_URL } from './credentials'
+import { CAPTCHA_V3_PUBLIC_KEY, FIREBASE_CONFIG, PIECE_IMAGES_BUCKET_URL } from './credentials'
 
 // https://firebase.google.com/docs/web/setup#available-libraries
-import { initializeApp } from 'firebase/app'
-import { connectFirestoreEmulator, enableMultiTabIndexedDbPersistence, getFirestore } from 'firebase/firestore'
-import { connectStorageEmulator, getStorage } from 'firebase/storage'
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
-import { getPerformance } from 'firebase/performance'
-import { getAuth, connectAuthEmulator, browserLocalPersistence } from 'firebase/auth'
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions'
 import { FUNCTIONS_REGION } from './functions/src/config'
+import { ReCaptchaV3Provider, initializeAppCheck } from 'firebase/app-check'
+import { browserLocalPersistence, connectAuthEmulator, getAuth } from 'firebase/auth'
+import { connectFirestoreEmulator, enableMultiTabIndexedDbPersistence, getFirestore } from 'firebase/firestore'
+import { connectFunctionsEmulator, getFunctions, httpsCallable } from 'firebase/functions'
+import { connectStorageEmulator, getStorage } from 'firebase/storage'
+import { getPerformance } from 'firebase/performance'
+import { initializeApp } from 'firebase/app'
 
 declare global {
   // eslint-disable-next-line no-var

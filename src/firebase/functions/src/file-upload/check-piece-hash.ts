@@ -1,7 +1,7 @@
 
-import type { ObjectMetadata } from 'firebase-functions/v1/storage'
-import { useAdmin } from '../helpers'
 import { createHash } from 'node:crypto'
+import { useAdmin } from '../helpers'
+import type { ObjectMetadata } from 'firebase-functions/v1/storage'
 
 /**
  * Called when a user uploads a piece image. Checks if the filename matches the

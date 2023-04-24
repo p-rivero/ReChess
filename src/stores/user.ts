@@ -1,6 +1,6 @@
+import { UserDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { UserDB } from '@/firebase/db'
 import type { GameSummary, UserDoc } from '@/firebase/db/schema'
 
 export class User {

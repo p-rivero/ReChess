@@ -6,6 +6,7 @@ module.exports = {
   'extends': [
     'plugin:vue/vue3-recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:import/recommended',
     'eslint:recommended',
     '@vue/eslint-config-typescript'
   ],
@@ -16,16 +17,28 @@ module.exports = {
   // Ignore the submodule directories
   // Also ignore the functions directory and any file that ends with .guard.ts
   ignorePatterns: ['protochess-engine', 'chessgroundx', 'functions', '*.guard.ts'],
+  plugins: [
+    'import',
+    'sort-imports-es6-autofix',
+  ],
   rules: {
-    // Use '_' as a prefix for unused variables
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-    'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    'import/no-unresolved': 0,
     'quotes': ['warn', 'single'],
     'semi': ['warn', 'never'],
     'object-curly-spacing': ['warn', 'always'],
+    'no-trailing-spaces': ['warn', { skipBlankLines: true }],
+    // Use '_' as a prefix for unused variables
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     'vue/script-indent': ['warn', 2, { baseIndent: 1 }],
     'vue/html-indent': ['warn', 2, { baseIndent: 1 }],
-    'no-trailing-spaces': ['warn', { skipBlankLines: true }],
-    'comma-dangle': ['warn', { functions: 'never', arrays: 'always-multiline', objects: 'always-multiline', imports: 'always-multiline', exports: 'always-multiline' }],
+    'comma-dangle': ['warn', {
+      functions: 'never',
+      arrays: 'always-multiline',
+      objects: 'always-multiline',
+      imports: 'always-multiline',
+      exports: 'always-multiline',
+    }],
+    'sort-imports-es6-autofix/sort-imports-es6': ['warn'],
   }
 }

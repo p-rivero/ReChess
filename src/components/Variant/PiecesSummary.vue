@@ -112,10 +112,10 @@
 </template>
 
 <script setup lang="ts">
-  import type { Variant } from '@/protochess/types'
+  import { Sortable } from 'sortablejs-vue3'
   import { ref } from 'vue'
   import PieceImageView from '@/components/Variant/PieceImageView.vue'
-  import { Sortable } from 'sortablejs-vue3'
+  import type { Variant } from '@/protochess/types'
   
   const hovered = ref(-1)
   const props = defineProps<{

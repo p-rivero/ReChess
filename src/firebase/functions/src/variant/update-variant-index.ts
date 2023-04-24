@@ -1,7 +1,7 @@
 
 import { useAdmin } from '../helpers'
-import type { VariantDoc, VariantIndexDoc } from 'db/schema'
 import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
+import type { VariantDoc, VariantIndexDoc } from 'db/schema'
 
 /**
  * Called when a variant document is inserted. Appends the variant to the index.

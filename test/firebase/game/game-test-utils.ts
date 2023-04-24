@@ -1,5 +1,5 @@
 import { serverTimestamp } from 'firebase/firestore'
-import type { RequestedColor, GameDoc, LobbySlotDoc, UserDoc, VariantDoc } from '@/firebase/db/schema'
+import type { GameDoc, LobbySlotDoc, RequestedColor, UserDoc, VariantDoc } from '@/firebase/db/schema'
 import type { TestUtilsSignature } from '../utils'
 import type { Timestamp } from 'firebase/firestore'
 
@@ -26,10 +26,10 @@ function userInfo(user: GameUser): [string, string, string]
 function userInfo(user: GameUser | undefined): [string | null, string | null, string | null]
 function userInfo(user: GameUser | undefined): [string | null, string | null, string | null] {
   switch (user) {
-    case 'alice': return [ALICE_ID, 'Alice', 'http://example.com/alice.jpg']
-    case 'bob': return [BOB_ID, 'Bob', 'http://example.com/bob.jpg']
-    case 'myself': return [MY_ID, 'My name', 'http://example.com/myself.jpg']
-    default: return [null, null, null]
+  case 'alice': return [ALICE_ID, 'Alice', 'http://example.com/alice.jpg']
+  case 'bob': return [BOB_ID, 'Bob', 'http://example.com/bob.jpg']
+  case 'myself': return [MY_ID, 'My name', 'http://example.com/myself.jpg']
+  default: return [null, null, null]
   }
 }
 

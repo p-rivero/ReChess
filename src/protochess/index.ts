@@ -1,9 +1,8 @@
 
-import { clone } from '@/utils/ts-utils'
 import * as Comlink from 'comlink'
-import type * as t from './types'
 import * as guard from './types.guard'
-import type { MoveInfo } from './types'
+import { clone } from '@/utils/ts-utils'
+import type * as t from './types'
 
 // Call this at the start of the app to initialize the wasm module
 let protochess: t.Protochess | null = null
@@ -172,7 +171,7 @@ function adaptMoveInfoWithEval(moveInfoEval: t.GetBestMoveResult): t.MoveInfoWit
   const MATE_VALUE = 1_000_000
   const MAX_DEPTH = 256 // Actually 127, but this is a safe upper bound
   
-  const moveInfo: MoveInfo = moveInfoEval.moveInfo
+  const moveInfo: t.MoveInfo = moveInfoEval.moveInfo
   const evalNumeric: number = moveInfoEval.evaluation
   // Depth in ply of a possible mate
   const mateDepth = MATE_VALUE - Math.abs(evalNumeric) + 1

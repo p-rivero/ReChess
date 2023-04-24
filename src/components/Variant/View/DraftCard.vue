@@ -71,10 +71,10 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
-  import { useVariantDraftStore } from '@/stores/variant-draft'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { useRouter } from 'vue-router'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
+  import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const draftStore = useVariantDraftStore()

@@ -1,6 +1,6 @@
-import type { Variant } from '@/protochess/types'
-import { isVariant } from '@/protochess/types.guard'
 import { fenToPlacements } from './fen'
+import { isVariant } from '@/protochess/types.guard'
+import type { Variant } from '@/protochess/types'
 
 export function parseVariantJson(json: string): Variant | undefined {
   try {

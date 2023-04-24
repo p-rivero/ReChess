@@ -1,10 +1,10 @@
 
-import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from '../utils'
+import { type TestUtilsSignature, assertFails, assertSucceeds, notInitialized, setupTestUtils } from '../utils'
 import { setupJest } from '../init'
 
 import type {
-  UsernameDoc,
   UserDoc,
+  UsernameDoc,
 } from '@/firebase/db/schema'
 
 const MY_ID = 'my_id'

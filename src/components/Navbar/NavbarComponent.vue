@@ -66,12 +66,12 @@
 </template>
 
 <script setup lang="ts">
+  import { ref } from 'vue'
+  import { requestSignIn } from '@/components/Auth/auth-manager'
+  import { toggleTheme } from '@/utils/theme'
+  import { useAuthStore } from '@/stores/auth-user'
   import { useRouter } from 'vue-router'
   import AccountCard from '@/components/Navbar/AccountCard.vue'
-  import { requestSignIn } from '@/components/Auth/auth-manager'
-  import { useAuthStore } from '@/stores/auth-user'
-  import { toggleTheme } from '@/utils/theme'
-  import { ref } from 'vue'
   
   const authStore = useAuthStore()
   const router = useRouter()

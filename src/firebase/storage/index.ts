@@ -1,8 +1,7 @@
+import { FirebaseError } from '@firebase/util'
+import { type FirebaseStorage, type UploadMetadata, type UploadResult, deleteObject, getDownloadURL , ref, uploadBytes } from 'firebase/storage'
 import { defaultStorage, pieceStorage } from '@/firebase'
 import { useAuthStore } from '@/stores/auth-user'
-import { getDownloadURL, ref, uploadBytes, deleteObject, type FirebaseStorage } from 'firebase/storage'
-import type { UploadMetadata, UploadResult } from 'firebase/storage'
-import { FirebaseError } from '@firebase/util'
 
 
 export type CacheHeader = `${'public' | 'private'}, max-age=${number}${', immutable' | ''}`
@@ -104,8 +103,8 @@ export async function getFilePath(bucket: Bucket, url: string): Promise<string> 
 
 function getStorageRef(bucket: Bucket): FirebaseStorage {
   switch (bucket) {
-    case 'default': return defaultStorage
-    case 'piece-images': return pieceStorage
-    default: throw new Error(`Invalid bucket: ${bucket}`)
+  case 'default': return defaultStorage
+  case 'piece-images': return pieceStorage
+  default: throw new Error(`Invalid bucket: ${bucket}`)
   }
 }

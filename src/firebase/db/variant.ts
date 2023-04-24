@@ -2,7 +2,7 @@ import { db } from '@/firebase'
 import type { UserUpvotesDoc, VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
 import type { Variant } from '@/protochess/types'
 
-import { collection, addDoc, getDoc, doc, getDocs, setDoc, deleteDoc, serverTimestamp, query, where, getCountFromServer, orderBy, Timestamp } from 'firebase/firestore'
+import { Timestamp, addDoc, collection, deleteDoc, doc, getCountFromServer, getDoc, getDocs, orderBy, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
 
 // Attempts to create a new variant in the database and returns the variant ID. Throws an error if the write fails.
 export async function createVariant(userId: string, displayName: string, variant: Variant): Promise<string> {

@@ -28,12 +28,12 @@
 </template>
 
 <script setup lang="ts">
-  import type { MoveInfo, MakeMoveResult, MakeMoveFlag, MakeMoveWinner, Player, StateDiff, VariantGameState } from '@/protochess/types'
-  import { getProtochess } from '@/protochess'
   import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
-  import { computed, ref, nextTick } from 'vue'
-  import ViewableChessBoard from './ViewableChessBoard.vue'
+  import { computed, nextTick, ref } from 'vue'
+  import { getProtochess } from '@/protochess'
   import PromotionPopup from '@/components/GameUI/PromotionPopup.vue'
+  import ViewableChessBoard from './ViewableChessBoard.vue'
+  import type { MakeMoveFlag, MakeMoveResult, MakeMoveWinner, MoveInfo, Player, StateDiff, VariantGameState } from '@/protochess/types'
   
   const props = defineProps<{
     white: 'human' | 'engine' | 'none'

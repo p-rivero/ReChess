@@ -1,11 +1,11 @@
-import { onSnapshot } from '@firebase/firestore'
 import { GameDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
-import type { GameDoc, GameSummary } from '@/firebase/db/schema'
-import type { MoveInfo, Player, PublishedVariant } from '@/protochess/types'
+import { object_equals } from '@/utils/ts-utils'
+import { onSnapshot } from '@firebase/firestore'
 import { readVariantDoc } from './variant'
 import { useAuthStore } from './auth-user'
-import { object_equals } from '@/utils/ts-utils'
+import type { GameDoc, GameSummary } from '@/firebase/db/schema'
+import type { MoveInfo, Player, PublishedVariant } from '@/protochess/types'
 
 export type Game = {
   id: string

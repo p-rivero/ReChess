@@ -1,13 +1,13 @@
-import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
+import { ref, watch } from 'vue'
 import sanitizeFilename from 'sanitize-filename'
 
-import type { Variant, FullPieceDef } from '@/protochess/types'
-import { exportFile } from '@/utils/file-io'
-import { clone, object_equals } from '@/utils/ts-utils'
-import { parseVariantJson } from '@/utils/chess/variant-json'
 import { VariantDB } from '@/firebase/db'
+import { clone, object_equals } from '@/utils/ts-utils'
+import { exportFile } from '@/utils/file-io'
+import { parseVariantJson } from '@/utils/chess/variant-json'
 import { useAuthStore } from '@/stores/auth-user'
+import type { FullPieceDef, Variant } from '@/protochess/types'
 
 export const useVariantDraftStore = defineStore('variant-draft', () => {
   

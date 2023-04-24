@@ -1,6 +1,6 @@
 
-import type { GameState, InitialState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from '@/protochess/types'
 import { clone } from '@/utils/ts-utils'
+import type { GameState, InitialState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from '@/protochess/types'
 
 export type MoveResult = { flag: MakeMoveFlag, winner: MakeMoveWinner }
 

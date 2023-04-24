@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
-import type { PublishedVariant } from '@/protochess/types'
 import { VariantDB } from '@/firebase/db'
 import { parseVariantJson } from '@/utils/chess/variant-json'
-import type { VariantDoc } from '@/firebase/db/schema'
 import { useAuthStore } from '@/stores/auth-user'
+import type { PublishedVariant } from '@/protochess/types'
+import type { VariantDoc } from '@/firebase/db/schema'
 
 export const useVariantStore = defineStore('variant', () => {
   

@@ -28,13 +28,13 @@
 
 
 <script setup lang="ts">
-  import type { MoveList, MoveInfo, StateDiff, Variant, InitialState } from '@/protochess/types'
-  import type * as cg from 'chessgroundx/types'
-  import { positionToKey, keyToPosition } from '@/utils/chess/chess-coords'
-  import type { Config } from 'chessgroundx/config'
-  import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue'
   import { computed, ref, watch } from 'vue'
   import { deepMerge } from '@/utils/ts-utils'
+  import { keyToPosition, positionToKey } from '@/utils/chess/chess-coords'
+  import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue'
+  import type * as cg from 'chessgroundx/types'
+  import type { Config } from 'chessgroundx/config'
+  import type { InitialState, MoveInfo, MoveList, StateDiff, Variant } from '@/protochess/types'
 
   const props = defineProps<{
     whitePov: boolean

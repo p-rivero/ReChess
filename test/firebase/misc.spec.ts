@@ -1,5 +1,5 @@
 
-import { notInitialized, setupTestUtils, assertFails, type TestUtilsSignature } from './utils'
+import { type TestUtilsSignature, assertFails, notInitialized, setupTestUtils } from './utils'
 import { setupJest } from './init'
 
 const MY_ID = 'my_id'

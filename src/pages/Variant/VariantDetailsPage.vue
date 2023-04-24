@@ -101,23 +101,23 @@
 
 <script setup lang="ts">
   import { computed, ref, watchEffect } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import VueMarkdown from 'vue-markdown-render'
   
-  import { useVariantStore } from '@/stores/variant'
-  import { useVariantDraftStore } from '@/stores/variant-draft'
-  import { useAuthStore } from '@/stores/auth-user'
-  import { useUserStore } from '@/stores/user'
-  import type { PublishedVariant } from '@/protochess/types'
-  import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
-  import PieceDetailsPopup from '@/components/Variant/View/PieceDetailsPopup.vue'
-  import UpvoteButton from '@/components/Variant/View/UpvoteButton.vue'
-  import PiecesSummary from '@/components/Variant/PiecesSummary.vue'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
-  import { requestSignIn } from '@/components/Auth/auth-manager'
   import { clone } from '@/utils/ts-utils'
   import { nTimes } from '@/utils/locale'
+  import { requestSignIn } from '@/components/Auth/auth-manager'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { updateTitle } from '@/utils/web-utils'
+  import { useAuthStore } from '@/stores/auth-user'
+  import { useUserStore } from '@/stores/user'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
+  import { useVariantStore } from '@/stores/variant'
+  import PieceDetailsPopup from '@/components/Variant/View/PieceDetailsPopup.vue'
+  import PiecesSummary from '@/components/Variant/PiecesSummary.vue'
+  import UpvoteButton from '@/components/Variant/View/UpvoteButton.vue'
+  import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
+  import type { PublishedVariant } from '@/protochess/types'
   
 
   const router = useRouter()

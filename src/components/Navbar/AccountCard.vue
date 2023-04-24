@@ -34,8 +34,8 @@
 
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/stores/auth-user'
   import { requestSignIn } from '@/components/Auth/auth-manager'
+  import { useAuthStore } from '@/stores/auth-user'
   import { useRouter } from 'vue-router'
   
   const authStore = useAuthStore()

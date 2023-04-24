@@ -1,9 +1,9 @@
+import { plugin as VueInputAutowidth } from 'vue-input-autowidth'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { plugin as VueInputAutowidth } from 'vue-input-autowidth'
-import App from '@/App.vue'
-import { router } from '@/router'
 import { getProtochess, initializeProtochess, protochessSupportsThreads } from '@/protochess'
+import { router } from '@/router'
+import App from '@/App.vue'
 
 
 import '@/assets/style/background.scss'

@@ -29,12 +29,12 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
-  import { useVariantStore } from '@/stores/variant'
-  import { useAuthStore } from '@/stores/auth-user'
-  import { useUserStore } from '@/stores/user'
-  import VariantCard from '@/components/Variant/View/VariantCard.vue'
   import { updateTitle } from '@/utils/web-utils'
+  import { useAuthStore } from '@/stores/auth-user'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useUserStore } from '@/stores/user'
+  import { useVariantStore } from '@/stores/variant'
+  import VariantCard from '@/components/Variant/View/VariantCard.vue'
   import type { PublishedVariant } from '@/protochess/types'
   import type { User } from '@/stores/user'
   

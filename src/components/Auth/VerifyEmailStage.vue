@@ -30,8 +30,8 @@
 
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/stores/auth-user'
   import { ref } from 'vue'
+  import { useAuthStore } from '@/stores/auth-user'
   
   const authStore = useAuthStore()
   const sentMessage = ref<string>()

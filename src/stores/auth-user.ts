@@ -1,17 +1,17 @@
-import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-import { auth } from '@/firebase'
-import { UserDB } from '@/firebase/db'
-import { User } from '@/stores/user'
 import { RechessError } from '@/utils/errors/RechessError'
+import { User } from '@/stores/user'
+import { UserDB } from '@/firebase/db'
 import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
+import { auth } from '@/firebase'
 
 import * as fb from 'firebase/auth'
 import { FirebaseError } from '@firebase/util'
-import type { UserDoc } from '@/firebase/db/schema'
-import { hideSignInPopup } from '@/components/Auth/auth-manager'
 import { PopupClosedError } from '@/utils/errors/PopupClosedError'
+import { hideSignInPopup } from '@/components/Auth/auth-manager'
+import type { UserDoc } from '@/firebase/db/schema'
 
 const AUTH_USER_KEY = 'loggedUser'
 

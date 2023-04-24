@@ -1,8 +1,8 @@
 
-import { threads } from 'wasm-feature-detect'
 import * as Comlink from 'comlink'
-import * as singleThread from 'protochess-singlethread'
 import * as multiThread from 'protochess-multithread'
+import * as singleThread from 'protochess-singlethread'
+import { threads } from 'wasm-feature-detect'
 
 class WasmModule {
   async init() {

@@ -1,6 +1,6 @@
-import { region } from 'firebase-functions'
-import { callFunction } from './helpers'
 import { FUNCTIONS_REGION } from './config'
+import { callFunction } from './helpers'
+import { region } from 'firebase-functions'
 
 // Lazy load each cloud function to reduce cold start time
 // (dynamic imoprts are only loaded once per process, not on each function call)

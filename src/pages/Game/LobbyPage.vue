@@ -95,21 +95,21 @@
 
 <script setup lang="ts">
   import { onUnmounted, ref, watchEffect } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   
-  import { useVariantStore } from '@/stores/variant'
-  import { useUserStore } from '@/stores/user'
-  import { useAuthStore } from '@/stores/auth-user'
-  import { useLobbyStore, type LobbySlot, type OngoingGameSlot } from '@/stores/lobby'
-  import type { PublishedVariant } from '@/protochess/types'
-  import PlayPopup from '@/components/GameUI/PlayPopup.vue'
-  import LobbyWaitingPopup from '@/components/Lobby/LobbyCreatorPopup.vue'
-  import LobbyJoiningPopup from '@/components/Lobby/LobbyChallengerPopup.vue'
+  import { type LobbySlot, type OngoingGameSlot, useLobbyStore } from '@/stores/lobby'
   import { requestSignIn } from '@/components/Auth/auth-manager'
-  import { updateTitle } from '@/utils/web-utils'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { updateTitle } from '@/utils/web-utils'
+  import { useAuthStore } from '@/stores/auth-user'
+  import { useUserStore } from '@/stores/user'
+  import { useVariantStore } from '@/stores/variant'
+  import LobbyJoiningPopup from '@/components/Lobby/LobbyChallengerPopup.vue'
   import LobbySlotView from '@/components/Lobby/LobbySlotView.vue'
+  import LobbyWaitingPopup from '@/components/Lobby/LobbyCreatorPopup.vue'
   import OngoingGameView from '@/components/Lobby/OngoingGameView.vue'
+  import PlayPopup from '@/components/GameUI/PlayPopup.vue'
+  import type { PublishedVariant } from '@/protochess/types'
   
 
   const router = useRouter()

@@ -82,12 +82,12 @@
 
 
 <script setup lang="ts">
-  import ImageCrop from './ImageCrop.vue'
-  import { nextTick, ref } from 'vue'
-  import { importFile } from '@/utils/file-io'
   import { getUrl, uploadBlob } from '@/firebase/storage'
-  import type { CacheHeader, Bucket } from '@/firebase/storage'
+  import { importFile } from '@/utils/file-io'
+  import { nextTick, ref } from 'vue'
   import FileDropArea from '../FileDropArea.vue'
+  import ImageCrop from './ImageCrop.vue'
+  import type { Bucket, CacheHeader } from '@/firebase/storage'
   
   const popup = ref<HTMLElement>()
   const buttonUpload = ref<HTMLButtonElement>()

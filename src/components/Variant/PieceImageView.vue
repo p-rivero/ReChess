@@ -27,8 +27,8 @@
 
 
 <script setup lang="ts">
-  import type { FullPieceDef, Player } from '@/protochess/types'
   import { computed } from 'vue'
+  import type { FullPieceDef, Player } from '@/protochess/types'
   
   const props = defineProps<{
     piece: FullPieceDef

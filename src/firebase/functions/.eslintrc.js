@@ -23,12 +23,14 @@ module.exports = {
   plugins: [
     '@typescript-eslint',
     'import',
+    'sort-imports-es6-autofix',
   ],
   rules: {
     'import/no-unresolved': 0,
-    'quotes': ['error', 'single'],
     'indent': ['error', 2],
+    'quotes': ['error', 'single'],
     'semi': ['warn', 'never'],
+    'object-curly-spacing': ['warn', 'always'],
     'no-trailing-spaces': ['warn', { skipBlankLines: true }],
     'no-unused-vars': ['warn', {
       args: 'none',
@@ -36,7 +38,6 @@ module.exports = {
     }],
     'valid-jsdoc': ['warn', { requireReturn: false }],
     'max-len': ['warn', { code: 120 }],
-    'object-curly-spacing': ['warn', 'always'],
     'comma-dangle': ['warn', {
       functions: 'never',
       arrays: 'always-multiline',
@@ -44,5 +45,6 @@ module.exports = {
       imports: 'always-multiline',
       exports: 'always-multiline',
     }],
+    'sort-imports-es6-autofix/sort-imports-es6': ['warn'],
   },
 }

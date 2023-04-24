@@ -70,12 +70,12 @@
 
 
 <script setup lang="ts">
-  import { useAuthStore } from '@/stores/auth-user'
-  import { computed, ref } from 'vue'
-  import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
-  import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import { computed, ref } from 'vue'
   import { debounce } from '@/utils/ts-utils'
+  import { useAuthStore } from '@/stores/auth-user'
+  import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
+  import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   
   const authStore = useAuthStore()
   const username = ref('')

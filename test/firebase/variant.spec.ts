@@ -1,5 +1,5 @@
 
-import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from './utils'
+import { type TestUtilsSignature, assertFails, assertSucceeds, notInitialized, setupTestUtils } from './utils'
 import { setupJest } from './init'
 
 import type { UserDoc, VariantDoc } from '@/firebase/db/schema'

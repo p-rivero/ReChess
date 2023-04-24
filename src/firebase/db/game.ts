@@ -1,6 +1,6 @@
+import { collection, getDocs, orderBy, query, serverTimestamp, where, writeBatch } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { doc, updateDoc } from '@firebase/firestore'
-import { query, collection, where, orderBy, getDocs, writeBatch, serverTimestamp } from 'firebase/firestore'
 import type { GameDoc } from './schema'
 
 export function getGameRef(gameId: string) {

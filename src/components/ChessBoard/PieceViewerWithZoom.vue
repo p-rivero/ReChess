@@ -62,9 +62,9 @@
 
 
 <script setup lang="ts">
+  import { ref, toRefs } from 'vue'
   import PieceViewer from './PieceViewer.vue'
   import type { FullPieceDef } from '@/protochess/types'
-  import { ref, toRefs } from 'vue'
   
   const board = ref<InstanceType<typeof PieceViewer>>()
   

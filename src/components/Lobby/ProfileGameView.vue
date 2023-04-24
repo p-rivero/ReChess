@@ -39,9 +39,9 @@
 </template>
 
 <script setup lang="ts">
-  import ExternalLinkButton from '@/components/BasicWrappers/ExternalLinkButton.vue'
   import { useRouter } from 'vue-router'
   import { useUserStore } from '@/stores/user'
+  import ExternalLinkButton from '@/components/BasicWrappers/ExternalLinkButton.vue'
   import type { GameSummary } from '@/firebase/db/schema'
 
   const router = useRouter()

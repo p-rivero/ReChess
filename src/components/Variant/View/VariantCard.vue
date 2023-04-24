@@ -67,17 +67,17 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  import HighlightWords from 'vue-highlight-words'
-  import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
-  import UpvoteButton from '@/components/Variant/View/UpvoteButton.vue'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
-  import { requestSignIn } from '@/components/Auth/auth-manager'
-  import { useVariantDraftStore } from '@/stores/variant-draft'
-  import { useAuthStore } from '@/stores/auth-user'
-  import { useUserStore } from '@/stores/user'
   import { clone } from '@/utils/ts-utils'
+  import { onMounted, ref } from 'vue'
+  import { requestSignIn } from '@/components/Auth/auth-manager'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { useAuthStore } from '@/stores/auth-user'
+  import { useRouter } from 'vue-router'
+  import { useUserStore } from '@/stores/user'
+  import { useVariantDraftStore } from '@/stores/variant-draft'
+  import HighlightWords from 'vue-highlight-words'
+  import UpvoteButton from '@/components/Variant/View/UpvoteButton.vue'
+  import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import type { PublishedVariant } from '@/protochess/types'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()

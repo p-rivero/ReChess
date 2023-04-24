@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
-  import LocalGame from '@/components/GameUI/LocalGame.vue'
   import { useRoute } from 'vue-router'
+  import LocalGame from '@/components/GameUI/LocalGame.vue'
   import type { Player } from '@/protochess/types'
   
   const route = useRoute()

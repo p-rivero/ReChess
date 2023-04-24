@@ -57,10 +57,10 @@
 
 
 <script setup lang="ts">
-  import type { MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
   import { gameOverMessage } from '@/utils/chess/game-over-message'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { ref } from 'vue'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import type { MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
   
   defineProps<{
     whitePov: boolean

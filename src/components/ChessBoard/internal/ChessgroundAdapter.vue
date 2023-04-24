@@ -19,14 +19,14 @@
 </template>
 
 <script setup lang="ts">
-  import { chessboardSvg } from './chessboard-svg'
   import { Chessground } from 'chessgroundx'
+  import { chessboardSvg } from './chessboard-svg'
+  import { clone, debounce, throttle } from '@/utils/ts-utils'
+  import { onMounted, onUnmounted, ref } from 'vue'
   import type * as cg from 'chessgroundx/types'
   import type { Api } from 'chessgroundx/api'
   import type { Config } from 'chessgroundx/config'
   import type { DrawShape } from 'chessgroundx/draw'
-  import { ref, onMounted, onUnmounted } from 'vue'
-  import { clone, debounce, throttle } from '@/utils/ts-utils'
   
   // Map from piece id to the URL of the image to use
   export type PlayerPieceImages = [string, string][]

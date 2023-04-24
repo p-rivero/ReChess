@@ -13,8 +13,8 @@
 </template>
 
 <script setup lang="ts">
+  import { coordsToPair, isCoords, pairToCoords } from '@/utils/chess/chess-coords'
   import PillList from '@/components/PillList.vue'
-  import { isCoords, coordsToPair, pairToCoords } from '@/utils/chess/chess-coords'
 
   const props = defineProps<{
     editable: boolean

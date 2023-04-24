@@ -11,12 +11,12 @@
 </template>
 
 <script setup lang="ts">
-  import NavbarComponent from '@/components/Navbar/NavbarComponent.vue'
-  import { ref, onMounted } from 'vue'
-  import SignInPopup from '@/components/Auth/SignInPopup.vue'
-  import PopupMessage from '@/components/PopupMsg/PopupMessage.vue'
-  import { setSignInPopup, signInRefresh } from '@/components/Auth/auth-manager'
+  import { onMounted, ref } from 'vue'
   import { setMessagePopup } from '@/components/PopupMsg/popup-manager'
+  import { setSignInPopup, signInRefresh } from '@/components/Auth/auth-manager'
+  import NavbarComponent from '@/components/Navbar/NavbarComponent.vue'
+  import PopupMessage from '@/components/PopupMsg/PopupMessage.vue'
+  import SignInPopup from '@/components/Auth/SignInPopup.vue'
   
   const signInPopup = ref<InstanceType<typeof SignInPopup>>()
   const messagePopup = ref<InstanceType<typeof PopupMessage>>()

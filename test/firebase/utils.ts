@@ -1,18 +1,18 @@
 // UTILITIES FOR WRITING SHORTER TESTS
 
-import type firebase from 'firebase/compat'
-import type { RulesTestContext, RulesTestEnvironment } from '@firebase/rules-unit-testing'
+import { DocumentReference, DocumentSnapshot, QuerySnapshot, Timestamp, WriteBatch, serverTimestamp, updateDoc, writeBatch } from '@firebase/firestore'
 import {
-  doc,
-  collection,
-  getDoc,
   addDoc,
-  setDoc,
+  collection,
   deleteDoc,
+  doc,
+  getDoc,
   getDocs,
+  setDoc,
 } from 'firebase/firestore'
-import type { CollectionReference, Query, DocumentData, UpdateData } from '@firebase/firestore-types'
-import { DocumentSnapshot, QuerySnapshot, WriteBatch, Timestamp, DocumentReference, updateDoc, writeBatch, serverTimestamp } from '@firebase/firestore'
+import type { CollectionReference, DocumentData, Query, UpdateData } from '@firebase/firestore-types'
+import type { RulesTestContext, RulesTestEnvironment } from '@firebase/rules-unit-testing'
+import type firebase from 'firebase/compat'
 
 /**
 - `verified`: logged user with a verified email

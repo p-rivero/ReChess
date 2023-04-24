@@ -1,7 +1,7 @@
 
-import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from '../utils'
+import { ALICE_ID, BOB_ID, MY_ID, VARIANT_ID, setupExtraVariant, setupGameDoc, setupLobbySlot, setupUsersAndVariant } from './game-test-utils'
+import { type TestUtilsSignature, assertFails, assertSucceeds, notInitialized, setupTestUtils } from '../utils'
 import { setupJest } from '../init'
-import { MY_ID, ALICE_ID, BOB_ID, VARIANT_ID, setupUsersAndVariant, setupLobbySlot, setupGameDoc, setupExtraVariant } from './game-test-utils'
 
 let { set, update, remove }: TestUtilsSignature = notInitialized()
 

@@ -214,20 +214,20 @@
 
 <script setup lang="ts">
 
-  import { ref, watch, onMounted } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
+  import { onMounted, ref, watch } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   
   import { AuthUser, useAuthStore } from '@/stores/auth-user'
+  import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { User, useUserStore } from '@/stores/user'
-  import { updateTitle } from '@/utils/web-utils'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { updateTitle } from '@/utils/web-utils'
+  import { useGameStore } from '@/stores/game'
   import EditableMarkdown from '@/components/BasicWrappers/EditableMarkdown.vue'
   import EditableTitle from '@/components/BasicWrappers/EditableTitle.vue'
-  import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import ImageSelectPopup from '@/components/ImageSelect/ImageSelectPopup.vue'
   import ProfileGameView from '@/components/Lobby/ProfileGameView.vue'
-  import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
-  import { useGameStore } from '@/stores/game'
+  import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   
   const router = useRouter()
   const route = useRoute()

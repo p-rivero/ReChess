@@ -68,8 +68,8 @@
 
 
 <script setup lang="ts">
-  import type { RequestedColor } from '@/firebase/db/schema'
   import { ref } from 'vue'
+  import type { RequestedColor } from '@/firebase/db/schema'
   
   type OnSelectCallback = (side: RequestedColor) => void
   

@@ -210,14 +210,14 @@
   import { computed, ref, watch } from 'vue'
   import { useAuthStore } from '@/stores/auth-user'
   
-  import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
-  import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import { PopupClosedError } from '@/utils/errors/PopupClosedError'
+  import { RechessError } from '@/utils/errors/RechessError'
   import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
   import { debounce } from '@/utils/ts-utils'
-  import { RechessError } from '@/utils/errors/RechessError'
-  import { PopupClosedError } from '@/utils/errors/PopupClosedError'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
+  import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   
   
   const emailRef = ref<InstanceType<typeof SmartTextInput>>()

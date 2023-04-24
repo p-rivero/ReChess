@@ -1,8 +1,8 @@
-import { Timestamp, onSnapshot } from '@firebase/firestore'
 import { LobbyDB } from '@/firebase/db'
+import { Timestamp, onSnapshot } from '@firebase/firestore'
 import { defineStore } from 'pinia'
-import type { GameDoc, LobbySlotDoc, RequestedColor } from '@/firebase/db/schema'
 import { useAuthStore } from './auth-user'
+import type { GameDoc, LobbySlotDoc, RequestedColor } from '@/firebase/db/schema'
 
 export type LobbySlot = {
   currentUserIsCreator: boolean

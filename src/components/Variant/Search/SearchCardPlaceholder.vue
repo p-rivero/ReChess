@@ -61,10 +61,10 @@
 </template>
 
 <script setup lang="ts">
-  import type { Match } from '@/utils/chess/variant-search'
   import { onMounted, ref } from 'vue'
-  import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import HighlightWords from 'vue-highlight-words'
+  import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
+  import type { Match } from '@/utils/chess/variant-search'
   import type { Variant } from '@/protochess/types'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()

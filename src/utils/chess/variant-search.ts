@@ -1,5 +1,5 @@
-import Fuse from 'fuse.js'
 import { VariantDB } from '@/firebase/db'
+import Fuse from 'fuse.js'
 
 type VariantIndexEntry = {
   id: string

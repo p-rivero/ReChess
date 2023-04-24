@@ -1,9 +1,9 @@
 
-import { notInitialized, setupTestUtils, assertFails, assertSucceeds, type TestUtilsSignature } from '../utils'
+import { type TestUtilsSignature, assertFails, assertSucceeds, notInitialized, setupTestUtils } from '../utils'
 import { setupJest } from '../init'
 
-import type { UserDoc, UserUpvotesDoc, VariantDoc } from '@/firebase/db/schema'
 import { Timestamp } from 'firebase/firestore'
+import type { UserDoc, UserUpvotesDoc, VariantDoc } from '@/firebase/db/schema'
 
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'

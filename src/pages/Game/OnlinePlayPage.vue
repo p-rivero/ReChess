@@ -12,13 +12,13 @@
 </template>
 
 <script setup lang="ts">
-  import BoardWithGui from '@/components/GameUI/BoardWithGui.vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import { useGameStore } from '@/stores/game'
-  import type { Player } from '@/protochess/types'
   import { onUnmounted, ref, watchEffect } from 'vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { updateTitle } from '@/utils/web-utils'
+  import { useGameStore } from '@/stores/game'
+  import { useRoute, useRouter } from 'vue-router'
+  import BoardWithGui from '@/components/GameUI/BoardWithGui.vue'
+  import type { Player } from '@/protochess/types'
   
   const route = useRoute()
   const router = useRouter()

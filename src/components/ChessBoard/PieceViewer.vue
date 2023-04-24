@@ -16,13 +16,13 @@
 
 
 <script setup lang="ts">
+  import { computed, onMounted, ref, watch } from 'vue'
+  import { keyToPosition, positionToKey } from '@/utils/chess/chess-coords'
   import ChessgroundAdapter from './internal/ChessgroundAdapter.vue'
   import type { Config } from 'chessgroundx/config'
-  import type { Key } from 'chessgroundx/types'
   import type { DrawShape } from 'chessgroundx/draw'
   import type { FullPieceDef } from '@/protochess/types'
-  import { keyToPosition, positionToKey } from '@/utils/chess/chess-coords'
-  import { onMounted, ref, watch, computed } from 'vue'
+  import type { Key } from 'chessgroundx/types'
   
   const props = defineProps<{
     piece: FullPieceDef
