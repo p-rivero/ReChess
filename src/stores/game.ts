@@ -1,6 +1,6 @@
 import { GameDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
-import { object_equals } from '@/utils/ts-utils'
+import { objectEquals } from '@/utils/ts-utils'
 import { onSnapshot } from '@firebase/firestore'
 import { readVariantDoc } from './variant'
 import { useAuthStore } from './auth-user'
@@ -68,7 +68,7 @@ export const useGameStore = defineStore('game', () => {
       const newGame = readDocument(snap.id, gameDoc, currentVariant)
       // If the same user has 2 tabs open, we need to check which ones are outdated
       // and call the callback only when needed
-      if (!object_equals(newGame, currentGame)) {
+      if (!objectEquals(newGame, currentGame)) {
         gameChangedCallback(newGame)
         currentGame = newGame
       }

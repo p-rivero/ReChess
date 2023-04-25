@@ -35,7 +35,7 @@ export function throttle<T extends Function>(cb: T, wait = 20) {
 
 // https://stackoverflow.com/questions/1068834/object-comparison-in-javascript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function object_equals(x: any, y: any) {
+export function objectEquals(x: any, y: any) {
   if (x === y) return true
   // if both x and y are null or undefined and exactly the same
 
@@ -59,7 +59,7 @@ export function object_equals(x: any, y: any) {
     if (typeof(x[p]) !== 'object') return false
     // Numbers, Strings, Functions, Booleans must be strictly equal
 
-    if (!object_equals(x[p],  y[p])) return false
+    if (!objectEquals(x[p],  y[p])) return false
     // Objects and Arrays must be tested recursively
   }
 

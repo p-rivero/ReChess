@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import sanitizeFilename from 'sanitize-filename'
 
 import { VariantDB } from '@/firebase/db'
-import { clone, object_equals } from '@/utils/ts-utils'
+import { clone, objectEquals } from '@/utils/ts-utils'
 import { exportFile } from '@/utils/file-io'
 import { parseVariantJson } from '@/utils/chess/variant-json'
 import { useAuthStore } from '@/stores/auth-user'
@@ -79,7 +79,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   
   // Returns true if the draft is not empty
   function hasDraft() {
-    return !object_equals(state.value, DEFAULT_DRAFT)
+    return !objectEquals(state.value, DEFAULT_DRAFT)
   }
   
   // Called when the user decides to hide the hint to create a variant
