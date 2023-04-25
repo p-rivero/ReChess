@@ -2,7 +2,7 @@
   <div class="column is-6 is-flex is-align-items-center">
     <img
       v-if="lobbySlot.creatorImage"
-      class="sz-3 mr-3 image is-rounded"
+      class="sz-3 mr-3 is-rounded"
       :src="lobbySlot.creatorImage"
       draggable="false"
       alt="Profile image"

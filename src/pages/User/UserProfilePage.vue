@@ -15,7 +15,7 @@
         >
           <img
             v-if="user.profileImg"
-            class="h-100 h-100"
+            class="h-100 h-100 is-rounded"
             :src="user.profileImg"
             draggable="false"
             alt="Profile image"
@@ -456,10 +456,6 @@
     }
     position: relative;
     margin-left: -0.4rem;
-    img {
-      border-radius: 50%;
-      object-fit: cover;
-    }
   }
   
   .button.is-transparent {

@@ -44,7 +44,7 @@
         >
           <img
             v-if="challenger.image"
-            class="sz-3 mr-2 image is-rounded"
+            class="sz-3 mr-2 is-rounded"
             :src="challenger.image"
             draggable="false"
             alt="Profile image"
