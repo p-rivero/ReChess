@@ -60,15 +60,15 @@
 </template>
 
 <script setup lang="ts">
+  import { DEFAULT_ORDER, searchVariants } from '@/utils/chess/variant-search'
   import { computed, onMounted, ref, watch } from 'vue'
-  import { searchVariants } from '@/utils/chess/variant-search'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { updateTitle } from '@/utils/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
   import { useVariantStore } from '@/stores/variant'
   import DraftCard from '@/components/Variant/View/DraftCard.vue'
   import SearchCard from '@/components/Variant/Search/SearchCard.vue'
-  import SearchOrderDropdown, { DEFAULT_ORDER } from '@/components/Variant/Search/SearchOrderDropdown.vue'
+  import SearchOrderDropdown from '@/components/Variant/Search/SearchOrderDropdown.vue'
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import VariantCard from '@/components/Variant/View/VariantCard.vue'
   import type { SearchOrder, VariantIndexResult } from '@/utils/chess/variant-search'

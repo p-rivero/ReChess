@@ -62,14 +62,25 @@
       return
     }
     
+    // More upvotes means a higher score. Use the search score as a tiebreaker
+    const upvoteScore = loadedVariant.value.numUpvotes + 0.1 * props.currentSearchScore
+    
     switch (props.orderBy) {
     case 'search-relevance':
       // Use the search score as the ordering score
       emit('update-score', props.currentSearchScore)
       break
+    case 'popular': {
+      // upvoteScore could be arbitrarily large, so we make it more reasonable by calculating
+      // the log. If upvoteScore is 0, then log(0) = -Inf. Add 1 to it so that log(1) = 0.
+      // Use the multiplier to control the weight of the upvoteScore in the popularity score
+      // (vs. variant.popularity, which is the number of current players in this variant).
+      const MULTIPLIER = 0.5
+      emit('update-score', loadedVariant.value.popularity + Math.log(upvoteScore + 1) * MULTIPLIER)
+      break
+    }
     case 'upvotes':
-      // More upvotes means a higher score. Use the search score as a tiebreaker
-      emit('update-score', loadedVariant.value.numUpvotes + 0.1 * props.currentSearchScore)
+      emit('update-score', upvoteScore)
       break
     case 'newest':
       // A newer variant has a greater timestamp (and thus a higher score)

@@ -7,7 +7,11 @@ type VariantIndexEntry = {
   description: string
 }
 
-export type SearchOrder = 'search-relevance' | 'upvotes' | 'newest'
+export type VariantListOrder = 'popular' | 'newest' | 'upvotes'
+export type SearchOrder = 'search-relevance' | VariantListOrder
+
+// Default order when not searching
+export const DEFAULT_ORDER = 'popular'
 
 export type Match = {start: number, end: number} // end is exclusive
 export type VariantIndexResult = {

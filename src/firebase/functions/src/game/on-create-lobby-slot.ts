@@ -1,6 +1,6 @@
 
-import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 import { FieldValue } from 'firebase-admin/firestore'
+import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 
 /**
  * Called when a lobby slot document is inserted. Updates the variant popularity (+3 points).

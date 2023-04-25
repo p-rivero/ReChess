@@ -130,6 +130,7 @@ export interface PublishedVariant extends Variant {
   creatorDisplayName: string,
   creatorId?: string,
   numUpvotes: number,
+  popularity: number,
   loggedUserUpvoted: boolean,
 }
 

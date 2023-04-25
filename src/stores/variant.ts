@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
+import { DEFAULT_ORDER, type VariantListOrder } from '@/utils/chess/variant-search'
 import { VariantDB } from '@/firebase/db'
 import { parseVariantJson } from '@/utils/chess/variant-json'
 import { useAuthStore } from '@/stores/auth-user'
@@ -11,14 +12,14 @@ export const useVariantStore = defineStore('variant', () => {
   
   // Currently fetched variants
   const variantList = ref<PublishedVariant[]>([])
-  const variantListOrder = ref<'newest' | 'upvotes'>('newest')
+  const variantListOrder = ref<VariantListOrder>(DEFAULT_ORDER)
   
   const authStore = useAuthStore()
   
   let listUpvotesUid: string | undefined = undefined
   // Fetches the list of variants from the database
   // TODO: Add pagination
-  async function refreshList(order: 'newest' | 'upvotes') {
+  async function refreshList(order: VariantListOrder) {
     // Only fetch the list if it hasn't been fetched yet (or if the order has changed)
     if (variantList.value.length > 0 && variantListOrder.value === order) return
     
@@ -127,6 +128,7 @@ export function readVariantDoc(doc: VariantDoc, userUpvoted: boolean, id: string
     creatorDisplayName: doc.creatorDisplayName,
     creatorId: doc.creatorId ?? undefined,
     numUpvotes: doc.numUpvotes,
+    popularity: doc.popularity,
     loggedUserUpvoted: userUpvoted,
     // Overwrite the existing name and description with the ones from the document
     displayName: doc.name,

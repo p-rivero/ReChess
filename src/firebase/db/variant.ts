@@ -1,6 +1,7 @@
 import { db } from '@/firebase'
 import type { UserUpvotesDoc, VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
 import type { Variant } from '@/protochess/types'
+import type { VariantListOrder } from '@/utils/chess/variant-search'
 
 import { Timestamp, addDoc, collection, deleteDoc, doc, getCountFromServer, getDoc, getDocs, orderBy, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
 
@@ -75,11 +76,22 @@ export async function removeUpvoteVariant(userId: string, variantId: string): Pr
 
 
 // TODO: Add pagination
-export async function getVariantList(order: 'newest' | 'upvotes'): Promise<[VariantDoc, string][]> {
-  const orderQuery = order === 'newest' ?
-    orderBy('creationTime', 'desc') :
-    orderBy('numUpvotes', 'desc')
-  const q = query(collection(db, 'variants'), orderQuery)
+export async function getVariantList(order: VariantListOrder): Promise<[VariantDoc, string][]> {
+  let q
+  const variants = collection(db, 'variants')
+  switch (order) {
+  case 'popular':
+    q = query(variants, orderBy('popularity', 'desc'), orderBy('numUpvotes', 'desc'))
+    break
+  case 'upvotes':
+    q = query(variants, orderBy('numUpvotes', 'desc'), orderBy('popularity', 'desc'))
+    break
+  case 'newest':
+    q = query(variants, orderBy('creationTime', 'desc'))
+    break
+  default:
+    throw new Error(`Invalid order: ${order}`)
+  }
   const querySnapshot = await getDocs(q)
   return querySnapshot.docs.map(doc => [doc.data() as VariantDoc, doc.id])
 }
