@@ -7,6 +7,7 @@ import type { Timestamp } from 'firebase/firestore'
 
 /**
  * Called directly by the client in order to create a new game.
+ * Additionally, it updates the game popularity (+1 point).
  * @param {any} data The data passed to the function
  * @param {string} data.variantId UID of the variant that the user wishes to play
  * @param {string} data.creatorId UID of the user that created the lobby slot.
@@ -68,6 +69,10 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('not-found', 'The variant does not exist.')
   }
   const variantDoc = variantSnapshot.data() as VariantDoc
+  
+  // Update variant popularity
+  variantRef.update({ popularity: FieldValue.increment(1) })
+    .catch((e) => console.error('Cannot update variant popularity', variantId, e))
   
   // Convert the playerToMove field from 0|1 to 'white'|'black'
   const variantInitialState = JSON.parse(variantDoc.initialState)

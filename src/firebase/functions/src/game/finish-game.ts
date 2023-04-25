@@ -6,6 +6,7 @@ import type { GameDoc, GameSummary, UserDoc } from 'db/schema'
  * Triggered when a game finishes successfully. Updates the denormalized
  * fields in the players' profiles (number of games played, win points and last
  * 5 games).
+ * Additionally, it updates the game popularity (-1 point).
  * @param {string} gameId The game ID of the game that finished
  * @return {Promise<void>} A promise that resolves when the function completes
  */
@@ -39,6 +40,11 @@ export default async function(gameId: string): Promise<void> {
     .catch((e) => console.error('Cannot update profile', gameDoc.IMMUTABLE.whiteId, e))
   updateProfile(db, gameId, gameDoc, gameDoc.IMMUTABLE.blackId)
     .catch((e) => console.error('Cannot update profile', gameDoc.IMMUTABLE.blackId, e))
+    
+  // Update the variant popularity
+  const variantRef = db.collection('variants').doc(gameDoc.IMMUTABLE.variantId)
+  variantRef.update({ popularity: FieldValue.increment(-1) })
+    .catch((e) => console.error('Cannot update variant popularity', gameDoc.IMMUTABLE.variantId, e))
 }
 
 

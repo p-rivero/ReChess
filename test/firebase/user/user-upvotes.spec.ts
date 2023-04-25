@@ -35,6 +35,7 @@ async function createUserAndVariant(creatorId = 'some_id') {
     creatorDisplayName: 'Another user',
     creatorId,
     numUpvotes: 10,
+    popularity: 2,
     initialState: '{}',
   }
   await set('admin', user, 'users', MY_ID)

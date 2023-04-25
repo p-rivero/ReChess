@@ -15,6 +15,7 @@ export async function createVariant(userId: string, displayName: string, variant
     creatorDisplayName: displayName,
     creatorId: userId,
     numUpvotes: 0,
+    popularity: 0,
     initialState: JSON.stringify(variant),
   }
   const docRef = await addDoc(collection(db, 'variants'), document)

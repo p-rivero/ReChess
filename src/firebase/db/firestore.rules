@@ -231,7 +231,7 @@ service cloud.firestore {
     match /variants/{variantId} {
       function isVariantDoc(doc) {
         return
-          hasFields(doc, ['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes'], ['creatorId']) &&
+          hasFields(doc, ['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes', 'popularity'], ['creatorId']) &&
           doc.name is string &&
           doc.name.size() >= 3 &&
           doc.name.size() <= 50 &&
@@ -243,6 +243,7 @@ service cloud.firestore {
           doc.initialState is string &&
           doc.initialState.size() <= 100000 &&
           doc.numUpvotes is int &&
+          doc.popularity is int &&
           (doc.creatorId == null || doc.creatorId is string);
       }
       function allowCreateVariant() {
@@ -254,7 +255,8 @@ service cloud.firestore {
           loggedAs(doc.creatorId) &&
           doc.creatorDisplayName == expectedDisplayName(creatorDoc) &&
           isServerTimestamp(doc.creationTime) &&
-          doc.numUpvotes == 0;
+          doc.numUpvotes == 0 &&
+          doc.popularity == 0;
       }
       
       allow read;

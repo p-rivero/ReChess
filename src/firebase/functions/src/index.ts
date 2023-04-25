@@ -39,7 +39,6 @@ region(FUNCTIONS_REGION)
     return callFunction(import('./game/create-game'), data, context)
   })
 
-
 export const finishGame =
 region(FUNCTIONS_REGION)
   .firestore
@@ -47,6 +46,23 @@ region(FUNCTIONS_REGION)
   .onCreate((_snap, context) => {
     return callFunction(import('./game/finish-game'), context.params.gameId)
   })
+
+export const onCreateLobbySlot =
+region(FUNCTIONS_REGION)
+  .firestore
+  .document('variants/{variantId}/lobby/{creatorUserId}')
+  .onCreate((snap, _context) => {
+    return callFunction(import('./game/on-create-lobby-slot'), snap)
+  })
+
+export const onRemoveLobbySlot =
+region(FUNCTIONS_REGION)
+  .firestore
+  .document('variants/{variantId}/lobby/{creatorUserId}')
+  .onDelete((snap, _context) => {
+    return callFunction(import('./game/on-remove-lobby-slot'), snap)
+  })
+
 
 // USER
 
