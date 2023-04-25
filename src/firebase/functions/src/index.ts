@@ -108,3 +108,19 @@ region(FUNCTIONS_REGION)
   .onCreate((snap) => {
     return callFunction(import('./variant/update-variant-index'), snap)
   })
+
+
+
+// If you need to run server-side code manually, you can use the following template:
+
+// export const manualFunction =
+// region(FUNCTIONS_REGION)
+//   .https
+//   .onRequest(async (_req, resp) => {
+//     await callFunction(import('./manual-function'))
+//     resp.status(200).send('Done')
+//   })
+
+// firebase deploy --only functions:manualFunction
+// gcloud functions call manualFunction --project rechess-web --region=europe-west1
+// gcloud functions delete manualFunction --project rechess-web --region=europe-west1

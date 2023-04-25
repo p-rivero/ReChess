@@ -1,15 +1,61 @@
 {
   "indexes": [
     {
+      "collectionGroup": "games",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "IMMUTABLE.variantId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "winner",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "IMMUTABLE.timeCreated",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "variants",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "IMMUTABLE.creatorId",
+          "fieldPath": "creatorId",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "IMMUTABLE.creationTime",
+          "fieldPath": "creationTime",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "variants",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "numUpvotes",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "popularity",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "variants",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "popularity",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "numUpvotes",
           "order": "DESCENDING"
         }
       ]
@@ -25,6 +71,12 @@
     {
       "collectionGroup": "games",
       "fieldPath": "moveHistory",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "IMMUTABLE.last5Games",
       "ttl": false,
       "indexes": []
     },

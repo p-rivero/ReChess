@@ -42,7 +42,7 @@ export async function callFunction< F extends(...args: any[]) => Promise<any> >
 }
 
 
-type BatchCallback = (batch: FirebaseFirestore.WriteBatch, ref: FirebaseFirestore.DocumentReference) => void
+type BatchCallback = (batch: FirebaseFirestore.WriteBatch, ref: FirebaseFirestore.DocumentReference) => void | Promise<void>
 type Firestore = FirebaseFirestore.Firestore
 type QuerySnapshot = FirebaseFirestore.QuerySnapshot
 
@@ -67,7 +67,7 @@ export async function batchedUpdate(db: Firestore, input: QuerySnapshot, operati
     for (let i = 0; i < MAX_BATCH_SIZE; i++) {
       const doc = input.docs[nBatch * MAX_BATCH_SIZE + i]
       if (!doc) break
-      operation(batch, doc.ref)
+      await operation(batch, doc.ref)
     }
     await batch.commit()
   }
