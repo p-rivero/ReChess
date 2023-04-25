@@ -7,6 +7,7 @@
     :invert-enemy-direction="invertEnemyDirection"
     :update-title="updateTitle"
     :show-game-over-popup="showGameOverPopup"
+    :allow-branching="allowBranching"
     
     @invalid-variant="invalidVariant"
   />
@@ -33,6 +34,7 @@
     invertEnemyDirection?: boolean
     updateTitle?: boolean
     showGameOverPopup?: boolean
+    allowBranching?: boolean
   }>()
   
   onMounted(async () => {

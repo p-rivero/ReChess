@@ -6,6 +6,7 @@
         :white="white"
         :black="black"
         :invert-enemy-direction="invertEnemyDirection"
+        :allow-branching="allowBranching"
         @new-move="(from, to, promotion, result) => {
           updateResult(result)
           emit('new-move', from, to, promotion, result?.winner)
@@ -53,6 +54,7 @@
     invertEnemyDirection?: boolean
     updateTitle?: boolean
     showGameOverPopup?: boolean
+    allowBranching?: boolean
   }>()
   
   

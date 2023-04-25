@@ -39,6 +39,7 @@
     white: 'human' | 'engine' | 'none'
     black: 'human' | 'engine' | 'none'
     invertEnemyDirection?: boolean
+    allowBranching?: boolean
   }>()
   
   type GameResult = {flag: MakeMoveFlag, winner: MakeMoveWinner}
@@ -57,7 +58,7 @@
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const promotionPopup = ref<InstanceType<typeof PromotionPopup>>()
   
-  const moveHistory = new MoveHistoryManager(false)
+  const moveHistory = new MoveHistoryManager(props.allowBranching)
   
   defineExpose({
     // Set the state of the board

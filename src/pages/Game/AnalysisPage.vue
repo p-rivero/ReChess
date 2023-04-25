@@ -3,6 +3,7 @@
     :white="'human'"
     :black="'human'"
     :has-gauge="true"
+    :allow-branching="true"
   />
 </template>
 
