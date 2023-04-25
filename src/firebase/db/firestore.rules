@@ -124,7 +124,7 @@ service cloud.firestore {
             doc.IMMUTABLE.renameAllowedAt is timestamp
           )) &&
           doc.IMMUTABLE.numGamesPlayed is int &&
-          doc.IMMUTABLE.numWinPoints is int &&
+          doc.IMMUTABLE.numWinPoints is number && // 0.5 points for draw, not an int
           doc.IMMUTABLE.last5Games is string;
       }
       function allowCreateUser() {
