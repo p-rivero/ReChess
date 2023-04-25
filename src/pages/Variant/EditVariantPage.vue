@@ -77,7 +77,6 @@
         <label class="label">Place or remove pieces:</label>
         <PiecePlacementButtons
           ref="pieceSelector"
-          :key="JSON.stringify(draftStore.state.pieceTypes)"
           :z-index="11"
           :variant="draftStore.state"
           @piece-selected="id => { board?.$el.scrollIntoView(); selectedPieceId = id }"

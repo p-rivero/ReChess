@@ -52,8 +52,8 @@
   >
     <DraftCard v-if="showDraftCard" />
     <VariantCard
-      v-for="(variant, index) of variantStore.variantList"
-      :key="index"
+      v-for="variant of variantStore.variantList"
+      :key="variant.uid"
       :variant="variant"
     />
   </div>

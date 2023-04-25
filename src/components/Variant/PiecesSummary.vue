@@ -6,10 +6,7 @@
     @end="e => emit('reorder', e.oldIndex, e.newIndex)"
   >
     <template #item="{element: piece, index: pieceIndex}">
-      <div
-        :key="pieceIndex"
-        class="piece-container mb-5"
-      >
+      <div class="piece-container mb-5">
         <div
           v-if="editable"
           class="columns mx-0 my-0 is-align-items-center"
@@ -74,7 +71,7 @@
             </p>
             <img
               v-for="(sym, i) of piece.promoVals[0].filter((sym: string) => symbolImg(0, sym))"
-              :key="i"
+              :key="sym + i"
               :src="symbolImg(0, sym)"
               :alt="`${sym}`"
               class="sz-2 mr-4"
@@ -90,7 +87,7 @@
             </p>
             <img
               v-for="(sym, i) of piece.promoVals[1].filter((sym: string) => symbolImg(1, sym))"
-              :key="i"
+              :key="sym + i"
               :src="symbolImg(1, sym)"
               :alt="`piece ${sym}`"
               class="sz-2 mr-4"

@@ -2,8 +2,8 @@
   <div>
     <div class="field is-grouped is-grouped-multiline">
       <button
-        v-for="(piece, index) in pieceList"
-        :key="index"
+        v-for="piece in pieceList"
+        :key="'' + piece.id + piece.definition.imageUrls"
         class="control button sz-3 px-1 py-1"
         :class="{'is-primary': selectedId === piece.id}"
         :style="{zIndex}"
@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref , watch } from 'vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import PieceImageView from '@/components/Variant/PieceImageView.vue'
   import type { FullPieceDef, Player, Variant } from '@/protochess/types'
@@ -87,33 +87,36 @@
   })
   
   type Piece = {
-    id: string|null|undefined
+    id: string | null | undefined
     definition: FullPieceDef
     color: Player
   }
   
   // Extract the id and url from the piece definition
   const pieceList = ref<Piece[]>([])
-  // First all white pieces
-  for (const piece of props.variant.pieceTypes) {
-    if (piece.ids[0] || piece.imageUrls[0]) {
-      pieceList.value.push({
-        id: piece.ids[0],
-        definition: piece,
-        color: 'white',
-      })
+  watch(props, p => {
+    pieceList.value = []
+    // First all white pieces
+    for (const piece of p.variant.pieceTypes) {
+      if (piece.ids[0] || piece.imageUrls[0]) {
+        pieceList.value.push({
+          id: piece.ids[0],
+          definition: piece,
+          color: 'white',
+        })
+      }
     }
-  }
-  // Then all black pieces
-  for (const piece of props.variant.pieceTypes) {
-    if (piece.ids[1] || piece.imageUrls[1]) {
-      pieceList.value.push({
-        id: piece.ids[1],
-        definition: piece,
-        color: 'black',
-      })
+    // Then all black pieces
+    for (const piece of p.variant.pieceTypes) {
+      if (piece.ids[1] || piece.imageUrls[1]) {
+        pieceList.value.push({
+          id: piece.ids[1],
+          definition: piece,
+          color: 'black',
+        })
+      }
     }
-  }
+  }, { immediate: true })
   
   function onPieceClick(piece: Piece | 'wall' | 'delete') {
     let id: string

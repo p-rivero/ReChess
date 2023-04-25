@@ -7,7 +7,7 @@
     <div class="promotion-picker">
       <div
         v-for="(url, index) of promotionUrls"
-        :key="index"
+        :key="url + index"
         class="promotion-option"
         :style="{backgroundImage: `url(${url})`}"
         @click="selectedIndex = index; active = false"
