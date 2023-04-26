@@ -31,6 +31,7 @@ export async function createUser(user: User, username: string): Promise<UserDoc>
   const batch = writeBatch(db)
   batch.set(doc(db, 'users', user.uid), newPublicData)
   batch.set(doc(db, 'users', user.uid, 'private', 'doc'), newPrivateData)
+  batch.set(doc(db, 'users', user.uid, 'renameTrigger', 'doc'), { name: user.displayName, username })
   batch.set(doc(db, 'usernames', username), newUsername)
   
   await batch.commit()
@@ -54,7 +55,14 @@ export async function getUserById(uid: string): Promise<UserDoc | undefined> {
 }
 
 // Update a user's public data
-export async function updateUser(uid: string, name: string|null, about: string, profileImg: string|null): Promise<void> {
+export async function updateUser(uid: string, name: string|null, about: string, profileImg: string|null, updateName: boolean): Promise<void> {
   const editableFields = { name, about, profileImg }
-  await updateDoc(doc(db, 'users', uid), editableFields)
+  if (updateName) {
+    const batch = writeBatch(db)
+    batch.update(doc(db, 'users', uid), editableFields)
+    batch.update(doc(db, 'users', uid, 'renameTrigger', 'doc'), { name })
+    await batch.commit()
+  } else {
+    await updateDoc(doc(db, 'users', uid), editableFields)
+  }
 }

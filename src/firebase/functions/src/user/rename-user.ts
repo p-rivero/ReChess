@@ -4,13 +4,13 @@ import type { Change } from 'firebase-functions'
 import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 
 import { batchedUpdate, useAdmin } from '../helpers'
-import type { UserDoc } from 'db/schema'
+import type { UserRenameTriggerDoc } from 'db/schema'
 
 
 /**
- * Called when a user document changes. Checks if the name has changed and,
- * if so, updates the name also in the denormalized fields.
- * @param {Change<QueryDocumentSnapshot>} change Snapshots of the user document before and after the change
+ * Called when the user changes their name in the user document.
+ * Updates the name also in the denormalized fields.
+ * @param {Change<QueryDocumentSnapshot>} change Snapshots of the `renameTrigger` document before and after the change
  * @param {string} userId The UID of the user that changed
  * @return {Promise<void>} A promise that resolves when the function is done
  */
@@ -20,24 +20,20 @@ export default async function(
 ): Promise<void> {
   const TIMEOUT_SECONDS = 5 * 60 // 5 minutes
   
-  const before = change.before.data() as UserDoc
-  const after = change.after.data() as UserDoc
-  // When the user is updated, check if the name has changed
-  if (before.name === after.name) return
+  const doc = change.after.data() as UserRenameTriggerDoc
   
   // The name has changed, initialize the admin SDK
   const admin = await useAdmin()
   const db = admin.firestore()
   
   // If this write was allowed by the rules, the current timestamp must be after the renameAllowedAt
-  const newName = after.name || `@${after.IMMUTABLE.username}`
+  const newName = doc.name || `@${doc.username}`
   await updateName(db, userId, newName, false)
   
   // Update the timeout to prevent spamming
   const timeout = Date.now() + 1000 * TIMEOUT_SECONDS
   const timeoutDate = new Date(timeout)
   const timeoutTimestamp = Timestamp.fromDate(timeoutDate)
-  // This will trigger renameUser again, but the name won't have changed
   db.collection('users')
     .doc(userId)
     .update({ 'IMMUTABLE.renameAllowedAt': timeoutTimestamp })

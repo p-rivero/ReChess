@@ -313,7 +313,7 @@
     user.value.updateDisplayName()
     
     try {
-      await userStore.storeUser(user.value)
+      await userStore.storeUser(user.value, true)
       // Update the timestamp to prevent 2 consecutive edits
       user.value.renameAllowedAt = new Date(Date.now() + 5 * 60 * 1000)
     } catch (e) {

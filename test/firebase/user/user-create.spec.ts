@@ -11,38 +11,11 @@ import type {
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
-let { get, query, set, update, now, afterSeconds, startBatch }: TestUtilsSignature = notInitialized()
+let { get, query, set, afterSeconds, startBatch }: TestUtilsSignature = notInitialized()
 
-setupJest('user-tests', env => {
-  ({ get, query, set, update, now, afterSeconds, startBatch } = setupTestUtils(env, MY_ID, MY_EMAIL))
+setupJest('user-create-tests', env => {
+  ({ get, query, set, afterSeconds, startBatch } = setupTestUtils(env, MY_ID, MY_EMAIL))
 })
-
-
-async function setupUser() {
-  const username: UsernameDoc = { userId: MY_ID }
-  const user: UserDoc = {
-    name: null,
-    about: '',
-    profileImg: null,
-    IMMUTABLE: {
-      username: 'my_username',
-      renameAllowedAt: null,
-      numGamesPlayed: 0,
-      numWinPoints: 0,
-      last5Games: '[]',
-    },
-  }
-  const userPrivate: UserPrivateDoc = {
-    IMMUTABLE: {
-      email: MY_EMAIL,
-      banned: false,
-    },
-  }
-  await set('admin', username, 'usernames', 'my_username')
-  await set('admin', user, 'users', MY_ID)
-  await set('admin', userPrivate, 'users', MY_ID, 'private', 'doc')
-}
-
 
 
 test('anyone can read created users', async () => {
@@ -420,96 +393,3 @@ test('renameAllowedAt must be null', async () => {
   await assertFails(batch.commit())
 })
 
-
-
-test('can edit display name after creating user', async () => {
-  await setupUser()
-    
-  await assertSucceeds(
-    update('verified', { 'name': 'this is my new name' }, 'users', MY_ID)
-  )
-  const user = await get('verified', 'users', MY_ID)
-  if (!user.exists()) throw new Error('user not found')
-  expect(user.data().name).toEqual('this is my new name')
-})
-
-test('cannot edit display name before renameAllowedAt', async () => {
-  await setupUser()
-  await update('admin', { 'IMMUTABLE.renameAllowedAt': afterSeconds(100) }, 'users', MY_ID )
-    
-  await assertFails(
-    update('verified', { 'name': 'this is my new name' }, 'users', MY_ID)
-  )
-})
-
-test('can edit display name after renameAllowedAt', async () => {
-  await setupUser()
-  await update('admin', { 'IMMUTABLE.renameAllowedAt': now() }, 'users', MY_ID )
-  await new Promise(resolve => setTimeout(resolve, 500))
-    
-  await assertSucceeds(
-    update('verified', { 'name': 'this is my new name' }, 'users', MY_ID)
-  )
-  const user = await get('verified', 'users', MY_ID)
-  if (!user.exists()) throw new Error('user not found')
-  expect(user.data().name).toEqual('this is my new name')
-})
-
-test('can edit about field', async () => {
-  await setupUser()
-    
-  await assertSucceeds(
-    update('verified', { 'about': 'this is my description' }, 'users', MY_ID)
-  )
-  const user = await get('verified', 'users', MY_ID)
-  if (!user.exists()) throw new Error('user not found')
-  expect(user.data().about).toEqual('this is my description')
-})
-
-test('can edit image', async () => {
-  await setupUser()
-    
-  await assertSucceeds(
-    update('verified', { 'profileImg': 'another.png' }, 'users', MY_ID)
-  )
-  const user = await get('verified', 'users', MY_ID)
-  if (!user.exists()) throw new Error('user not found')
-  expect(user.data().profileImg).toEqual('another.png')
-})
-
-test('cannot edit immutable fields', async () => {
-  await setupUser()
-  
-  // Actual data has not changed, so this should succeed
-  await assertSucceeds(
-    update('verified', { 'IMMUTABLE.username': 'my_username' }, 'users', MY_ID)
-  )
-  
-  await assertFails(
-    update('verified', { 'IMMUTABLE.username': 'new_username' }, 'users', MY_ID)
-  )
-  await assertFails(
-    update('verified', { 'IMMUTABLE.numWinPoints': 10 }, 'users', MY_ID)
-  )
-  await assertFails(
-    update('verified', { 'IMMUTABLE.numGamesPlayed': 10 }, 'users', MY_ID)
-  )
-  await assertFails(
-    update('verified', { 'IMMUTABLE.renameAllowedAt': afterSeconds(2) }, 'users', MY_ID)
-  )
-})
-
-test('cannot edit immutable private fields', async () => {
-  await setupUser()
-  
-  await assertFails(
-    update('verified', { 'IMMUTABLE.email': 'new@mail.com' }, 'users', MY_ID, 'private', 'doc')
-  )
-  await assertFails(
-    update('verified', { 'IMMUTABLE.banned': true }, 'users', MY_ID, 'private', 'doc')
-  )
-  // Data has not changed, so this should succeed
-  await assertSucceeds(
-    update('verified', { 'IMMUTABLE.banned': false }, 'users', MY_ID, 'private', 'doc')
-  )
-})

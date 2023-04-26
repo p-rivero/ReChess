@@ -224,6 +224,36 @@ service cloud.firestore {
         allow create: if allowCreateUpvote();
         allow delete: if allowDeleteUpvote();
       }
+      
+      
+      match /renameTrigger/{docName} {
+        function isRenameTriggerDoc(doc) {
+          let userDoc = getAfter(/databases/$(database)/documents/users/$(userId)).data;
+          return
+            docName == 'doc' && // Only 1 document allowed
+            hasFields(doc, ['username'], ['name']) &&
+            doc.name == userDoc.name &&
+            doc.username == userDoc.IMMUTABLE.username;
+        }
+        function allowCreateRenameTrigger() {
+          let doc = request.resource.data;
+          return
+            isRenameTriggerDoc(doc) &&
+            loggedAs(userId);
+        }
+        function allowUpdateRenameTrigger() {
+          let old = resource.data;
+          let new = request.resource.data;
+          return
+            isRenameTriggerDoc(new) &&
+            loggedAs(userId) &&
+            old.name != new.name;
+        }
+        
+        allow read: if loggedAs(userId);
+        allow create: if allowCreateRenameTrigger();
+        allow update: if allowUpdateRenameTrigger();
+      }
     }
     
     
@@ -431,6 +461,7 @@ service cloud.firestore {
           let doc = request.resource.data;
           let gameDoc = getAfter(/databases/$(database)/documents/games/$(gameId)).data;
           return
+            (loggedAs(gameDoc.IMMUTABLE.whiteId) || loggedAs(gameDoc.IMMUTABLE.blackId)) &&
             docName == 'doc' &&
             hasFields(doc, ['gameOverTime'], []) &&
             doc.gameOverTime is timestamp &&

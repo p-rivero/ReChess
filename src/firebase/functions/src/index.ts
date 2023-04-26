@@ -77,7 +77,7 @@ region(FUNCTIONS_REGION)
 export const renameUser =
 region(FUNCTIONS_REGION)
   .firestore
-  .document('users/{userId}')
+  .document('users/{userId}/renameTrigger/doc')
   .onUpdate((change, context) => {
     return callFunction(import('./user/rename-user'), change, context.params.userId)
   })
