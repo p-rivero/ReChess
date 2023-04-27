@@ -1,5 +1,6 @@
 import { GameDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
+import { moveToString, parseMove } from '@/utils/chess/chess-coords'
 import { objectEquals } from '@/utils/ts-utils'
 import { onSnapshot } from '@firebase/firestore'
 import { readVariantDoc } from './variant'
@@ -109,9 +110,10 @@ export const useGameStore = defineStore('game', () => {
     winner: 'white' | 'black' | 'draw' | undefined
   ) {
     if (!currentGameId || !currentGame) throw new Error('No game is being listened to')
-    // Append the new move to the move history
+    // Append the new move to the move history. Important: Add a space after the move
     currentGame.moveHistory.push({ from, to, promotion })
-    currentGame.moveHistoryString += stringifyMove(from, to, promotion)
+    currentGame.moveHistoryString += moveToString({ from, to, promotion }) + ' '
+    
     currentGame.playerToMove = winner ? 'game-over' : playerToMove
     currentGame.winner = winner
     // Update the game in the database
@@ -161,35 +163,6 @@ export const useGameStore = defineStore('game', () => {
       loggedUserIsWhite: authStore.loggedUser?.uid === doc.IMMUTABLE.whiteId,
       loggedUserIsBlack: authStore.loggedUser?.uid === doc.IMMUTABLE.blackId,
     }
-  }
-  
-  function parseMove(move: string): MoveInfo {
-    const moveRegex = /^([a-p])([0-9]{1,2})([a-p])([0-9]{1,2})(=..?)?$/
-    const match = move.match(moveRegex)
-    if (!match) throw new Error(`Invalid move string: "${move}"`)
-    const [, fromFile, fromRank, toFile, toRank, promotion] = match
-    const fromX = fromFile.charCodeAt(0) - 'a'.charCodeAt(0)
-    const fromY = parseInt(fromRank) - 1
-    const toX = toFile.charCodeAt(0) - 'a'.charCodeAt(0)
-    const toY = parseInt(toRank) - 1
-    // Skip '='
-    const promotionId = promotion ? promotion[1] : undefined
-    return {
-      from: [fromX, fromY],
-      to: [toX, toY],
-      promotion: promotionId,
-    }
-  }
-  
-  function stringifyMove(from: [number, number], to: [number, number], promotion: string|undefined) {
-    const promotionStr = promotion ? `=${promotion}` : ''
-    // Important: the space at the end is required
-    return stringifyCoord(from) + stringifyCoord(to) + promotionStr + ' '
-  }
-  function stringifyCoord(coord: [number, number]) {
-    const file = String.fromCharCode('a'.charCodeAt(0) + coord[0])
-    const rank = coord[1] + 1
-    return file + rank
   }
   
   
