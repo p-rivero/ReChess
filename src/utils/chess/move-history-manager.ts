@@ -6,7 +6,7 @@ export type MoveResult = { flag: MakeMoveFlag, winner: MakeMoveWinner }
 
 export type MoveHistoryQueryResult = Readonly<{ state: GameState, lastMove?: MoveInfo }>
 
-type MoveTreeNode = {
+export type MoveTreeNode = {
   move: MoveInfo | 'root'
   children: MoveTreeNode[]
   parent: MoveTreeNode | null
@@ -64,18 +64,32 @@ export class MoveHistoryManager {
   public undo(): MoveHistoryQueryResult | null {
     // Can't undo at the root
     if (this.currentNode.parent === null) return null
-    this.currentNode = this.currentNode.parent
-    return this.buildResultFromCurrentNode()
+    return this.goTo(this.currentNode.parent)
   }
 
   // Returns the state reached by redoing the last move, null if there is none
   // If there is more than one alternative, goes to the first child (principal variation)
   public redo(): MoveHistoryQueryResult | null {
     if (this.currentNode.children.length === 0) return null
-    this.currentNode = this.currentNode.children[0]
+    return this.goTo(this.currentNode.children[0])
+  }
+  
+  // Goes directly to the given move, returns the state reached
+  public goTo(move: MoveTreeNode): MoveHistoryQueryResult {
+    this.currentNode = move
     return this.buildResultFromCurrentNode()
   }
+  
+  // Returns the root and current node of the history tree, used for implementing
+  // a move tree viewer
+  public getRoot(): MoveTreeNode {
+    return this.historyRoot
+  }
+  public getCurrentNode(): MoveTreeNode {
+    return this.currentNode
+  }
 
+  
   
   private buildResultFromCurrentNode(): MoveHistoryQueryResult {
     return {

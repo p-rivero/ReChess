@@ -23,6 +23,14 @@
         class="ml-2"
         :white-pov="true"
       />
+      <div class="card py-3">
+        <MoveHistoryWrap
+          v-if="board?.historyRootRef"
+          :root="board?.historyRootRef"
+          :current-selection="board?.historyCurrentNodeRef"
+          @node-clicked="node => board?.jumpToHistoryNode(node)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -35,6 +43,7 @@
   import { showPopupImportant } from '@/components/PopupMsg/popup-manager'
   import { updateTitle } from '@/utils/web-utils'
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
+  import MoveHistoryWrap from '@/components/GameUI/MoveHistoryWrap.vue'
   import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
   import type { MakeMoveFlag, MakeMoveWinner, MoveInfo, Player, Variant } from '@/protochess/types'
   
@@ -86,6 +95,7 @@
         emit('invalid-variant')
         return
       }
+      // Initialize evaluation gauge
       if (props.hasGauge) {
         await updateEvaluation()
       }

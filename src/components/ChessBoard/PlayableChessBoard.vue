@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-  import { MoveHistoryManager } from '@/utils/chess/move-history-manager'
+  import { MoveHistoryManager, type MoveHistoryQueryResult, type MoveTreeNode } from '@/utils/chess/move-history-manager'
   import { computed, nextTick, ref } from 'vue'
   import { getProtochess } from '@/protochess'
   import PromotionPopup from '@/components/GameUI/PromotionPopup.vue'
@@ -54,6 +54,8 @@
   const whitePov = computed(() => props.white == 'human' || props.black != 'human')
   const cursorPointer = ref(false)
   const aspectRatio = ref(1)
+  const historyRootRef = ref<MoveTreeNode>()
+  const historyCurrentNodeRef = ref<MoveTreeNode>()
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const promotionPopup = ref<InstanceType<typeof PromotionPopup>>()
@@ -77,14 +79,11 @@
       
       promotionPopup.value?.initialize(variant)
       moveHistory.initialize({ initialState: variant, moveHistory: state.moveHistory })
+      historyRootRef.value = moveHistory.getRoot()
+      historyCurrentNodeRef.value = moveHistory.getCurrentNode()
       emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
       
       return handleResult(result)
-    },
-    
-    // Move a piece from one position to another, and optionally promote it
-    makeMove(from: [number, number], to: [number, number], promotion?: string) {
-      board.value?.makeMove(from, to, promotion)
     },
     
     // Returns which player is to move
@@ -112,6 +111,17 @@
     clearArrows(brush: string) {
       board.value?.clearArrows(brush)
     },
+    
+    // Go to a given history node
+    async jumpToHistoryNode(node: MoveTreeNode) {
+      const entry = moveHistory.goTo(node)
+      await jumpToMove(entry)
+      
+    },
+    
+    // Expose the history tree for the UI to display
+    historyRootRef,
+    historyCurrentNodeRef,
   })
   
   
@@ -169,6 +179,7 @@
     board.value?.setStateDiff(stateDiff)
     board.value?.setLastMove(mv)
     moveHistory.newMove(mv)
+    historyCurrentNodeRef.value = moveHistory.getCurrentNode()
     
     // Important: update the player before emitting new-move (otherwise, the player sent to the server will be wrong)
     emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
@@ -204,15 +215,21 @@
   
   
   async function onWheel(up: boolean) {
-    const protochess = await getProtochess()
     // Attempt to get the history entry
     const entry = up ? moveHistory.undo() : moveHistory.redo()
     if (!entry) return
-    
+    await jumpToMove(entry)
+  }
+  
+  async function jumpToMove(entry: MoveHistoryQueryResult) {
     // Update the state of the engine and the board
+    const protochess = await getProtochess()
     const result = await protochess.setState(entry.state)
     const stateDiff = await protochess.getStateDiff()
     board.value?.setStateDiff(stateDiff)
+    
+    // Update the history view
+    historyCurrentNodeRef.value = moveHistory.getCurrentNode()
     
     // Update highlighted move
     if (entry.lastMove) {
