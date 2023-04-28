@@ -1,15 +1,13 @@
 <template>
-  <div
-    :style="{backgroundColor: indentDepth ? getColor(indentDepth) : 'transparent'}"
-    class="mt-1 mb-3 list-container"
-  >
+  <div class="mb-3 list-container">
     <div
       v-for="(row, i) of moveList"
       :key="i"
     >
       <div
         v-if="row.isSentinel"
-        class="ml-2 bg-mask"
+        class="ml-2 mt-1 bg-mask"
+        :class="{'alt-color': indentDepth % 2 === 0}"
       >
         <MoveHistoryView
           :root="row.node"
@@ -203,16 +201,6 @@
     moveList.value = formattedList
   })
   
-  
-  function getColor(depth: number): string {
-    const colors = [
-      'rgba(255, 0, 0, 0.1)',
-      'rgba(0, 0, 255, 0.1)',
-      'rgba(0, 255, 0, 0.1)',
-    ]
-    return colors[depth % colors.length]
-  }
-  
 </script>
 
 
@@ -249,10 +237,17 @@
   }
   
   [data-theme="dark"] .bg-mask {
-    background-color: $black-ter;
+    background-color: $black-bis;
+    &.alt-color {
+      background-color: $black-ter;
+    }
+    border-radius: 0.25rem 0 0 0.25rem;
   }
   [data-theme="light"] .bg-mask {
-    background-color: $white-ter;
+    background-color: $white-bis;
+    &.alt-color {
+      background-color: $white-ter;
+    }
   }
   
 </style>

@@ -1,6 +1,7 @@
 <template>
   <MoveHistoryView
     :key="updateKey"
+    class="py-3 history-bg h-100 scrollable"
     :root="root"
     :start-at-left="true"
     :root-move-number="1"
@@ -31,3 +32,17 @@
     updateKey.value++
   })
 </script>
+
+
+<style scoped lang="scss">
+  @import '@/assets/style/variables.scss';
+  [data-theme="dark"] .history-bg {
+    background-color: $black-bis;
+  }
+  [data-theme="light"] .history-bg {
+    background-color: $white-bis
+  }
+  .history-bg {
+    border-radius: 0.25rem;
+  }
+</style>

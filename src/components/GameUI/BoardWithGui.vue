@@ -23,7 +23,7 @@
         class="ml-2"
         :white-pov="true"
       />
-      <div class="card py-3">
+      <div class="card history-sz">
         <MoveHistoryWrap
           v-if="board?.historyRootRef"
           :root="board?.historyRootRef"
@@ -180,3 +180,9 @@
   }
 </script>
 
+
+<style scoped lang="scss">
+  .history-sz {
+    height: 50vh;
+  }
+</style>
