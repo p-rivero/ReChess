@@ -1,6 +1,10 @@
 <template>
   <div class="is-flex is-flex-direction-column is-align-items-center">
-    <div class="is-flex h-100 w-100">
+    <div class="is-flex h-100 w-100" />
+  </div>
+  
+  <div class="columns">
+    <div class="column">
       <PlayableChessBoard
         ref="board"
         :white="white"
@@ -17,12 +21,22 @@
         }"
         @player-changed="p => playerToMove = p"
       />
+    </div>
+    
+    <div class="column is-narrow">
       <EvaluationGauge
         v-if="hasGauge"
         ref="gauge"
         class="ml-2"
         :white-pov="true"
       />
+      <div
+        v-else
+        class="mx-2"
+      />
+    </div>
+    
+    <div class="column is-narrow">
       <div class="card history-sz">
         <MoveHistoryWrap
           v-if="board?.historyRootRef"
@@ -183,6 +197,7 @@
 
 <style scoped lang="scss">
   .history-sz {
-    height: 50vh;
+    height: 100%;
+    max-height: calc(100vh - 6rem);
   }
 </style>

@@ -215,25 +215,18 @@
   .list-move {
     width: 50%;
     border-radius: 0.25rem;
+    &.is-clickable:hover {
+      background-color: rgba($brown, 0.2);
+    }
   }
   .list-container {
     min-width: 17rem;
   }
   
-  [data-theme="dark"] .highlight-move {
-    background-color: $darker-brown;
+  .highlight-move {
+    background-color: $brown;
     font-weight: 600;
-  }
-  [data-theme="light"] .highlight-move {
-    background-color: $light-brown;
-    font-weight: 600;
-  }
-  
-  [data-theme="dark"] .list-move.is-clickable:hover {
-    background-color: rgba($darker-brown, 0.2);
-  }
-  [data-theme="light"] .list-move.is-clickable:hover {
-    background-color: rgba($light-brown, 0.2);
+    color: $white;
   }
   
   [data-theme="dark"] .bg-mask {
@@ -246,8 +239,9 @@
   [data-theme="light"] .bg-mask {
     background-color: $white-bis;
     &.alt-color {
-      background-color: $white-ter;
+      background-color: $grey-lighter;
     }
+    border-radius: 0.25rem 0 0 0.25rem;
   }
   
 </style>
