@@ -8,6 +8,7 @@
     :update-title="updateTitle"
     :show-game-over-popup="showGameOverPopup"
     :allow-branching="allowBranching"
+    :opponent-name="opponentName"
     
     @invalid-variant="invalidVariant"
   />
@@ -35,6 +36,7 @@
     updateTitle?: boolean
     showGameOverPopup?: boolean
     allowBranching?: boolean
+    opponentName?: string
   }>()
   
   onMounted(async () => {

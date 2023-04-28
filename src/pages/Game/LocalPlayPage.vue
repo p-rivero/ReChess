@@ -5,6 +5,7 @@
     :invert-enemy-direction="otherPlayer === 'human'"
     :update-title="otherPlayer !== 'human'"
     :show-game-over-popup="true"
+    :opponent-name="otherPlayer === 'engine' ? 'Engine' : 'Anonymous'"
   />
 </template>
 

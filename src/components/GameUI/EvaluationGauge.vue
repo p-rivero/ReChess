@@ -3,55 +3,39 @@
  -->
  
 <template>
-  <div class="is-flex">
+  <div
+    class="eval-gauge"
+    :class="{'reverse': !whitePov}"
+  >
+    <div class="black-bar" />
     <div
-      class="eval-gauge"
-      :class="{'reverse': !whitePov}"
-    >
-      <div class="black-bar" />
-      <div
-        class="marker"
-        style="height: 12.5%"
-      />
-      <div
-        class="marker"
-        style="height: 25%"
-      />
-      <div
-        class="marker"
-        style="height: 37.5%"
-      />
-      <div
-        class="center-line"
-        style="height: 50%"
-      />
-      <div
-        class="marker"
-        style="height: 62.5%"
-      />
-      <div
-        class="marker"
-        style="height: 75%"
-      />
-      <div
-        class="marker"
-        style="height: 87.5%"
-      />
-    </div>
-    <div>
-      <div class="ml-2 eval-text">
-        {{ evalText }}
-      </div>
-      <div class="ml-2 mb-2">
-        {{ depthText }}
-      </div>
-      <a
-        v-if="explainText"
-        class="ml-2 is-size-5"
-        @click="explain"
-      >
-        Why?</a>
-    </div>
+      class="marker"
+      style="height: 12.5%"
+    />
+    <div
+      class="marker"
+      style="height: 25%"
+    />
+    <div
+      class="marker"
+      style="height: 37.5%"
+    />
+    <div
+      class="center-line"
+      style="height: 50%"
+    />
+    <div
+      class="marker"
+      style="height: 62.5%"
+    />
+    <div
+      class="marker"
+      style="height: 75%"
+    />
+    <div
+      class="marker"
+      style="height: 87.5%"
+    />
   </div>
 </template>
 
@@ -59,7 +43,6 @@
 <script setup lang="ts">
   import { gameOverMessage } from '@/utils/chess/game-over-message'
   import { ref } from 'vue'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import type { MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
   
   defineProps<{
@@ -68,7 +51,7 @@
   
   const blackBarHeight = ref('50%')
   const evalText = ref('')
-  const depthText = ref('')
+  const depthText = ref('Loading...')
   const explainText = ref<string>()
   
   defineExpose({
@@ -108,12 +91,17 @@
       depthText.value = 'Game over'
       explainText.value = gameOverMessage(flag, playerToMove)
     },
+    
+    evalText,
+    depthText,
+    explainText,
+    
+    resetText(enabled: boolean) {
+      evalText.value = ''
+      explainText.value = undefined
+      depthText.value = enabled ? 'Loading...' : ''
+    },
   })
-  
-  function explain() {
-    if (!explainText.value) return
-    showPopup('Why is the game over?', explainText.value, 'ok')
-  }
   
   // Convert centipawns (positive or negative) to the probability of white winning (0 to 100)
   function cpToWinOdds(cp: number): number {
@@ -151,6 +139,7 @@
     display: block;
     width: 20px;
     background-color: #ccc;
+    border-radius: 0.25rem;
     &::after {
       content: "";
       position: absolute;
@@ -158,13 +147,13 @@
       bottom: 0;
       left: 0;
       right: 0;
-      box-shadow: 0 0 5px rgb(0 0 0 / 60%) inset;
     }
   }
   .eval-gauge .black-bar {
     display: block;
     width: 100%;
     background-color: #0f0f0f;
+    border-radius: 0.25rem 0.25rem 0 0;
     height: v-bind(blackBarHeight);
     transition: height 0.5s;
   }

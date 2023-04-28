@@ -122,6 +122,9 @@
     // Expose the history tree for the UI to display
     historyRootRef,
     historyCurrentNodeRef,
+    
+    // Expose the aspect ratio to improve the layout
+    aspectRatio,
   })
   
   

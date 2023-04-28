@@ -1,12 +1,12 @@
 <template>
-  <div class="mb-3 list-container">
+  <div class="list-container">
     <div
       v-for="(row, i) of moveList"
       :key="i"
     >
       <div
         v-if="row.isSentinel"
-        class="ml-2 mt-1 bg-mask"
+        class="ml-2 mb-3 mt-1 bg-mask"
         :class="{'alt-color': indentDepth % 2 === 0}"
       >
         <MoveHistoryView

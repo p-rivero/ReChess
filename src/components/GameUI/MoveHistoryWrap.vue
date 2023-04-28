@@ -1,7 +1,7 @@
 <template>
   <MoveHistoryView
     :key="updateKey"
-    class="py-3 history-bg h-100 scrollable"
+    class="py-3 history-bg scrollable"
     :root="root"
     :start-at-left="true"
     :root-move-number="1"
@@ -44,5 +44,6 @@
   }
   .history-bg {
     border-radius: 0.25rem;
+    min-height: 10rem;
   }
 </style>

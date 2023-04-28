@@ -3,7 +3,7 @@
     <div class="is-flex h-100 w-100" />
   </div>
   
-  <div class="columns">
+  <div :class="{'columns': (board?.aspectRatio ?? 1) < 3}">
     <div class="column">
       <PlayableChessBoard
         ref="board"
@@ -23,23 +23,52 @@
       />
     </div>
     
-    <div class="column is-narrow">
+    
+    <div class="column is-narrow is-flex">
       <EvaluationGauge
         v-if="hasGauge"
+        v-show="gaugeEnabled"
         ref="gauge"
-        class="ml-2"
+        class="mr-2"
         :white-pov="true"
       />
-      <div
-        v-else
-        class="mx-2"
-      />
-    </div>
-    
-    <div class="column is-narrow">
-      <div class="card history-sz">
+      <div class="card history-card">
+        <div class="history-header px-2 py-1 is-flex is-align-items-center">
+          <p class="is-size-4 has-text-weight-semibold mr-3">
+            {{ gauge?.evalText }}
+          </p>
+          <p
+            v-if="opponentName"
+            class="is-size-5"
+          >
+            vs. {{ opponentName }}
+          </p>
+          <p class="is-size-5">
+            {{ gauge?.depthText }}
+          </p>
+          <a
+            v-if="gauge?.explainText"
+            class="ml-3 is-size-5"
+            @click="showPopup('Why is the game over?', gauge?.explainText ?? '', 'ok')"
+          >
+            Why?
+          </a>
+          <div
+            v-else-if="hasGauge"
+            class="is-flex-grow-1 is-flex is-align-items-center is-justify-content-flex-end"
+          >
+            <SmartCheckbox
+              class="mt-1"
+              text="Eval"
+              :start-value="true"
+              @changed="setGaugeEnabled"
+            />
+          </div>
+        </div>
+
         <MoveHistoryWrap
           v-if="board?.historyRootRef"
+          class="history"
           :root="board?.historyRootRef"
           :current-selection="board?.historyCurrentNodeRef"
           @node-clicked="node => board?.jumpToHistoryNode(node)"
@@ -54,11 +83,12 @@
   import { gameOverMessage } from '@/utils/chess/game-over-message'
   import { getProtochess } from '@/protochess'
   import { ref, watch } from 'vue'
-  import { showPopupImportant } from '@/components/PopupMsg/popup-manager'
+  import { showPopup, showPopupImportant } from '@/components/PopupMsg/popup-manager'
   import { updateTitle } from '@/utils/web-utils'
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
   import MoveHistoryWrap from '@/components/GameUI/MoveHistoryWrap.vue'
   import PlayableChessBoard from '@/components/ChessBoard/PlayableChessBoard.vue'
+  import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'
   import type { MakeMoveFlag, MakeMoveWinner, MoveInfo, Player, Variant } from '@/protochess/types'
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
@@ -69,6 +99,8 @@
   // Only show the popup when going from 'playing' to 'game-over', not when
   // going from 'none' to 'game-over' (which happens when the page is loaded)
   let previousState: 'playing' | 'game-over' | 'none' = 'none'
+  // Allow disabling the gauge
+  const gaugeEnabled = ref(true)
   
   const props = defineProps<{
     white: 'human' | 'engine' | 'none'
@@ -78,6 +110,7 @@
     updateTitle?: boolean
     showGameOverPopup?: boolean
     allowBranching?: boolean
+    opponentName?: string
   }>()
   
   
@@ -182,6 +215,7 @@
   
   async function updateEvaluation() {
     board.value?.clearArrows('analysis')
+    if (!props.hasGauge || !gaugeEnabled.value) return
     const protochess = await getProtochess()
     try {
       const mv = await protochess.getBestMoveTimeout(1)
@@ -192,12 +226,26 @@
       console.info('Evaluation failed:', e)
     }
   }
+  
+  function setGaugeEnabled(enabled: boolean) {
+    gauge.value?.resetText(enabled)
+    gaugeEnabled.value = enabled
+    updateEvaluation()
+  }
 </script>
 
 
 <style scoped lang="scss">
-  .history-sz {
+  @import '@/assets/style/variables.scss';
+  .history-card {
     height: 100%;
     max-height: calc(100vh - 6rem);
+    .history-header {
+      height: 3rem;
+      border-bottom: 2px solid $grey-darkest;
+    }
+    .history {
+      height: calc(100% - 3rem);
+    }
   }
 </style>
