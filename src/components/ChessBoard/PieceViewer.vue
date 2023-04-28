@@ -37,10 +37,6 @@
     (event: 'clicked', delta: [number, number], mode?: 'add'|'remove'): void
   }>()
   
-  defineExpose({
-    redraw: () => board.value?.redrawAll(),
-  })
-  
   const image = computed(() => props.piece.imageUrls[0] || props.piece.imageUrls[1] || '')
   const board = ref<InstanceType<typeof ChessgroundAdapter>>()
     

@@ -70,7 +70,6 @@
       popup.value?.classList.add('is-active')
       document.documentElement.classList.add('is-clipped')
       buttonClose.value?.focus()
-      board.value?.redraw()
     },
     hide: closePopup,
   })

@@ -273,11 +273,6 @@
       shapes = shapes?.filter(s => s.brush != brush) || []
       board.value?.setShapes(shapes)
     },
-    
-    // Redraw the board
-    redraw() {
-      board.value?.redrawAll()
-    },
   })
   
   function extractImages(state: Variant): PieceImages {

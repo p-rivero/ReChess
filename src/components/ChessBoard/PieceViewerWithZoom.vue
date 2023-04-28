@@ -79,10 +79,6 @@
     (event: 'clicked', delta: [number, number], mode?: 'add'|'remove'): void
   }>()
   
-  defineExpose({
-    redraw: () => board.value?.redraw(),
-  })
-  
   const width = ref<number>(7)
   const height = ref<number>(7)
   type Position = 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'

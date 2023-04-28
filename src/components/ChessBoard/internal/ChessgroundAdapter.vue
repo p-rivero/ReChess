@@ -21,8 +21,8 @@
 <script setup lang="ts">
   import { Chessground } from 'chessgroundx'
   import { chessboardSvg } from './chessboard-svg'
-  import { clone, debounce, throttle } from '@/utils/ts-utils'
-  import { onMounted, onUnmounted, ref } from 'vue'
+  import { clone, throttle } from '@/utils/ts-utils'
+  import { onMounted, ref } from 'vue'
   import type * as cg from 'chessgroundx/types'
   import type { Api } from 'chessgroundx/api'
   import type { Config } from 'chessgroundx/config'
@@ -85,7 +85,6 @@
     explode(keys: cg.Key[]){ chessgroundApi?.explode(keys) },
     getShapes(){ return clone(chessgroundApi?.state.drawable.shapes) as DrawShape[] },
     setShapes(shapes: DrawShape[]){ chessgroundApi?.setAutoShapes(shapes) },
-    redrawAll(){ chessgroundApi?.redrawAll() },
   })
   
   
@@ -141,19 +140,6 @@
     }
   }
   
-  // Redraw the board when the window is resized
-  // https://github.com/lichess-org/chessground/issues/54
-  if (!props.disableRefresh) {
-    const redrawBoardDebounced = debounce(redrawBoard)
-    window.addEventListener('resize', redrawBoard)
-    window.addEventListener('scroll', redrawBoardDebounced)
-    onUnmounted(() => window.removeEventListener('resize', redrawBoard))
-    onUnmounted(() => window.removeEventListener('scroll', redrawBoardDebounced))
-  }
-  function redrawBoard() {
-    chessgroundApi?.redrawAll()
-  }
-  
 </script>
 
 
@@ -168,6 +154,11 @@
   .cg-wrap {
     position: relative;
     height: 100%;
+  }
+  
+  /* Prevent blue flash when placing pieces on mobile */
+  cg-board {
+    -webkit-tap-highlight-color: transparent;
   }
   
   cg-board {
@@ -341,6 +332,7 @@
   .chessboard .cg-wrap {
     background-image: v-bind(boardBackground);
     background-repeat: no-repeat;
+    background-size: cover;
   }
   [data-theme="dark"] .chessboard piece._-piece {
     background-color: hsl(0, 0%, 14%);
