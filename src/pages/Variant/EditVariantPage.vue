@@ -38,8 +38,8 @@
           :default="8"
           :start-value="draftStore.state.boardHeight"
           @changed="h => {
-            board?.getPositionsWhere(p => p[1] >= h).forEach(p => board?.removePiece(p))
-            refreshFen()
+            // Split the fen rows and get the last h rows
+            draftStore.state.fen = board?.getFen().split('/').slice(-h).join('/') ?? ''
             draftStore.state.boardHeight = h
           }"
         />
