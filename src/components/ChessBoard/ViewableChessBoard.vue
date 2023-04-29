@@ -120,8 +120,8 @@
   defineExpose({
     // Set the state of the board
     setState(state: Variant, diff?: StateDiff) {
-      if (state.boardWidth < 2 || state.boardHeight < 2) {
-        throw new Error('Minimum board size is 2x2')
+      if (state.boardWidth < 1 || state.boardHeight < 1) {
+        throw new Error('Minimum board size is 1x1')
       }
       let newConfig: Config = {}
       if (state.boardWidth != currentWidth || state.boardHeight != currentHeight) {

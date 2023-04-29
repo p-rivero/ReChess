@@ -33,7 +33,7 @@
         </div>
         <SmartNumberInput
           class="width-5rem"
-          :min="2"
+          :min="1"
           :max="16"
           :default="8"
           :start-value="draftStore.state.boardHeight"
@@ -48,7 +48,7 @@
         </div>
         <SmartNumberInput
           class="width-5rem"
-          :min="2"
+          :min="1"
           :max="16"
           :default="8"
           :start-value="draftStore.state.boardWidth"
