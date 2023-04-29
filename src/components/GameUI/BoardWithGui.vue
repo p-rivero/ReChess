@@ -3,8 +3,11 @@
     <div class="is-flex h-100 w-100" />
   </div>
   
-  <div :class="{'columns': (board?.aspectRatio ?? 1) < 3}">
-    <div class="column">
+  <div :class="{ 'columns': !forceVertical }">
+    <div
+      class="column"
+      :class="{ 'remove-x-spacing': forceVertical }"
+    >
       <PlayableChessBoard
         ref="board"
         :white="white"
@@ -24,15 +27,21 @@
     </div>
     
     
-    <div class="column is-narrow is-flex pt-0-mobile">
+    <div
+      class="is-narrow is-flex pt-2"
+      :class="{ 'column': !forceVertical, 'pt-0-mobile': !forceVertical }"
+    >
       <EvaluationGauge
         v-if="hasGauge"
         v-show="gaugeEnabled"
         ref="gauge"
-        class="mr-2"
+        class="mr-2 is-flex-shrink-0"
         :white-pov="true"
       />
-      <div class="card history-card">
+      <div
+        class="card history-card"
+        :class="{ 'history-below': forceVertical }"
+      >
         <div class="history-header px-2 py-1 is-flex is-align-items-center">
           <p class="is-size-4 has-text-weight-semibold mr-3">
             {{ gauge?.evalText }}
@@ -85,10 +94,10 @@
 </template>
 
 <script setup lang="ts">
+  import { computed, ref, watch } from 'vue'
   import { debounce } from '@/utils/ts-utils'
   import { gameOverMessage } from '@/utils/chess/game-over-message'
   import { getProtochess } from '@/protochess'
-  import { ref, watch } from 'vue'
   import { showPopup, showPopupImportant } from '@/components/PopupMsg/popup-manager'
   import { updateTitle } from '@/utils/web-utils'
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
@@ -167,6 +176,9 @@
       updateTitle('Waiting for opponent')
     }
   })
+  
+  const forceVertical = computed(() => (board.value?.aspectRatio ?? 1) >= 3)
+  const showHint = computed(() => (board.value?.aspectRatio ?? 1) <= 0.2)
   
   
   const updateEvalDebounced = debounce(updateEvaluation, 500)
@@ -272,5 +284,20 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  
+  .history-below {
+    width: 100%;
+    max-width: 50rem;
+    .history {
+      max-height: 15rem;
+    }
+  }
+  
+  .remove-x-spacing {
+    margin-left: -1rem !important;
+    margin-right: -1rem !important;
+    padding-left: 0;
+    padding-right: 0;
   }
 </style>
