@@ -514,7 +514,7 @@
       align-self: center;
     }
   }
-  @media screen and (max-width: 767px) {
+  @media screen and (max-width: 768px) {
     .column {
       width: 100%;
     }

@@ -24,7 +24,7 @@
     </div>
     
     
-    <div class="column is-narrow is-flex">
+    <div class="column is-narrow is-flex pt-0-mobile">
       <EvaluationGauge
         v-if="hasGauge"
         v-show="gaugeEnabled"
@@ -38,8 +38,14 @@
             {{ gauge?.evalText }}
           </p>
           <p
-            v-if="opponentName"
+            v-if="gameOverPopupShown"
             class="is-size-5"
+          >
+            Game Over
+          </p>
+          <p
+            v-else-if="opponentName"
+            class="is-size-5 opponent-name-text"
           >
             vs. {{ opponentName }}
           </p>
@@ -95,7 +101,7 @@
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
   const playerToMove = ref<Player>()
   // Only show the game over popup once
-  let gameOverPopupShown = false
+  const gameOverPopupShown = ref(false)
   // Only show the popup when going from 'playing' to 'game-over', not when
   // going from 'none' to 'game-over' (which happens when the page is loaded)
   let previousState: 'playing' | 'game-over' | 'none' = 'none'
@@ -153,7 +159,7 @@
   watch(playerToMove, () => {
     if (!props.updateTitle) return
     const currentPlayer = playerToMove.value === 'white' ? props.white : props.black
-    if (gameOverPopupShown) {
+    if (gameOverPopupShown.value) {
       updateTitle('Game over')
     } else if (currentPlayer === 'human') {
       updateTitle('Your turn')
@@ -188,13 +194,13 @@
     if (props.hasGauge) {
       gauge.value?.gameOver(flag, winner, playerToMove)
     }
-    if (props.showGameOverPopup && previousState === 'playing' && !gameOverPopupShown) {
+    if (props.showGameOverPopup && previousState === 'playing' && !gameOverPopupShown.value) {
       showGameOverPopup(flag, winner, playerToMove)
     }
     
     previousState = 'game-over'
     // Even if the popup was not shown initially, prevent it from being shown again
-    gameOverPopupShown = true
+    gameOverPopupShown.value = true
     updateTitle('Game over')
     emit('game-over', flag, winner, playerToMove)
   }
@@ -242,10 +248,29 @@
     max-height: calc(100vh - 6rem);
     .history-header {
       height: 3rem;
-      border-bottom: 2px solid $grey-darkest;
+      border-bottom: 1px solid $grey-darkest;
     }
     .history {
       height: calc(100% - 3rem);
     }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .history-card {
+      width: 100%;
+      .history {
+        max-height: 15rem;
+      }
+    }
+    .pt-0-mobile {
+      padding-top: 0 !important;
+    }
+  }
+  
+  .opponent-name-text {
+    max-width: 15rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 </style>

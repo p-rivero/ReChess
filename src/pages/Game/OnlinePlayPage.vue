@@ -5,6 +5,7 @@
     :black="isBlack ? 'human' : 'none'"
     :update-title="isWhite || isBlack"
     :show-game-over-popup="isWhite || isBlack"
+    :opponent-name="opponentName"
     
     @new-move="newMove"
     @invalid-variant="illegalPosition"
@@ -28,6 +29,7 @@
   // For the remote player, use 'none' and set the state manually
   const isWhite = ref(false)
   const isBlack = ref(false)
+  const opponentName = ref('')
   
   // When the route changes, update the game
   watchEffect(() => {
@@ -43,6 +45,8 @@
       isBlack.value = game.loggedUserIsBlack
       if (!isWhite.value && !isBlack.value) {
         updateTitle(`${game.whiteName} vs ${game.blackName}`)
+      } else {
+        opponentName.value = isWhite.value ? game.blackName : game.whiteName
       }
     })
     
