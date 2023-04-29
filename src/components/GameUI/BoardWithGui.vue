@@ -38,7 +38,7 @@
             {{ gauge?.evalText }}
           </p>
           <p
-            v-if="gameOverPopupShown"
+            v-if="!gaugeEnabled && gameOverPopupShown"
             class="is-size-5"
           >
             Game Over
