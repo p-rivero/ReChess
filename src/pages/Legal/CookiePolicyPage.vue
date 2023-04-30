@@ -1,9 +1,11 @@
 <template>
   <div class="content has-text-justified">
     <h1><strong>COOKIE POLICY</strong></h1>
-    <p><strong>Last updated March 13, 2023</strong></p>
+    <p><strong>Last updated April 30, 2023</strong></p>
 
-    <p>This is the Cookie Policy for ReChess, accessible from <a href="https://rechess.org">https://rechess.org</a></p>
+    <p>This is the Cookie Policy for ReChess, accessible from <a href="https://rechess.org">https://rechess.org</a>.</p>
+    <p><strong>This site is a free-to-use personal project. It serves no ads and does not track you.</strong> It does not use cookies for any purpose other than to provide the service. Since all cookies are strictly necessary for the functioning of the site, no cookie consent banner needs to be shown.</p>
+    <p>All code is open source and available at <a href="https://github.com/p-rivero/ReChess">GitHub</a>.</p>
 
     <h2><strong>What Are Cookies</strong></h2>
     <p>As is common practice with almost all professional websites this site uses cookies, which are tiny files that are downloaded to your computer, to improve your experience. This page describes what information they gather, how we use it and why we sometimes need to store these cookies. We will also share how you can prevent these cookies from being stored however this may downgrade or 'break' certain elements of the sites functionality.</p>
@@ -37,8 +39,13 @@
       <li>
         <p>From time to time we test new features and make subtle changes to the way that the site is delivered. When we are still testing new features these cookies may be used to ensure that you receive a consistent experience whilst on the site whilst ensuring we understand which optimisations our users appreciate the most.</p>
       </li>
+      <br>
       <li>
         <p>We also use social media buttons and/or plugins on this site that allow you to connect with your social network in various ways. For these to work the following social media sites including; Google and GitHub, will set cookies through our site which may be used to enhance your profile on their site or contribute to the data they hold for various purposes outlined in their respective privacy policies.</p>
+      </li>
+      <br>
+      <li>
+        <p>Google reCAPTCHA sets a necessary cookie for the purpose of providing its risk analysis. This prevents malicious users from abusing the site.</p>
       </li>
     </ul>
 
