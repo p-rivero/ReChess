@@ -45,12 +45,12 @@ export interface UserPrivateDoc {
   }
 }
 
-// users/{userID}/upvotedVariants/{variantId}
+// users/{userId}/upvotedVariants/{variantId}
 export interface UserUpvotesDoc {
   timeUpvoted: Timestamp
 }
 
-// users/{userID}/renameTrigger/doc
+// users/{userId}/renameTrigger/doc
 export interface UserRenameTriggerDoc {
   // This document is used to trigger a cloud function when the user changes their name
   name: string
