@@ -5,9 +5,21 @@
   
   <div :class="{ 'columns': !forceVertical }">
     <div
-      class="column"
+      class="column is-flex"
       :class="{ 'remove-x-spacing': forceVertical }"
     >
+      <div
+        v-if="showHistoryHint"
+        class="history-column is-align-items-end is-justify-content-center"
+      >
+        <button
+          class="button is-primary is-rounded mb-3 mr-2 px-1"
+          @click="moveHistory?.$el.scrollIntoView()"
+        >
+          <div class="icon-arrow-down color-white sz-2" />
+        </button>
+      </div>
+      
       <PlayableChessBoard
         ref="board"
         :white="white"
@@ -84,6 +96,7 @@
 
         <MoveHistoryWrap
           v-if="board?.historyRootRef"
+          ref="moveHistory"
           class="history"
           :root="board?.historyRootRef"
           :current-selection="board?.historyCurrentNodeRef"
@@ -109,6 +122,7 @@
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
+  const moveHistory = ref<InstanceType<typeof MoveHistoryWrap>>()
   const playerToMove = ref<Player>()
   // Only show the game over popup once
   const gameOverPopupShown = ref(false)
@@ -180,7 +194,7 @@
   })
   
   const forceVertical = computed(() => (board.value?.aspectRatio ?? 1) >= 3)
-  const showHint = computed(() => (board.value?.aspectRatio ?? 1) <= 0.2)
+  const showHistoryHint = computed(() => (board.value?.aspectRatio ?? 1) <= 0.5)
   
   
   const updateEvalDebounced = debounce(updateEvaluation, 500)
@@ -269,6 +283,10 @@
     }
   }
   
+  .history-column {
+    display: none;
+  }
+  
   @media screen and (max-width: 768px) {
     .history-card {
       width: 100%;
@@ -278,6 +296,10 @@
     }
     .pt-0-mobile {
       padding-top: 0 !important;
+    }
+    
+    .history-column {
+      display: flex;
     }
   }
   
