@@ -21,8 +21,6 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     }
   }
   const state = ref<Variant>(initialState)
-  // By default, seeCreateHint is true. If the user clicks on the "Hide" button, it will be set to 'false'
-  const seeCreateHint = ref(localStorage.getItem('seeCreateHint') !== 'false')
   
   // Save every time the state changes
   watch(state, () => {
@@ -82,19 +80,12 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
     return !objectEquals(state.value, DEFAULT_DRAFT)
   }
   
-  // Called when the user decides to hide the hint to create a variant
-  function hideCreateHint() {
-    seeCreateHint.value = false
-    localStorage.setItem('seeCreateHint', 'false')
-  }
-  
   // Discard the current draft
   function discardDraft() {
     state.value = clone(DEFAULT_DRAFT)
   }
 
-  return { state, addPiece, backupFile, loadFile, publish, nameExists, hasDraft,
-    seeCreateHint, hideCreateHint, discardDraft }
+  return { state, addPiece, backupFile, loadFile, publish, nameExists, hasDraft, discardDraft }
 })
 
 const DEFAULT_DRAFT: Readonly<Variant> = {

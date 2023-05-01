@@ -52,7 +52,7 @@
     </div>
   </div>
   <div
-    v-else-if="draftStore.seeCreateHint"
+    v-else-if="userPrefsStore.seeCreateHint"
     class="draft-card outline px-2 py-2 mx-3 my-4 is-clickable"
     @click="editDraft"
   >
@@ -73,11 +73,13 @@
   import { onMounted, ref } from 'vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { useRouter } from 'vue-router'
+  import { useUserPrefsStore } from '@/stores/user-preferences'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const draftStore = useVariantDraftStore()
+  const userPrefsStore = useUserPrefsStore()
   const router = useRouter()
   
   onMounted(async () => {
@@ -107,7 +109,7 @@
       'You can always create a new variant from scratch by clicking the **Create** button in the top navigation bar. \
       \n\nYou can also use any existing variant as a template to create your own.',
       'ok-cancel',
-      draftStore.hideCreateHint
+      () => userPrefsStore.seeCreateHint = false
     )
   }
   

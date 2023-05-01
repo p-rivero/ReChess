@@ -68,12 +68,15 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import { requestSignIn } from '@/components/Auth/auth-manager'
+  import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { toggleTheme } from '@/utils/theme'
   import { useAuthStore } from '@/stores/auth-user'
   import { useRouter } from 'vue-router'
+  import { useUserPrefsStore } from '@/stores/user-preferences'
   import AccountCard from '@/components/Navbar/AccountCard.vue'
   
   const authStore = useAuthStore()
+  const userPrefsStore = useUserPrefsStore()
   const router = useRouter()
   const navbarBurger = ref<HTMLElement>()
   const navbarMenu = ref<HTMLElement>()
@@ -90,11 +93,24 @@
   
   
   function create() {
-    if (authStore.loggedUser) {
-      hideNavBarMenu()
-      router.push({ name: 'edit-draft' })
-    } else {
+    hideNavBarMenu()
+    if (!authStore.loggedUser) {
       requestSignIn()
+    } else if (userPrefsStore.suggestUsingTemplate) {
+      showPopup(
+        'Create a variant from scratch',
+        'Making small changes to a variant you like is much easier than creating a new one from scratch. \
+        \n\n> **Tip:** Click any variant to see its details, and then select "Use as template". \
+        \n\nAre you sure you want to create a new variant? \
+        \n\n*If you click "Yes", this message won\'t be shown again.*',
+        'yes-no',
+        () => {
+          userPrefsStore.suggestUsingTemplate = false
+          router.push({ name: 'edit-draft' })
+        }
+      )
+    } else {
+      router.push({ name: 'edit-draft' })
     }
   }
 </script>

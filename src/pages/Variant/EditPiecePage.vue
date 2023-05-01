@@ -446,9 +446,10 @@
       'explosion squares'
     showPopup(
       `Clear all ${plural}?`,
-      `This will remove **all** the ${plural} of this piece. Do you want to continue?
-      \n\n> Tip: If you only want to remove one square, select "Add / Remove" \
-      and then *tap that square* on the board.`,
+      `This will remove **all** the ${plural} of this piece.
+      \n\n> **Tip:** If you only want to remove one square, select "Add / Remove" \
+      and then *tap that square* on the board. \
+      \n\nDo you want to proceed?`,
       'yes-no',
       () => {
         if (!piece) throw new Error('Piece is null')
