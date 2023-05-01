@@ -40,6 +40,7 @@
     black: 'human' | 'engine' | 'none'
     invertEnemyDirection?: boolean
     allowBranching?: boolean
+    engineLevel?: 1 | 2 | 3 | 4 | 5
   }>()
   
   type GameResult = {flag: MakeMoveFlag, winner: MakeMoveWinner}
@@ -153,9 +154,12 @@
   
   // Called in order to make the computer play its move
   async function makeEngineMove() {
+    if (!props.engineLevel) throw new Error('Engine level must be set to make the engine play')
     const protochess = await getProtochess()
-    // TODO: Allow the user to choose the search timeout
-    const timeoutSeconds = 2
+    
+    // Extremely naive way to define the engine strength, just wait longer for higher levels
+    // In the future, we should make a proper difficulty setting in the engine
+    const timeoutSeconds = props.engineLevel
     
     // The engine can return a move almost immediately. Wait a second to make it feel more natural
     const minWaitTime = 1000

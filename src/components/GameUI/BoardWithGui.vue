@@ -14,6 +14,7 @@
         :black="black"
         :invert-enemy-direction="invertEnemyDirection"
         :allow-branching="allowBranching"
+        :engine-level="engineLevel"
         @new-move="(from, to, promotion, result) => {
           updateResult(result)
           emit('new-move', from, to, promotion, result?.winner)
@@ -126,6 +127,7 @@
     showGameOverPopup?: boolean
     allowBranching?: boolean
     opponentName?: string
+    engineLevel?: 1 | 2 | 3 | 4 | 5
   }>()
   
   

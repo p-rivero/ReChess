@@ -9,6 +9,7 @@
     :show-game-over-popup="showGameOverPopup"
     :allow-branching="allowBranching"
     :opponent-name="opponentName"
+    :engine-level="engineLevel"
     
     @invalid-variant="invalidVariant"
   />
@@ -37,6 +38,7 @@
     showGameOverPopup?: boolean
     allowBranching?: boolean
     opponentName?: string
+    engineLevel?: 1 | 2 | 3 | 4 | 5
   }>()
   
   onMounted(async () => {

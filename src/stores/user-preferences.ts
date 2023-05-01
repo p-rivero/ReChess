@@ -9,14 +9,17 @@ export const useUserPrefsStore = defineStore('user-preferences', () => {
   
   const SEE_CREATE_HINT = true
   const SUGGEST_USING_TEMPLATE = true
+  const ENGINE_LEVEL = 3
   
   const seeCreateHint = ref(getLocalFlag('seeCreateHint', SEE_CREATE_HINT))
   const suggestUsingTemplate = ref(getLocalFlag('suggestUsingTemplate', SUGGEST_USING_TEMPLATE))
+  const engineLevel = ref(parseInt(getFromStorage('engineLevel', ENGINE_LEVEL)))
   
   watch(seeCreateHint, () => saveToStorage('seeCreateHint', seeCreateHint.value))
   watch(suggestUsingTemplate, () => saveToStorage('suggestUsingTemplate', suggestUsingTemplate.value))
+  watch(engineLevel, () => saveToStorage('engineLevel', engineLevel.value))
   
-  return { seeCreateHint, suggestUsingTemplate }
+  return { seeCreateHint, suggestUsingTemplate, engineLevel }
 })
 
 

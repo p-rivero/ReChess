@@ -10,7 +10,7 @@
   <div class="field is-grouped is-grouped-multiline">
     <button
       class="button mr-2 mb-2"
-      @click="playPopup?.show(side => router.push({ name: 'play-offline', query: {startAs: side} }))"
+      @click="playPopup?.showWithLevels((side, level) => router.push({ name: 'play-offline', query: {startAs: side, lvl: level} }))"
     >
       <div class="sz-icon icon-cpu color-theme" />
       Against computer
