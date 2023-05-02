@@ -106,7 +106,7 @@
           <button
             class="button is-fullwidth"
             :disabled="hasError || loading"
-            @click="playPopup?.show(side => router.push({ name: 'draft-play', query: {startAs: side} }))"
+            @click="playPopup?.showWithLevels((side, level) => router.push({ name: 'draft-play', query: {startAs: side, lvl: level} }))"
           >
             <div class="sz-icon icon-cpu color-theme" />
             <span>Play vs. engine</span>
