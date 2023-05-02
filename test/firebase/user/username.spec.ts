@@ -82,8 +82,8 @@ test('cannot create a username without corresponding user', async () => {
   
 test('cannot steal a taken username', async () => {
   await set('admin', { userId: '1234' }, 'usernames', 'cool_username')
-  setupUser('1234', 'cool_username')
-  setupUser(MY_ID, 'cool_username') // I'm trying to steal this username
+  await setupUser('1234', 'cool_username')
+  await setupUser(MY_ID, 'cool_username') // I'm trying to steal this username
   
   await assertFails(
     // Try to steal cool_username for my own user

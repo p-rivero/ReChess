@@ -97,20 +97,20 @@ test('cannot remove upvote if not upvoted first', async () => {
 
 test('can see own upvotes', async () => {
   await createUserAndVariant(MY_ID)
-  assertSucceeds(
+  await assertSucceeds(
     get('verified', 'users', MY_ID, 'upvotedVariants', '1234')
   )
-  assertSucceeds(
+  await assertSucceeds(
     query('verified', `users/${MY_ID}/upvotedVariants`)
   )
 })
 
 test('cannot see upvotes of another user', async () => {
   await createUserAndVariant('ANOTHER_ID')
-  assertFails(
+  await assertFails(
     get('verified', 'users', 'ANOTHER_ID', 'upvotedVariants', '1234')
   )
-  assertFails(
+  await assertFails(
     query('verified', 'users/ANOTHER_ID/upvotedVariants')
   )
 })
