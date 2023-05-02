@@ -12,6 +12,7 @@
     :engine-level="engineLevel"
     
     @invalid-variant="invalidVariant"
+    @new-move="(from, to, promo, winner) => emit('new-move', from, to, promo, winner)"
   />
 </template>
 
@@ -22,7 +23,7 @@
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useVariantStore } from '@/stores/variant'
   import BoardWithGui from './BoardWithGui.vue'
-  import type { Variant } from '@/protochess/types'
+  import type { Player, Variant } from '@/protochess/types'
   
   const route = useRoute()
   const router = useRouter()
@@ -39,6 +40,10 @@
     allowBranching?: boolean
     opponentName?: string
     engineLevel?: 1 | 2 | 3 | 4 | 5
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'new-move', from: [number, number], to: [number, number], promotion?: string, winner?: Player|'none'): void
   }>()
   
   onMounted(async () => {

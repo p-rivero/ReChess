@@ -156,11 +156,6 @@
     height: 100%;
   }
   
-  /* Prevent blue flash when placing pieces on mobile */
-  cg-board {
-    -webkit-tap-highlight-color: transparent;
-  }
-  
   cg-board {
     position: absolute;
     top: 0;
@@ -171,6 +166,8 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    /* Prevent blue flash when placing pieces on mobile */
+    -webkit-tap-highlight-color: transparent;
     line-height: 0;
     background-size: cover;
     cursor: v-bind("cursorPointer ? 'pointer' : 'default'");
