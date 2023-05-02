@@ -35,6 +35,9 @@
   import ViewableChessBoard from './ViewableChessBoard.vue'
   import type { MakeMoveFlag, MakeMoveResult, MakeMoveWinner, MoveInfo, Player, StateDiff, VariantGameState } from '@/protochess/types'
   
+  // If the user navigates the history while the engine is thinking, the found move is stored here until it can be played
+  let engineStoredMove: MoveInfo|undefined = undefined
+  
   const props = defineProps<{
     white: 'human' | 'engine' | 'none'
     black: 'human' | 'engine' | 'none'
@@ -70,6 +73,7 @@
       const result = await protochess.setState(state)
       const stateDiff = await protochess.getStateDiff()
       const variant = state.initialState
+      engineStoredMove = undefined
       
       board.value?.setState(variant, stateDiff)
       if (state.moveHistory.length > 0) {
@@ -154,6 +158,14 @@
   
   // Called in order to make the computer play its move
   async function makeEngineMove() {
+    if (engineStoredMove) {
+      // The engine has already found a move, play it
+      await new Promise(resolve => setTimeout(resolve, 100))
+      await playMove(engineStoredMove)
+      engineStoredMove = undefined
+      return
+    }
+    
     if (!props.engineLevel) throw new Error('Engine level must be set to make the engine play')
     const uiEngine = await getProtochess('ui')
     const state = await uiEngine.getState()
@@ -171,6 +183,11 @@
       const bestMove = await searchEngine.getBestMoveTimeout(timeoutSeconds)
       const waitTime = Math.max(0, minWaitTime - (Date.now() - startTime))
       await new Promise(resolve => setTimeout(resolve, waitTime))
+      if (!moveHistory.canMakeMove()) {
+        // The user has navigated to a different position, store the move for later
+        engineStoredMove = bestMove
+        return
+      }
       await playMove(bestMove)
     } catch (e) {
       // Unable to find a move, probably because the game has ended
