@@ -4,19 +4,25 @@ import * as guard from './types.guard'
 import { clone } from '@/utils/ts-utils'
 import type * as t from './types'
 
+const INSTANCES = ['ui', 'search'] as const
+type Instance = typeof INSTANCES[number]
+
 // Call this at the start of the app to initialize the wasm module
-let protochess: t.Protochess | null = null
+let protochessInstances: t.Protochess[] = []
 let supportsThreads: boolean | undefined = undefined
 export async function initializeProtochess() {
-  protochess = await init()
+  const initPromises: Promise<t.Protochess>[] = []
+  for (const _ of INSTANCES) initPromises.push(init())
+  protochessInstances = await Promise.all(initPromises)
 }
 // Use this to get a reference to the protochess object
-export async function getProtochess(): Promise<t.Protochess> {
+export async function getProtochess(instance: Instance): Promise<t.Protochess> {
+  const index = INSTANCES.indexOf(instance)
   // Wait for the wasm module to be initialized
-  while (protochess === null) {
+  while (protochessInstances[index] === undefined) {
     await new Promise(resolve => setTimeout(resolve, 10))
   }
-  return protochess
+  return protochessInstances[index]
 }
 export async function protochessSupportsThreads(): Promise<boolean> {
   // Wait for the wasm module to be initialized

@@ -86,7 +86,8 @@ function checkPieces(state: Variant, errorMsgHandler: ErrorMessageHandler): bool
 
 
 async function checkProtochess(state: InitialState): Promise<void> {
-  const protochess = await getProtochess()
+  // validatePosition() is fast, use the UI instance
+  const protochess = await getProtochess('ui')
   await protochess.setState({ initialState: state, moveHistory: [] })
   await protochess.validatePosition()
 }

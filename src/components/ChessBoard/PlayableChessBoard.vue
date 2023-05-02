@@ -66,7 +66,7 @@
   defineExpose({
     // Set the state of the board
     async setState(state: VariantGameState): Promise<GameResult|undefined> {
-      const protochess = await getProtochess()
+      const protochess = await getProtochess('ui')
       const result = await protochess.setState(state)
       const stateDiff = await protochess.getStateDiff()
       const variant = state.initialState
@@ -89,7 +89,7 @@
     
     // Returns which player is to move
     async playerToMove(): Promise<Player> {
-      const protochess = await getProtochess()
+      const protochess = await getProtochess('ui')
       return protochess.playerToMove()
     },
     
@@ -131,7 +131,7 @@
   
   // Called when the user makes a move on the board
   async function userMovedCallback(from: [number, number], to: [number, number]) {
-    const protochess = await getProtochess()
+    const protochess = await getProtochess('ui')
     const possiblePromotions = await protochess.possiblePromotions(from, to)
     let promotion: string|undefined = undefined
     if (possiblePromotions.length > 0) {
@@ -155,7 +155,10 @@
   // Called in order to make the computer play its move
   async function makeEngineMove() {
     if (!props.engineLevel) throw new Error('Engine level must be set to make the engine play')
-    const protochess = await getProtochess()
+    const uiEngine = await getProtochess('ui')
+    const state = await uiEngine.getState()
+    const searchEngine = await getProtochess('search')
+    await searchEngine.setState(state)
     
     // Extremely naive way to define the engine strength, just wait longer for higher levels
     // In the future, we should make a proper difficulty setting in the engine
@@ -165,7 +168,7 @@
     const minWaitTime = 1000
     const startTime = Date.now()
     try {
-      const bestMove = await protochess.getBestMoveTimeout(timeoutSeconds)
+      const bestMove = await searchEngine.getBestMoveTimeout(timeoutSeconds)
       const waitTime = Math.max(0, minWaitTime - (Date.now() - startTime))
       await new Promise(resolve => setTimeout(resolve, waitTime))
       await playMove(bestMove)
@@ -177,7 +180,7 @@
   
   // Plays a move on the engine and updates the UI
   async function playMove(mv: MoveInfo) {
-    const protochess = await getProtochess()
+    const protochess = await getProtochess('ui')
     // Play the move on the engine
     const result = await protochess.makeMove(mv)
     const stateDiff = await protochess.getStateDiff()
@@ -200,7 +203,7 @@
       cursorPointer.value = false
       return
     }
-    const protochess = await getProtochess()
+    const protochess = await getProtochess('ui')
     const moves = await protochess.legalMoves()
     const moveWhite = props.white == 'human' && state.playerToMove == 0
     const moveBlack = props.black == 'human' && state.playerToMove == 1
@@ -230,7 +233,7 @@
   
   async function jumpToMove(entry: MoveHistoryQueryResult) {
     // Update the state of the engine and the board
-    const protochess = await getProtochess()
+    const protochess = await getProtochess('ui')
     const result = await protochess.setState(entry.state)
     const stateDiff = await protochess.getStateDiff()
     board.value?.setStateDiff(stateDiff)

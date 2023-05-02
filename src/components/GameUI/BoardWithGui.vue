@@ -154,7 +154,6 @@
   
   defineExpose({
     async setState(variant: Variant, history: MoveInfo[] = [], fen?: string) {
-      const protochess = await getProtochess()
       // Set the board state and make sure it's valid
       // Since the page has just loaded, the move history is empty
       try {
@@ -165,6 +164,8 @@
           await updateResult(result)
         } else {
           // If in the middle of a game, check that the position is valid
+          // validPosition() is fast, use the UI instance
+          const protochess = await getProtochess('ui')
           await protochess.validatePosition()
           await updateResult()
         }
@@ -174,8 +175,9 @@
         return
       }
       // Initialize evaluation gauge
+      // This can take a while, don't await it
       if (props.hasGauge) {
-        await updateEvaluation()
+        updateEvaluation()
       }
     },
     playerToMove,
@@ -205,7 +207,8 @@
       previousState = 'playing'
     }
     if (!result && props.hasGauge) {
-      await updateEvalDebounced()
+      // This can take a while, don't await it
+      updateEvalDebounced()
     }
   }
   
@@ -250,11 +253,16 @@
   async function updateEvaluation() {
     board.value?.clearArrows('analysis')
     if (!props.hasGauge || !gaugeEnabled.value) return
-    const protochess = await getProtochess()
+    
+    const uiEngine = await getProtochess('ui')
+    const searchEngine = await getProtochess('search')
+    const state = await uiEngine.getState()
+    const playerToMove = await uiEngine.playerToMove()
+    
     try {
-      const mv = await protochess.getBestMoveTimeout(1)
-      const player = await protochess.playerToMove()
-      gauge.value?.updateEvaluation(mv.evaluation, mv.depth, player === 'black')
+      await searchEngine.setState(state)
+      const mv = await searchEngine.getBestMoveTimeout(1)
+      gauge.value?.updateEvaluation(mv.evaluation, mv.depth, playerToMove === 'black')
       board.value?.drawArrow(mv.from, mv.to, 'analysis', mv.promotion)
     } catch (e) {
       console.info('Evaluation failed:', e)
