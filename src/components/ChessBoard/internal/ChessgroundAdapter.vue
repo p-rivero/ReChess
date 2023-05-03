@@ -21,8 +21,8 @@
 <script setup lang="ts">
   import { Chessground } from 'chessgroundx'
   import { chessboardSvg } from './chessboard-svg'
-  import { clone, throttle } from '@/utils/ts-utils'
-  import { onMounted, ref } from 'vue'
+  import { clone, debounce, throttle } from '@/utils/ts-utils'
+  import { onBeforeUnmount, onMounted, ref } from 'vue'
   import type * as cg from 'chessgroundx/types'
   import type { Api } from 'chessgroundx/api'
   import type { Config } from 'chessgroundx/config'
@@ -140,6 +140,12 @@
     }
   }
   
+  // Refresh the board when scrolling, so that the click events have the correct coordinates
+  if (!props.disableRefresh) {
+    const redrawBoardDebounced = debounce(() => chessgroundApi?.redrawAll())
+    window.addEventListener('scroll', redrawBoardDebounced)
+    onBeforeUnmount(() => window.removeEventListener('scroll', redrawBoardDebounced))
+  }
 </script>
 
 

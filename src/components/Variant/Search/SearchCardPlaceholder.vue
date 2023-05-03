@@ -11,6 +11,7 @@
         :view-only="true"
         :show-coordinates="false"
         :capture-wheel-events="false"
+        :disable-refresh="true"
       />
       <p class="mt-3 is-size-5 has-text-weight-semibold">
         <HighlightWords

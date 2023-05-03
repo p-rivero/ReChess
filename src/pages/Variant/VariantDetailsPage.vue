@@ -86,6 +86,7 @@
             :view-only="true"
             :show-coordinates="true"
             :capture-wheel-events="false"
+            :disable-refresh="true"
           />
         </div>
       </div>
