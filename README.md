@@ -116,8 +116,8 @@ firebase deploy
 
 ## About the license 📜
 
-All files in this repository (submodules not included) are licensed under the [MIT License](LICENSE). The `protochess-engine` and `chessgroundx` submodules are licensed under the [GNU General Public License v3.0](https://github.com/p-rivero/protochess-engine/blob/master/LICENSE), since those are forks of [raytran/protochess](https://github.com/raytran/protochess) and [gbtami/chessgroundx](https://github.com/gbtami/chessgroundx) (both licensed under the GPL v3.0).
+All files in this repository (submodules not included) are licensed under the [MIT License](LICENSE). The `protochess-engine` and `chessgroundx` submodules are licensed under the [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.en.html), since those are forks of [raytran/protochess](https://github.com/raytran/protochess) and [gbtami/chessgroundx](https://github.com/gbtami/chessgroundx) (both licensed under the GPLv3).
 
-This means that, technically, the project as a whole is licensed under the GPL v3.0, but some parts (namely, the code in this repository) are licensed under the MIT License, which is [GPL-compatible](https://www.gnu.org/licenses/license-list.en.html#Expat). See [this document](https://softwarefreedom.org/resources/2007/gpl-non-gpl-collaboration.html) for more information.
+This means that the project as a whole is licensed under the GPLv3, but some parts (namely, the code in this repository) are licensed under the MIT License, which is [GPL-compatible](https://www.gnu.org/licenses/license-list.en.html#Expat). See [this document](https://softwarefreedom.org/resources/2007/gpl-non-gpl-collaboration.html) for more information.
 
-You are free to use the files in this repository under the terms of the MIT License, but if you also clone and use the `protochess-engine` submodule or the `chessgroundx` submodule, you must comply with the terms of the GPL v3.0.
+You are free to use the files in this repository under the terms of the MIT License, but if you also clone and use the `protochess-engine` submodule or the `chessgroundx` submodule, you must comply with the terms of the GPLv3.
