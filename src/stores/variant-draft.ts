@@ -104,6 +104,7 @@ const DEFAULT_DRAFT: Readonly<Variant> = {
     repetitionsDraw: 3,
     checksToLose: 0,
   },
+  tags: [],
 }
 
 const DEFAULT_PIECE: Readonly<FullPieceDef> = {

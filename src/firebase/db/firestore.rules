@@ -261,7 +261,7 @@ service cloud.firestore {
     match /variants/{variantId} {
       function isVariantDoc(doc) {
         return
-          hasFields(doc, ['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes', 'popularity'], ['creatorId']) &&
+          hasFields(doc, ['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes', 'popularity', 'tags'], ['creatorId']) &&
           doc.name is string &&
           doc.name.size() >= 3 &&
           doc.name.size() <= 50 &&
@@ -271,9 +271,10 @@ service cloud.firestore {
           doc.creationTime is timestamp &&
           doc.creatorDisplayName is string &&
           doc.initialState is string &&
-          doc.initialState.size() <= 100000 &&
+          doc.initialState.size() <= 200000 &&
           doc.numUpvotes is int &&
           doc.popularity is int &&
+          doc.tags is list &&
           (doc.creatorId == null || doc.creatorId is string);
       }
       function allowCreateVariant() {

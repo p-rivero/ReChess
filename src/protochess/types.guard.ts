@@ -136,7 +136,11 @@ export function isVariant(obj: unknown): obj is Variant {
                 typeof e["imageUrls"][1] === "string")
         ) &&
         typeof typedObj["displayName"] === "string" &&
-        typeof typedObj["description"] === "string"
+        typeof typedObj["description"] === "string" &&
+        Array.isArray(typedObj["tags"]) &&
+        typedObj["tags"].every((e: any) =>
+            typeof e === "string"
+        )
     )
 }
 

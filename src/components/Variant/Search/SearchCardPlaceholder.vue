@@ -94,6 +94,7 @@
       },
       displayName: '',
       description: '',
+      tags: [],
     }
     board.value?.setState(DUMMY_VARIANT)
   })

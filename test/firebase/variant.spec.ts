@@ -51,6 +51,7 @@ test('can create variant with display name', async () => {
     creatorId: MY_ID,
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await assertSucceeds(
@@ -69,6 +70,7 @@ test('can create variant with username', async () => {
     creatorId: MY_ID,
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await assertSucceeds(
@@ -87,6 +89,7 @@ test('cannot create variant if not verified', async () => {
     creatorId: MY_ID,
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await assertFails(
@@ -105,6 +108,7 @@ test('variant name must be trimmed', async () => {
     creatorId: MY_ID,
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await assertFails(
@@ -123,6 +127,7 @@ test('creator id must be correct', async () => {
     creatorId: 'WRONG_ID', // Trying to impersonate another user
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await assertFails(
@@ -145,6 +150,7 @@ test('creator must id must mot be null', async () => {
     creatorId: null,
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   // Creator id can be null if the user has been deleted,
@@ -165,6 +171,7 @@ test('creator display name must be correct', async () => {
     creatorId: MY_ID,
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await assertFails(
@@ -195,6 +202,7 @@ test('creation time must be correct', async () => {
     creatorId: MY_ID,
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await assertFails(
@@ -216,6 +224,7 @@ test('num upvotes must be 0', async () => {
     creatorId: MY_ID,
     numUpvotes: 10,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await assertFails(
@@ -237,6 +246,7 @@ test('popularity must be 0', async () => {
     creatorId: MY_ID,
     numUpvotes: 0,
     popularity: 2,
+    tags: [],
     initialState: '{}',
   }
   await assertFails(
@@ -258,6 +268,7 @@ test('cannot edit variant', async () => {
     creatorId: MY_ID,
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await set('admin', variant, 'variants', 'variant_id')
@@ -280,11 +291,51 @@ test('cannot remove variant', async () => {
     creatorId: MY_ID,
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await set('admin', variant, 'variants', 'variant_id')
   
   await assertFails(
     remove('verified', 'variants', 'variant_id')
+  )
+})
+
+
+test('can create variant with with tags', async () => {
+  await setupUser()
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    popularity: 0,
+    tags: ['abc', 'def'],
+    initialState: '{}',
+  }
+  await assertSucceeds(
+    add('verified', variant, 'variants')
+  )
+})
+
+test('can create variant with with tags', async () => {
+  await setupUser()
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    popularity: 0,
+    tags: ['abc', 'def'],
+    initialState: '{}',
+  }
+  await assertSucceeds(
+    add('verified', variant, 'variants')
   )
 })

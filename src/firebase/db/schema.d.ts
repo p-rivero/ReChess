@@ -67,6 +67,7 @@ export interface VariantDoc {
   creatorId: string | null
   numUpvotes: number
   popularity: number
+  tags: string[]
   // JSON string that corresponds to the Variant interface in src/protochess/types.d.ts
   // Validated client-side (on every fetch), since server-side validation would require importing
   // the protochess wasm module on the cloud function

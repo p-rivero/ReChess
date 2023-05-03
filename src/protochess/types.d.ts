@@ -121,6 +121,7 @@ export interface Variant extends InitialState {
   pieceTypes: FullPieceDef[],
   displayName: string,
   description: string,
+  tags: string[],
 }
 
 /** @see {isPublishedVariant} ts-auto-guard:type-guard */

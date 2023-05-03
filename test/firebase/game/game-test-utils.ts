@@ -16,6 +16,7 @@ const VARIANT_DOC: Readonly<VariantDoc> = {
   creatorId: ALICE_ID,
   numUpvotes: 0,
   popularity: 0,
+  tags: [],
   initialState: '{}',
 }
 
@@ -88,6 +89,7 @@ export async function setupExtraVariant(set: TestUtilsSignature['set'], variantI
     creatorId: ALICE_ID,
     numUpvotes: 0,
     popularity: 0,
+    tags: [],
     initialState: '{}',
   }
   await set('admin', variant, 'variants', variantId)
