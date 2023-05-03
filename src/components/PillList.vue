@@ -87,9 +87,9 @@
 
   const props = defineProps<{
     editable: boolean
-    validator: (text: string) => boolean
+    validator?: (text: string) => boolean
     startingPills?: string[]
-    allowRepeat: boolean
+    allowRepeat?: boolean
     prefix?: string
   }>()
 
@@ -122,7 +122,7 @@
       return
     }
     const repeatError = !props.allowRepeat && pills.value.some((p) => p.text === pill.text && p !== pill)
-    if (!repeatError && props.validator(pill.text)) {
+    if (!repeatError && (props.validator?.(pill.text) ?? true)) {
       pill.originalText = pill.text
       pill.error = false
       pill.editing = false

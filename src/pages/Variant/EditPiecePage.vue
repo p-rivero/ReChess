@@ -169,7 +169,6 @@
       <CoordPillList
         :editable="true"
         class="mb-6"
-        :allow-repeat="false"
         :starting-coords="piece?.winSquares"
         @changed="coords => piece!.winSquares = coords"
       />
@@ -192,7 +191,6 @@
       <CoordPillList
         :editable="true"
         class="mb-6"
-        :allow-repeat="false"
         :starting-coords="piece?.doubleJumpSquares"
         @changed="coords => piece!.doubleJumpSquares = coords"
       />
@@ -218,7 +216,6 @@
       <CoordPillList
         class="mb-5"
         :editable="true"
-        :allow-repeat="false"
         :starting-coords="piece?.promotionSquares"
         @changed="coords => piece!.promotionSquares = coords"
       />
@@ -231,7 +228,6 @@
           <label>(White) Promote to:</label>
           <CharPillList
             :editable="true"
-            :allow-repeat="false"
             :starting-pills="piece?.promoVals[0]"
             @changed="promos => piece!.promoVals[0] = promos"
           />
@@ -244,7 +240,6 @@
           <label>(Black) Promote to:</label>
           <CharPillList
             :editable="true"
-            :allow-repeat="false"
             :starting-pills="piece?.promoVals[1]"
             @changed="promos => piece!.promoVals[1] = promos"
           />

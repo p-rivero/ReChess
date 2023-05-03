@@ -56,10 +56,20 @@
         </button>
       </div>
     </div>
+    <div
+      v-if="variant.tags.length > 0"
+      class="tags mb-2"
+    >
+      <span
+        v-for="tag of variant.tags"
+        :key="tag"
+        class="tag is-primary"
+      >
+        <span class="is-size-6 mr-1 adjust-text"> # </span>
+        {{ tag }}
+      </span>
+    </div>
     <div class="is-flex align-items-center">
-      <!-- <div class="tags mr-4 mb-0">
-        <span class="tag is-primary">Tag 1</span>
-      </div> -->
       <div class="is-flex-grow-1" />
       <UpvoteButton :variant="props.variant" />
     </div>
@@ -141,5 +151,9 @@
   }
   .board-container {
     min-height: 7rem;
+  }
+  
+  .tag {
+    border-radius: 1rem;
   }
 </style>

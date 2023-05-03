@@ -4,10 +4,10 @@
 
 <template>
   <PillList
-    :editable="$props.editable"
+    :editable="editable"
     :validator="validator"
-    :starting-pills="$props.startingChars"
-    :allow-repeat="$props.allowRepeat"
+    :starting-pills="startingChars"
+    :allow-repeat="allowRepeat"
     @changed="pills => emit('changed', pills)"
   />
 </template>
@@ -18,7 +18,7 @@
   defineProps<{
     editable: boolean
     startingChars?: string[]
-    allowRepeat: boolean
+    allowRepeat?: boolean
   }>()
   
   const emit = defineEmits<{

@@ -13,6 +13,14 @@
         <a @click="creatorClicked">{{ variant?.creatorDisplayName }}</a>
       </p>
       
+      <PillList
+        v-if="variant && variant.tags.length > 0"
+        class="mb-5"
+        :editable="false"
+        :starting-pills="variant.tags"
+        :prefix="'#'"
+      />
+      
       <UpvoteButton
         v-if="variant"
         class="mb-5"
@@ -116,6 +124,7 @@
   import { useVariantStore } from '@/stores/variant'
   import PieceDetailsPopup from '@/components/Variant/View/PieceDetailsPopup.vue'
   import PiecesSummary from '@/components/Variant/PiecesSummary.vue'
+  import PillList from '@/components/PillList.vue'
   import UpvoteButton from '@/components/Variant/View/UpvoteButton.vue'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import type { PublishedVariant } from '@/protochess/types'

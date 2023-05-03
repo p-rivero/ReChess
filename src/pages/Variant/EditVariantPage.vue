@@ -173,9 +173,8 @@
         <div class="column px-0 py-0">
           <PillList
             :editable="true"
-            :validator="text => true"
+            :validator="text => !text.match(/[\s,#]/)"
             :starting-pills="draftStore.state.tags"
-            :allow-repeat="false"
             :prefix="'#'"
             @changed="pills => draftStore.state.tags = pills"
           />
