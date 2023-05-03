@@ -152,7 +152,7 @@
     
     
     
-    <div class="column mb-5">
+    <div class="column">
       <SmartTextInput
         class="is-large mb-5"
         placeholder="Variant name"
@@ -166,6 +166,21 @@
         :error-handler="errorMsgHandler"
         @changed="name => draftStore.state.displayName = name"
       />
+      <div class="columns mx-0 mb-5">
+        <div class="column is-narrow px-0 py-0 mt-2">
+          <label class="label mb-0 mr-3">Tags:</label>
+        </div>
+        <div class="column px-0 py-0">
+          <PillList
+            :editable="true"
+            :validator="text => true"
+            :starting-pills="draftStore.state.tags"
+            :allow-repeat="false"
+            :prefix="'#'"
+            @changed="pills => draftStore.state.tags = pills"
+          />
+        </div>
+      </div>
       <EditableMarkdown
         class="mb-5"
         :text="draftStore.state.description"
@@ -278,6 +293,7 @@
   import FileDropArea from '@/components/FileDropArea.vue'
   import PiecePlacementButtons from '@/components/Variant/Edit/PiecePlacementButtons.vue'
   import PiecesSummary from '@/components/Variant/PiecesSummary.vue'
+  import PillList from '@/components/PillList.vue'
   import PlayPopup from '@/components/GameUI/PlayPopup.vue'
   import PopupOverlay from '@/components/PopupMsg/PopupOverlay.vue'
   import SmartCheckbox from '@/components/BasicWrappers/SmartCheckbox.vue'

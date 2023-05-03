@@ -8,11 +8,11 @@
 -->
 
 <template>
-  <div class="pill-row field is-grouped is-grouped-multiline">
-    <span
+  <div class="is-flex is-flex-wrap-wrap">
+    <div
       v-for="(pill, pillIndex) in pills"
       :key="pillIndex"
-      class="pill tag"
+      class="pill tag mx-1 my-1"
       :class="{
         'is-primary': !pill.error,
         'is-danger': pill.error,
@@ -20,9 +20,10 @@
       }"
       @click="onPillClick(pill)"
     >
+      <span class="pl-2 pr-1 adjust-text is-size-4"> {{ prefix }} </span>
       <div
         v-if="!pill.editing"
-        class="pill-text ml-2 px-1 py-0"
+        class="pill-text pr-1 adjust-text"
       >
         {{ pill.text }}
       </div>
@@ -30,7 +31,7 @@
         v-else
         ref="pillInput"
         v-autowidth
-        class="pill-input ml-2 px-1 py-0"
+        class="pill-input px-0 py-0"
         type="text"
         :value="pill.text"
         @input="onPillInput(pill, $event)"
@@ -44,10 +45,10 @@
         class="delete mr-2"
         @click="removePill(pill)"
       />
-    </span>
+    </div>
     <div
       v-if="editable"
-      class="pill tag is-primary"
+      class="pill tag mx-1 my-1 is-primary"
       @click="onAddPillClick()"
     >
       <div class="add-button sz-2">
@@ -89,6 +90,7 @@
     validator: (text: string) => boolean
     startingPills?: string[]
     allowRepeat: boolean
+    prefix?: string
   }>()
 
   const emit = defineEmits<{
@@ -186,13 +188,15 @@
 <style scoped lang="scss">
   .pill {
     height: 2rem;
-    margin: 0.25rem;
     padding: 0;
     border-radius: 1rem;
     cursor: pointer;
     .pill-text {
       font-size: 1rem;
       pointer-events: none;
+      max-width: 12rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     
     .pill-input {
@@ -200,7 +204,9 @@
       color: white;
       background-color: transparent;
       border: none;
+      max-width: 12rem;
       outline: none;
+      margin-right: 0.1rem;
     }
     .add-button {
       display: flex;
