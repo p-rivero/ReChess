@@ -19,6 +19,7 @@ $background: $grey-lightest;
 $shadow: 0 0 0.7em 0 rgba(0, 0, 0, 0.2);
 
 @import "node_modules/bulma-checkbox/bulma-checkbox";
+@import '@creativebulma/bulma-tooltip/dist/bulma-tooltip.min.css';
 @import 'bulma/bulma.sass';
 
 @import 'icons';

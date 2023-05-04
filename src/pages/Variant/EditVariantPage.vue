@@ -168,7 +168,7 @@
       />
       <div class="columns mx-0 mb-5">
         <div class="column is-narrow px-0 py-0 mt-2">
-          <label class="label mb-0 mr-3">Tags:</label>
+          <label class="mb-0 mr-3">Tags:</label>
         </div>
         <div class="column px-0 py-0">
           <PillList

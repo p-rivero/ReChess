@@ -17,6 +17,7 @@
             :show-coordinates="false"
             :capture-wheel-events="false"
             :disable-refresh="true"
+            :cursor-pointer="true"
           />
         </div>
       </div>
@@ -61,12 +62,13 @@
       class="tags mb-2"
     >
       <span
-        v-for="tag of variant.tags"
+        v-for="tag of variant.tags.slice(0, 5)"
         :key="tag"
-        class="tag is-primary"
+        class="tag is-primary is-outlined"
+        :data-tooltip="getTextWidth(tag) > remToPx(15) ? tag : undefined"
       >
         <span class="is-size-6 mr-1 adjust-text"> # </span>
-        {{ tag }}
+        <span class="tag-text"> {{ tag }}</span>
       </span>
     </div>
     <div class="is-flex align-items-center">
@@ -78,6 +80,7 @@
 
 <script setup lang="ts">
   import { clone } from '@/utils/ts-utils'
+  import { getTextWidth, remToPx } from '@/utils/web-utils'
   import { onMounted, ref } from 'vue'
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
@@ -155,5 +158,12 @@
   
   .tag {
     border-radius: 1rem;
+    border-bottom: 0;
+    .tag-text {
+      max-width: 13rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 </style>

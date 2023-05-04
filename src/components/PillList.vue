@@ -10,7 +10,7 @@
 <template>
   <div class="is-flex is-flex-wrap-wrap">
     <div
-      v-for="(pill, pillIndex) in pills"
+      v-for="(pill, pillIndex) of pills"
       :key="pillIndex"
       class="pill tag mx-1 my-1"
       :class="{
@@ -18,6 +18,7 @@
         'is-danger': pill.error,
         'non-editable': !editable,
       }"
+      :data-tooltip="getTextWidth(pill.text) > remToPx(11) ? pill.text : undefined"
       @click="onPillClick(pill)"
     >
       <span class="pl-2 pr-1 adjust-text is-size-4"> {{ prefix }} </span>
@@ -82,6 +83,7 @@
 
 
 <script setup lang="ts">
+  import { getTextWidth , remToPx } from '@/utils/web-utils'
   import { ref } from 'vue'
 
 
