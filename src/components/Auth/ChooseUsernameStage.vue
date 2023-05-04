@@ -83,6 +83,7 @@
   const hasError = ref(false)
   const loading = ref(false)
   const errorHandler = new ErrorMessageHandler(hasError)
+  const usernameRef = ref<InstanceType<typeof SmartTextInput>>()
   
   const submitDisabled = computed(() => {
     return hasError.value || loading.value || !username.value || usernameStatus.value !== 'available'
@@ -90,7 +91,9 @@
   
   defineExpose({
     init() {
-    // Nothing to do at the moment
+      if (!usernameRef.value) throw new Error('usernameRef not found')
+      usernameRef.value.focus()
+      usernameRef.value.triggerChanged()
     },
     cleanup() {
       username.value = ''

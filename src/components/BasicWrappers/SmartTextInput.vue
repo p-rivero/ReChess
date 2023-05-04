@@ -57,6 +57,9 @@
       textInput.value.value = text
       validate(text)
     },
+    triggerChanged() {
+      inputChanged()
+    },
   })
   
   
