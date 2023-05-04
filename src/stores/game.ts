@@ -59,7 +59,7 @@ export const useGameStore = defineStore('game', () => {
       // Don't parse the variant doc every time a move is made
       // Only parse it when the game is first loaded
       if (currentVariant == null) {
-        const variant = readVariantDoc(gameDoc.IMMUTABLE.variant, false, gameDoc.IMMUTABLE.variantId)
+        const variant = readVariantDoc(gameDoc.IMMUTABLE.variant, gameDoc.IMMUTABLE.variantId)
         if (!variant) {
           invalidVariantCallback()
           return
@@ -125,7 +125,7 @@ export const useGameStore = defineStore('game', () => {
   async function getUserGames(userId: string): Promise<GameSummary[]> {
     const gameDocs = await GameDB.getUserGames(userId)
     return gameDocs.map(([doc, id]) => {
-      const variant = readVariantDoc(doc.IMMUTABLE.variant, false, doc.IMMUTABLE.variantId)
+      const variant = readVariantDoc(doc.IMMUTABLE.variant, doc.IMMUTABLE.variantId)
       if (!variant) throw new Error('Invalid variant')
       
       const side = doc.IMMUTABLE.whiteId === userId ? 'white' : 'black'

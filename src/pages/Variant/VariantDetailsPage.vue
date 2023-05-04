@@ -109,7 +109,7 @@
 
 
 <script setup lang="ts">
-  import { computed, ref, watchEffect } from 'vue'
+  import { computed, ref, watch, watchEffect } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import VueMarkdown from 'vue-markdown-render'
   
@@ -159,6 +159,13 @@
     board.value?.setState(newVariant)
     variant.value = newVariant
     updateTitle(newVariant.displayName)
+  })
+  
+  watch(authStore, store => {
+    if (!variant.value) return
+    variant.value.loggedUserUpvoted = store.loggedUser ?
+      store.loggedUser.upvotedVariants.includes(variant.value.uid) :
+      false
   })
   
   const rules = computed(() => {

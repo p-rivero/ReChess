@@ -11,7 +11,7 @@ import * as fb from 'firebase/auth'
 import { FirebaseError } from '@firebase/util'
 import { PopupClosedError } from '@/utils/errors/PopupClosedError'
 import { hideSignInPopup } from '@/components/Auth/auth-manager'
-import type { UserDoc } from '@/firebase/db/schema'
+import type { UserDoc, UserPrivateCacheDoc } from '@/firebase/db/schema'
 
 const AUTH_USER_KEY = 'loggedUser'
 
@@ -21,8 +21,9 @@ export class AuthUser extends User {
   public readonly email: string
   public readonly verified: boolean
   public readonly signInProvider: SignInProvider
+  public upvotedVariants: string[] = []
   
-  constructor(authUser: fb.User, dbUser: UserDoc | undefined) {
+  constructor(authUser: fb.User, dbUser?: UserDoc, userCache?: UserPrivateCacheDoc) {
     if (!authUser.email) throw new Error('User has no email')
     // If the user has logged in with a third-party provider, the document
     // doesn't exist until they choose a username.
@@ -39,6 +40,12 @@ export class AuthUser extends User {
       },
     }
     super(authUser.uid, dbUser ?? DEFAULT_DOC)
+    if (userCache) {
+      const CHUNK_SIZE = 20
+      for (let i = 0; i < userCache.upvotedVariants.length; i += CHUNK_SIZE) {
+        this.upvotedVariants.push(userCache.upvotedVariants.slice(i, i + CHUNK_SIZE))
+      }
+    }
     
     this.email = authUser.email
     this.verified = authUser.emailVerified
@@ -65,8 +72,11 @@ export const useAuthStore = defineStore('auth-user', () => {
       return
     }
     // We need to fetch the user fields (username, about) from the database
-    const user = await UserDB.getUserById(newUser.uid)
-    persistUser(new AuthUser(newUser, user))
+    const [user, cache] = await Promise.all([
+      UserDB.getUserById(newUser.uid),
+      UserDB.getUserPrivateCache(newUser.uid),
+    ])
+    persistUser(new AuthUser(newUser, user, cache))
     
     // If the user has just verified their email, the popup may already be showing.
     // If needed, hide it.
@@ -177,7 +187,7 @@ export const useAuthStore = defineStore('auth-user', () => {
     if (!auth.currentUser) throw new Error('User needs to be logged in with a third party provider')
     try {
       const userDoc = await UserDB.createUser(auth.currentUser, username)
-      // Success, update the user
+      // Success, update the user. The cache does not exist yet
       persistUser(new AuthUser(auth.currentUser, userDoc))
     } catch (e) {
       console.error('Failed to create user in database', e)

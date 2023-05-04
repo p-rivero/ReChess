@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
+import { AuthUser, useAuthStore } from '@/stores/auth-user'
 import { DEFAULT_ORDER, type VariantListOrder } from '@/utils/chess/variant-search'
 import { VariantDB } from '@/firebase/db'
 import { parseVariantJson } from '@/utils/chess/variant-json'
-import { useAuthStore } from '@/stores/auth-user'
 import type { PublishedVariant } from '@/protochess/types'
 import type { VariantDoc } from '@/firebase/db/schema'
 
@@ -16,7 +16,6 @@ export const useVariantStore = defineStore('variant', () => {
   
   const authStore = useAuthStore()
   
-  let listUpvotesUid: string | undefined = undefined
   // Fetches the list of variants from the database
   // TODO: Add pagination
   async function refreshList(order: VariantListOrder) {
@@ -26,14 +25,10 @@ export const useVariantStore = defineStore('variant', () => {
     // Fetch the list of variant documents from the database
     const docsWithId = await VariantDB.getVariantList(order)
     
-    // Fetch whether the user has upvoted each variant simultaneously
-    listUpvotesUid = authStore.loggedUser?.uid
-    const userUpvoted = await Promise.all(docsWithId.map(hasUpvoted))
-    
     // Convert each pair of documents into a PublishedVariant
     const result = []
-    for (const [i, [doc, id]] of docsWithId.entries()) {
-      const state = readVariantDoc(doc, userUpvoted[i], id)
+    for (const [doc, id] of docsWithId) {
+      const state = readVariantDoc(doc, id, authStore.loggedUser)
       if (state) result.push(state)
       else console.warn('Invalid variant document', doc)
     }
@@ -43,12 +38,11 @@ export const useVariantStore = defineStore('variant', () => {
   
   watch(authStore, async () => {
     // If the user has changed, we need to fetch the upvotes again
-    if (authStore.loggedUser?.uid !== listUpvotesUid) {
-      listUpvotesUid = authStore.loggedUser?.uid
-      variantList.value.forEach(async variant => {
-        variant.loggedUserUpvoted = await VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, variant.uid)
-      })
-    }
+    variantList.value.forEach(variant => {
+      variant.loggedUserUpvoted = authStore.loggedUser ?
+        authStore.loggedUser.upvotedVariants.includes(variant.uid) :
+        false
+    })
   })
   
   // Gets a variant from the database, or returns undefined if it doesn't exist
@@ -59,25 +53,18 @@ export const useVariantStore = defineStore('variant', () => {
       return existingVariant
     }
     
-    // Fetch both documents from the database simultaneously
-    return Promise.all([
-      VariantDB.getVariantById(id),
-      VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, id),
-    ]).then(([doc, userUpvoted]) => {
-      // Convert the documents into a PublishedVariant
-      if (!doc) return undefined
-      return readVariantDoc(doc, userUpvoted, id)
-    })
+    const doc = await VariantDB.getVariantById(id)
+    if (!doc) return undefined
+    return readVariantDoc(doc, id, authStore.loggedUser)
   }
   
   // Gets all the variants from a specific creator, in order of creation time
   async function getVariantsFromCreator(userId: string): Promise<PublishedVariant[]> {
     const docsWithId = await VariantDB.getVariantsFromCreator(userId)
     // Fetch whether the user has upvoted each variant simultaneously
-    const userUpvoted = await Promise.all(docsWithId.map(hasUpvoted))
     const result = []
-    for (const [i, [doc, id]] of docsWithId.entries()) {
-      const state = readVariantDoc(doc, userUpvoted[i], id)
+    for (const [doc, id] of docsWithId) {
+      const state = readVariantDoc(doc, id, authStore.loggedUser)
       if (state) result.push(state)
     }
     return result
@@ -88,7 +75,7 @@ export const useVariantStore = defineStore('variant', () => {
     const docsWithId = await VariantDB.getUpvotedVariants(upvoterId)
     const result: PublishedVariant[] = []
     for (const [doc, id] of docsWithId) {
-      const state = readVariantDoc(doc, true, id)
+      const state = readVariantDoc(doc, id, authStore.loggedUser)
       if (state) result.push(state)
     }
     return result
@@ -106,16 +93,19 @@ export const useVariantStore = defineStore('variant', () => {
     }
   }
   
-  function hasUpvoted(variant: [VariantDoc, string]): Promise<boolean> {
-    const variantId = variant[1]
-    return VariantDB.hasUserUpvoted(authStore.loggedUser?.uid, variantId)
-  }
-  
   return { refreshList, getVariant, getVariantsFromCreator, getUpvotedVariants, upvote, variantList }
 })
 
 
-export function readVariantDoc(doc: VariantDoc, userUpvoted: boolean, id: string): PublishedVariant | undefined {
+
+/**
+ * Converts a variant document into a PublishedVariant. Optionally, the logged user can be provided to check if they have upvoted the variant.
+ * @param doc The variant document to convert
+ * @param id The ID of the variant document
+ * @param user The logged user, if any. Can be obtained from the auth store.
+ * @returns The converted variant, or undefined if the document is invalid
+ */
+export function readVariantDoc(doc: VariantDoc, id: string, user?: AuthUser|null): PublishedVariant | undefined {
   const variant = parseVariantJson(doc.initialState)
   if (!variant) {
     console.error('Illegal variant document', doc)
@@ -129,7 +119,7 @@ export function readVariantDoc(doc: VariantDoc, userUpvoted: boolean, id: string
     creatorId: doc.creatorId ?? undefined,
     numUpvotes: doc.numUpvotes,
     popularity: doc.popularity,
-    loggedUserUpvoted: userUpvoted,
+    loggedUserUpvoted: user ? user.upvotedVariants.includes(id) : false,
     // Overwrite the existing name and description with the ones from the document
     displayName: doc.name,
     description: doc.description,

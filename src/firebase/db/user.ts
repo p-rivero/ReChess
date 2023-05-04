@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import type { UserDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
+import type { UserDoc, UserPrivateCacheDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
 
 import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore'
 import type { User } from '@firebase/auth'
@@ -52,6 +52,12 @@ export async function getUserById(uid: string): Promise<UserDoc | undefined> {
   const document = await getDoc(doc(db, 'users', uid))
   if (!document.exists()) return undefined
   return document.data() as UserDoc
+}
+// userId -> UserPrivateCacheDoc
+export async function getUserPrivateCache(uid: string): Promise<UserPrivateCacheDoc | undefined> {
+  const document = await getDoc(doc(db, 'users', uid, 'privateCache', 'doc'))
+  if (!document.exists()) return undefined
+  return document.data() as UserPrivateCacheDoc
 }
 
 // Update a user's public data

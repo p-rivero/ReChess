@@ -47,19 +47,6 @@ export async function getNumVariantsWithName(name: string): Promise<number> {
   return count.data().count
 }
 
-
-// Returns true if the user has upvoted the variant
-export async function hasUserUpvoted(userId: string | undefined, variantId: string): Promise<boolean> {
-  if (!userId) return false
-  try {
-    const document = await getDoc(doc(db, 'users', userId, 'upvotedVariants', variantId))
-    return document.exists()
-  } catch (error) {
-    console.warn('Failed to check if user has upvoted variant.', error)
-    return false
-  }
-}
-
 // Upvotes the variant for the user
 export async function upvoteVariant(userId: string, variantId: string): Promise<void> {
   // Add the user's upvote. A cloud function will increment the variant's upvotes
