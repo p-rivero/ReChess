@@ -46,8 +46,18 @@ export interface UserPrivateDoc {
 }
 
 // users/{userId}/upvotedVariants/{variantId}
-export interface UserUpvotesDoc {
-  timeUpvoted: Timestamp
+// users/{userId}/reportedVariants/{variantId}
+// users/{userId}/reportedUsers/{reportedUserId}
+export interface TimestampDoc {
+  time: Timestamp
+}
+
+// users/{userId}/privateCache/doc
+export interface UserPrivateCacheDoc {
+  // Both are a list of variantIds, without separators (fixed length)
+  upvotedVariants: string // 20 chars per ID
+  reportedVariants: string // 20 chars per ID
+  reportedUsers: string // 28 chars per ID
 }
 
 // users/{userId}/renameTrigger/doc

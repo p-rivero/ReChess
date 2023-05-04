@@ -196,33 +196,65 @@ service cloud.firestore {
       }
       
       
+      function isTimestampDoc(doc) {
+        return
+          hasFields(doc, ['time'], []) &&
+          doc.time is timestamp;
+      }
+      
       match /upvotedVariants/{variantId} {
-        function isUpvoteDoc(doc) {
-          return
-            hasFields(doc, ['timeUpvoted'], []) &&
-            doc.timeUpvoted is timestamp;
-        }
         function allowCreateUpvote() {
           let doc = request.resource.data;
           return
-            isUpvoteDoc(doc) &&
+            isTimestampDoc(doc) &&
             loggedAs(userId) &&
-            // User can only upvote a variant once
-            isServerTimestamp(doc.timeUpvoted) &&
+            isServerTimestamp(doc.time) &&
             exists(/databases/$(database)/documents/variants/$(variantId));
         }
         function allowDeleteUpvote() {
           let doc = resource.data;
           return
             // Fail if the document does not exist, to avoid triggering a cloud function
-            isUpvoteDoc(doc) &&
+            isTimestampDoc(doc) &&
             loggedAs(userId);
         }
-        
         // Other users cannot see my upvotes
         allow read: if loggedAs(userId);
         allow create: if allowCreateUpvote();
         allow delete: if allowDeleteUpvote();
+      }
+      
+      match /reportedVariants/{variantId} {
+        function allowCreateVariantReport() {
+          let doc = request.resource.data;
+          return
+            isTimestampDoc(doc) &&
+            loggedAs(userId) &&
+            isServerTimestamp(doc.time) &&
+            exists(/databases/$(database)/documents/variants/$(variantId));
+        }
+        // Other users cannot see my reports
+        allow read: if loggedAs(userId);
+        allow create: if allowCreateVariantReport();
+      }
+      
+      match /reportedUsers/{reportedUserId} {
+        function allowCreateUserReport() {
+          let doc = request.resource.data;
+          return
+            isTimestampDoc(doc) &&
+            loggedAs(userId) &&
+            isServerTimestamp(doc.time) &&
+            exists(/databases/$(database)/documents/users/$(reportedUserId));
+        }
+        // Other users cannot see my reports
+        allow read: if loggedAs(userId);
+        allow create: if allowCreateUserReport();
+      }
+      
+      match /privateCache/{docName} {
+        // Read-only
+        allow read: if loggedAs(userId) && docName == 'doc';
       }
       
       

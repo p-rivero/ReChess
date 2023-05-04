@@ -3,7 +3,7 @@ import { type TestUtilsSignature, assertFails, assertSucceeds, notInitialized, s
 import { setupJest } from '../init'
 
 import { Timestamp } from 'firebase/firestore'
-import type { UserDoc, UserUpvotesDoc, VariantDoc } from '@/firebase/db/schema'
+import type { TimestampDoc, UserDoc, VariantDoc } from '@/firebase/db/schema'
 
 const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
@@ -37,6 +37,7 @@ async function createUserAndVariant(creatorId = 'some_id') {
     numUpvotes: 10,
     popularity: 2,
     initialState: '{}',
+    tags: [],
   }
   await set('admin', user, 'users', MY_ID)
   await set('admin', variant, 'variants', '1234')
@@ -44,7 +45,7 @@ async function createUserAndVariant(creatorId = 'some_id') {
 
 test('can upvote and un-upvote a variant', async () => {
   await createUserAndVariant()
-  const upvoteDoc: UserUpvotesDoc = { timeUpvoted: now() }
+  const upvoteDoc: TimestampDoc = { time: now() }
   await assertSucceeds(
     set('verified', upvoteDoc, 'users', MY_ID, 'upvotedVariants', '1234')
   )
@@ -55,7 +56,7 @@ test('can upvote and un-upvote a variant', async () => {
 
 test('cannot upvote a variant if not verified', async () => {
   await createUserAndVariant()
-  const upvoteDoc: UserUpvotesDoc = { timeUpvoted: now() }
+  const upvoteDoc: TimestampDoc = { time: now() }
   await assertFails(
     set('unverified', upvoteDoc, 'users', MY_ID, 'upvotedVariants', '1234')
   )
@@ -63,7 +64,7 @@ test('cannot upvote a variant if not verified', async () => {
 
 test('cannot upvote a variant that does not exist', async () => {
   await createUserAndVariant()
-  const upvoteDoc: UserUpvotesDoc = { timeUpvoted: now() }
+  const upvoteDoc: TimestampDoc = { time: now() }
   await assertFails(
     set('verified', upvoteDoc, 'users', MY_ID, 'upvotedVariants', 'BAD_ID')
   )
@@ -71,7 +72,7 @@ test('cannot upvote a variant that does not exist', async () => {
 
 test('upvote timestamp must be correct', async () => {
   await createUserAndVariant()
-  const upvoteDoc: UserUpvotesDoc = { timeUpvoted: Timestamp.fromDate(new Date(2020, 1, 1)) }
+  const upvoteDoc: TimestampDoc = { time: Timestamp.fromDate(new Date(2020, 1, 1)) }
   await assertFails(
     set('verified', upvoteDoc, 'users', MY_ID, 'upvotedVariants', '1234')
   )
@@ -79,7 +80,7 @@ test('upvote timestamp must be correct', async () => {
 
 test('cannot upvote a variant twice', async () => {
   await createUserAndVariant()
-  const upvoteDoc: UserUpvotesDoc = { timeUpvoted: now() }
+  const upvoteDoc: TimestampDoc = { time: now() }
   await assertSucceeds(
     set('verified', upvoteDoc, 'users', MY_ID, 'upvotedVariants', '1234')
   )

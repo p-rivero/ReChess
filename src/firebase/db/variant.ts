@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import type { UserUpvotesDoc, VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
+import type { TimestampDoc, VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
 import type { Variant } from '@/protochess/types'
 import type { VariantListOrder } from '@/utils/chess/variant-search'
 
@@ -63,8 +63,8 @@ export async function hasUserUpvoted(userId: string | undefined, variantId: stri
 // Upvotes the variant for the user
 export async function upvoteVariant(userId: string, variantId: string): Promise<void> {
   // Add the user's upvote. A cloud function will increment the variant's upvotes
-  const upvoteDoc: UserUpvotesDoc = {
-    timeUpvoted: serverTimestamp() as Timestamp,
+  const upvoteDoc: TimestampDoc = {
+    time: serverTimestamp() as Timestamp,
   }
   setDoc(doc(db, 'users', userId, 'upvotedVariants', variantId), upvoteDoc)
 }
@@ -107,7 +107,7 @@ export async function getVariantsFromCreator(userId: string): Promise<[VariantDo
 // Returns the upvoted variants for the user, in order of upvote time
 export async function getUpvotedVariants(userId: string): Promise<[VariantDoc, string][]> {
   // Get upvoted variants
-  const q = query(collection(db, 'users', userId, 'upvotedVariants'), orderBy('timeUpvoted', 'desc'))
+  const q = query(collection(db, 'users', userId, 'upvotedVariants'), orderBy('time', 'desc'))
   const querySnapshot = await getDocs(q)
   const variantIds = querySnapshot.docs.map(doc => doc.id)
   // For each variant, get the variant document

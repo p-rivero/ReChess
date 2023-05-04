@@ -33,6 +33,14 @@ export default async function(user: UserRecord): Promise<void> {
     console.error('Error deleting private user document for user', userId)
     console.error(err)
   })
+  userDoc.ref.collection('privateCache').doc('doc').delete().catch((err) => {
+    console.error('Error deleting cache document for user', userId)
+    console.error(err)
+  })
+  userDoc.ref.collection('renameTrigger').doc('doc').delete().catch((err) => {
+    console.error('Error deleting cache document for user', userId)
+    console.error(err)
+  })
   userDoc.ref.delete().catch((err) => {
     console.error('Error deleting public user document for user', userId)
     console.error(err)

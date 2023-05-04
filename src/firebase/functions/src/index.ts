@@ -90,7 +90,7 @@ region(FUNCTIONS_REGION)
   .firestore
   .document('users/{userId}/upvotedVariants/{variantId}')
   .onDelete((_snap, context) => {
-    return callFunction(import('./variant/decrement-variant-upvotes'), context.params.variantId)
+    return callFunction(import('./variant/decrement-variant-upvotes'), context.params.variantId, context.params.userId)
   })
 
 export const incrementVariantUpvotes =
@@ -98,7 +98,7 @@ region(FUNCTIONS_REGION)
   .firestore
   .document('users/{userId}/upvotedVariants/{variantId}')
   .onCreate((_snap, context) => {
-    return callFunction(import('./variant/increment-variant-upvotes'), context.params.variantId)
+    return callFunction(import('./variant/increment-variant-upvotes'), context.params.variantId, context.params.userId)
   })
 
 export const updateVariantIndex =
