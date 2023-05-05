@@ -5,8 +5,7 @@
         <SmartTextInput
           class="is-medium"
           placeholder="Search..."
-          :start-text="lastSearchText"
-          @changed="text => search(text)"
+          @changed="search"
         />
         <span class="icon is-small is-left px-3 py-3">
           <div class="icon-search color-theme" />
@@ -61,9 +60,8 @@
 
 <script setup lang="ts">
   import { DEFAULT_ORDER, searchVariants } from '@/utils/chess/variant-search'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
-  import { updateTitle } from '@/utils/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
   import { useVariantStore } from '@/stores/variant'
   import DraftCard from '@/components/Variant/View/DraftCard.vue'
@@ -97,13 +95,9 @@
     return authStore.loggedUser && variantStore.variantList.length > 0
   })
   
-  onMounted(() => updateTitle())
-  
   const orderBy = ref<SearchOrder>('search-relevance')
-  const lastSearchText = ref('')
   
   async function search(text: string) {
-    lastSearchText.value = text
     text = text.trim()
     if (text.length === 0) {
       searching.value = false
@@ -115,17 +109,11 @@
   }
   
   
-  // Store the last search in session storage so that it can be restored
-  // when the user navigates back to the home page
-  const storedSearchText = sessionStorage.getItem('last-search-text')
+  // Persist the search order in session storage
   const storedSearchOrder = sessionStorage.getItem('search-order') as SearchOrder | null
-  if (storedSearchText) {
-    search(storedSearchText)
-  }
   if (storedSearchOrder) {
     orderBy.value = storedSearchOrder
   }
-  watch(lastSearchText, text => sessionStorage.setItem('last-search-text', text))
   watch(orderBy, async order => {
     sessionStorage.setItem('search-order', order)
     if (order === 'search-relevance') {
