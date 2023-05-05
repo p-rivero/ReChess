@@ -1,10 +1,12 @@
 import { VariantDB } from '@/firebase/db'
 import Fuse from 'fuse.js'
 
-type VariantIndexEntry = {
+interface VariantIndexEntry {
   id: string
   name: string
   description: string
+}
+interface VariantIndexEntryWithTags extends VariantIndexEntry {
   tags: string[]
 }
 
@@ -25,9 +27,14 @@ export type VariantIndexResult = {
 
 class VariantSearchIndex {
   private index: Fuse<VariantIndexEntry>
+  private dataset: VariantIndexEntryWithTags[]
+  // Guaranteed to never match any tags, since the # char is not allowed
+  private lastTagsHash = '#'
   
-  constructor(variants: VariantIndexEntry[]) {
-    this.index = new Fuse(variants, {
+  constructor(variants: VariantIndexEntryWithTags[]) {
+    this.dataset = variants
+    // First create an empty index. On the first search, it will be populated
+    this.index = new Fuse([], {
       includeScore: true,
       includeMatches: true,
       keys: [
@@ -39,39 +46,39 @@ class VariantSearchIndex {
           name: 'description',
           weight: 0.15,
         },
-        {
-          name: 'tags',
-          weight: 1,
-        },
       ],
     })
   }
   
-  search(text: string, limit: number, tags: string[]): VariantIndexResult[] {
-    // https://fusejs.io/api/query.html
-    let textQuery: Fuse.Expression | undefined = undefined
-    let tagQuery: Fuse.Expression[] | undefined = undefined
-    if (text !== '') {
-      textQuery = { $or: [{ name: text }, { description: text }] }
-    }
-    if (tags.length > 0) {
-      // Exact match the START of all tags
-      tagQuery = tags.map(tag => ({ tags: '^' + tag.toLowerCase() }))
-    }
+  updateIndex(tags: string[]) {
+    const tagsHash = tags.join(',')
+    if (tagsHash === this.lastTagsHash) return
+    this.lastTagsHash = tagsHash
     
-    let fuseQuery
-    if (textQuery && tagQuery) {
-      fuseQuery = { $and: [textQuery, ...tagQuery] }
-    } else if (textQuery) {
-      fuseQuery = textQuery
-    } else if (tagQuery) {
-      fuseQuery = { $and: tagQuery }
-    } else {
-      throw new Error('A query was expected but none was provided')
-    }
+    console.log('Updating variant search index for tags:', tags)
     
-    const searchResult = this.index.search(fuseQuery, { limit })
-    return searchResult.map(result => {
+    // For each input tag, chech if some of the variant's tags match it
+    const filteredVariants = this.dataset.filter(variant => {
+      for (const tag of tags) {
+        if (!variant.tags.some(t => t.startsWith(tag))) return false
+      }
+      return true
+    })
+    
+    // Remove the tags from the variants to avoid unnecessary indexing
+    const variants = filteredVariants.map(variant => {
+      const { tags: _, ...rest } = variant
+      return rest
+    })
+    
+    // Update the index
+    this.index.setCollection(variants)
+  }
+  
+  search(query: string, limit: number, tags: string[]): VariantIndexResult[] {
+    this.updateIndex(tags)
+    
+    return this.index.search(query, { limit }).map(result => {
       const { item, score, matches } = result
       const { id, name } = item
       
@@ -120,7 +127,7 @@ export async function searchVariants(query: string, limit: number): Promise<Vari
     const variants = indexDoc.index.split('\n').map(line => {
       const [id, name, description, tagStr] = line.split('\t')
       const tags = tagStr.split(',')
-      const entry: VariantIndexEntry = { id, name, description, tags }
+      const entry: VariantIndexEntryWithTags = { id, name, description, tags }
       return entry
     })
     currentIndex = new VariantSearchIndex(variants)
