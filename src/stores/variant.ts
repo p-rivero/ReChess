@@ -12,6 +12,7 @@ export const useVariantStore = defineStore('variant', () => {
   
   // Currently fetched variants
   const variantList = ref<PublishedVariant[]>([])
+  const variantListFetched = ref(false)
   const variantListOrder = ref<VariantListOrder>(DEFAULT_ORDER)
   
   const authStore = useAuthStore()
@@ -33,6 +34,7 @@ export const useVariantStore = defineStore('variant', () => {
       else console.warn('Invalid variant document', doc)
     }
     variantList.value = result
+    variantListFetched.value = true
     variantListOrder.value = order
   }
   
@@ -93,7 +95,10 @@ export const useVariantStore = defineStore('variant', () => {
     }
   }
   
-  return { refreshList, getVariant, getVariantsFromCreator, getUpvotedVariants, upvote, variantList }
+  return {
+    refreshList, getVariant, getVariantsFromCreator, getUpvotedVariants, upvote,
+    variantList, variantListFetched,
+  }
 })
 
 
