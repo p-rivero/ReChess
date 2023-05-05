@@ -12,12 +12,13 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
   const admin = await useAdmin()
   const db = admin.firestore()
   
-  let { name, description } = snap.data() as VariantDoc
+  let { name, description, tags } = snap.data() as VariantDoc
   // Replace tabs and newlines with spaces
-  name = name.replace(/[\t\n]/g, ' ')
-  description = description.replace(/[\t\n]/g, ' ')
+  name = name.replace(/[\t\n]/g, ' ').toLowerCase()
+  description = description.replace(/[\t\n]/g, ' ').toLowerCase()
+  tags = tags.map(tag => tag.replace(/[\t\n# ,]/g, '').toLowerCase())
   
-  const line = `${snap.id}\t${name}\t${description.slice(0, 100)}`
+  const line = `${snap.id}\t${name}\t${description.slice(0, 100)}\t${tags.join(',')}`
   
   const indexRef = db.collection('variantIndex').doc('doc')
   const indexDoc = await indexRef.get()

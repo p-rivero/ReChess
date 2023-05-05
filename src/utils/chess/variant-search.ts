@@ -5,6 +5,7 @@ type VariantIndexEntry = {
   id: string
   name: string
   description: string
+  tags: string[]
 }
 
 export type VariantListOrder = 'popular' | 'newest' | 'upvotes'
@@ -38,12 +39,39 @@ class VariantSearchIndex {
           name: 'description',
           weight: 0.15,
         },
+        {
+          name: 'tags',
+          weight: 1,
+        },
       ],
     })
   }
   
-  search(query: string, limit: number): VariantIndexResult[] {
-    return this.index.search(query, { limit }).map(result => {
+  search(text: string, limit: number, tags: string[]): VariantIndexResult[] {
+    // https://fusejs.io/api/query.html
+    let textQuery: Fuse.Expression | undefined = undefined
+    let tagQuery: Fuse.Expression[] | undefined = undefined
+    if (text !== '') {
+      textQuery = { $or: [{ name: text }, { description: text }] }
+    }
+    if (tags.length > 0) {
+      // Exact match the START of all tags
+      tagQuery = tags.map(tag => ({ tags: '^' + tag.toLowerCase() }))
+    }
+    
+    let fuseQuery
+    if (textQuery && tagQuery) {
+      fuseQuery = { $and: [textQuery, ...tagQuery] }
+    } else if (textQuery) {
+      fuseQuery = textQuery
+    } else if (tagQuery) {
+      fuseQuery = { $and: tagQuery }
+    } else {
+      throw new Error('A query was expected but none was provided')
+    }
+    
+    const searchResult = this.index.search(fuseQuery, { limit })
+    return searchResult.map(result => {
       const { item, score, matches } = result
       const { id, name } = item
       
@@ -90,12 +118,23 @@ export async function searchVariants(query: string, limit: number): Promise<Vari
   if (currentIndex === null) {
     const indexDoc = await VariantDB.getVariantIndex()
     const variants = indexDoc.index.split('\n').map(line => {
-      const [id, name, description] = line.split('\t')
-      const entry: VariantIndexEntry = { id, name, description }
+      const [id, name, description, tagStr] = line.split('\t')
+      const tags = tagStr.split(',')
+      const entry: VariantIndexEntry = { id, name, description, tags }
       return entry
     })
     currentIndex = new VariantSearchIndex(variants)
   }
   
-  return currentIndex.search(query, limit)
+  // Extract tags from the query (prefixed with #)
+  const TAG_REGEX = /#[^\s#,]+/g
+  const tags = query.match(TAG_REGEX)?.map(tag => tag.slice(1).toLowerCase()) ?? []
+  
+  const queryStr = query
+    .replace(TAG_REGEX, '') // Remove tags from the query
+    .replace(/\s+/g, ' ')   // Normalize whitespace
+    .trim()
+    .toLowerCase()
+  
+  return currentIndex.search(queryStr, limit, tags)
 }
