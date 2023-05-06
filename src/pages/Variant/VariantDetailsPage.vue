@@ -285,7 +285,7 @@
       return false
     }
     for (const p of variant.value.pieceTypes) {
-      if (p.explodes && p.ids[player]) {
+      if (p.explodeOnCapture && p.ids[player]) {
         return true
       }
     }

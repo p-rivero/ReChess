@@ -10,6 +10,8 @@ type FenPlacements = string
  *  for the custom FEN format */
 type FullFen = string
 
+type Option<T> = T | null | undefined
+
 export interface Protochess {
   /** Console-friendly representation of the current state */
   toString(): Promise<string>,
@@ -37,6 +39,8 @@ export interface Protochess {
   getState(): Promise<GameState>,
   /** Get the current state, but only the information that can change during a game */
   getStateDiff(): Promise<StateDiff>,
+  /** Get the list of currently played moves in algebraic notation */
+  getMoveHistory(): Promise<string[]>,
   /** Get all possible moves for the current player (for each origin square, what are the possible destinations) */
   legalMoves(): Promise<MoveList[]>,
   /** For a given move (from, to), returns the IDs of the pieces that can be promoted to */
@@ -66,6 +70,7 @@ export interface MakeMoveResult {
   flag: MakeMoveFlag,
   winner: MakeMoveWinner,
   exploded: [number, number][],
+  moveNotation?: string,
 }
 
 /** @see {isMoveInfo} ts-auto-guard:type-guard */
@@ -143,11 +148,12 @@ export interface VariantGameState extends GameState {
 // Piece properties that affect the game logic
 /** @see {isPieceDefinition} ts-auto-guard:type-guard */
 export interface PieceDefinition {
-  ids: [string|undefined|null, string|undefined|null],
+  ids: [Option<string>, Option<string>],
+  notationPrefix: [Option<string>, Option<string>],
   isLeader: boolean,
   castleFiles?: [number, number],
   isCastleRook: boolean,
-  explodes: boolean,
+  explodeOnCapture: boolean,
   explosionDeltas: [number, number][],
   immuneToExplosion: boolean,
   promotionSquares: [number, number][],
@@ -179,7 +185,7 @@ export interface PieceDefinition {
 // Piece properties that are only used for the GUI
 export interface FullPieceDef extends PieceDefinition {
   displayName: string,
-  imageUrls: [string|undefined|null, string|undefined|null],
+  imageUrls: [Option<string>, Option<string>],
 }
 
 
@@ -211,6 +217,7 @@ export interface IWasmModule {
     loadFen(fen: FullFen): Promise<unknown>,
     getState(): Promise<unknown>,
     getStateDiff(): Promise<unknown>,
+    getMoveHistory(): Promise<unknown>,
     legalMoves(): Promise<unknown>,
     possiblePromotions(fromX: number, fromY: number, toX: number, toY: number): Promise<unknown>,
     getMaxThreads(): Promise<unknown>,

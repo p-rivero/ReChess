@@ -112,7 +112,7 @@ const DEFAULT_PIECE: Readonly<FullPieceDef> = {
   isLeader: false,
   castleFiles: undefined,
   isCastleRook: false,
-  explodes: false,
+  explodeOnCapture: false,
   explosionDeltas: [],
   immuneToExplosion: false,
   promotionSquares: [],

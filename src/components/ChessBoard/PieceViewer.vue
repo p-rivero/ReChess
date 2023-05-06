@@ -146,7 +146,7 @@
       keysCapture.splice(keysCapture.indexOf(key), 1)
     }
     let keysExplosion: Key[] = []
-    if (props.piece.explodes) {
+    if (props.piece.explodeOnCapture) {
       keysExplosion.push(positionToKey(piece_coords))
       for (const [x, y] of props.piece.explosionDeltas) {
         keysExplosion.push(positionToKey([x + piece_coords[0], y + piece_coords[1]]))

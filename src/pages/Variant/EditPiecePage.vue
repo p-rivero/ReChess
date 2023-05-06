@@ -252,8 +252,8 @@
           <SmartCheckbox
             text="Explode when capturing"
             class="rules-field"
-            :start-value="piece?.explodes"
-            @changed="value => piece!.explodes = value"
+            :start-value="piece?.explodeOnCapture"
+            @changed="value => piece!.explodeOnCapture = value"
           />
         </div>
         <div class="column">
@@ -266,7 +266,7 @@
         </div>
       </div>
       <AddRemoveButtons
-        v-show="piece?.explodes"
+        v-show="piece?.explodeOnCapture"
         text="Explosion squares:"
         :z-index="11"
         type="explosion"

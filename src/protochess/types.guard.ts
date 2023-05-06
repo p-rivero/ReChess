@@ -27,7 +27,9 @@ export function isMakeMoveResult(obj: unknown): obj is MakeMoveResult {
             Array.isArray(e) &&
             typeof e[0] === "number" &&
             typeof e[1] === "number"
-        )
+        ) &&
+        (typeof typedObj["moveNotation"] === "undefined" ||
+            typeof typedObj["moveNotation"] === "string")
     )
 }
 
@@ -172,13 +174,20 @@ export function isPieceDefinition(obj: unknown): obj is PieceDefinition {
         (typeof typedObj["ids"][1] === "undefined" ||
             typedObj["ids"][1] === null ||
             typeof typedObj["ids"][1] === "string") &&
+        Array.isArray(typedObj["notationPrefix"]) &&
+        (typeof typedObj["notationPrefix"][0] === "undefined" ||
+            typedObj["notationPrefix"][0] === null ||
+            typeof typedObj["notationPrefix"][0] === "string") &&
+        (typeof typedObj["notationPrefix"][1] === "undefined" ||
+            typedObj["notationPrefix"][1] === null ||
+            typeof typedObj["notationPrefix"][1] === "string") &&
         typeof typedObj["isLeader"] === "boolean" &&
         (typeof typedObj["castleFiles"] === "undefined" ||
             Array.isArray(typedObj["castleFiles"]) &&
             typeof typedObj["castleFiles"][0] === "number" &&
             typeof typedObj["castleFiles"][1] === "number") &&
         typeof typedObj["isCastleRook"] === "boolean" &&
-        typeof typedObj["explodes"] === "boolean" &&
+        typeof typedObj["explodeOnCapture"] === "boolean" &&
         Array.isArray(typedObj["explosionDeltas"]) &&
         typedObj["explosionDeltas"].every((e: any) =>
             Array.isArray(e) &&

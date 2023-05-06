@@ -138,6 +138,14 @@ async function init(): Promise<t.Protochess> {
       return result
     },
     
+    async getMoveHistory(): Promise<string[]> {
+      const result = await wasm.wasmObject.getMoveHistory()
+      if (!Array.isArray(result) || !result.every(e => typeof e === 'string')) {
+        throw new Error(`Expected array, got ${result}`)
+      }
+      return result
+    },
+    
     async legalMoves(): Promise<t.MoveList[]> {
       const moves = await wasm.wasmObject.legalMoves()
       if (!Array.isArray(moves) || !moves.every(guard.isMoveList)) {
