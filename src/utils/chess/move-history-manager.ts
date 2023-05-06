@@ -1,5 +1,6 @@
 
 import { clone, objectEquals } from '@/utils/ts-utils'
+import { moveToString } from './chess-coords'
 import type { GameState, InitialState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from '@/protochess/types'
 
 export type MoveResult = { flag: MakeMoveFlag, winner: MakeMoveWinner }
@@ -8,6 +9,7 @@ export type MoveHistoryQueryResult = Readonly<{ state: GameState, lastMove?: Mov
 
 export type MoveTreeNode = {
   move: MoveInfo | 'root'
+  notation: string
   children: MoveTreeNode[]
   parent: MoveTreeNode | null
 }
@@ -21,18 +23,26 @@ export class MoveHistoryManager {
   
   constructor(branchingAllowed: boolean) {
     this.branchingAllowed = branchingAllowed
-    this.historyRoot = { move: 'root', children: [], parent: null }
+    this.historyRoot = {
+      move: 'root',
+      notation: '',
+      children: [],
+      parent: null,
+    }
     this.currentNode = this.historyRoot
   }
   
   // Starts a new history
-  public initialize(state: Readonly<GameState>) {
+  public initialize(state: Readonly<GameState>, historyNotation: string[]) {
     this.initialState = state.initialState
     this.initialFen = state.initialFen
     this.historyRoot.children = []
     this.currentNode = this.historyRoot
-    for (const move of state.moveHistory) {
-      this.newMove(move)
+    if (historyNotation.length !== state.moveHistory.length) {
+      throw new Error('History notation length does not match move history length')
+    }
+    for (const [i, move] of state.moveHistory.entries()) {
+      this.newMove(move, historyNotation[i])
     }
   }
   
@@ -44,7 +54,7 @@ export class MoveHistoryManager {
   }
 
   // Stores a new move in the history
-  public newMove(move: MoveInfo) {
+  public newMove(move: MoveInfo, notation?: string) {
     if (!this.canMakeMove()) {
       throw new Error('Moving is not allowed')
     }
@@ -54,7 +64,13 @@ export class MoveHistoryManager {
       this.currentNode = this.currentNode.children[index]
     } else {
       // Create a new branch
-      const newNode: MoveTreeNode = { move, children: [], parent: this.currentNode }
+      const newNode: MoveTreeNode = {
+        move,
+        // Fall back to naive notation if none is provided
+        notation: notation ?? moveToString(move),
+        children: [],
+        parent: this.currentNode,
+      }
       this.currentNode.children.push(newNode)
       this.currentNode = newNode
     }

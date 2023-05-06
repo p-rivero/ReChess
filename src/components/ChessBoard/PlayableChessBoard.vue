@@ -72,6 +72,7 @@
       const protochess = await getProtochess('ui')
       const result = await protochess.setState(state)
       const stateDiff = await protochess.getStateDiff()
+      const historyNotation = await protochess.getMoveHistory()
       const variant = state.initialState
       engineStoredMove = undefined
       
@@ -83,7 +84,7 @@
       updateMovableSquares(stateDiff, result.flag !== 'Ok')
       
       promotionPopup.value?.initialize(variant)
-      moveHistory.initialize({ initialState: variant, moveHistory: state.moveHistory })
+      moveHistory.initialize(state, historyNotation)
       historyRootRef.value = moveHistory.getRoot()
       historyCurrentNodeRef.value = moveHistory.getCurrentNode()
       emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
@@ -205,7 +206,7 @@
     const gameResult = handleResult(result)
     board.value?.setStateDiff(stateDiff)
     board.value?.setLastMove(mv)
-    moveHistory.newMove(mv)
+    moveHistory.newMove(mv, result.moveNotation)
     historyCurrentNodeRef.value = moveHistory.getCurrentNode()
     
     // Important: update the player before emitting new-move (otherwise, the player sent to the server will be wrong)

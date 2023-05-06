@@ -109,6 +109,7 @@ const DEFAULT_DRAFT: Readonly<Variant> = {
 
 const DEFAULT_PIECE: Readonly<FullPieceDef> = {
   ids: ['', ''],
+  notationPrefix: [null, null],
   isLeader: false,
   castleFiles: undefined,
   isCastleRook: false,

@@ -53,7 +53,6 @@
 
 
 <script setup lang="ts">
-  import { moveToString } from '@/utils/chess/chess-coords'
   import { onMounted, ref } from 'vue'
   import type { MoveTreeNode } from '@/utils/chess/move-history-manager'
 
@@ -121,7 +120,7 @@
       }
       // Add the next move (this skips the root, which is not a real move)
       flatList.push({
-        move: moveToString(currentNode.children[0].move),
+        move: currentNode.children[0].notation,
         highlighted: currentNode.children[0] === props.currentSelection,
         node: currentNode.children[0],
       })
