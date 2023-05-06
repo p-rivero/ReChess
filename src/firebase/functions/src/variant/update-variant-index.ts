@@ -13,6 +13,13 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
   const db = admin.firestore()
   
   let { name, description, tags } = snap.data() as VariantDoc
+  
+  // Enforce the 35 character limit on tags
+  if (tags.some(tag => tag.length > 35)) {
+    snap.ref.delete().catch((e) => console.error('Cannot delete invalid variant', e))
+    return
+  }
+  
   // Replace tabs and newlines with spaces
   name = name.replace(/[\t\n]/g, ' ').toLowerCase()
   description = description.replace(/[\t\n]/g, ' ').toLowerCase()

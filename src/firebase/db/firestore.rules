@@ -307,6 +307,7 @@ service cloud.firestore {
           doc.numUpvotes is int &&
           doc.popularity is int &&
           doc.tags is list &&
+          doc.tags.size() <= 7 &&
           (doc.creatorId == null || doc.creatorId is string);
       }
       function allowCreateVariant() {

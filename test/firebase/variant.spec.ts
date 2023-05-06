@@ -339,3 +339,30 @@ test('can create variant with with tags', async () => {
     add('verified', variant, 'variants')
   )
 })
+
+test('cannot have more than 7 tags', async () => {
+  await setupUser()
+  
+  const variant: VariantDoc = {
+    name: 'My variant',
+    description: 'Variant description',
+    creationTime: now(),
+    creatorDisplayName: 'My name',
+    creatorId: MY_ID,
+    numUpvotes: 0,
+    popularity: 0,
+    tags: ['1', '2', '3', '4', '5', '6', '7', '8'],
+    initialState: '{}',
+  }
+  await assertFails(
+    add('verified', variant, 'variants')
+  )
+  
+  variant.tags.pop()
+  await assertSucceeds(
+    add('verified', variant, 'variants')
+  )
+  
+  // The 35 char length limit of the tags is not enforced by the security rules
+  // The cloud function checks this instead
+})

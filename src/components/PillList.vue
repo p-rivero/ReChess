@@ -35,6 +35,7 @@
         class="pill-input px-0 py-0"
         type="text"
         :value="pill.text"
+        :maxlength="maxPillLength"
         @input="onPillInput(pill, $event)"
         @blur="finishEdit(pill)"
         @keydown.enter="finishEdit(pill)"
@@ -48,7 +49,7 @@
       />
     </div>
     <div
-      v-if="editable"
+      v-if="editable && (!maxPills || pills.length < maxPills)"
       class="pill tag mx-1 my-1 is-primary"
       @click="onAddPillClick()"
     >
@@ -93,6 +94,8 @@
     startingPills?: string[]
     allowRepeat?: boolean
     prefix?: string
+    maxPills?: number
+    maxPillLength?: number
   }>()
 
   const emit = defineEmits<{
@@ -114,6 +117,7 @@
   function onPillInput(pill: Pill, event: Event) {
     const input = event.target as HTMLInputElement
     pill.text = input.value
+    pill.error = false
   }
 
   function finishEdit(pill: Pill) {

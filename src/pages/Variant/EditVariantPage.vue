@@ -176,6 +176,8 @@
             :validator="text => !text.match(/[\s,#]/)"
             :starting-pills="draftStore.state.tags"
             :prefix="'#'"
+            :max-pills="7"
+            :max-pill-length="35"
             @changed="pills => draftStore.state.tags = pills"
           />
         </div>
