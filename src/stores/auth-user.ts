@@ -22,6 +22,8 @@ export class AuthUser extends User {
   public readonly verified: boolean
   public readonly signInProvider: SignInProvider
   public upvotedVariants: string[] = []
+  public reportedVariants: string[] = []
+  public reportedUsers: string[] = []
   
   constructor(authUser: fb.User, dbUser?: UserDoc, userCache?: UserPrivateCacheDoc) {
     if (!authUser.email) throw new Error('User has no email')
@@ -41,10 +43,9 @@ export class AuthUser extends User {
     }
     super(authUser.uid, dbUser ?? DEFAULT_DOC)
     if (userCache) {
-      const CHUNK_SIZE = 20
-      for (let i = 0; i < userCache.upvotedVariants.length; i += CHUNK_SIZE) {
-        this.upvotedVariants.push(userCache.upvotedVariants.slice(i, i + CHUNK_SIZE))
-      }
+      this.upvotedVariants = userCache.upvotedVariants.split(' ')
+      this.reportedVariants = userCache.reportedVariants.split(' ')
+      this.reportedUsers = userCache.reportedUsers.split(' ')
     }
     
     this.email = authUser.email

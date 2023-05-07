@@ -34,8 +34,7 @@ export default async function(variantId: string, userId: string): Promise<void> 
       reportedUsers: '',
     }
   } else {
-    // Concatenate the variantId to the end of the upvotedVariants array
-    userCacheDoc.upvotedVariants += variantId
+    userCacheDoc.upvotedVariants += ' ' + variantId
   }
   userCacheRef.set(userCacheDoc)
     .catch((err) => {

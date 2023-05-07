@@ -54,10 +54,10 @@ export interface TimestampDoc {
 
 // users/{userId}/privateCache/doc
 export interface UserPrivateCacheDoc {
-  // Both are a list of variantIds, without separators (fixed length)
-  upvotedVariants: string // 20 chars per ID
-  reportedVariants: string // 20 chars per ID
-  reportedUsers: string // 28 chars per ID
+  // Both are a list of space-separated document IDs
+  upvotedVariants: string
+  reportedVariants: string
+  reportedUsers: string
 }
 
 // users/{userId}/renameTrigger/doc

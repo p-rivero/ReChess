@@ -44,22 +44,14 @@ export default async function(variantId: string, userId: string): Promise<void> 
   const userCacheDoc = userCacheSnapshot.data() as UserPrivateCacheDoc
   const upvotedVariants = userCacheDoc.upvotedVariants
     
-  // Split the string into chunks, find the variantId, and remove it
-  const CHUNK_SIZE = 20
-  let splicedVariants: string | undefined = undefined
-  for (let i = 0; i < upvotedVariants.length; i += CHUNK_SIZE) {
-    const chunk = upvotedVariants.slice(i, i + CHUNK_SIZE)
-    if (chunk === variantId) {
-      splicedVariants = upvotedVariants.slice(0, i) + upvotedVariants.slice(i + CHUNK_SIZE)
-      break
-    }
-  }
+  // Find the variantId, and remove it
+  const splicedVariants = upvotedVariants.split(' ').filter((id) => id !== variantId).join(' ')
+  
   // This could happen if the user upvotes and then immediately un-upvotes a variant.
   // Give the other function some time to write the user's private cache, then write our version.
-  if (splicedVariants === undefined) {
-    console.error('Overriding cache!', variantId, upvotedVariants)
+  if (splicedVariants.length === upvotedVariants.length) {
+    console.error('Overriding cache!', userId, variantId)
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    splicedVariants = upvotedVariants
   }
   
   // Update the user private cache
