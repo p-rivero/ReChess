@@ -41,7 +41,6 @@ export interface GameSummary {
 export interface UserPrivateDoc {
   IMMUTABLE: {
     email: string
-    banned: boolean
   }
 }
 
@@ -67,6 +66,11 @@ export interface UserRenameTriggerDoc {
   username: string
 }
 
+// users/{userId}/hidden/doc
+export interface UserHiddenDoc {
+  numReports: number
+}
+
 
 // variants/{variantId}
 export interface VariantDoc {
@@ -76,6 +80,7 @@ export interface VariantDoc {
   creatorDisplayName: string
   creatorId: string | null
   numUpvotes: number
+  numReports: number
   popularity: number
   tags: string[]
   // JSON string that corresponds to the Variant interface in src/protochess/types.d.ts

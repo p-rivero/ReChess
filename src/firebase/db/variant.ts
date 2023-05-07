@@ -16,6 +16,7 @@ export async function createVariant(userId: string, displayName: string, variant
     creatorDisplayName: displayName,
     creatorId: userId,
     numUpvotes: 0,
+    numReports: 0,
     popularity: 0,
     tags: variant.tags,
     initialState: JSON.stringify(variant),

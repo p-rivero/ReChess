@@ -35,7 +35,6 @@ async function setupUser(name: string|null = null) {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
     },
   }
   await set('admin', username, 'usernames', 'my_username')
@@ -127,13 +126,6 @@ test('cannot edit immutable private fields', async () => {
   
   await assertFails(
     update('verified', { 'IMMUTABLE.email': 'new@mail.com' }, 'users', MY_ID, 'private', 'doc')
-  )
-  await assertFails(
-    update('verified', { 'IMMUTABLE.banned': true }, 'users', MY_ID, 'private', 'doc')
-  )
-  // Data has not changed, so this should succeed
-  await assertSucceeds(
-    update('verified', { 'IMMUTABLE.banned': false }, 'users', MY_ID, 'private', 'doc')
   )
 })
 

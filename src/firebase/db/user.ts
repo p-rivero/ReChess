@@ -22,7 +22,6 @@ export async function createUser(user: User, username: string): Promise<UserDoc>
   const newPrivateData: UserPrivateDoc = {
     IMMUTABLE: {
       email: user.email,
-      banned: false,
     },
   }
   const newUsername: UsernameDoc = {

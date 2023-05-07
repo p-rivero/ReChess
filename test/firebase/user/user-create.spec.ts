@@ -63,7 +63,6 @@ test('can create a user if authenticated', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
     },
   }
   const batch = startBatch('unverified')
@@ -91,7 +90,6 @@ test('cannot create a user if username is already taken', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
     },
   }
   await assertFails(
@@ -121,7 +119,6 @@ test('cannot create a user if not authenticated', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
     },
   }
   const batch = startBatch('not logged')
@@ -148,7 +145,6 @@ test('cannot create a user with more than 0 wins', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
     },
   }
   const batch = startBatch('unverified')
@@ -175,7 +171,6 @@ test('cannot create a user with more than 0 played games', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
     },
   }
   const batch = startBatch('unverified')
@@ -202,34 +197,6 @@ test('last5Games must be an empty array', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
-    },
-  }
-  const batch = startBatch('unverified')
-  batch.set(username, 'usernames', 'my_username')
-  batch.set(user, 'users', MY_ID)
-  batch.set(userPrivate, 'users', MY_ID, 'private', 'doc')
-  await assertFails(batch.commit())
-})
-
-test('cannot create a banned user', async () => {
-  const username: UsernameDoc = { userId: MY_ID }
-  const user: UserDoc = {
-    name: 'my new user',
-    about: '',
-    profileImg: 'example.com/img.png',
-    IMMUTABLE: {
-      username: 'my_username',
-      renameAllowedAt: null,
-      numGamesPlayed: 0,
-      numWinPoints: 0,
-      last5Games: '[]',
-    },
-  }
-  const userPrivate: UserPrivateDoc = {
-    IMMUTABLE: {
-      email: MY_EMAIL,
-      banned: true,
     },
   }
   const batch = startBatch('unverified')
@@ -256,7 +223,6 @@ test('can create a user without name or profileImg', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
     },
   }
   const batch = startBatch('unverified')
@@ -282,7 +248,6 @@ test('cannot create a user without also creating username', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
     },
   }
   const batch = startBatch('unverified')
@@ -328,7 +293,6 @@ test('cannot create more than one private doc', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
     },
   }
   const batch = startBatch('unverified')
@@ -356,7 +320,6 @@ test('email must match auth token', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: 'another@mail.com',
-      banned: false,
     },
   }
   const batch = startBatch('unverified')
@@ -383,7 +346,6 @@ test('renameAllowedAt must be null', async () => {
   const userPrivate: UserPrivateDoc = {
     IMMUTABLE: {
       email: MY_EMAIL,
-      banned: false,
     },
   }
   const batch = startBatch('unverified')

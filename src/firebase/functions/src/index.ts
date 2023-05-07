@@ -98,7 +98,12 @@ region(FUNCTIONS_REGION)
   .firestore
   .document('users/{userId}/upvotedVariants/{variantId}')
   .onCreate((_snap, context) => {
-    return callFunction(import('./variant/increment-variant-upvotes'), context.params.variantId, context.params.userId)
+    return callFunction(
+      import('./variant/increment-variant-upvotes-reports'),
+      'upvote',
+      context.params.variantId,
+      context.params.userId
+    )
   })
 
 export const updateVariantIndex =

@@ -87,7 +87,8 @@ service cloud.firestore {
         let doc = request.resource.data;
         return
           isUsernameDoc(doc) &&
-          // When creating a user, the user must be authenticated and the starting data must be correct. Allow unverified accounts, since at the time of creation, the user has not yet verified their email.
+          // When creating a user, the user must be authenticated and the starting data must be correct.
+          // Allow unverified accounts, since at the time of creation, the user has not yet verified their email.
           loggedAsUnverified(doc.userId) &&
           isValidUsername(username) &&
           !usernameIsTaken(username) &&
@@ -168,9 +169,8 @@ service cloud.firestore {
         function isPrivateUserDoc(doc) {
           return
             hasFields(doc, ['IMMUTABLE'], []) &&
-            hasFields(doc.IMMUTABLE, ['email', 'banned'], []) &&
-            doc.IMMUTABLE.email is string &&
-            doc.IMMUTABLE.banned is bool;
+            hasFields(doc.IMMUTABLE, ['email'], []) &&
+            doc.IMMUTABLE.email is string;
         }
         function allowCreateUserPrivate() {
           let doc = request.resource.data;
@@ -178,8 +178,7 @@ service cloud.firestore {
             isPrivateUserDoc(doc) &&
             loggedAsUnverified(userId) &&
             docName == 'doc' && // Only 1 document allowed
-            doc.IMMUTABLE.email == request.auth.token.email &&
-            doc.IMMUTABLE.banned == false;
+            doc.IMMUTABLE.email == request.auth.token.email;
         }
         function allowUpdateUserPrivate() {
           let old = resource.data;
@@ -258,6 +257,9 @@ service cloud.firestore {
         allow read: if loggedAs(userId) && docName == 'doc';
       }
       
+      // users/{userId}/hidden/doc cannot be read or written directly, it can only be
+      // accessed by moderators and cloud functions.
+      
       
       match /renameTrigger/{docName} {
         function isRenameTriggerDoc(doc) {
@@ -294,7 +296,10 @@ service cloud.firestore {
     match /variants/{variantId} {
       function isVariantDoc(doc) {
         return
-          hasFields(doc, ['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes', 'popularity', 'tags'], ['creatorId']) &&
+          hasFields(doc,
+            ['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes', 'numReports', 'popularity', 'tags'],
+            ['creatorId']
+          ) &&
           doc.name is string &&
           doc.name.size() >= 3 &&
           doc.name.size() <= 50 &&
@@ -306,6 +311,7 @@ service cloud.firestore {
           doc.initialState is string &&
           doc.initialState.size() <= 200000 &&
           doc.numUpvotes is int &&
+          doc.numReports is int &&
           doc.popularity is int &&
           doc.tags is list &&
           doc.tags.size() <= 7 &&
@@ -321,6 +327,7 @@ service cloud.firestore {
           doc.creatorDisplayName == expectedDisplayName(creatorDoc) &&
           isServerTimestamp(doc.creationTime) &&
           doc.numUpvotes == 0 &&
+          doc.numReports == 0 &&
           doc.popularity == 0;
       }
       
