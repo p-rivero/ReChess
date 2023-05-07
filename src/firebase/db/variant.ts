@@ -25,12 +25,15 @@ export async function createVariant(userId: string, displayName: string, variant
 }
 
 // Fetches the variant index from the database
-export async function getVariantIndex(): Promise<VariantIndexDoc> {
-  const document = await getDoc(doc(db, 'variantIndex', 'doc'))
-  // If no variant has ever been created, the index document will not exist
-  // This will never happen in production, but return an empty string in development to avoid errors
-  if (!document.exists()) return { index: '' }
-  return document.data() as VariantIndexDoc
+export async function getVariantIndex(): Promise<string> {
+  // Get all documents in the variantIndex collection
+  const q = query(collection(db, 'variantIndex'))
+  const documents = await getDocs(q)
+  // Concatenate all the indexes
+  return documents.docs.map(doc => {
+    const data = doc.data() as VariantIndexDoc
+    return data.index
+  }).join('\n')
 }
 
 // id -> VariantDoc

@@ -121,13 +121,14 @@ let currentIndex: VariantSearchIndex | null = null
 export async function searchVariants(query: string, tags: string[], limit: number): Promise<VariantIndexResult[]> {
   // If the index is not yet initialized, fetch it from the server
   if (currentIndex === null) {
-    const indexDoc = await VariantDB.getVariantIndex()
-    const variants = indexDoc.index.split('\n').map(line => {
-      const [id, name, description, tagStr] = line.split('\t')
-      const tags = tagStr.split(',')
-      const entry: VariantIndexEntryWithTags = { id, name, description, tags }
-      return entry
-    })
+    const index = await VariantDB.getVariantIndex()
+    const variants = index.length === 0 ? [] :
+      index.split('\n').map(line => {
+        const [id, name, description, tagStr] = line.split('\t')
+        const tags = tagStr.split(',')
+        const entry: VariantIndexEntryWithTags = { id, name, description, tags }
+        return entry
+      })
     currentIndex = new VariantSearchIndex(variants)
   }
   
