@@ -51,8 +51,8 @@ export const useVariantStore = defineStore('variant', () => {
     const result = []
     for (const [doc, id] of docsWithId) {
       const state = readVariantDoc(doc, id, authStore.loggedUser)
-      if (state) result.push(state)
-      else console.warn('Invalid variant document', doc)
+      const reported = authStore.loggedUser ? authStore.loggedUser.reportedVariants.includes(id) : false
+      if (state && !reported) result.push(state)
     }
     fullVariantList = result
     variantListOrder = order

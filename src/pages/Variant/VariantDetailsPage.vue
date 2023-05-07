@@ -76,7 +76,7 @@
           Use as template
         </button>
         <button
-          v-if="authStore.loggedUser && variant?.creatorId !== authStore.loggedUser.uid"
+          v-if="showReportButton"
           class="button is-fullwidth mb-4"
           @click="reportVariant"
         >
@@ -167,6 +167,17 @@
     variant.value.loggedUserUpvoted = store.loggedUser ?
       store.loggedUser.upvotedVariants.includes(variant.value.uid) :
       false
+  })
+  
+  const showReportButton = computed(() => {
+    if (typeof route.params.variantId !== 'string') return false
+    // If the user is not logged or has already reported the variant, don't show the button
+    if (!authStore.loggedUser) return false
+    if (authStore.loggedUser.reportedVariants.includes(route.params.variantId)) return false
+    // While loading the page, show the button (usually the loaded variant can be reported)
+    if (!variant.value) return true
+    // When the variant is loaded, we can check if the user is the creator of the variant
+    return variant.value?.creatorId !== authStore.loggedUser.uid
   })
   
   const rules = computed(() => {
@@ -262,6 +273,7 @@
         if (!variant.value) throw new Error('variant is null')
         try {
           await variantStore.reportVariant(variant.value.uid)
+          authStore.loggedUser?.reportedVariants.push(variant.value.uid)
           showPopup(
             'Variant reported',
             'The variant has been reported. \

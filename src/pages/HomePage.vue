@@ -119,7 +119,12 @@
       return
     }
     // Wait until the index has been fetched before setting searching to true
-    searchResults.value = await searchVariants(queryText, queryTags, 10)
+    let searchRes = await searchVariants(queryText, queryTags, 10)
+    // If the user is logged in, filter out the reported variants
+    if (authStore.loggedUser) {
+      searchRes = searchRes.filter(variant => !authStore.loggedUser?.reportedVariants.includes(variant.id))
+    }
+    searchResults.value = searchRes
     searching.value = true
   }
   
