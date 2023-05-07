@@ -13,18 +13,40 @@ export const useVariantStore = defineStore('variant', () => {
   // Currently fetched variants
   const variantList = ref<PublishedVariant[]>([])
   const variantListFetched = ref(false)
-  const variantListOrder = ref<VariantListOrder>(DEFAULT_ORDER)
+  
+  let fullVariantList: PublishedVariant[] = []
+  let variantListOrder: VariantListOrder = DEFAULT_ORDER
+  // Firebase only allows 1 tag. Use the first tag in the list for the query
+  // and filter the rest of the tags in the client
+  let variantListTag: string|undefined = undefined
   
   const authStore = useAuthStore()
   
   // Fetches the list of variants from the database
-  // TODO: Add pagination
-  async function refreshList(order: VariantListOrder) {
-    // Only fetch the list if it hasn't been fetched yet (or if the order has changed)
-    if (variantList.value.length > 0 && variantListOrder.value === order) return
+  async function refreshList(order: VariantListOrder, tags: string[]) {
+    const [primaryTag, ...clientTags] = tags
+    await refreshFullList(order, primaryTag)
     
-    // Fetch the list of variant documents from the database
-    const docsWithId = await VariantDB.getVariantList(order)
+    // Filter the list of variants
+    let result = fullVariantList
+    for (const tag of clientTags) {
+      result = result.filter(variant => variant.tags.some(t => t.startsWith(tag)))
+    }
+    
+    variantList.value = result
+    variantListFetched.value = true
+  }
+  
+  async function refreshFullList(order: VariantListOrder, tag: string) {
+    // TODO: Add pagination
+    // Only fetch the list if it hasn't been fetched yet (or if the order has changed)
+    if (variantList.value.length > 0 && variantListOrder === order && variantListTag === tag) {
+      return
+    }
+    
+    console.warn('Fetching variant list')
+    // Fetch and filter the list of variants
+    const docsWithId = await VariantDB.getVariantList(order, tag)
     
     // Convert each pair of documents into a PublishedVariant
     const result = []
@@ -33,9 +55,9 @@ export const useVariantStore = defineStore('variant', () => {
       if (state) result.push(state)
       else console.warn('Invalid variant document', doc)
     }
-    variantList.value = result
-    variantListFetched.value = true
-    variantListOrder.value = order
+    fullVariantList = result
+    variantListOrder = order
+    variantListTag = tag
   }
   
   watch(authStore, async () => {

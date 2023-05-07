@@ -64,18 +64,19 @@ export async function removeUpvoteVariant(userId: string, variantId: string): Pr
 
 
 // TODO: Add pagination
-export async function getVariantList(order: VariantListOrder): Promise<[VariantDoc, string][]> {
+export async function getVariantList(order: VariantListOrder, tag?: string): Promise<[VariantDoc, string][]> {
   let q
   const variants = collection(db, 'variants')
+  const tagQuery = tag ? [where('tags', 'array-contains', tag)] : []
   switch (order) {
   case 'popular':
-    q = query(variants, orderBy('popularity', 'desc'), orderBy('numUpvotes', 'desc'))
+    q = query(variants, ...tagQuery, orderBy('popularity', 'desc'), orderBy('numUpvotes', 'desc'))
     break
   case 'upvotes':
-    q = query(variants, orderBy('numUpvotes', 'desc'), orderBy('popularity', 'desc'))
+    q = query(variants, ...tagQuery, orderBy('numUpvotes', 'desc'), orderBy('popularity', 'desc'))
     break
   case 'newest':
-    q = query(variants, orderBy('creationTime', 'desc'))
+    q = query(variants, ...tagQuery, orderBy('creationTime', 'desc'))
     break
   default:
     throw new Error(`Invalid order: ${order}`)

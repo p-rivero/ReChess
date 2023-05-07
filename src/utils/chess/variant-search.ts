@@ -55,8 +55,6 @@ class VariantSearchIndex {
     if (tagsHash === this.lastTagsHash) return
     this.lastTagsHash = tagsHash
     
-    console.log('Updating variant search index for tags:', tags)
-    
     // For each input tag, chech if some of the variant's tags match it
     const filteredVariants = this.dataset.filter(variant => {
       for (const tag of tags) {
@@ -109,18 +107,18 @@ class VariantSearchIndex {
       }
     }
     // If there are any matches of 4 characters or more, only return those
-    const longMatches3 = result.filter(({ start, end }) => end - start >= 4)
-    if (longMatches3.length > 0) return longMatches3
+    const longMatches4 = result.filter(({ start, end }) => end - start >= 4)
+    if (longMatches4.length > 0) return longMatches4
     // If there are any matches of 2 characters or more, only return those
-    const longMatches1 = result.filter(({ start, end }) => end - start >= 2)
-    if (longMatches1.length > 0) return longMatches1
+    const longMatches2 = result.filter(({ start, end }) => end - start >= 2)
+    if (longMatches2.length > 0) return longMatches2
     return result
   }
 }
 
 let currentIndex: VariantSearchIndex | null = null
 
-export async function searchVariants(query: string, limit: number): Promise<VariantIndexResult[]> {
+export async function searchVariants(query: string, tags: string[], limit: number): Promise<VariantIndexResult[]> {
   // If the index is not yet initialized, fetch it from the server
   if (currentIndex === null) {
     const indexDoc = await VariantDB.getVariantIndex()
@@ -133,15 +131,5 @@ export async function searchVariants(query: string, limit: number): Promise<Vari
     currentIndex = new VariantSearchIndex(variants)
   }
   
-  // Extract tags from the query (prefixed with #)
-  const TAG_REGEX = /#[^\s#,]+/g
-  const tags = query.match(TAG_REGEX)?.map(tag => tag.slice(1).toLowerCase()) ?? []
-  
-  const queryStr = query
-    .replace(TAG_REGEX, '') // Remove tags from the query
-    .replace(/\s+/g, ' ')   // Normalize whitespace
-    .trim()
-    .toLowerCase()
-  
-  return currentIndex.search(queryStr, limit, tags)
+  return currentIndex.search(query, limit, tags)
 }

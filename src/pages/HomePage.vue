@@ -61,6 +61,7 @@
 <script setup lang="ts">
   import { DEFAULT_ORDER, searchVariants } from '@/utils/chess/variant-search'
   import { computed, ref, watch } from 'vue'
+  import { debounce } from '@/utils/ts-utils'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { useVariantStore } from '@/stores/variant'
@@ -94,15 +95,27 @@
   })
   
   const orderBy = ref<SearchOrder>('search-relevance')
+  const tags = ref<string[]>([])
   
   async function search(text: string) {
-    text = text.trim()
-    if (text.length === 0) {
+    // Extract tags from the query (prefixed with #)
+    const TAG_REGEX = /#[^\s#,]+/g
+    const queryTags = text.match(TAG_REGEX)?.map(tag => tag.slice(1).toLowerCase()) ?? []
+    
+    const queryText = text
+      .replace(TAG_REGEX, '') // Remove tags from the query
+      .replace(/#/g, '')      // Remove any '#' symbols that were not tags
+      .replace(/\s+/g, ' ')   // Normalize whitespace
+      .trim()
+      .toLowerCase()
+    
+    if (queryText.length === 0) {
+      tags.value = queryTags
       searching.value = false
       return
     }
     // Wait until the index has been fetched before setting searching to true
-    searchResults.value = await searchVariants(text, 10)
+    searchResults.value = await searchVariants(queryText, queryTags, 10)
     searching.value = true
   }
   
@@ -114,11 +127,21 @@
   }
   watch(orderBy, async order => {
     sessionStorage.setItem('search-order', order)
+    refreshVariantList()
+  })
+  const refreshVariantListDebounced = debounce(refreshVariantList, 500)
+  watch(tags, () => refreshVariantListDebounced())
+  
+  
+  // Load the variant list at startup
+  refreshVariantList()
+  async function refreshVariantList() {
+    let order = orderBy.value
     if (order === 'search-relevance') {
       order = DEFAULT_ORDER
     }
     try {
-      await variantStore.refreshList(order)
+      await variantStore.refreshList(order, tags.value)
     } catch (e) {
       console.error(e)
       showPopup(
@@ -127,7 +150,7 @@
         'ok'
       )
     }
-  }, { immediate: true })
+  }
   
 </script>
 
