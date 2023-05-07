@@ -214,6 +214,7 @@
   .list-move {
     width: 50%;
     border-radius: 0.25rem;
+    word-break: break-word;
     &.is-clickable:hover {
       background-color: rgba($brown, 0.2);
     }

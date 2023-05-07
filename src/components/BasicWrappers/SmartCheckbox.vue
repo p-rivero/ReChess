@@ -8,7 +8,7 @@
         @change="checkboxChanged($event.target)"
       >
       <span class="check" />
-      <span class="control-label">{{ text }}</span>
+      <span class="control-label adjust-text">{{ text }}</span>
     </label>
   </div>
 </template>

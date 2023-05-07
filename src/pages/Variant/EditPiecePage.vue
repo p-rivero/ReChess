@@ -41,7 +41,7 @@
     
     
     
-    <div class="column mb-5 is-7">
+    <div class="column mb-2 is-7">
       <SmartTextInput
         class="is-large mb-5"
         placeholder="Piece name"
@@ -56,57 +56,94 @@
         @changed="name => piece!.displayName = name"
       />
       <div class="columns">
-        <div class="column">
-          <div class="horizontal-field">
-            <SmartCheckbox
-              text="White"
-              class="mr-4"
-              :start-value="!whiteInvisible"
-              @changed="enabled => enabledCheckboxChanged(enabled, 'white')"
-            />
-            <PieceImageEdit
-              :image-url="piece?.imageUrls[0]"
-              :class="{ invisible: whiteInvisible }"
-              @image-changed="url => { piece!.imageUrls[0] = url; errorMsgHandler.clear() }"
-              @upload-error="imageUploadFailed"
-            />
-            <SmartTextInput
-              class="width-3rem"
-              :class="{ invisible: whiteInvisible }"
-              placeholder="A"
-              :start-text="pieceIdWhite ?? undefined"
-              :error-handler="errorMsgHandler"
-              :error-priority="1"
-              :validator="t => symbolValidator(t, 'white')"
-              @changed="text => updatePieceId(text, 'white')"
-            />
-          </div>
+        <div class="column is-flex is-align-items-center pb-1">
+          <SmartCheckbox
+            text="White"
+            class="mr-4"
+            :start-value="!whiteInvisible"
+            @changed="enabled => enabledCheckboxChanged(enabled, 'white')"
+          />
+          <PieceImageEdit
+            :image-url="piece?.imageUrls[0]"
+            :class="{ invisible: whiteInvisible }"
+            @image-changed="url => { piece!.imageUrls[0] = url; errorMsgHandler.clear() }"
+            @upload-error="imageUploadFailed"
+          />
+          <SmartTextInput
+            ref="whiteSymbolInput"
+            class="width-3rem"
+            :class="{ invisible: whiteInvisible }"
+            placeholder="A"
+            :start-text="piece?.ids[0] ?? undefined"
+            :error-handler="errorMsgHandler"
+            :error-priority="1"
+            :validator="t => symbolValidator(t, 'white')"
+            @changed="text => updatePieceId(text, 'white')"
+          />
         </div>
         
-        <div class="column">
-          <div class="horizontal-field">
-            <SmartCheckbox
-              text="Black"
-              class="mr-4"
-              :start-value="!blackInvisible"
-              @changed="enabled => enabledCheckboxChanged(enabled, 'black')"
-            />
-            <PieceImageEdit
-              :image-url="piece?.imageUrls[1]"
-              :class="{ invisible: blackInvisible }"
-              @image-changed="url => { piece!.imageUrls[1] = url; errorMsgHandler.clear() }"
-              @upload-error="imageUploadFailed"
-            />
-            <SmartTextInput
-              class="width-3rem"
-              :class="{ invisible: blackInvisible }"
-              placeholder="a"
-              :start-text="pieceIdBlack ?? undefined"
-              :error-handler="errorMsgHandler"
-              :validator="t => symbolValidator(t, 'black')"
-              @changed="text => updatePieceId(text, 'black')"
-            />
-          </div>
+        <div class="column is-flex is-align-items-center pb-1">
+          <SmartCheckbox
+            text="Black"
+            class="mr-4"
+            :start-value="!blackInvisible"
+            @changed="enabled => enabledCheckboxChanged(enabled, 'black')"
+          />
+          <PieceImageEdit
+            :image-url="piece?.imageUrls[1]"
+            :class="{ invisible: blackInvisible }"
+            @image-changed="url => { piece!.imageUrls[1] = url; errorMsgHandler.clear() }"
+            @upload-error="imageUploadFailed"
+          />
+          <SmartTextInput
+            ref="blackSymbolInput"
+            class="width-3rem"
+            :class="{ invisible: blackInvisible }"
+            placeholder="a"
+            :start-text="piece?.ids[1] ?? undefined"
+            :error-handler="errorMsgHandler"
+            :validator="t => symbolValidator(t, 'black')"
+            @changed="text => updatePieceId(text, 'black')"
+          />
+        </div>
+      </div>
+      
+      <div class="columns">
+        <div class="column is-narrow is-flex is-align-items-center">
+          <SmartCheckbox
+            text="Custom move prefix"
+            :start-value="piece?.notationPrefix[0] != null || piece?.notationPrefix[1] != null"
+            @changed="enabled => {
+              if (enabled) piece!.notationPrefix = [whiteNotationInput?.getText(), blackNotationInput?.getText()]
+              else piece!.notationPrefix = [undefined, undefined]
+            }"
+          />
+        </div>
+        <div
+          v-show="piece?.notationPrefix[0] != null"
+          class="column is-flex-show is-align-items-center"
+          :class="{ invisible: whiteInvisible }"
+        >
+          <span class="mr-2"> White: </span>
+          <SmartTextInput
+            ref="whiteNotationInput"
+            placeholder="(none)"
+            :start-text="piece?.notationPrefix[0] ?? ''"
+            @changed="text => piece!.notationPrefix[0] = text"
+          />
+        </div>
+        <div
+          v-show="piece?.notationPrefix[1] != null"
+          class="column is-flex-show is-align-items-center"
+          :class="{ invisible: blackInvisible }"
+        >
+          <span class="mr-2"> Black: </span>
+          <SmartTextInput
+            ref="blackNotationInput"
+            placeholder="(none)"
+            :start-text="piece?.notationPrefix[1] ?? ''"
+            @changed="text => piece!.notationPrefix[1] = text"
+          />
         </div>
       </div>
       
@@ -327,6 +364,10 @@
   }
   
   const board = ref<InstanceType<typeof PieceViewerWithZoom>>()
+  const whiteSymbolInput = ref<InstanceType<typeof SmartTextInput>>()
+  const blackSymbolInput = ref<InstanceType<typeof SmartTextInput>>()
+  const whiteNotationInput = ref<InstanceType<typeof SmartTextInput>>()
+  const blackNotationInput = ref<InstanceType<typeof SmartTextInput>>()
   const hasError = ref(false)
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
@@ -336,9 +377,6 @@
   // Hide a piece if it's current id is null or undefined
   const whiteInvisible = computed(() => piece?.ids[0] == null || piece?.ids[0] === undefined)
   const blackInvisible = computed(() => piece?.ids[1] == null || piece?.ids[1] === undefined)
-  // Reference to the current value of the piece id text inputs, initialize to the current id
-  const pieceIdWhite = ref(piece?.ids[0])
-  const pieceIdBlack = ref(piece?.ids[1])
   // Reference to the current (number) value of the castling file text inputs
   const castleFileQueenside = ref(piece?.castleFiles?.[0] || 2)
   const castleFileKingside = ref(piece?.castleFiles?.[1] || 6)
@@ -369,7 +407,7 @@
   function enabledCheckboxChanged(enabled: boolean, color: Player) {
     if (!piece) throw new Error('Piece is null')
     // Determine the new id to use
-    const textBoxVal = color === 'white' ? pieceIdWhite.value : pieceIdBlack.value
+    const textBoxVal = color === 'white' ? whiteSymbolInput.value?.getText() : blackSymbolInput.value?.getText()
     const enabledId = textBoxVal ?? ''
     const newId = enabled ? enabledId : null
     
@@ -462,13 +500,8 @@
     const oldId = color === 'white' ? piece.ids[0] : piece.ids[1]
     if (oldId) draftStore.state.fen = removePiecesById(draftStore.state.fen, oldId)
     // Update the piece id
-    if (color === 'white') {
-      pieceIdWhite.value = newId
-      piece.ids[0] = newId
-    } else {
-      pieceIdBlack.value = newId
-      piece.ids[1] = newId
-    }
+    if (color === 'white') piece.ids[0] = newId
+    else piece.ids[1] = newId
   }
   
   function imageUploadFailed() {
@@ -508,6 +541,9 @@
     .column {
       width: 80%;
       align-self: center;
+      &.is-narrow {
+        width: auto;
+      }
     }
   }
   @media screen and (max-width: 768px) {
@@ -526,12 +562,6 @@
   .field-label-both {
     @extend .field-label;
     margin-left: 1rem;
-  }
-  
-  .horizontal-field {
-    display: flex;
-    margin-bottom: 1rem;
-    align-items: center;
   }
   
   .rules-field:not(:last-child) {

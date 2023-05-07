@@ -62,6 +62,13 @@
 </script>
 
 <style scoped lang="scss">
+
+  .horizontal-field {
+    display: flex;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  
   .field-label {
     flex-basis: auto;
     flex-grow: 0;
