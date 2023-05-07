@@ -110,7 +110,6 @@ region(FUNCTIONS_REGION)
   })
 
 
-
 // If you need to run server-side code manually, you can use the following template:
 
 // export const manualFunction =

@@ -17,7 +17,7 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
   let { name, description, tags } = snap.data() as VariantDoc
   
   // Enforce the 35 character limit on tags
-  if (tags.some(tag => tag.length > 35)) {
+  if (tags.some((tag) => tag.length > 35)) {
     snap.ref.delete().catch((e) => console.error('Cannot delete invalid variant', e))
     return
   }
@@ -25,7 +25,7 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
   // Replace tabs and newlines with spaces
   name = name.replace(/[\t\n]/g, ' ').toLowerCase()
   description = description.replace(/[\t\n]/g, ' ').toLowerCase()
-  tags = tags.map(tag => tag.replace(/[\t\n# ,]/g, '').toLowerCase())
+  tags = tags.map((tag) => tag.replace(/[\t\n# ,]/g, '').toLowerCase())
   
   const line = `${snap.id}\t${name}\t${description.slice(0, 100)}\t${tags.join(',')}`
   
@@ -43,7 +43,7 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
  * Appends a line to the a given index document.
  * @param {FirebaseFirestore.Firestore} db Database instance to use
  * @param {string} line Text to append to the index
- * @param {number} index Number of the index document to append to, incremented until a document with free space is found
+ * @param {number} index Number of the index document to append to, incremented until a free index is found
  * @return {Promise<boolean>} True if the line was appended, false if the index is full
  */
 async function appendToIndex(db: FirebaseFirestore.Firestore, line: string, index: number): Promise<boolean> {
