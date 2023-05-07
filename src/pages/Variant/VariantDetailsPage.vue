@@ -78,8 +78,9 @@
         <button
           v-if="authStore.loggedUser && variant?.creatorId !== authStore.loggedUser.uid"
           class="button is-fullwidth mb-4"
+          @click="reportVariant"
         >
-          <div class="sz-icon icon-report color-theme" />
+          <div class="sz-icon icon-flag color-theme" />
           Report
         </button>
       </div>
@@ -249,6 +250,38 @@
       }
     )
   }
+  
+  
+  function reportVariant() {
+    showPopup(
+      'Report variant',
+      'A moderator will review the variant and remove it if it violates our rules. \
+      \n\n**This action cannot be undone.** Do you want to report this variant?',
+      'yes-no',
+      async () => {
+        if (!variant.value) throw new Error('variant is null')
+        try {
+          await variantStore.reportVariant(variant.value.uid)
+          showPopup(
+            'Variant reported',
+            'The variant has been reported. \
+            \n\nThank you for helping us keep ReChess a safe place.',
+            'ok'
+          )
+        } catch (e) {
+          console.error(e)
+          showPopup(
+            'Error',
+            'An unexpected error occurred while reporting the variant. \
+            \n\nThis probably means that the variant has already been reported.',
+            'ok'
+          )
+        }
+      }
+    )
+  }
+  
+  
   
   async function creatorClicked() {
     if (!variant.value) {

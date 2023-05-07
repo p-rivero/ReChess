@@ -244,6 +244,7 @@ service cloud.firestore {
           return
             isTimestampDoc(doc) &&
             loggedAs(userId) &&
+            reportedUserId != userId &&
             isServerTimestamp(doc.time) &&
             exists(/databases/$(database)/documents/users/$(reportedUserId));
         }

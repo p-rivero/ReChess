@@ -121,6 +121,15 @@
         />
       </div>
       
+      <button
+        v-if="!myProfile(user)"
+        class="button mt-6"
+        @click="reportUser"
+      >
+        <div class="sz-icon icon-flag color-theme" />
+        Report user
+      </button>
+      
       <SmartErrorMessage
         v-show="hasError && myProfile(user)"
         class="mt-4"
@@ -358,7 +367,7 @@
     await userStore.storeUser(user.value)
   }
   
-  async function deleteAccount() {
+  function deleteAccount() {
     showPopup(
       'Delete account',
       '**Your profile data will be deleted immediately, this action cannot be undone.** \
@@ -396,6 +405,35 @@
       )
       return
     }
+  }
+  
+  function reportUser() {
+    showPopup(
+      'Report user',
+      'A moderator will review this user\'s profile and ban them it if it violates our rules. \
+      \n\n**This action cannot be undone.** Do you want to report this user?',
+      'yes-no',
+      async () => {
+        if (!user.value) throw new Error('User is undefined')
+        try {
+          await userStore.reportUser(user.value.uid)
+          showPopup(
+            'User reported',
+            'This user has been reported. \
+            \n\nThank you for helping us keep ReChess a safe place.',
+            'ok'
+          )
+        } catch (e) {
+          console.error(e)
+          showPopup(
+            'Error',
+            'An unexpected error occurred while reporting the user. \
+            \n\nThis probably means that the user has already been reported.',
+            'ok'
+          )
+        }
+      }
+    )
   }
   
   async function resetPassword() {

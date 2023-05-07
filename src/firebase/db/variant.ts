@@ -56,13 +56,21 @@ export async function upvoteVariant(userId: string, variantId: string): Promise<
   const upvoteDoc: TimestampDoc = {
     time: serverTimestamp() as Timestamp,
   }
-  setDoc(doc(db, 'users', userId, 'upvotedVariants', variantId), upvoteDoc)
+  await setDoc(doc(db, 'users', userId, 'upvotedVariants', variantId), upvoteDoc)
 }
 
 // Un-upvotes the variant for the user
 export async function removeUpvoteVariant(userId: string, variantId: string): Promise<void> {
   // Remove the user's upvote. A cloud function will decrement the variant's upvotes
-  deleteDoc(doc(db, 'users', userId, 'upvotedVariants', variantId))
+  await deleteDoc(doc(db, 'users', userId, 'upvotedVariants', variantId))
+}
+
+// Reports the variant in behalf of the user
+export async function reportVariant(userId: string, variantId: string): Promise<void> {
+  const reportDoc: TimestampDoc = {
+    time: serverTimestamp() as Timestamp,
+  }
+  await setDoc(doc(db, 'users', userId, 'reportedVariants', variantId), reportDoc)
 }
 
 

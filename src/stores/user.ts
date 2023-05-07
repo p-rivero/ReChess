@@ -1,6 +1,7 @@
 import { UserDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useAuthStore } from './auth-user'
 import type { GameSummary, UserDoc } from '@/firebase/db/schema'
 
 export class User {
@@ -41,6 +42,7 @@ export class User {
 
 export const useUserStore = defineStore('user', () => {
   const lastUserCache = ref<User | undefined>(undefined)
+  const authStore = useAuthStore()
   
   // userId -> User
   async function getUserById(id: string): Promise<User | undefined> {
@@ -74,5 +76,13 @@ export const useUserStore = defineStore('user', () => {
     await UserDB.updateUser(user.uid, name, user.about, profileImg, updateName)
   }
   
-  return { getUserById, getUserByUsername, storeUser }
+  // Report a user. This will only succeed if the user is authenticated.
+  async function reportUser(id: string): Promise<void> {
+    if (!authStore.loggedUser) {
+      throw new Error('User must be logged in to report a user')
+    }
+    await UserDB.reportUser(authStore.loggedUser.uid, id)
+  }
+  
+  return { getUserById, getUserByUsername, storeUser, reportUser }
 })

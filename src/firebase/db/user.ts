@@ -1,7 +1,7 @@
 import { db } from '@/firebase'
-import type { UserDoc, UserPrivateCacheDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
+import type { TimestampDoc, UserDoc, UserPrivateCacheDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
 
-import { doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore'
+import { Timestamp, doc, getDoc, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore'
 import type { User } from '@firebase/auth'
 
 // Creates a new user in the database (public data + private data + username)
@@ -71,4 +71,12 @@ export async function updateUser(uid: string, name: string|null, about: string, 
   } else {
     await updateDoc(doc(db, 'users', uid), editableFields)
   }
+}
+
+// Reports a user
+export async function reportUser(reporterId: string, reportedUserId: string): Promise<void> {
+  const reportDoc: TimestampDoc = {
+    time: serverTimestamp() as Timestamp,
+  }
+  await setDoc(doc(db, 'users', reporterId, 'reportedUsers', reportedUserId), reportDoc)
 }
