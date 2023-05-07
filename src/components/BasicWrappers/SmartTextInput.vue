@@ -57,6 +57,10 @@
       textInput.value.value = text
       validate(text)
     },
+    getText(): string {
+      if (!textInput.value) throw new Error('Text input is null')
+      return textInput.value.value
+    },
     triggerChanged() {
       inputChanged()
     },

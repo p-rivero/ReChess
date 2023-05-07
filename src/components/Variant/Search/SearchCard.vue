@@ -8,6 +8,7 @@
     v-if="loadedVariant"
     :variant="loadedVariant"
     :highlight-matches="matches"
+    @tag-clicked="tag => emit('tag-clicked', tag)"
   />
   <SearchCardPlaceholder
     v-else
@@ -35,6 +36,7 @@
   
   const emit = defineEmits<{
     (event: 'update-score', score: number): void
+    (event: 'tag-clicked', tag: string): void
   }>()
   
   const variantStore = useVariantStore()

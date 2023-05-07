@@ -44,7 +44,6 @@ export const useVariantStore = defineStore('variant', () => {
       return
     }
     
-    console.warn('Fetching variant list')
     // Fetch and filter the list of variants
     const docsWithId = await VariantDB.getVariantList(order, tag)
     

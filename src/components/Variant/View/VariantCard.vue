@@ -64,8 +64,9 @@
       <span
         v-for="tag of variant.tags.slice(0, 5)"
         :key="tag"
-        class="tag is-primary is-outlined"
+        class="tag is-primary is-outlined is-clickable"
         :data-tooltip="getTextWidth(tag) > remToPx(15) ? tag : undefined"
+        @click="emit('tag-clicked', tag)"
       >
         <span class="is-size-6 mr-1 adjust-text"> # </span>
         <span class="tag-text"> {{ tag }}</span>
@@ -102,6 +103,10 @@
   const props = defineProps<{
     variant: PublishedVariant
     highlightMatches?: {start: number, end: number}[]
+  }>()
+  
+  const emit = defineEmits<{
+    (event: 'tag-clicked', tag: string): void
   }>()
   
   onMounted(async () => {

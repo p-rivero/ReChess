@@ -3,6 +3,7 @@
     <div class="box is-flex">
       <p class="control has-icons-left has-icons-right is-flex-grow-1">
         <SmartTextInput
+          ref="searchInput"
           class="is-medium"
           placeholder="Search..."
           @changed="search"
@@ -34,6 +35,7 @@
       :current-search-score="searchResult.searchScore"
       :order-by="orderBy"
       @update-score="score => searchResult.sortScore = score"
+      @tag-clicked="tagClicked"
     />
     <div
       v-if="searchResults.length === 0"
@@ -54,6 +56,7 @@
       v-for="variant of variantStore.variantList"
       :key="variant.uid"
       :variant="variant"
+      @tag-clicked="tagClicked"
     />
   </div>
 </template>
@@ -75,6 +78,7 @@
   const variantStore = useVariantStore()
   const authStore = useAuthStore()
     
+  const searchInput = ref<InstanceType<typeof SmartTextInput>>()
   const searching = ref(false)
   const searchResults = ref<VariantIndexResult[]>([])
   
@@ -91,7 +95,7 @@
   const showDraftCard = computed(() => {
     // Do not show draft card if user is not logged in
     // Also wait until the variant list is fetched to avoid distracting pop-in
-    return authStore.loggedUser && variantStore.variantListFetched
+    return authStore.loggedUser && variantStore.variantListFetched && tags.value.length === 0
   })
   
   const orderBy = ref<SearchOrder>('search-relevance')
@@ -119,6 +123,19 @@
     searching.value = true
   }
   
+  function tagClicked(tag: string) {
+    if (!searchInput.value) throw new Error('searchInput is not defined')
+    const currentText = searchInput.value.getText()
+    // Escape regex characters in the tag
+    const tagRegex = new RegExp(`#${tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`)
+    const alreadyInQuery = tagRegex.test(currentText)
+    if (!alreadyInQuery) {
+      const newText = `${currentText} #${tag}`.trim()
+      searchInput.value.setText(newText)
+      search(newText)
+    }
+  }
+  
   
   // Persist the search order in session storage
   const storedSearchOrder = sessionStorage.getItem('search-order') as SearchOrder | null
@@ -129,7 +146,7 @@
     sessionStorage.setItem('search-order', order)
     refreshVariantList()
   })
-  const refreshVariantListDebounced = debounce(refreshVariantList, 500)
+  const refreshVariantListDebounced = debounce(refreshVariantList, 300)
   watch(tags, () => refreshVariantListDebounced())
   
   
