@@ -285,7 +285,7 @@
           showPopup(
             'Error',
             'An unexpected error occurred while reporting the variant. \
-            \n\nThis probably means that the variant has already been reported.',
+            \n\nThis usually means that the variant has already been reported.',
             'ok'
           )
         }

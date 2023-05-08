@@ -82,6 +82,32 @@ region(FUNCTIONS_REGION)
     return callFunction(import('./user/rename-user'), change, context.params.userId)
   })
 
+export const reportVariant =
+region(FUNCTIONS_REGION)
+  .firestore
+  .document('users/{userId}/reportedVariants/{variantId}')
+  .onCreate((_snap, context) => {
+    return callFunction(
+      import('./user/upvote-or-report'),
+      'reportVariant',
+      context.params.variantId,
+      context.params.userId
+    )
+  })
+
+export const reportUser =
+region(FUNCTIONS_REGION)
+  .firestore
+  .document('users/{userId}/reportedUsers/{reportedUserId}')
+  .onCreate((_snap, context) => {
+    return callFunction(
+      import('./user/upvote-or-report'),
+      'reportUser',
+      context.params.reportedUserId,
+      context.params.userId
+    )
+  })
+
 
 // VARIANT
 
@@ -99,21 +125,8 @@ region(FUNCTIONS_REGION)
   .document('users/{userId}/upvotedVariants/{variantId}')
   .onCreate((_snap, context) => {
     return callFunction(
-      import('./variant/increment-variant-upvotes-reports'),
-      'upvote',
-      context.params.variantId,
-      context.params.userId
-    )
-  })
-
-export const incrementVariantReports =
-region(FUNCTIONS_REGION)
-  .firestore
-  .document('users/{userId}/reportedVariants/{variantId}')
-  .onCreate((_snap, context) => {
-    return callFunction(
-      import('./variant/increment-variant-upvotes-reports'),
-      'report',
+      import('./user/upvote-or-report'),
+      'upvoteVariant',
       context.params.variantId,
       context.params.userId
     )

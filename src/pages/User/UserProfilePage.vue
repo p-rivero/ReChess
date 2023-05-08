@@ -122,7 +122,7 @@
       </div>
       
       <button
-        v-if="!myProfile(user)"
+        v-if="!myProfile(user) && authStore.loggedUser && !authStore.loggedUser.reportedUsers?.includes(user.uid)"
         class="button mt-6"
         @click="reportUser"
       >
@@ -417,6 +417,7 @@
         if (!user.value) throw new Error('User is undefined')
         try {
           await userStore.reportUser(user.value.uid)
+          authStore.loggedUser?.reportedUsers.push(user.value.uid)
           showPopup(
             'User reported',
             'This user has been reported. \
@@ -428,7 +429,7 @@
           showPopup(
             'Error',
             'An unexpected error occurred while reporting the user. \
-            \n\nThis probably means that the user has already been reported.',
+            \n\nThis usually means that the user has already been reported.',
             'ok'
           )
         }
