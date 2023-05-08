@@ -171,8 +171,13 @@
     lobbyStore.onJoinSlot((id, name) => {
       joiningPopup.value?.show(id, name)
     })
-    lobbyStore.onLeaveSlot(() => {
+    lobbyStore.onKickedFromSlot(() => {
       joiningPopup.value?.hide()
+      showPopup(
+        'Cannot join game',
+        'The game creator has declined your request to join the game.',
+        'ok'
+      )
     })
     lobbyStore.onGameCreated((gameId, creatorId) => {
       router.push({ name: 'play-online', params: { gameId } })

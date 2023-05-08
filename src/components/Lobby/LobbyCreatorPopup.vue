@@ -85,7 +85,7 @@
           @click="emit('reject-challenger')"
         >
           <div class="sz-icon icon-cross color-theme" />
-          Reject
+          Decline
         </button>
         
         <button

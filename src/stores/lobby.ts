@@ -42,6 +42,7 @@ const EMPTY_FN = () => { /* do nothing */ }
 export const useLobbyStore = defineStore('lobby', () => {
   const authStore = useAuthStore()
   let currentVariantId: string | null = null
+  let showKickedPopup = false
   
   // Callbacks
   let unsubscribe = EMPTY_FN
@@ -52,7 +53,7 @@ export const useLobbyStore = defineStore('lobby', () => {
   let challengerJoinedCallback: (info: ChallengerInfo) => void = EMPTY_FN
   let challengerLeftCallback = EMPTY_FN
   let joinSlotCallback: (id: string, name: string) => void = EMPTY_FN
-  let leaveSlotCallback = EMPTY_FN
+  let kickedFromSlotCallback = EMPTY_FN
   let gameCreatedCallback: (gameId: string, creatorId: string) => void = EMPTY_FN
   
   // Get real time updates for the slots in a lobby
@@ -67,9 +68,13 @@ export const useLobbyStore = defineStore('lobby', () => {
       const slots: LobbySlot[] = []
       // Update the list of slots
       snap.forEach(docSnap => {
-        const docId = docSnap.id
+        const creatorId = docSnap.id
+        // Skip slots created by reported users
+        if (authStore.loggedUser && authStore.loggedUser.reportedUsers.includes(creatorId)) {
+          return
+        }
         const doc = docSnap.data() as LobbySlotDoc
-        slots.push(readLobbyDocument(docId, doc))
+        slots.push(readLobbyDocument(creatorId, doc))
       })
       lobbyLoadedCallback(slots)
       
@@ -79,6 +84,11 @@ export const useLobbyStore = defineStore('lobby', () => {
         lobbyCreatedCallback(mySlot.requestedColor)
         // If my slot has a challenger, show their info
         if (mySlot.challengerId) {
+          // If challenger is reported, kick them automatically
+          if (authStore.loggedUser && authStore.loggedUser.reportedUsers.includes(mySlot.challengerId)) {
+            rejectChallenger()
+            return
+          }
           challengerJoinedCallback({
             name: mySlot.challengerDisplayName ?? '[error]',
             image: mySlot.challengerImage,
@@ -96,11 +106,15 @@ export const useLobbyStore = defineStore('lobby', () => {
       const joinedSlot = slots.find(s => s.currentUserIsChallenger)
       if (joinedSlot) {
         joinSlotCallback(joinedSlot.creatorId, joinedSlot.creatorDisplayName)
+        showKickedPopup = true
         if (joinedSlot.gameDocId) {
           gameCreatedCallback(joinedSlot.gameDocId, joinedSlot.creatorId)
+          // Don't show popup if the creator accepts the challenge
+          showKickedPopup = false
         }
-      } else {
-        leaveSlotCallback()
+      } else if (showKickedPopup) {
+        kickedFromSlotCallback()
+        showKickedPopup = false
       }
     })
     const unsubscribeOngoing = onSnapshot(LobbyDB.getOngoingGames(variantId), snap => {
@@ -146,8 +160,8 @@ export const useLobbyStore = defineStore('lobby', () => {
   function onJoinSlot(callback: (id: string, name: string)=>void) {
     joinSlotCallback = callback
   }
-  function onLeaveSlot(callback: ()=>void) {
-    leaveSlotCallback = callback
+  function onKickedFromSlot(callback: ()=>void) {
+    kickedFromSlotCallback = callback
   }
   function onGameCreated(callback: (gameId: string, creatorId: string)=>void) {
     gameCreatedCallback = callback
@@ -164,7 +178,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     challengerJoinedCallback = EMPTY_FN
     challengerLeftCallback = EMPTY_FN
     joinSlotCallback = EMPTY_FN
-    leaveSlotCallback = EMPTY_FN
+    kickedFromSlotCallback = EMPTY_FN
     lobbyDeletedCallback = EMPTY_FN
   }
   
@@ -278,6 +292,8 @@ export const useLobbyStore = defineStore('lobby', () => {
     if (!currentVariantId) {
       throw new Error('Must call setUpdateListener before cancelJoining')
     }
+    // Don't show popup when leaving voluntarily
+    showKickedPopup = false
     await LobbyDB.updateChallenger(currentVariantId, creatorId, null, null, null)
   }
   
@@ -292,7 +308,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     onChallengerLeft,
     onGameCreated,
     onJoinSlot,
-    onLeaveSlot,
+    onKickedFromSlot,
     
     createSlot,
     removeSlot,
