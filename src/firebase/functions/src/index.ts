@@ -82,30 +82,12 @@ region(FUNCTIONS_REGION)
     return callFunction(import('./user/rename-user'), change, context.params.userId)
   })
 
-export const reportVariant =
-region(FUNCTIONS_REGION)
-  .firestore
-  .document('users/{userId}/reportedVariants/{variantId}')
-  .onCreate((_snap, context) => {
-    return callFunction(
-      import('./user/upvote-or-report'),
-      'reportVariant',
-      context.params.variantId,
-      context.params.userId
-    )
-  })
-
 export const reportUser =
 region(FUNCTIONS_REGION)
   .firestore
   .document('users/{userId}/reportedUsers/{reportedUserId}')
-  .onCreate((_snap, context) => {
-    return callFunction(
-      import('./user/upvote-or-report'),
-      'reportUser',
-      context.params.reportedUserId,
-      context.params.userId
-    )
+  .onCreate((snap, context) => {
+    return callFunction(import('./user/report-user'), context.params.reportedUserId, context.params.userId, snap)
   })
 
 
@@ -124,12 +106,15 @@ region(FUNCTIONS_REGION)
   .firestore
   .document('users/{userId}/upvotedVariants/{variantId}')
   .onCreate((_snap, context) => {
-    return callFunction(
-      import('./user/upvote-or-report'),
-      'upvoteVariant',
-      context.params.variantId,
-      context.params.userId
-    )
+    return callFunction(import('./variant/increment-variant-upvotes'), context.params.variantId, context.params.userId)
+  })
+  
+export const reportVariant =
+region(FUNCTIONS_REGION)
+  .firestore
+  .document('users/{userId}/reportedVariants/{variantId}')
+  .onCreate((snap, context) => {
+    return callFunction(import('./variant/report-variant'), context.params.variantId, context.params.userId, snap)
   })
 
 export const updateVariantIndex =
