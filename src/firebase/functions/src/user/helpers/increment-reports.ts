@@ -1,7 +1,7 @@
 
 import { ModerationDoc, UserDoc } from 'db/schema'
 import { updatePrivateCache } from './update-private-cache'
-import { useAdmin } from '@/helpers'
+import { useAdmin } from '../../helpers'
 
 /**
  * Increments the report count of a variant or user, and updates

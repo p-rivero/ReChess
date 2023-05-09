@@ -9,7 +9,6 @@
     "target": "es2017",
     "paths": {
       "db/*": ["../db/*"],
-      "@/*": ["./src/*"],
     }
   },
   "compileOnSave": true,

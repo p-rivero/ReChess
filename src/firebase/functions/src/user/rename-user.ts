@@ -3,7 +3,7 @@ import { Timestamp } from 'firebase-admin/firestore'
 import type { Change } from 'firebase-functions'
 import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 
-import { batchedUpdate, useAdmin } from '@/helpers'
+import { batchedUpdate, useAdmin } from '../helpers'
 import type { UserRenameTriggerDoc } from 'db/schema'
 
 

@@ -1,7 +1,7 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import { FieldValue } from 'firebase-admin/firestore'
-import { useAdmin } from '@/helpers'
+import { useAdmin } from '../helpers'
 import type { CancelledGameDoc, GameDoc } from 'db/schema'
 import type { Timestamp } from 'firebase/firestore'
 

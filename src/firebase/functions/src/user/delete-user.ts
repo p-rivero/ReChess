@@ -1,5 +1,5 @@
 
-import { batchedUpdate, useAdmin } from '@/helpers'
+import { batchedUpdate, useAdmin } from '../helpers'
 import { updateName } from './rename-user'
 import type { UserDoc } from 'db/schema'
 import type { UserRecord } from 'firebase-admin/auth'

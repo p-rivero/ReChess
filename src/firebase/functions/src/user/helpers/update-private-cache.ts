@@ -1,6 +1,6 @@
 
 import { UserPrivateCacheDoc } from 'db/schema'
-import { useAdmin } from '@/helpers'
+import { useAdmin } from '../../helpers'
 
 
 /**
