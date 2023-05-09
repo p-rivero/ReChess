@@ -161,10 +161,16 @@ test('cannot create renameTrigger with incorrect data', async () => {
   )
 })
 
-test('cannot create renameTrigger if not verified', async () => {
+test('can create renameTrigger if not verified', async () => {
+  await setupUser('A name')
+  await assertSucceeds(
+    set('unverified', { name: 'A name', username: 'my_username' }, 'users', MY_ID, 'renameTrigger', 'doc')
+  )
+})
+test('cannot create renameTrigger for another user', async () => {
   await setupUser('A name')
   await assertFails(
-    set('unverified', { name: 'A name', username: 'my_username' }, 'users', MY_ID, 'renameTrigger', 'doc')
+    set('not logged', { name: 'A name', username: 'my_username' }, 'users', MY_ID, 'renameTrigger', 'doc')
   )
 })
 
