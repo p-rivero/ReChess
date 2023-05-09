@@ -234,14 +234,14 @@ export const useAuthStore = defineStore('auth-user', () => {
     return methods[0] as SignInProvider
   }
   
-  // Returns true if a username is available
-  async function checkUsername(username: string): Promise<boolean> {
-    return (await UserDB.getId(username)) === undefined
+  // Returns true if the username has not been taken yet
+  async function usernameAvailable(username: string): Promise<boolean> {
+    return (await UserDB.getUserByUsername(username)) === undefined
   }
 
   return {
     emailLogIn, emailRegister, thirdPartySignIn, thirdPartyRegister, signOut, deleteUser,
-    sendEmailVerification, sendPasswordResetEmail, getProvider, checkUsername,
+    sendEmailVerification, sendPasswordResetEmail, getProvider, usernameAvailable,
     loggedUser,
   }
 })

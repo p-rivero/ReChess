@@ -60,10 +60,9 @@ export const useUserStore = defineStore('user', () => {
       return lastUserCache.value
     }
     
-    const id = await UserDB.getId(username)
-    if (!id) return undefined
-    const doc = await UserDB.getUserById(id)
-    if (!doc) return undefined
+    const user = await UserDB.getUserByUsername(username)
+    if (!user) return undefined
+    const [id, doc] = user
     lastUserCache.value = new User(id, doc)
     return lastUserCache.value
   }

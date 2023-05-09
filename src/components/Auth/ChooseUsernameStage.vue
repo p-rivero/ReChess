@@ -116,10 +116,10 @@
     usernameStatus.value = 'unknown'
     if (name === '') return
     // Limit the number of requests to the server
-    await checkDebounced(name)
+    await checkUsernameDebounced(name)
   }
-  const checkDebounced = debounce(async (name: string) => {
-    const available = await authStore.checkUsername(name)
+  const checkUsernameDebounced = debounce(async (name: string) => {
+    const available = await authStore.usernameAvailable(name)
     // This result is obsolete, user has already changed the username
     if (name !== username.value) return
     usernameStatus.value = available ? 'available' : 'taken'

@@ -1,7 +1,7 @@
 import { db } from '@/firebase'
 import type { ReportDoc, UserDoc, UserPrivateCacheDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
 
-import { Timestamp, doc, getDoc, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore'
+import { Timestamp, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore'
 import type { User } from '@firebase/auth'
 
 // Creates a new user in the database (public data + private data + username)
@@ -38,12 +38,15 @@ export async function createUser(user: User, username: string): Promise<UserDoc>
   return newPublicData
 }
 
-// username -> userId
-export async function getId(username: string): Promise<string | undefined> {
-  const document = await getDoc(doc(db, 'usernames', username))
-  if (!document.exists()) return undefined
-  const data = document.data() as UsernameDoc
-  return data.userId
+// username -> [userId, UserDoc]
+export async function getUserByUsername(username: string): Promise<[string, UserDoc] | undefined> {
+  const q = query(collection(db, 'users'), where('IMMUTABLE.username', '==', username))
+  const querySnapshot = await getDocs(q)
+  if (querySnapshot.size === 0) return undefined
+  if (querySnapshot.size > 1) throw new Error('Multiple users with the same username')
+  const userId = querySnapshot.docs[0].id
+  const doc = querySnapshot.docs[0].data() as UserDoc
+  return [userId, doc]
 }
 
 // userId -> UserDoc
