@@ -1,6 +1,6 @@
 
 import { createHash } from 'node:crypto'
-import { useAdmin } from '../helpers'
+import { useAdmin } from '@/helpers'
 import type { ObjectMetadata } from 'firebase-functions/v1/storage'
 
 /**

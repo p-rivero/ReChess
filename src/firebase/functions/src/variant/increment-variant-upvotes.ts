@@ -1,7 +1,7 @@
 
 import { FieldValue } from 'firebase-admin/firestore'
-import { useAdmin } from '@/helpers'
 import { updatePrivateCache } from '@/user/helpers/update-private-cache'
+import { useAdmin } from '@/helpers'
 
 /**
  * Called when a user upvotes a variant. Increments the upvote count of the variant and

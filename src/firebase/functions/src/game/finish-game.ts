@@ -1,5 +1,5 @@
 import { FieldValue } from 'firebase-admin/firestore'
-import { useAdmin } from '../helpers'
+import { useAdmin } from '@/helpers'
 import type { GameDoc, GameSummary, UserDoc } from 'db/schema'
 
 /**
