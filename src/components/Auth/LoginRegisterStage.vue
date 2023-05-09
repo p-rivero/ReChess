@@ -44,34 +44,12 @@
       class="mb-5"
     >
       <label class="label">Username</label>
-      <SmartTextInput
+      <UsernameTextbox
         ref="usernameRef"
-        class="mb-2"
-        placeholder="your_username"
         :error-handler="errorHandler"
-        :refresh-handler-on-input="true"
-        :validator="text => {
-          if (!isRegister) return undefined
-          if (text === '' && !isStrict) return undefined
-          if (text === '') return 'Please enter a username'
-          if (text.length < 3) return 'Username must be at least 3 characters long'
-          if (text.length > 25) return 'Username must be at most 25 characters long'
-          if (!(/^[a-zA-Z0-9_]+$/).test(text)) return 'Username can only contain letters, numbers, and underscores'
-        }"
-        :start-text="username"
-        @changed="updateUsername"
+        :strict-mode="isStrict"
+        :disable-checking="!isRegister"
       />
-      <p
-        class="help"
-        :style="{visibility: username ? 'visible' : 'hidden'}"
-        :class="{
-          'has-text-danger': usernameStatus === 'taken',
-          'has-text-success': usernameStatus === 'available',
-        }"
-      >
-        rechess.org/user/<b>{{ username }}</b>
-        {{ usernameStatus === 'taken' ? 'is already taken' : usernameStatus === 'available' ? 'is available' : '' }}
-      </p>
     </div>
     
     <div class="mb-5">
@@ -214,17 +192,16 @@
   import { PopupClosedError } from '@/utils/errors/PopupClosedError'
   import { RechessError } from '@/utils/errors/RechessError'
   import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
-  import { debounce } from '@/utils/ts-utils'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
+  import UsernameTextbox from './UsernameTextbox.vue'
   
   
   const emailRef = ref<InstanceType<typeof SmartTextInput>>()
-  const usernameRef = ref<InstanceType<typeof SmartTextInput>>()
+  const usernameRef = ref<InstanceType<typeof UsernameTextbox>>()
   const passwordRepeatRef = ref<InstanceType<typeof SmartTextInput>>()
   const email = ref('')
-  const username = ref('')
   const password = ref('')
   const passwordRepeat = ref('')
   const isRegister = ref(false)
@@ -233,13 +210,13 @@
   const revealPasswords = ref(false)
   
   const authStore = useAuthStore()
-  const usernameStatus = ref<'available' | 'taken' | 'unknown'>('unknown')
   const hasError = ref(false)
   const resetPasswordHint = ref<'hidden' | 'shown' | 'sending'>('hidden')
   const errorHandler = new ErrorMessageHandler(hasError)
   
   const submitDisabled = computed(() => {
-    return hasError.value || loading.value || (isRegister.value && usernameStatus.value !== 'available')
+    if (!usernameRef.value) return true
+    return hasError.value || loading.value || (isRegister.value && usernameRef.value.usernameStatus !== 'available')
   })
   
   defineExpose({
@@ -252,10 +229,8 @@
       loading.value = false
       revealPasswords.value = false
       resetPasswordHint.value = 'hidden'
-      username.value = ''
       passwordRepeat.value = ''
-      usernameStatus.value = 'unknown'
-      usernameRef.value?.setText('')
+      usernameRef.value?.cleanup()
       passwordRepeatRef.value?.setText('')
     },
   })
@@ -265,23 +240,6 @@
     (event: 'choose-username'): void
   }>()
   
-  
-  
-  async function updateUsername(name: string) {
-    if (name === username.value) return
-    username.value = name
-    usernameStatus.value = 'unknown'
-    if (name === '') return
-    // Limit the number of requests to the server
-    await checkUsernameDebounced(name)
-  }
-  const checkUsernameDebounced = debounce(async (name: string) => {
-    const available = await authStore.usernameAvailable(name)
-    // This result is obsolete, user has already changed the username
-    if (name !== username.value) return
-    usernameStatus.value = available ? 'available' : 'taken'
-    errorHandler.clear()
-  }, 1000)
   
   async function signInClick() {
     if (submitDisabled.value) return
@@ -297,14 +255,15 @@
   }
   
   async function register() {
-    if (email.value === '' || username.value === '' || password.value === '' || passwordRepeat.value === '') {
+    if (!usernameRef.value) throw new Error('Username textbox not found')
+    if (email.value === '' || usernameRef.value.username === '' || password.value === '' || passwordRepeat.value === '') {
       // Refresh error messages, now in strict mode
       isStrict.value = true
       errorHandler.clear()
       return
     }
     // This throws an error if the email or username is already taken
-    await authStore.emailRegister(email.value, username.value, password.value)
+    await authStore.emailRegister(email.value, usernameRef.value.username, password.value)
     // Also send a verification email
     await authStore.sendEmailVerification()
     emit('check-verify')
@@ -386,7 +345,7 @@
     resetPasswordHint.value = 'hidden'
   }
   // Hide the reset password hint if the user changes anything
-  watch([email, username, password, passwordRepeat], () => {
+  watch([email, usernameRef, password, passwordRepeat], () => {
     resetPasswordHint.value = 'hidden'
   })
 </script>

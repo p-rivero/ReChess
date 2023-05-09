@@ -8,35 +8,12 @@
       It cannot be changed later, so choose wisely!
     </p>
     
-    <div class="mb-5">
-      <SmartTextInput
-        ref="usernameRef"
-        class="mb-2"
-        placeholder="your_username"
-        :error-handler="errorHandler"
-        :refresh-handler-on-input="true"
-        :validator="text => {
-          if (text === '') return undefined
-          if (text.length < 3) return 'Username must be at least 3 characters long'
-          if (text.length > 25) return 'Username must be at most 25 characters long'
-          if (!(/^[a-zA-Z0-9_]+$/).test(text)) return 'Username can only contain letters, numbers, and underscores'
-        }"
-        :start-text="username"
-        @changed="updateUsername"
-        @enter-pressed="submit"
-      />
-      <p
-        v-show="username !== ''"
-        class="help"
-        :class="{
-          'has-text-danger': usernameStatus === 'taken',
-          'has-text-success': usernameStatus === 'available',
-        }"
-      >
-        rechess.org/user/<b>{{ username }}</b>
-        {{ usernameStatus === 'taken' ? 'is already taken' : usernameStatus === 'available' ? 'is available' : '' }}
-      </p>
-    </div>
+    <UsernameTextbox
+      ref="usernameRef"
+      class="mb-5"
+      :error-handler="errorHandler"
+      @enter-pressed="submit"
+    />
     
     <SmartErrorMessage
       v-show="hasError"
@@ -72,21 +49,19 @@
 <script setup lang="ts">
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
   import { computed, ref } from 'vue'
-  import { debounce } from '@/utils/ts-utils'
   import { useAuthStore } from '@/stores/auth-user'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
-  import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
+  import UsernameTextbox from './UsernameTextbox.vue'
   
   const authStore = useAuthStore()
-  const username = ref('')
-  const usernameStatus = ref<'available' | 'taken' | 'unknown'>('unknown')
   const hasError = ref(false)
   const loading = ref(false)
   const errorHandler = new ErrorMessageHandler(hasError)
-  const usernameRef = ref<InstanceType<typeof SmartTextInput>>()
+  const usernameRef = ref<InstanceType<typeof UsernameTextbox>>()
   
   const submitDisabled = computed(() => {
-    return hasError.value || loading.value || !username.value || usernameStatus.value !== 'available'
+    if (!usernameRef.value) return true
+    return hasError.value || loading.value || !usernameRef.value.username || usernameRef.value.usernameStatus !== 'available'
   })
   
   defineExpose({
@@ -96,8 +71,7 @@
       usernameRef.value.triggerChanged()
     },
     cleanup() {
-      username.value = ''
-      usernameStatus.value = 'unknown'
+      usernameRef.value?.cleanup()
       hasError.value = false
       loading.value = false
     },
@@ -110,27 +84,12 @@
   
   
   
-  async function updateUsername(name: string) {
-    if (name === username.value) return
-    username.value = name
-    usernameStatus.value = 'unknown'
-    if (name === '') return
-    // Limit the number of requests to the server
-    await checkUsernameDebounced(name)
-  }
-  const checkUsernameDebounced = debounce(async (name: string) => {
-    const available = await authStore.usernameAvailable(name)
-    // This result is obsolete, user has already changed the username
-    if (name !== username.value) return
-    usernameStatus.value = available ? 'available' : 'taken'
-    errorHandler.clear()
-  }, 1000)
-  
   async function submit() {
+    if (!usernameRef.value) throw new Error('usernameRef not found')
     if (submitDisabled.value) return
     loading.value = true
     try {
-      await authStore.thirdPartyRegister(username.value)
+      await authStore.thirdPartyRegister(usernameRef.value.username)
     } catch (e) {
       errorHandler.showException(e)
       return
