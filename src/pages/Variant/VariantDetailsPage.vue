@@ -106,6 +106,10 @@
     ref="pieceDetailsPopup"
     :variant="variant"
   />
+  <PopupWithTextbox
+    ref="reportPopup"
+    hint="Tell us why (optional)"
+  />
 </template>
 
 
@@ -126,6 +130,7 @@
   import PieceDetailsPopup from '@/components/Variant/View/PieceDetailsPopup.vue'
   import PiecesSummary from '@/components/Variant/PiecesSummary.vue'
   import PillList from '@/components/PillList.vue'
+  import PopupWithTextbox from '@/components/PopupMsg/PopupWithTextbox.vue'
   import UpvoteButton from '@/components/Variant/View/UpvoteButton.vue'
   import ViewableChessBoard from '@/components/ChessBoard/ViewableChessBoard.vue'
   import type { PublishedVariant } from '@/protochess/types'
@@ -141,6 +146,7 @@
   const variant = ref<PublishedVariant>()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
   const pieceDetailsPopup = ref<InstanceType<typeof PieceDetailsPopup>>()
+  const reportPopup = ref<InstanceType<typeof PopupWithTextbox>>()
     
   watchEffect(async () => {
     if (!route.params.variantId || typeof route.params.variantId !== 'string') {
@@ -264,15 +270,16 @@
   
   
   function reportVariant() {
-    showPopup(
+    reportPopup.value?.show(
+      false,
       'Report variant',
       'A moderator will review the variant and remove it if it violates our rules. \
-      \n\n**This action cannot be undone.** Do you want to report this variant?',
-      'yes-no',
-      async () => {
+      \n\nThis action cannot be undone.',
+      'ok-cancel',
+      async reason => {
         if (!variant.value) throw new Error('variant is null')
         try {
-          await variantStore.reportVariant(variant.value.uid)
+          await variantStore.reportVariant(variant.value.uid, reason)
           authStore.loggedUser?.reportedVariants.push(variant.value.uid)
           showPopup(
             'Variant reported',

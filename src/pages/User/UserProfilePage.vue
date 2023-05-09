@@ -426,17 +426,17 @@
   function reportUser() {
     reportPopup.value?.show(
       false,
-      'Report user',
+      'Report and block user',
       'A moderator will review this user\'s profile and ban them it if it violates our rules. \
-      \n\nThis action cannot be undone. Do you want to report this user?',
-      'yes-no',
-      async text => {
+      \n\nThis action cannot be undone.',
+      'ok-cancel',
+      async reason => {
         if (!user.value) throw new Error('User is undefined')
         try {
-          await userStore.blockUser(user.value.uid, true, text)
+          await userStore.blockUser(user.value.uid, true, reason)
           showPopup(
             'User reported',
-            'This user has been reported. \
+            'Report sent successfully. You will stop seeing this user in the online lobby. \
             \n\nThank you for helping us keep ReChess a safe place.',
             'ok'
           )
@@ -455,15 +455,17 @@
   function blockUser() {
     showPopup(
       'Block user',
-      'This action cannot be undone. Do you want to block this user?',
-      'yes-no',
+      'You will stop seeing this user in the online lobby. \
+      This does *not* block the variants created by this user. \
+      \n\nThis action cannot be undone.',
+      'ok-cancel',
       async () => {
         if (!user.value) throw new Error('User is undefined')
         try {
           await userStore.blockUser(user.value.uid, false)
           showPopup(
             'User blocked',
-            'You will no longer see this user while playing.',
+            'You will no longer see this user.',
             'ok'
           )
         } catch (e) {
