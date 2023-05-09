@@ -20,6 +20,7 @@
       </header>
       <section class="modal-card-body content mb-0">
         <VueMarkdown :source="messageText" />
+        <slot />
       </section>
       <footer class="modal-card-foot">
         <button
@@ -60,7 +61,14 @@
   let isImportant = false
   
   defineExpose({
-    show(important: boolean, title: string, message: string, buttons: 'ok' | 'ok-cancel' | 'yes-no', accept?: () => void, cancel?: () => void) {
+    show(
+      important: boolean,
+      title: string,
+      message: string,
+      buttons: 'ok' | 'ok-cancel' | 'yes-no',
+      accept?: () => void,
+      cancel?: () => void
+    ) {
       titleText.value = title
       messageText.value = message
       isImportant = important

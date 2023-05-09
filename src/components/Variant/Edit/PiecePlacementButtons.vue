@@ -23,7 +23,7 @@
           @click="onPieceClick('wall')"
         >
           <div
-            class="icon-block"
+            class="icon-wall"
             :class="{
               'color-theme': selectedId !== 'wall',
               'color-white': selectedId === 'wall',

@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import type { TimestampDoc, UserDoc, UserPrivateCacheDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
+import type { ReportDoc, UserDoc, UserPrivateCacheDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
 
 import { Timestamp, doc, getDoc, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore'
 import type { User } from '@firebase/auth'
@@ -73,9 +73,11 @@ export async function updateUser(uid: string, name: string|null, about: string, 
 }
 
 // Reports a user
-export async function reportUser(reporterId: string, reportedUserId: string): Promise<void> {
-  const reportDoc: TimestampDoc = {
+export async function reportUser(reporterId: string, reportedUserId: string, onlyBlock: boolean, reason: string): Promise<void> {
+  const reportDoc: ReportDoc = {
     time: serverTimestamp() as Timestamp,
+    reason: reason,
+    onlyBlock,
   }
   await setDoc(doc(db, 'users', reporterId, 'reportedUsers', reportedUserId), reportDoc)
 }

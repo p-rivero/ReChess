@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import type { TimestampDoc, VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
+import type { ReportDoc, TimestampDoc, VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
 import type { Variant } from '@/protochess/types'
 import type { VariantListOrder } from '@/utils/chess/variant-search'
 
@@ -67,9 +67,11 @@ export async function removeUpvoteVariant(userId: string, variantId: string): Pr
 }
 
 // Reports the variant in behalf of the user
-export async function reportVariant(userId: string, variantId: string): Promise<void> {
-  const reportDoc: TimestampDoc = {
+export async function reportVariant(userId: string, variantId: string, reason: string): Promise<void> {
+  const reportDoc: ReportDoc = {
     time: serverTimestamp() as Timestamp,
+    reason,
+    onlyBlock: false,
   }
   await setDoc(doc(db, 'users', userId, 'reportedVariants', variantId), reportDoc)
 }

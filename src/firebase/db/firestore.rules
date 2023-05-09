@@ -200,6 +200,16 @@ service cloud.firestore {
           hasFields(doc, ['time'], []) &&
           doc.time is timestamp;
       }
+      function isReportDoc(doc) {
+        return
+          hasFields(doc, ['time', 'reason', 'onlyBlock'], []) &&
+          doc.time is timestamp &&
+          doc.reason is string &&
+          doc.reason.size() <= 1000 &&
+          doc.onlyBlock is bool &&
+          // If onlyBlock, reason must be empty
+          (doc.onlyBlock ? doc.reason.size() == 0 : true);
+      }
       
       match /upvotedVariants/{variantId} {
         function allowCreateUpvote() {
@@ -227,9 +237,11 @@ service cloud.firestore {
         function allowCreateVariantReport() {
           let doc = request.resource.data;
           return
-            isTimestampDoc(doc) &&
+            isReportDoc(doc) &&
             loggedAs(userId) &&
             isServerTimestamp(doc.time) &&
+            // Cannot block variants, just report them
+            doc.onlyBlock == false &&
             exists(/databases/$(database)/documents/variants/$(variantId));
         }
         // Other users cannot see my reports
@@ -241,7 +253,7 @@ service cloud.firestore {
         function allowCreateUserReport() {
           let doc = request.resource.data;
           return
-            isTimestampDoc(doc) &&
+            isReportDoc(doc) &&
             loggedAs(userId) &&
             reportedUserId != userId &&
             isServerTimestamp(doc.time) &&

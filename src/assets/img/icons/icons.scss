@@ -445,6 +445,14 @@
 }
 
 
+/* wall.svg */
+.icon-wall {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/wall.svg");
+  mask-image: url("@/assets/img/icons/wall.svg");
+}
+
+
 /* zoom1.svg */
 .icon-zoom1 {
   @extend .icon-common;

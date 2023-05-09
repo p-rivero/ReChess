@@ -121,14 +121,24 @@
         />
       </div>
       
-      <button
+      <div
         v-if="!myProfile(user) && authStore.loggedUser && !authStore.loggedUser.reportedUsers?.includes(user.uid)"
-        class="button mt-6"
-        @click="reportUser"
       >
-        <div class="sz-icon icon-flag color-theme" />
-        Report user
-      </button>
+        <button
+          class="button mt-6 mr-4"
+          @click="blockUser"
+        >
+          <div class="sz-icon icon-block color-theme" />
+          Block user
+        </button>
+        <button
+          class="button mt-6"
+          @click="reportUser"
+        >
+          <div class="sz-icon icon-flag color-theme" />
+          Report user
+        </button>
+      </div>
       
       <SmartErrorMessage
         v-show="hasError && myProfile(user)"
@@ -219,6 +229,10 @@
       'ok'
     )"
   />
+  <PopupWithTextbox
+    ref="reportPopup"
+    hint="Tell us why (optional)"
+  />
 </template>
 
 <script setup lang="ts">
@@ -235,6 +249,7 @@
   import EditableMarkdown from '@/components/BasicWrappers/EditableMarkdown.vue'
   import EditableTitle from '@/components/BasicWrappers/EditableTitle.vue'
   import ImageSelectPopup from '@/components/ImageSelect/ImageSelectPopup.vue'
+  import PopupWithTextbox from '@/components/PopupMsg/PopupWithTextbox.vue'
   import ProfileGameView from '@/components/Lobby/ProfileGameView.vue'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   
@@ -249,6 +264,7 @@
   const showDangerZone = ref(false)
   const sendingResetPasswordEmail = ref(false)
   const imageSelectPopup = ref<InstanceType<typeof ImageSelectPopup>>()
+  const reportPopup = ref<InstanceType<typeof PopupWithTextbox>>()
   
   const errorHandler = new ErrorMessageHandler(hasError)
   
@@ -408,16 +424,16 @@
   }
   
   function reportUser() {
-    showPopup(
+    reportPopup.value?.show(
+      false,
       'Report user',
       'A moderator will review this user\'s profile and ban them it if it violates our rules. \
-      \n\n**This action cannot be undone.** Do you want to report this user?',
+      \n\nThis action cannot be undone. Do you want to report this user?',
       'yes-no',
-      async () => {
+      async text => {
         if (!user.value) throw new Error('User is undefined')
         try {
-          await userStore.reportUser(user.value.uid)
-          authStore.loggedUser?.reportedUsers.push(user.value.uid)
+          await userStore.blockUser(user.value.uid, true, text)
           showPopup(
             'User reported',
             'This user has been reported. \
@@ -430,6 +446,32 @@
             'Error',
             'An unexpected error occurred while reporting the user. \
             \n\nThis usually means that the user has already been reported.',
+            'ok'
+          )
+        }
+      }
+    )
+  }
+  function blockUser() {
+    showPopup(
+      'Block user',
+      'This action cannot be undone. Do you want to block this user?',
+      'yes-no',
+      async () => {
+        if (!user.value) throw new Error('User is undefined')
+        try {
+          await userStore.blockUser(user.value.uid, false)
+          showPopup(
+            'User blocked',
+            'You will no longer see this user while playing.',
+            'ok'
+          )
+        } catch (e) {
+          console.error(e)
+          showPopup(
+            'Error',
+            'An unexpected error occurred while blocking the user. \
+            \n\nThis usually means that the user has already been blocked.',
             'ok'
           )
         }

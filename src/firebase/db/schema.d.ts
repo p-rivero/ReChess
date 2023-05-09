@@ -45,10 +45,15 @@ export interface UserPrivateDoc {
 }
 
 // users/{userId}/upvotedVariants/{variantId}
-// users/{userId}/reportedVariants/{variantId}
-// users/{userId}/reportedUsers/{reportedUserId}
 export interface TimestampDoc {
   time: Timestamp
+}
+
+// users/{userId}/reportedVariants/{variantId}
+// users/{userId}/reportedUsers/{reportedUserId}
+export interface ReportDoc extends TimestampDoc {
+  reason: string
+  onlyBlock: boolean
 }
 
 // users/{userId}/privateCache/doc

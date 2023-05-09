@@ -116,11 +116,11 @@ export const useVariantStore = defineStore('variant', () => {
     }
   }
   
-  async function reportVariant(id: string): Promise<void> {
+  async function reportVariant(id: string, reason: string): Promise<void> {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to report a variant')
     }
-    await VariantDB.reportVariant(authStore.loggedUser.uid, id)
+    await VariantDB.reportVariant(authStore.loggedUser.uid, id, reason)
   }
   
   return {

@@ -76,13 +76,20 @@ export const useUserStore = defineStore('user', () => {
     await UserDB.updateUser(user.uid, name, user.about, profileImg, updateName)
   }
   
-  // Report a user. This will only succeed if the user is authenticated.
-  async function reportUser(id: string): Promise<void> {
+  // Block a user, and optionally report them. This will only succeed if the user is authenticated.
+  async function blockUser(id: string, report: true, reason: string): Promise<void>
+  async function blockUser(id: string, report: false): Promise<void>
+  async function blockUser(id: string, report: boolean, reason?: string): Promise<void> {
     if (!authStore.loggedUser) {
       throw new Error('User must be logged in to report a user')
     }
-    await UserDB.reportUser(authStore.loggedUser.uid, id)
+    if (!report && reason) {
+      throw new Error('When blocking a user, do not provide a reason')
+    }
+    const onlyBlock = !report
+    await UserDB.reportUser(authStore.loggedUser.uid, id, onlyBlock, reason ?? '')
+    authStore.loggedUser?.reportedUsers.push(id)
   }
   
-  return { getUserById, getUserByUsername, storeUser, reportUser }
+  return { getUserById, getUserByUsername, storeUser, blockUser }
 })
