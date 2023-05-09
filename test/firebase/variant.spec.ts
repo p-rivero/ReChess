@@ -50,7 +50,6 @@ test('can create variant with display name', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -70,7 +69,6 @@ test('can create variant with username', async () => {
     creatorDisplayName: '@my_username',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -90,7 +88,6 @@ test('cannot create variant if not verified', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -110,7 +107,6 @@ test('variant name must be trimmed', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -130,7 +126,6 @@ test('creator id must be correct', async () => {
     creatorDisplayName: 'My name',
     creatorId: 'WRONG_ID', // Trying to impersonate another user
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -154,7 +149,6 @@ test('creator must id must mot be null', async () => {
     creatorDisplayName: 'My name',
     creatorId: null,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -176,7 +170,6 @@ test('creator display name must be correct', async () => {
     creatorDisplayName: 'ANOTHER NAME',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -208,7 +201,6 @@ test('creation time must be correct', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -231,7 +223,6 @@ test('num upvotes must be 0', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 10,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -240,29 +231,6 @@ test('num upvotes must be 0', async () => {
     add('verified', variant, 'variants')
   )
   variant.numUpvotes = 0
-  await assertSucceeds(
-    add('verified', variant, 'variants')
-  )
-})
-
-test('num reports must be 0', async () => {
-  await setupUser()
-  const variant: VariantDoc = {
-    name: 'My variant',
-    description: 'Variant description',
-    creationTime: now(),
-    creatorDisplayName: 'My name',
-    creatorId: MY_ID,
-    numUpvotes: 0,
-    numReports: 5,
-    popularity: 0,
-    tags: [],
-    initialState: '{}',
-  }
-  await assertFails(
-    add('verified', variant, 'variants')
-  )
-  variant.numReports = 0
   await assertSucceeds(
     add('verified', variant, 'variants')
   )
@@ -277,7 +245,6 @@ test('popularity must be 0', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 2,
     tags: [],
     initialState: '{}',
@@ -300,7 +267,6 @@ test('cannot edit variant', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -324,7 +290,6 @@ test('cannot remove variant', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: [],
     initialState: '{}',
@@ -347,7 +312,6 @@ test('can create variant with with tags', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: ['abc', 'def'],
     initialState: '{}',
@@ -367,7 +331,6 @@ test('can create variant with with tags', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: ['abc', 'def'],
     initialState: '{}',
@@ -387,7 +350,6 @@ test('cannot have more than 7 tags', async () => {
     creatorDisplayName: 'My name',
     creatorId: MY_ID,
     numUpvotes: 0,
-    numReports: 0,
     popularity: 0,
     tags: ['1', '2', '3', '4', '5', '6', '7', '8'],
     initialState: '{}',

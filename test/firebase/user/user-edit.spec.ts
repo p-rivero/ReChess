@@ -249,12 +249,12 @@ test('cannot see other renameTrigger', async () => {
 })
 
 
-test('users cannot see their hidden doc', async () => {
+test('users cannot see their moderation doc', async () => {
   await setupUser('Name 1')
   await assertFails(
-    set('verified', { numReports: 0 }, 'users', MY_ID, 'hidden', 'doc')
+    set('verified', { numReports: 0 }, 'users', MY_ID, 'moderation', 'doc')
   )
   await assertFails(
-    get('verified', 'users', MY_ID, 'hidden', 'doc')
+    get('verified', 'users', MY_ID, 'moderation', 'doc')
   )
 })

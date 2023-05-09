@@ -1,5 +1,4 @@
 
-import { FieldValue } from 'firebase-admin/firestore'
 import { ModerationDoc, UserDoc } from 'db/schema'
 import { updatePrivateCache } from './update-private-cache'
 import { useAdmin } from '@/helpers'
@@ -23,24 +22,20 @@ export async function incrementReports(
   const db = admin.firestore()
   
   const moderationRef = db.collection(collectionName).doc(docId).collection('moderation').doc('doc')
-  const newSummaryLine = makeSummaryLine(reporterId, reportReason)
+  const newSummaryLine = await makeSummaryLine(reporterId, reportReason)
   db.runTransaction(async (transaction) => {
     const moderationSnap = await transaction.get(moderationRef)
-    // Create the moderation doc if it doesn't exist
-    if (!moderationSnap.exists) {
-      const newDoc: ModerationDoc = {
-        numReports: 0,
-        reportsSummary: '',
+    let newDoc: ModerationDoc
+    if (moderationSnap.exists) {
+      const oldDoc = moderationSnap.data() as ModerationDoc
+      newDoc = {
+        numReports: oldDoc.numReports + 1,
+        reportsSummary: oldDoc.reportsSummary + newSummaryLine,
       }
-      transaction.set(moderationRef, newDoc)
+    } else {
+      newDoc = { numReports: 1, reportsSummary: newSummaryLine }
     }
-    const moderationDoc = moderationSnap.data() as ModerationDoc
-    
-    const updateObj = {
-      numReports: FieldValue.increment(1),
-      reportsSummary: moderationDoc.reportsSummary + newSummaryLine,
-    }
-    transaction.update(moderationRef, updateObj)
+    transaction.set(moderationRef, newDoc)
   }).catch((err) => {
     console.error('Error while incrementing upvotes or reports:', collectionName, docId)
     console.error(err)

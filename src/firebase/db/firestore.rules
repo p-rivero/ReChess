@@ -269,8 +269,8 @@ service cloud.firestore {
         allow read: if loggedAs(userId) && docName == 'doc';
       }
       
-      // users/{userId}/hidden/doc cannot be read or written directly, it can only be
-      // accessed by moderators and cloud functions.
+      // users/{userId}/moderation/doc cannot be read or written directly,
+      // it can only be accessed by moderators and cloud functions.
       
       
       match /renameTrigger/{docName} {
@@ -309,7 +309,7 @@ service cloud.firestore {
       function isVariantDoc(doc) {
         return
           hasFields(doc,
-            ['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes', 'numReports', 'popularity', 'tags'],
+            ['name', 'description', 'creationTime', 'creatorDisplayName', 'initialState', 'numUpvotes', 'popularity', 'tags'],
             ['creatorId']
           ) &&
           doc.name is string &&
@@ -323,7 +323,6 @@ service cloud.firestore {
           doc.initialState is string &&
           doc.initialState.size() <= 200000 &&
           doc.numUpvotes is int &&
-          doc.numReports is int &&
           doc.popularity is int &&
           doc.tags is list &&
           doc.tags.size() <= 7 &&
@@ -339,13 +338,15 @@ service cloud.firestore {
           doc.creatorDisplayName == expectedDisplayName(creatorDoc) &&
           isServerTimestamp(doc.creationTime) &&
           doc.numUpvotes == 0 &&
-          doc.numReports == 0 &&
           doc.popularity == 0;
       }
       
       allow read;
       allow create: if allowCreateVariant();
       // Disallow editing and deleting variants
+      
+      // variants/{variantId}/moderation/doc cannot be read or written directly,
+      // it can only be accessed by moderators and cloud functions.
       
       
       match /lobby/{creatorUserId} {

@@ -39,7 +39,6 @@ async function createVariant(id: string) {
     creatorDisplayName: 'Another user',
     creatorId: 'some_id',
     numUpvotes: 10,
-    numReports: 0,
     popularity: 2,
     initialState: '{}',
     tags: [],
