@@ -265,8 +265,8 @@ service cloud.firestore {
       }
       
       match /privateCache/{docName} {
-        // Read-only
-        allow read: if loggedAs(userId) && docName == 'doc';
+        // Read-only. Allow unverified, so that it can be read at creation time.
+        allow read: if loggedAsUnverified(userId) && docName == 'doc';
       }
       
       // users/{userId}/moderation/doc cannot be read or written directly,
@@ -286,7 +286,8 @@ service cloud.firestore {
           let doc = request.resource.data;
           return
             isRenameTriggerDoc(doc) &&
-            loggedAs(userId);
+            // At account creation, the user is still unverified
+            loggedAsUnverified(userId);
         }
         function allowUpdateRenameTrigger() {
           let old = resource.data;
