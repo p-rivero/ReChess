@@ -205,7 +205,7 @@ service cloud.firestore {
           hasFields(doc, ['time', 'reason', 'onlyBlock'], []) &&
           doc.time is timestamp &&
           doc.reason is string &&
-          doc.reason.size() <= 1000 &&
+          doc.reason.size() <= 250 &&
           doc.onlyBlock is bool &&
           // If onlyBlock, reason must be empty
           (doc.onlyBlock ? doc.reason.size() == 0 : true);

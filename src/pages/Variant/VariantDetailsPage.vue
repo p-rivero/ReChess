@@ -109,6 +109,7 @@
   <PopupWithTextbox
     ref="reportPopup"
     hint="Tell us why (optional)"
+    :max-length="250"
   />
 </template>
 

@@ -5,6 +5,7 @@
       class="mt-5"
       :multiline="false"
       :placeholder="hint"
+      :max-length="maxLength"
     />
   </PopupMessage>
 </template>
@@ -20,6 +21,7 @@
     
   defineProps<{
     hint?: string,
+    maxLength?: number,
   }>()
   
   defineExpose({

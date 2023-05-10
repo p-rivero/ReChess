@@ -6,6 +6,7 @@
     :type="type"
     :class="{'is-danger': isError}"
     :placeholder="props.placeholder"
+    :maxlength="props.maxLength"
     @input="inputChanged"
     @keydown.enter="emit('enter-pressed')"
   >
@@ -16,6 +17,7 @@
     :class="{'is-danger': isError}"
     :type="type"
     :placeholder="props.placeholder"
+    :maxlength="props.maxLength"
     @input="inputChanged"
   />
 </template>
@@ -37,6 +39,7 @@
     errorHandler?: ErrorMessageHandler
     errorPriority?: number
     emitChangedWhenError?: boolean
+    maxLength?: number
   }>()
   
   const emit = defineEmits<{

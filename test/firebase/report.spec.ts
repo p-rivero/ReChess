@@ -220,12 +220,12 @@ test('max reason length is 1000', async () => {
   const reportDoc: ReportDoc = {
     time: now(),
     onlyBlock: false,
-    reason: 'a'.repeat(1001),
+    reason: 'a'.repeat(251),
   }
   await assertFails(
     set('verified', reportDoc, 'users', MY_ID, 'reportedVariants', VARIANT_ID)
   )
-  reportDoc.reason = 'a'.repeat(1000)
+  reportDoc.reason = 'a'.repeat(250)
   await assertSucceeds(
     set('verified', reportDoc, 'users', MY_ID, 'reportedVariants', VARIANT_ID)
   )
