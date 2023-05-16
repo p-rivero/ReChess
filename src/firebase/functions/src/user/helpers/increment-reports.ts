@@ -23,7 +23,7 @@ export async function incrementReports(
   
   const moderationRef = db.collection(collectionName).doc(docId).collection('moderation').doc('doc')
   const newSummaryLine = await makeSummaryLine(reporterId, reportReason)
-  db.runTransaction(async (transaction) => {
+  const p1 = db.runTransaction(async (transaction) => {
     const moderationSnap = await transaction.get(moderationRef)
     let newDoc: ModerationDoc
     if (moderationSnap.exists) {
@@ -42,7 +42,9 @@ export async function incrementReports(
   })
   
   const mode = collectionName === 'users' ? 'reportUser' : 'reportVariant'
-  updatePrivateCache(mode, docId, reporterId)
+  const p2 = updatePrivateCache(mode, docId, reporterId)
+  
+  await Promise.all([p1, p2])
 }
 
 /**

@@ -71,7 +71,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
   const variantDoc = variantSnapshot.data() as VariantDoc
   
   // Update variant popularity
-  variantRef.update({ popularity: FieldValue.increment(1) })
+  const p1 = variantRef.update({ popularity: FieldValue.increment(1) })
     .catch((e) => console.error('Cannot update variant popularity', variantId, e))
   
   // Convert the playerToMove field from 0|1 to 'white'|'black'
@@ -119,7 +119,8 @@ export default async function(data: unknown, context: CallableContext): Promise<
       calledFinishGame: false,
     },
   }
-  const gameRef = await db.collection('games').add(newGame)
+  const p2 = db.collection('games').add(newGame)
   
+  const [_, gameRef] = await Promise.all([p1, p2])
   return { gameId: gameRef.id }
 }

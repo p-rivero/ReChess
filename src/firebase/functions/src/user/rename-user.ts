@@ -34,13 +34,12 @@ export default async function(
   const timeout = Date.now() + 1000 * TIMEOUT_SECONDS
   const timeoutDate = new Date(timeout)
   const timeoutTimestamp = Timestamp.fromDate(timeoutDate)
-  db.collection('users')
-    .doc(userId)
-    .update({ 'IMMUTABLE.renameAllowedAt': timeoutTimestamp })
-    .catch((err) => {
-      console.error('Error while updating rename timeout for user', userId + ':')
-      console.error(err)
-    })
+  try {
+    await db.collection('users').doc(userId).update({ 'IMMUTABLE.renameAllowedAt': timeoutTimestamp })
+  } catch (err) {
+    console.error('Error while updating rename timeout for user', userId + ':')
+    console.error(err)
+  }
 }
 
 
@@ -62,7 +61,7 @@ export async function updateName(
 ): Promise<void> {
   // Update the creator name of the variants this user has created
   const updatedVariants = await db.collection('variants').where('creatorId', '==', userId).get()
-  batchedUpdate(db, updatedVariants, (batch, ref) => {
+  const p1 = batchedUpdate(db, updatedVariants, (batch, ref) => {
     batch.update(ref, {
       'creatorDisplayName': newName,
       'creatorId': removeId ? null : userId,
@@ -74,7 +73,7 @@ export async function updateName(
   
   // Update the opponent name of the games this user has played as white
   const updatedGamesWhite = await db.collection('games').where('IMMUTABLE.whiteId', '==', userId).get()
-  batchedUpdate(db, updatedGamesWhite, (batch, ref) => {
+  const p2 = batchedUpdate(db, updatedGamesWhite, (batch, ref) => {
     batch.update(ref, {
       'IMMUTABLE.whiteDisplayName': newName,
       'IMMUTABLE.whiteId': removeId ? null : userId,
@@ -86,7 +85,7 @@ export async function updateName(
   
   // Update the opponent name of the games this user has played as black
   const updatedGamesBlack = await db.collection('games').where('IMMUTABLE.blackId', '==', userId).get()
-  batchedUpdate(db, updatedGamesBlack, (batch, ref) => {
+  const p3 = batchedUpdate(db, updatedGamesBlack, (batch, ref) => {
     batch.update(ref, {
       'IMMUTABLE.blackDisplayName': newName,
       'IMMUTABLE.blackId': removeId ? null : userId,
@@ -95,7 +94,8 @@ export async function updateName(
     console.error('Error while updating games (black) for user', userId + ':')
     console.error(err)
   })
-  
   // Do not update the name in the lobby entries, because they are short-lived and
   // it's not a problem to have the old name there for a while
+  
+  await Promise.all([p1, p2, p3])
 }

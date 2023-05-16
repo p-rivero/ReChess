@@ -45,9 +45,10 @@ export async function updatePrivateCache(
     throw new Error('Invalid mode: ' + mode)
   }
   
-  userCacheRef.set(userCacheDoc)
-    .catch((err) => {
-      console.error('Error while updating cache for user', userId + ':')
-      console.error(err)
-    })
+  try {
+    await userCacheRef.set(userCacheDoc)
+  } catch (err) {
+    console.error('Error while updating cache for user', userId + ':')
+    console.error(err)
+  }
 }

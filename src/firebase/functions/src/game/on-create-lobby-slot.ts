@@ -15,6 +15,9 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
     return
   }
   
-  variantRef.update({ popularity: FieldValue.increment(3) })
-    .catch((e) => console.error('Cannot update variant popularity', variantRef.id, e))
+  try {
+    await variantRef.update({ popularity: FieldValue.increment(3) })
+  } catch (e) {
+    console.error('Cannot update variant popularity', variantRef.id, e)
+  }
 }

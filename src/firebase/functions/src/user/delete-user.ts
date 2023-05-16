@@ -22,38 +22,38 @@ export default async function(user: UserRecord): Promise<void> {
   
   // Remove upvotes
   const userUpvotes = await userDoc.ref.collection('upvotedVariants').get()
-  batchedUpdate(db, userUpvotes, (batch, ref) => {
+  const p1 = batchedUpdate(db, userUpvotes, (batch, ref) => {
     batch.delete(ref)
   }).catch((err) => {
     console.error('Error deleting upvotes for user', userId)
     console.error(err)
   })
   // Delete the user public and private documents
-  userDoc.ref.collection('private').doc('doc').delete().catch((err) => {
+  const p2 = userDoc.ref.collection('private').doc('doc').delete().catch((err) => {
     console.error('Error deleting private user document for user', userId)
     console.error(err)
   })
-  userDoc.ref.collection('privateCache').doc('doc').delete().catch((err) => {
+  const p3 = userDoc.ref.collection('privateCache').doc('doc').delete().catch((err) => {
     console.error('Error deleting cache document for user', userId)
     console.error(err)
   })
-  userDoc.ref.collection('renameTrigger').doc('doc').delete().catch((err) => {
-    console.error('Error deleting cache document for user', userId)
+  const p4 = userDoc.ref.collection('renameTrigger').doc('doc').delete().catch((err) => {
+    console.error('Error deleting renameTrigger document for user', userId)
     console.error(err)
   })
-  userDoc.ref.delete().catch((err) => {
+  const p5 = userDoc.ref.delete().catch((err) => {
     console.error('Error deleting public user document for user', userId)
     console.error(err)
   })
   
   // Free the username
-  db.collection('usernames').doc(username).delete().catch((err) => {
+  const p6 = db.collection('usernames').doc(username).delete().catch((err) => {
     console.error('Error deleting username', username, 'for user', userId)
     console.error(err)
   })
   
   // Update the user name in denormalized fields
-  updateName(db, userId, '[deleted]', true).catch((err) => {
+  const p7 = updateName(db, userId, '[deleted]', true).catch((err) => {
     console.error('Error while updating name for user', userId + ':')
     console.error(err)
   })
@@ -61,9 +61,11 @@ export default async function(user: UserRecord): Promise<void> {
   // Remove the user's profile picture
   const appDefaultBucket = admin.storage().bucket()
   const profilePicRef = appDefaultBucket.file(`profile-images/${userId}`)
-  profilePicRef.delete().catch((err) => {
+  const p8 = profilePicRef.delete().catch((err) => {
     if (err.code === 404) return
     console.error('Error deleting profile picture for user', userId)
     console.error(err)
   })
+  
+  await Promise.all([p1, p2, p3, p4, p5, p6, p7, p8])
 }

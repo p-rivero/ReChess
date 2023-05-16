@@ -32,19 +32,21 @@ export default async function(gameId: string): Promise<void> {
     console.warn('finishGame() already called for game: ' + gameId)
     return
   }
-  gameRef.update({ 'IMMUTABLE.calledFinishGame': true })
+  const p1 = gameRef.update({ 'IMMUTABLE.calledFinishGame': true })
     .catch((e) => console.error('Cannot set calledFinishGame on game', gameId, e))
   
   // Update the profiles
-  updateProfile(db, gameId, gameDoc, gameDoc.IMMUTABLE.whiteId)
+  const p2 = updateProfile(db, gameId, gameDoc, gameDoc.IMMUTABLE.whiteId)
     .catch((e) => console.error('Cannot update profile', gameDoc.IMMUTABLE.whiteId, e))
-  updateProfile(db, gameId, gameDoc, gameDoc.IMMUTABLE.blackId)
+  const p3 = updateProfile(db, gameId, gameDoc, gameDoc.IMMUTABLE.blackId)
     .catch((e) => console.error('Cannot update profile', gameDoc.IMMUTABLE.blackId, e))
     
   // Update the variant popularity
   const variantRef = db.collection('variants').doc(gameDoc.IMMUTABLE.variantId)
-  variantRef.update({ popularity: FieldValue.increment(-1) })
+  const p4 = variantRef.update({ popularity: FieldValue.increment(-1) })
     .catch((e) => console.error('Cannot update variant popularity', gameDoc.IMMUTABLE.variantId, e))
+    
+  await Promise.all([p1, p2, p3, p4])
 }
 
 

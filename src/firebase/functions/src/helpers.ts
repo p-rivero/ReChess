@@ -1,8 +1,4 @@
-
-// Each transaction or batch of writes can write to a maximum of 500 documents
-// https://firebase.google.com/docs/firestore/manage-data/transactions
-const MAX_BATCH_SIZE = 500
-
+import { MAX_BATCH_SIZE } from './config'
 
 // True if the admin SDK has been initialized for this cloud function instance
 let adminInitialized = false

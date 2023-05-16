@@ -14,7 +14,7 @@ export default async function(variantId: string, userId: string): Promise<void> 
   const db = admin.firestore()
   
   // Decrement the upvote count for the variant
-  db.collection('variants')
+  const p1 = db.collection('variants')
     .doc(variantId)
     .update('numUpvotes', FieldValue.increment(-1))
     .catch((err) => {
@@ -37,7 +37,12 @@ export default async function(variantId: string, userId: string): Promise<void> 
       reportedVariants: '',
       reportedUsers: '',
     }
-    userCacheRef.set(newDoc).catch(console.error)
+    try {
+      await userCacheRef.set(newDoc)
+    } catch (err) {
+      console.error('Error while updating cache for user', userId + ':')
+      console.error(err)
+    }
     return
   }
   
@@ -55,9 +60,11 @@ export default async function(variantId: string, userId: string): Promise<void> 
   }
   
   // Update the user private cache
-  userCacheRef.update({ upvotedVariants: splicedVariants })
+  const p2 = userCacheRef.update({ upvotedVariants: splicedVariants })
     .catch((err) => {
       console.error('Error while updating cache for user', userId + ':')
       console.error(err)
     })
+    
+  await Promise.all([p1, p2])
 }
