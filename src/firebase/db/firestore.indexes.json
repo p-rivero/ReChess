@@ -63,6 +63,12 @@
   ],
   "fieldOverrides": [
     {
+      "collectionGroup": "cancelledGames",
+      "fieldPath": "cancelReason",
+      "ttl": false,
+      "indexes": []
+    },
+    {
       "collectionGroup": "games",
       "fieldPath": "IMMUTABLE.variant.initialState",
       "ttl": false,
@@ -75,8 +81,74 @@
       "indexes": []
     },
     {
+      "collectionGroup": "moderation",
+      "fieldPath": "reportsSummary",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "private",
+      "fieldPath": "email",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "privateCache",
+      "fieldPath": "reportedUsers",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "privateCache",
+      "fieldPath": "reportedVariants",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "privateCache",
+      "fieldPath": "upvotedVariants",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "reportedUsers",
+      "fieldPath": "reason",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "reportedVariants",
+      "fieldPath": "reason",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "about",
+      "ttl": false,
+      "indexes": []
+    },
+    {
       "collectionGroup": "users",
       "fieldPath": "IMMUTABLE.last5Games",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "profileImg",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "variantIndex",
+      "fieldPath": "index",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "variants",
+      "fieldPath": "description",
       "ttl": false,
       "indexes": []
     },
