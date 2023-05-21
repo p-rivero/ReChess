@@ -1,0 +1,12 @@
+diff --git a/node_modules/sortablejs-vue3/package.json b/node_modules/sortablejs-vue3/package.json
+index 3092135..5481088 100644
+--- a/node_modules/sortablejs-vue3/package.json
++++ b/node_modules/sortablejs-vue3/package.json
+@@ -30,6 +30,7 @@
+   "module": "./dist/sortablejs-vue3.es.js",
+   "exports": {
+     ".": {
++      "types": "./dist/types/main.d.ts",
+       "import": "./dist/sortablejs-vue3.es.js",
+       "require": "./dist/sortablejs-vue3.umd.js"
+     }

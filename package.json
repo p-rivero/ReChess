@@ -16,7 +16,7 @@
     "build-only": "vite build --config .config/vite.config.ts",
     "dev-only": "vite --config .config/vite.config.ts",
     "start-emulator": "firebase emulators:start",
-    "postinstall": "chmod +x ./src/assets/img/icons/generate-icons.sh"
+    "postinstall": "chmod +x ./src/assets/img/icons/generate-icons.sh; patch-package"
   },
   "dependencies": {
     "@creativebulma/bulma-tooltip": "^1.2.0",
