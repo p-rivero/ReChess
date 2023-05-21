@@ -49,6 +49,21 @@ If you use VSCode, install the [Vue Language extension](https://marketplace.visu
    
    > Note: Remember that the browser key will be exposed to the client, so anyone can see and use it.
    > Make sure to restrict it to your domain and set up App Check properly.
+   
+   <details>
+   <summary>APIs that need to be enabled</summary>
+      <ul>
+      <li> Cloud Firestore API </li>
+      <li> Cloud Logging API </li>
+      <li> Cloud Storage for Firebase API </li>
+      <li> Firebase App Check API </li>
+      <li> Firebase Hosting API </li>
+      <li> Firebase Installations API </li>
+      <li> Firebase Remote Config API </li>
+      <li> Identity Toolkit API </li>
+      <li> Token Service API </li>
+      </ul>
+   </details>
 
 3. Update `src/firebase/credentials.ts` with your Firebase credentials. The `CAPTCHA_V3_PUBLIC_KEY` is the one you created for App Check.
    
