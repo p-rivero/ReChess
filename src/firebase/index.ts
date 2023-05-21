@@ -16,7 +16,7 @@ declare global {
 }
 
 // Initialize Firebase
-const app = initializeApp(FIREBASE_CONFIG)
+const app = initializeApp({ apiKey: import.meta.env.VITE_RECHESS_FIREBASE_API_KEY, ...FIREBASE_CONFIG })
 export const db = getFirestore(app)
 export const defaultStorage = getStorage(app)
 export const pieceStorage = getStorage(app, PIECE_IMAGES_BUCKET_URL)

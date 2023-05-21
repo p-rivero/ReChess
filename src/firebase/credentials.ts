@@ -5,7 +5,6 @@ export const DEFAULT_BUCKET_NAME = 'rechess-web.appspot.com'
 export const PIECE_IMAGES_BUCKET_URL = 'gs://rechess-web-piece-images'
 
 export const FIREBASE_CONFIG = {
-  apiKey: import.meta.env.VITE_RECHESS_FIREBASE_API_KEY,
   authDomain: 'rechess.org',
   projectId: 'rechess-web',
   storageBucket: DEFAULT_BUCKET_NAME,

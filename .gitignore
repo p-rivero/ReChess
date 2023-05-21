@@ -32,3 +32,4 @@ coverage
 *.sln
 *.sw?
 
+.config/admin-key.json

@@ -1,6 +1,9 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
-      "verbatimModuleSyntax": false
+      "verbatimModuleSyntax": false,
+      "esModuleInterop": true,
+      "module": "es2020",
+      "moduleResolution": "node"
     }
 }
