@@ -11,7 +11,7 @@ import type { ObjectMetadata } from 'firebase-functions/v1/storage'
  */
 export default async function(image: ObjectMetadata): Promise<void> {
   if (!image.name) return
-  if (image.name.startsWith('profile-images/')) return
+  if (!image.name.startsWith('piece-images/')) return
   
   // Download the image
   const admin = await useAdmin()
