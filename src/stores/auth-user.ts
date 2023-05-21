@@ -149,7 +149,6 @@ export const useAuthStore = defineStore('auth-user', () => {
   
   
   async function thirdPartySignIn(signInprovider: 'google'|'github'): Promise<UserDoc | undefined> {
-    // This should be fb.BaseOAuthProvider, but it's not exported
     let provider: fb.GoogleAuthProvider | fb.GithubAuthProvider
     
     if (signInprovider === 'google') {
@@ -188,7 +187,6 @@ export const useAuthStore = defineStore('auth-user', () => {
     if (!auth.currentUser) throw new Error('User needs to be logged in with a third party provider')
     try {
       const userDoc = await UserDB.createUser(auth.currentUser, username)
-      // Success, update the user. The cache does not exist yet
       persistUser(new AuthUser(auth.currentUser, userDoc))
     } catch (e) {
       console.error('Failed to create user in database', e)
@@ -206,6 +204,10 @@ export const useAuthStore = defineStore('auth-user', () => {
     await auth.signOut()
   }
   
+  async function refreshAuthData(): Promise<void> {
+    auth.currentUser?.reload()
+  }
+  
   // Removes the user auth. This triggers a cloud function that deletes the user documents.
   async function deleteUser(): Promise<void> {
     if (!auth.currentUser) throw new Error('User is not logged in')
@@ -214,8 +216,10 @@ export const useAuthStore = defineStore('auth-user', () => {
   
   async function sendEmailVerification() {
     if (!auth.currentUser) throw new Error('User is not logged in')
+    const url = new URL(window.location.origin)
+    url.searchParams.set('verify-email', 'true')
     await fb.sendEmailVerification(auth.currentUser, {
-      url: window.location.origin,
+      url: url.toString(),
       handleCodeInApp: true,
     })
   }
@@ -240,7 +244,7 @@ export const useAuthStore = defineStore('auth-user', () => {
   }
 
   return {
-    emailLogIn, emailRegister, thirdPartySignIn, thirdPartyRegister, signOut, deleteUser,
+    emailLogIn, emailRegister, thirdPartySignIn, thirdPartyRegister, signOut, refreshAuthData, deleteUser,
     sendEmailVerification, sendPasswordResetEmail, getProvider, usernameAvailable,
     loggedUser,
   }

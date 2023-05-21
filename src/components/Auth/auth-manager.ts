@@ -24,6 +24,16 @@ export async function signInRefresh() {
   const userStore = useUserStore()
   // Allow users to use the website without logging in
   if (!authStore.loggedUser) return
+  
+  // After verifying the email, we need to refresh the auth data
+  const url = new URL(window.location.href)
+  if (url.searchParams.get('verify-email')) {
+    await authStore.refreshAuthData()
+    url.searchParams.delete('verify-email')
+    window.location.href = url.toString()
+    return
+  }
+  
   // If the user is authenticated, make sure they have completed the sign in process
   // For social logins, choose a username
   const user = await userStore.getUserById(authStore.loggedUser.uid)
@@ -32,6 +42,7 @@ export async function signInRefresh() {
     showPopupIfNotWhitelisted('chooseUsername')
     return
   }
+  
   // For email logins, verify the email
   checkEmailVerified()
 }
