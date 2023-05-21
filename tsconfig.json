@@ -1,5 +1,5 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.web.json",
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
   "include": [".config/env.d.ts", "src/**/*", "src/**/*.vue"],
   "exclude": ["src/firebase/functions"],
   "compilerOptions": {
@@ -13,11 +13,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["node", "jest"],
-    // Temporary fix for https://github.com/vuejs/tsconfig/issues/6
-    "preserveValueImports": false,
-    "importsNotUsedAsValues": "remove",
-    "verbatimModuleSyntax": true,
+    "types": ["node", "jest"]
   },
   "references": [
     {
