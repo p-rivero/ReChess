@@ -14,6 +14,7 @@ import { hideSignInPopup } from '@/components/Auth/auth-manager'
 import type { UserDoc, UserPrivateCacheDoc } from '@/firebase/db/schema'
 
 const AUTH_USER_KEY = 'loggedUser'
+const REFRESH_AUTH_PARAM = 'refresh-auth'
 
 export type SignInProvider = 'password' | 'google.com' | 'github.com'
 
@@ -72,7 +73,16 @@ export const useAuthStore = defineStore('auth-user', () => {
       persistUser(null)
       return
     }
-    // We need to fetch the user fields (username, about) from the database
+    
+    // After verifying the email, refresh the auth data to avoid sending unveridied requests
+    const url = new URL(window.location.href)
+    if (url.searchParams.get(REFRESH_AUTH_PARAM)) {
+      await newUser.reload()
+      url.searchParams.delete(REFRESH_AUTH_PARAM)
+      window.location.href = url.toString()
+      return
+    }
+    
     const [user, cache] = await Promise.all([
       UserDB.getUserById(newUser.uid),
       UserDB.getUserPrivateCache(newUser.uid),
@@ -204,10 +214,6 @@ export const useAuthStore = defineStore('auth-user', () => {
     await auth.signOut()
   }
   
-  async function refreshAuthData(): Promise<void> {
-    auth.currentUser?.reload()
-  }
-  
   // Removes the user auth. This triggers a cloud function that deletes the user documents.
   async function deleteUser(): Promise<void> {
     if (!auth.currentUser) throw new Error('User is not logged in')
@@ -217,7 +223,7 @@ export const useAuthStore = defineStore('auth-user', () => {
   async function sendEmailVerification() {
     if (!auth.currentUser) throw new Error('User is not logged in')
     const url = new URL(window.location.origin)
-    url.searchParams.set('verify-email', 'true')
+    url.searchParams.set(REFRESH_AUTH_PARAM, 'true')
     await fb.sendEmailVerification(auth.currentUser, {
       url: url.toString(),
       handleCodeInApp: true,
@@ -244,7 +250,7 @@ export const useAuthStore = defineStore('auth-user', () => {
   }
 
   return {
-    emailLogIn, emailRegister, thirdPartySignIn, thirdPartyRegister, signOut, refreshAuthData, deleteUser,
+    emailLogIn, emailRegister, thirdPartySignIn, thirdPartyRegister, signOut, deleteUser,
     sendEmailVerification, sendPasswordResetEmail, getProvider, usernameAvailable,
     loggedUser,
   }
