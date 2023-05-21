@@ -47,7 +47,7 @@
 
 
 <script setup lang="ts">
-  import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
   import { computed, ref, watch } from 'vue'
   import { useAuthStore } from '@/stores/auth-user'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'

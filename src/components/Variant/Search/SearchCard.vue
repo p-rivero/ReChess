@@ -23,7 +23,7 @@
   import { useVariantStore } from '@/stores/variant'
   import SearchCardPlaceholder from './SearchCardPlaceholder.vue'
   import VariantCard from '../View/VariantCard.vue'
-  import type { Match, SearchOrder } from '@/utils/chess/variant-search'
+  import type { Match, SearchOrder } from '@/helpers/chess/variant-search'
   import type { PublishedVariant } from '@/protochess/types'
   
   const props = defineProps<{

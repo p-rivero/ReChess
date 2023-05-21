@@ -33,10 +33,10 @@
 
 <script setup lang="ts">
   import { getUrl, uploadBlob } from '@/firebase/storage'
-  import { hashBlob, importFile } from '@/utils/file-io'
+  import { hashBlob, importFile } from '@/helpers/file-io'
   import FileDropArea from '@/components/FileDropArea.vue'
   
-  import { autoCropImage, autoCropSvg } from '@/utils/image-crop'
+  import { autoCropImage, autoCropSvg } from '@/helpers/image-crop'
   import { ref, toRefs } from 'vue'
   
   // Piece images go in their own bucket so that that we can run the

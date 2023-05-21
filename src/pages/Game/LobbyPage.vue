@@ -100,7 +100,7 @@
   import { type LobbySlot, type OngoingGameSlot, useLobbyStore } from '@/stores/lobby'
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
-  import { updateTitle } from '@/utils/web-utils'
+  import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
   import { useUserStore } from '@/stores/user'
   import { useVariantStore } from '@/stores/variant'

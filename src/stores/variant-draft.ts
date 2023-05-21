@@ -3,9 +3,9 @@ import { ref, watch } from 'vue'
 import sanitizeFilename from 'sanitize-filename'
 
 import { VariantDB } from '@/firebase/db'
-import { clone, objectEquals } from '@/utils/ts-utils'
-import { exportFile } from '@/utils/file-io'
-import { parseVariantJson } from '@/utils/chess/variant-json'
+import { clone, objectEquals } from '@/helpers/ts-utils'
+import { exportFile } from '@/helpers/file-io'
+import { parseVariantJson } from '@/helpers/chess/variant-json'
 import { useAuthStore } from '@/stores/auth-user'
 import type { FullPieceDef, Variant } from '@/protochess/types'
 

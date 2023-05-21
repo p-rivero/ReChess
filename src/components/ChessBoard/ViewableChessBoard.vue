@@ -29,8 +29,8 @@
 
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue'
-  import { deepMerge } from '@/utils/ts-utils'
-  import { keyToPosition, positionToKey } from '@/utils/chess/chess-coords'
+  import { deepMerge } from '@/helpers/ts-utils'
+  import { keyToPosition, positionToKey } from '@/helpers/chess/chess-coords'
   import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue'
   import type * as cg from 'chessgroundx/types'
   import type { Config } from 'chessgroundx/config'

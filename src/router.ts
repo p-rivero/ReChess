@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { updateTitle } from '@/utils/web-utils'
+import { updateTitle } from '@/helpers/web-utils'
 import HomePage from '@/pages/HomePage.vue'
 import type { RouteParams, RouteRecordRaw } from 'vue-router'
 // https://github.com/mutoe/vue3-realworld-example-app/blob/master/src/router.ts

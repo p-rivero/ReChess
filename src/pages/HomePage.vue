@@ -62,9 +62,9 @@
 </template>
 
 <script setup lang="ts">
-  import { DEFAULT_ORDER, searchVariants } from '@/utils/chess/variant-search'
+  import { DEFAULT_ORDER, searchVariants } from '@/helpers/chess/variant-search'
   import { computed, ref, watch } from 'vue'
-  import { debounce } from '@/utils/ts-utils'
+  import { debounce } from '@/helpers/ts-utils'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { useVariantStore } from '@/stores/variant'
@@ -73,7 +73,7 @@
   import SearchOrderDropdown from '@/components/Variant/Search/SearchOrderDropdown.vue'
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import VariantCard from '@/components/Variant/View/VariantCard.vue'
-  import type { SearchOrder, VariantIndexResult } from '@/utils/chess/variant-search'
+  import type { SearchOrder, VariantIndexResult } from '@/helpers/chess/variant-search'
   
   const variantStore = useVariantStore()
   const authStore = useAuthStore()

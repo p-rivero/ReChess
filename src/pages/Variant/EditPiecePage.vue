@@ -322,11 +322,11 @@
 
 
 <script setup lang="ts">
-  import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
   import { computed, ref } from 'vue'
-  import { letterToNumber, numberToLetter } from '@/utils/chess/chess-coords'
-  import { paramToInt } from '@/utils/web-utils'
-  import { removePiecesById } from '@/utils/chess/fen'
+  import { letterToNumber, numberToLetter } from '@/helpers/chess/chess-coords'
+  import { paramToInt } from '@/helpers/web-utils'
+  import { removePiecesById } from '@/helpers/chess/fen'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { useRoute, useRouter } from 'vue-router'

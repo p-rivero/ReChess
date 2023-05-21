@@ -69,7 +69,7 @@
   import { ref } from 'vue'
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
-  import { toggleTheme } from '@/utils/theme'
+  import { toggleTheme } from '@/helpers/theme'
   import { useAuthStore } from '@/stores/auth-user'
   import { useRouter } from 'vue-router'
   import { useUserPrefsStore } from '@/stores/user-preferences'

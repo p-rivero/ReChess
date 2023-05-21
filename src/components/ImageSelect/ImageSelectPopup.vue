@@ -83,7 +83,7 @@
 
 <script setup lang="ts">
   import { getUrl, uploadBlob } from '@/firebase/storage'
-  import { importFile } from '@/utils/file-io'
+  import { importFile } from '@/helpers/file-io'
   import { nextTick, ref } from 'vue'
   import FileDropArea from '../FileDropArea.vue'
   import ImageCrop from './ImageCrop.vue'

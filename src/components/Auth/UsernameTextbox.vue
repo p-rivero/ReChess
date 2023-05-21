@@ -35,11 +35,11 @@
 
 <script setup lang="ts">
 
-  import { debounce } from '@/utils/ts-utils'
+  import { debounce } from '@/helpers/ts-utils'
   import { ref } from 'vue'
   import { useAuthStore } from '@/stores/auth-user'
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
-  import type { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import type { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
 
   const username = ref('')
   const usernameStatus = ref<'available' | 'taken' | 'unknown'>('unknown')

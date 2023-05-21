@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watch } from 'vue'
-  import { keyToPosition, positionToKey } from '@/utils/chess/chess-coords'
+  import { keyToPosition, positionToKey } from '@/helpers/chess/chess-coords'
   import ChessgroundAdapter from './internal/ChessgroundAdapter.vue'
   import type { Config } from 'chessgroundx/config'
   import type { DrawShape } from 'chessgroundx/draw'

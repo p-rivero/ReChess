@@ -21,7 +21,7 @@
 <script setup lang="ts">
   import { Chessground } from 'chessgroundx'
   import { chessboardSvg } from './chessboard-svg'
-  import { clone, debounce, throttle } from '@/utils/ts-utils'
+  import { clone, debounce, throttle } from '@/helpers/ts-utils'
   import { onBeforeUnmount, onMounted, ref } from 'vue'
   import type * as cg from 'chessgroundx/types'
   import type { Api } from 'chessgroundx/api'

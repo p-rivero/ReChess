@@ -1,7 +1,7 @@
 
 import * as Comlink from 'comlink'
 import * as guard from './types.guard'
-import { clone } from '@/utils/ts-utils'
+import { clone } from '@/helpers/ts-utils'
 import type * as t from './types'
 
 const INSTANCES = ['ui', 'search'] as const

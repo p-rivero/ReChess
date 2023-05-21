@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-  import { DEFAULT_ORDER, type SearchOrder } from '@/utils/chess/variant-search'
+  import { DEFAULT_ORDER, type SearchOrder } from '@/helpers/chess/variant-search'
   import { computed, ref, watchEffect } from 'vue'
   
   const OPTIONS_TEXT: Record<SearchOrder, string> = {

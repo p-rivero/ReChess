@@ -282,9 +282,9 @@
 
 
 <script setup lang="ts">
-  import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
   import { checkState } from '@/components/Variant/Edit/check-state'
-  import { importFile } from '@/utils/file-io'
+  import { importFile } from '@/helpers/file-io'
   import { onMounted, ref, watch } from 'vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
   import { useAuthStore } from '@/stores/auth-user'

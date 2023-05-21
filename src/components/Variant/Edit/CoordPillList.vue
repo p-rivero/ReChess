@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-  import { coordsToPair, isCoords, pairToCoords } from '@/utils/chess/chess-coords'
+  import { coordsToPair, isCoords, pairToCoords } from '@/helpers/chess/chess-coords'
   import PillList from '@/components/PillList.vue'
 
   const props = defineProps<{

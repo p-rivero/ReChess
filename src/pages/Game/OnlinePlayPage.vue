@@ -15,7 +15,7 @@
 <script setup lang="ts">
   import { onUnmounted, ref, watchEffect } from 'vue'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
-  import { updateTitle } from '@/utils/web-utils'
+  import { updateTitle } from '@/helpers/web-utils'
   import { useGameStore } from '@/stores/game'
   import { useRoute, useRouter } from 'vue-router'
   import BoardWithGui from '@/components/GameUI/BoardWithGui.vue'

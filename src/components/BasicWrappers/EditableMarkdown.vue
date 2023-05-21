@@ -67,7 +67,7 @@
   
   import SmartTextInput from './SmartTextInput.vue'
   import VueMarkdown from 'vue-markdown-render'
-  import type { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import type { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
   
   const props = defineProps<{
     text?: string

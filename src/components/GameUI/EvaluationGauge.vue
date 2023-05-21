@@ -41,7 +41,7 @@
 
 
 <script setup lang="ts">
-  import { gameOverMessage } from '@/utils/chess/game-over-message'
+  import { gameOverMessage } from '@/helpers/chess/game-over-message'
   import { ref } from 'vue'
   import type { MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
   

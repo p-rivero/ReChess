@@ -1,7 +1,7 @@
 import { db } from '@/firebase'
 import type { ReportDoc, TimestampDoc, VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
 import type { Variant } from '@/protochess/types'
-import type { VariantListOrder } from '@/utils/chess/variant-search'
+import type { VariantListOrder } from '@/helpers/chess/variant-search'
 
 import { Timestamp, addDoc, collection, deleteDoc, doc, getCountFromServer, getDoc, getDocs, orderBy, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
 

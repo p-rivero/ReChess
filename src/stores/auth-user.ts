@@ -1,15 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-import { RechessError } from '@/utils/errors/RechessError'
+import { RechessError } from '@/helpers/errors/RechessError'
 import { User } from '@/stores/user'
 import { UserDB } from '@/firebase/db'
-import { UserNotFoundError } from '@/utils/errors/UserNotFoundError'
+import { UserNotFoundError } from '@/helpers/errors/UserNotFoundError'
 import { auth } from '@/firebase'
 
 import * as fb from 'firebase/auth'
 import { FirebaseError } from '@firebase/util'
-import { PopupClosedError } from '@/utils/errors/PopupClosedError'
+import { PopupClosedError } from '@/helpers/errors/PopupClosedError'
 import { hideSignInPopup } from '@/components/Auth/auth-manager'
 import type { UserDoc, UserPrivateCacheDoc } from '@/firebase/db/schema'
 

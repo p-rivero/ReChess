@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import type { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import type { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
   const errorMessage = ref<string>('')
   
   const props = defineProps<{

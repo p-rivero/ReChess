@@ -80,8 +80,8 @@
 </template>
 
 <script setup lang="ts">
-  import { clone } from '@/utils/ts-utils'
-  import { getTextWidth, remToPx } from '@/utils/web-utils'
+  import { clone } from '@/helpers/ts-utils'
+  import { getTextWidth, remToPx } from '@/helpers/web-utils'
   import { onMounted, ref } from 'vue'
   import { requestSignIn } from '@/components/Auth/auth-manager'
   import { showPopup } from '@/components/PopupMsg/popup-manager'

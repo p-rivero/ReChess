@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import { updateTitle } from '@/utils/web-utils'
+  import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
   import { useRoute, useRouter } from 'vue-router'
   import { useVariantStore } from '@/stores/variant'

@@ -2,9 +2,9 @@ import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
 import { AuthUser, useAuthStore } from '@/stores/auth-user'
-import { DEFAULT_ORDER, type VariantListOrder } from '@/utils/chess/variant-search'
+import { DEFAULT_ORDER, type VariantListOrder } from '@/helpers/chess/variant-search'
 import { VariantDB } from '@/firebase/db'
-import { parseVariantJson } from '@/utils/chess/variant-json'
+import { parseVariantJson } from '@/helpers/chess/variant-json'
 import type { PublishedVariant } from '@/protochess/types'
 import type { VariantDoc } from '@/firebase/db/schema'
 

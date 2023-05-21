@@ -242,10 +242,10 @@
   import { useRoute, useRouter } from 'vue-router'
   
   import { AuthUser, useAuthStore } from '@/stores/auth-user'
-  import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+  import { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
   import { User, useUserStore } from '@/stores/user'
   import { showPopup } from '@/components/PopupMsg/popup-manager'
-  import { updateTitle } from '@/utils/web-utils'
+  import { updateTitle } from '@/helpers/web-utils'
   import { useGameStore } from '@/stores/game'
   import EditableMarkdown from '@/components/BasicWrappers/EditableMarkdown.vue'
   import EditableTitle from '@/components/BasicWrappers/EditableTitle.vue'

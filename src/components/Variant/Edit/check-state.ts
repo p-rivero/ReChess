@@ -1,5 +1,5 @@
 import { getProtochess } from '@/protochess'
-import type { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
+import type { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
 import type { FullPieceDef, InitialState, Variant } from '@/protochess/types'
 
 export async function checkState(variant: Variant, errorMsgHandler: ErrorMessageHandler): Promise<void> {

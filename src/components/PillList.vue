@@ -84,7 +84,7 @@
 
 
 <script setup lang="ts">
-  import { getTextWidth , remToPx } from '@/utils/web-utils'
+  import { getTextWidth , remToPx } from '@/helpers/web-utils'
   import { ref } from 'vue'
 
 

@@ -1,5 +1,5 @@
 
-import { clone, objectEquals } from '@/utils/ts-utils'
+import { clone, objectEquals } from '@/helpers/ts-utils'
 import { moveToString } from './chess-coords'
 import type { GameState, InitialState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from '@/protochess/types'
 
