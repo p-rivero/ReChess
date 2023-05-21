@@ -77,7 +77,8 @@ export const useAuthStore = defineStore('auth-user', () => {
     // After verifying the email, refresh the auth data to avoid sending unveridied requests
     const url = new URL(window.location.href)
     if (url.searchParams.get(REFRESH_AUTH_PARAM)) {
-      await newUser.reload()
+      // https://stackoverflow.com/questions/47243702/firebase-token-email-verified-going-weird
+      await newUser.getIdToken(true)
       url.searchParams.delete(REFRESH_AUTH_PARAM)
       window.location.href = url.toString()
       return

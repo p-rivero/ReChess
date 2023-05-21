@@ -40,7 +40,7 @@
       <p class="mr-3">
         Changed your mind?
       </p>
-      <a @click="logout">Logout</a>
+      <a @click="authStore.signOut()">Logout</a>
     </div>
   </div>
 </template>
@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
   import { ErrorMessageHandler } from '@/utils/errors/error-message-handler'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useAuthStore } from '@/stores/auth-user'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import UsernameTextbox from './UsernameTextbox.vue'
@@ -99,9 +99,8 @@
     emit('check-verify')
   }
   
-  async function logout() {
-    await authStore.signOut()
-    emit('close-popup')
-  }
+  watch(authStore, store => {
+    if (!store.loggedUser) emit('close-popup')
+  })
   
 </script>

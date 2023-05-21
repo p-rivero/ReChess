@@ -24,15 +24,15 @@ export async function signInRefresh() {
   const userStore = useUserStore()
   // Allow users to use the website without logging in
   if (!authStore.loggedUser) return
+  
   // If the user is authenticated, make sure they have completed the sign in process
   // For social logins, choose a username
-  const user = await userStore.getUserById(authStore.loggedUser.uid)
-  if (!user) {
+  const userDoc = await userStore.getUserById(authStore.loggedUser.uid)
+  if (authStore.loggedUser && !userDoc) {
     // Logged but user document does not exist, show the choose username popup
     showPopupIfNotWhitelisted('chooseUsername')
     return
   }
-  
   // For email logins, verify the email
   checkEmailVerified()
 }
@@ -46,7 +46,7 @@ export function checkEmailVerified(): boolean {
   // Called then the user has created an account with email and password,
   // or every time the user refreshes the page
   const authStore = useAuthStore()
-  if (!authStore.loggedUser) throw new Error('Only call checkEmailVerified when logged in')
+  if (!authStore.loggedUser) return false
   const verified = authStore.loggedUser.verified
   if (verified) {
     // Email is verified, nothing else to do
