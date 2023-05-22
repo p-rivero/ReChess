@@ -1,4 +1,4 @@
-import { admin, fnTest, functions } from './init'
+import { admin, fnTest, functions } from '../init'
 import type { ObjectMetadata } from 'firebase-functions/lib/v1/providers/storage'
 
 const bucket = admin.storage().bucket('rechess-web-piece-images')
