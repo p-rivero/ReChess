@@ -1,13 +1,11 @@
 import dotenv from 'dotenv'
 import * as admin from 'firebase-admin'
 import initFunctions from 'firebase-functions-test'
-
+import { assertEmulatorsRunning } from '../test-common'
 import { FIREBASE_CONFIG } from '../../src/firebase/credentials'
 
 const PROJECT_ID = 'functions-test'
 
-//! IMPORTANT: Do not run the functions emulator, since it will interfere with the test.
-//! You can use: firebase emulators:exec --only firestore,storage,auth 'npm test'
 process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080"
 process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099"
 process.env.FIREBASE_STORAGE_EMULATOR_HOST = "localhost:9199"
@@ -26,5 +24,10 @@ const fnTest = initFunctions({}, '.config/admin-key.json')
 // Mock initializeApp before importing functions
 jest.spyOn(admin, 'initializeApp').mockReturnValue(admin.app())
 const functions = require('../../src/firebase/functions/src/index') as typeof import('../../src/firebase/functions/src/index')
+
+
+// Do not run the functions emulator, since it will interfere with the test.
+// You can use: firebase emulators:start --only firestore,storage,auth
+beforeAll(assertEmulatorsRunning)
 
 export { admin, fnTest, functions }

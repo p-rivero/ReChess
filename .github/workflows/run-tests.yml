@@ -5,11 +5,6 @@ name: Run unit tests
     branches:
       - main
       - dev
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - main
-      - dev
 
 jobs:
   test:
