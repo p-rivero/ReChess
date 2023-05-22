@@ -24,9 +24,12 @@ jobs:
           
       - name: Setup secrets
         run: |
-          echo "VITE_RECHESS_FIREBASE_API_KEY=${{ secrets.RECHESS_FIREBASE_API_KEY }}" >> .config/.env.local &&
-          echo "${{ secrets.ADMIN_KEY_JSON }}" >> .config/admin-key.json
+          echo "VITE_RECHESS_FIREBASE_API_KEY=${{ secrets.RECHESS_FIREBASE_API_KEY }}" >> .config/.env.local
           
+      - uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: ".config/admin-key.json"
+          json: ${{ secrets.ADMIN_KEY_JSON }}
       
       - name: Setup Node
         uses: actions/setup-node@v3
