@@ -24,17 +24,20 @@ export default async function(data: unknown, context: CallableContext): Promise<
   if (!context.auth) {
     throw new HttpsError('unauthenticated', 'The function must be called while authenticated.')
   }
+  if (!context.auth.token.email_verified) {
+    throw new HttpsError('unauthenticated', 'The email is not verified.')
+  }
   
   // Validate input
   const { gameId, reason } = data as { gameId: unknown, reason: unknown }
   if (!gameId || !reason) {
-    throw new HttpsError('invalid-argument', 'The function must be called with a variantId and creatorId.')
+    throw new HttpsError('invalid-argument', 'The function must be called with a gameId and reason.')
   }
   if (typeof gameId !== 'string') {
-    throw new HttpsError('invalid-argument', 'The variantId must be a string.')
+    throw new HttpsError('invalid-argument', 'The gameId must be a string.')
   }
   if (typeof reason !== 'string') {
-    throw new HttpsError('invalid-argument', 'The creatorId must be a string.')
+    throw new HttpsError('invalid-argument', 'The reason must be a string.')
   }
   
   const admin = await useAdmin()

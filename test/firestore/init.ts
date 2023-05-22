@@ -25,7 +25,11 @@ export function setupJest(projectId: string, onInit: (testEnv: RulesTestEnvironm
       process.exit(1)
     }
     // Supress console warnings
-    jest.spyOn(console, 'warn').mockImplementation(() => { /* suppress warnings */ })
+    jest.spyOn(console, 'warn').mockImplementation((...e) => {
+      const last = e[e.length - 1]
+      if (typeof last === 'string' && last.startsWith('7 PERMISSION_DENIED:')) return
+      console.warn(...e)
+    })
     onInit(testEnv)
   })
   
