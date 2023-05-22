@@ -22,9 +22,11 @@ jobs:
           submodules: recursive
           fetch-depth: 0
           
-      - name: Setup enviroment variables
+      - name: Setup secrets
         run: |
-          echo "VITE_RECHESS_FIREBASE_API_KEY=${{ secrets.RECHESS_FIREBASE_API_KEY }}" >> .config/.env.local
+          echo "VITE_RECHESS_FIREBASE_API_KEY=${{ secrets.RECHESS_FIREBASE_API_KEY }}" >> .config/.env.local &&
+          echo "${{ secrets.ADMIN_KEY_JSON }}" >> .config/admin-key.json
+          
       
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -32,6 +34,14 @@ jobs:
           node-version: 16
       
       - run: npm install
+      
+      - name: Cache firebase emulators
+        uses: actions/cache@v2
+        with:
+          path: /github/home/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('**/firebase.json') }}
+          restore-keys: |
+            ${{ runner.os }}-firebase-emulators-
         
       - name: Test with Firebase emulators
         uses: w9jds/firebase-action@master
@@ -39,3 +49,9 @@ jobs:
           args: emulators:exec --only firestore,storage,auth 'npm test'
         env:
           GCP_SA_KEY: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_RECHESS_WEB }}'
+          
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
