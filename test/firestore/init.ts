@@ -12,13 +12,18 @@ export function setupJest(projectId: string, onInit: (testEnv: RulesTestEnvironm
     // assertEmulatorRunning('Firestore', 8080, true)
     await assertEmulatorsRunning()
     
-    testEnv = await initializeTestEnvironment({
-      projectId: projectId,
-      firestore: {
-        host: 'localhost',
-        port: 8080,
-      },
-    })
+    try {
+      testEnv = await initializeTestEnvironment({
+        projectId: projectId,
+        firestore: {
+          host: 'localhost',
+          port: 8080,
+        },
+      })
+    } catch (e) {
+      // Cannot connect to emulator
+      process.exit(1)
+    }
     // Supress console warnings
     jest.spyOn(console, 'warn').mockImplementation(() => { /* suppress warnings */ })
     onInit(testEnv)

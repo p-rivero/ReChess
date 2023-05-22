@@ -36,7 +36,7 @@ jobs:
       - name: Cache firebase emulators
         uses: actions/cache@v2
         with:
-          path: /github/home/.cache/firebase/emulators
+          path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('**/firebase.json') }}
           restore-keys: |
             ${{ runner.os }}-firebase-emulators-
