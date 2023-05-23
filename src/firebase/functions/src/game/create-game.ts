@@ -43,8 +43,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('permission-denied', 'The function must be called by the user that created the lobby slot.')
   }
   
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db } = await useAdmin()
   
   // Fetch the lobby slot
   const lobbySlotRef = db.collection('variants').doc(variantId).collection('lobby').doc(creatorId)

@@ -10,8 +10,7 @@ import { useAdmin } from '../helpers'
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function(variantId: string, userId: string): Promise<void> {
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db } = await useAdmin()
   
   // Decrement the upvote count for the variant
   const p1 = db.collection('variants')

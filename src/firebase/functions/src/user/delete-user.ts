@@ -11,8 +11,7 @@ import type { UserRecord } from 'firebase-admin/auth'
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function(user: UserRecord): Promise<void> {
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db, storage } = await useAdmin()
   const userId = user.uid
   
   const userDoc = await db.collection('users').doc(userId).get()
@@ -59,7 +58,7 @@ export default async function(user: UserRecord): Promise<void> {
   })
   
   // Remove the user's profile picture
-  const appDefaultBucket = admin.storage().bucket()
+  const appDefaultBucket = storage.bucket()
   const profilePicRef = appDefaultBucket.file(`profile-images/${userId}`)
   const p8 = profilePicRef.delete().catch((err) => {
     if (err.code === 404) return

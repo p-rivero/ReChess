@@ -1,11 +1,12 @@
 import { expectHttpsError } from '../utils'
-import { fnTest, functions, initialize } from '../init'
+import { functions, initialize } from '../init'
+import admin from 'firebase-admin'
 import type { https } from 'firebase-functions'
 import type { GameDoc } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
 
-const admin = initialize('cancel-game-test')
-const db = admin.firestore()
+const { app, fnTest } = initialize('cancel-game-test')
+const db = app.firestore()
 const cancelGame = fnTest.wrap(functions.cancelGame)
 
 function dummyContext(appCheck = true, auth = true, emailVerified = true): https.CallableContext {
@@ -42,7 +43,7 @@ function makeArgs(gameId = '1234', reason = 'a cancel reason') {
 }
 
 
-async function createGame(gameId = '1234') {
+async function insertGame(gameId = '1234') {
   const doc: GameDoc = {
     moveHistory: '',
     playerToMove: 'white',
@@ -120,5 +121,7 @@ test('cannot cancel a game that does not exist', async () => {
   let e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The game does not exist.')
   
-  // TODO: Create a game
+  await insertGame()
+  
+  await cancelGame(arg, context)
 })

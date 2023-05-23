@@ -11,8 +11,7 @@ const MAX_INDEX_SIZE = 1_040_000 // 1 MiB - 8576 bytes (plenty of space for meta
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function(snap: QueryDocumentSnapshot): Promise<void> {
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db } = await useAdmin()
   
   let { name, description, tags } = snap.data() as VariantDoc
   

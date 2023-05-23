@@ -11,8 +11,7 @@ import type { GameDoc, GameSummary, UserDoc } from 'db/schema'
  * @return {Promise<void>} A promise that resolves when the function completes
  */
 export default async function(gameId: string): Promise<void> {
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db } = await useAdmin()
   
   // Fetch the game, make sure it exists and is finished
   const gameRef = db.collection('games').doc(gameId)

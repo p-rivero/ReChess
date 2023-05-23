@@ -40,8 +40,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('invalid-argument', 'The reason must be a string.')
   }
   
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db } = await useAdmin()
   
   // Fetch the game
   const gameRef = db.collection('games').doc(gameId)

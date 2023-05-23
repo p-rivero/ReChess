@@ -15,8 +15,7 @@ export async function updatePrivateCache(
   variantOrUserId: string,
   userId: string
 ) {
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db } = await useAdmin()
   
   // Fetch existing cache doc (if there is one)
   const userCacheRef = db.collection('users').doc(userId).collection('privateCache').doc('doc')

@@ -23,8 +23,7 @@ export default async function(
   const doc = change.after.data() as UserRenameTriggerDoc
   
   // The name has changed, initialize the admin SDK
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db } = await useAdmin()
   
   // If this write was allowed by the rules, the current timestamp must be after the renameAllowedAt
   const newName = doc.name || `@${doc.username}`

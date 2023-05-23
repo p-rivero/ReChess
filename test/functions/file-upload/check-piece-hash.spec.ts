@@ -1,8 +1,8 @@
-import { fnTest, functions, initialize } from '../init'
+import { functions, initialize } from '../init'
 import type { ObjectMetadata } from 'firebase-functions/lib/v1/providers/storage'
 
-const admin = initialize('check-piece-hash-test')
-const bucket = admin.storage().bucket('rechess-web-piece-images')
+const { app, fnTest } = initialize('check-piece-hash-test')
+const bucket = app.storage().bucket('rechess-web-piece-images')
 const checkPieceHash = fnTest.wrap(functions.checkPieceHash)
 
 function makeMetadata(filename: string): ObjectMetadata {
@@ -26,6 +26,10 @@ test('accepts images with correct hash', async () => {
   
   await bucket.upload('test/img.png', {
     destination: FILE_PATH,
+    metadata: {
+      contentType: `image/png`,
+      metadata: { userId: '1234' },
+    },
   })
   
   await checkPieceHash(makeMetadata(FILE_PATH))
@@ -39,11 +43,15 @@ test('rejects images with an incorrect name', async () => {
   
   await bucket.upload('test/img.png', {
     destination: FILE_PATH,
+    metadata: {
+      contentType: `image/png`,
+      metadata: { userId: '1234' },
+    },
   })
   
   // spy on console.warn
   const spy = jest.spyOn(console, 'warn').mockImplementation((...args) => { 
-    const msg = args.map(arg => arg.toString()).join(' ')
+    const msg = args.join(' ')
     if (msg !== 'Deleting piece-images/some-name because the hash does not match the filename.') {
       throw new Error('Unexpected console.warn call: ' + msg)
     }
@@ -56,6 +64,7 @@ test('rejects images with an incorrect name', async () => {
   if (spy.mock.calls.length !== 1) {
     throw new Error('Expected console.warn to be called')
   }
+  spy.mockRestore()
 })
 
 test('ignores images in other directories', async () => {
@@ -63,6 +72,10 @@ test('ignores images in other directories', async () => {
   
   await bucket.upload('test/img.png', {
     destination: FILE_PATH,
+    metadata: {
+      contentType: `image/png`,
+      metadata: { userId: '1234' },
+    },
   })
   
   await checkPieceHash(makeMetadata(FILE_PATH))

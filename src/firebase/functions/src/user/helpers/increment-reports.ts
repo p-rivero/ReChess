@@ -18,8 +18,7 @@ export async function incrementReports(
   reporterId: string,
   reportReason: string
 ): Promise<void> {
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db } = await useAdmin()
   
   const moderationRef = db.collection(collectionName).doc(docId).collection('moderation').doc('doc')
   const newSummaryLine = await makeSummaryLine(reporterId, reportReason)
@@ -67,8 +66,7 @@ async function makeSummaryLine(userId: string, reportReason: string): Promise<st
  * @return {string} The username of the user
  */
 async function getUsername(userId: string): Promise<string> {
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db } = await useAdmin()
   const userSnap = await db.collection('users').doc(userId).get()
   const userDoc = userSnap.data() as UserDoc
   return userDoc.IMMUTABLE.username

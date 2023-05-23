@@ -14,8 +14,8 @@ export default async function(image: ObjectMetadata): Promise<void> {
   if (!image.name.startsWith('piece-images/')) return
   
   // Download the image
-  const admin = await useAdmin()
-  const fileRef = admin.storage().bucket(image.bucket).file(image.name)
+  const { storage } = await useAdmin()
+  const fileRef = storage.bucket(image.bucket).file(image.name)
   const [file] = await fileRef.download()
   
   // Compute the hash of the image
@@ -24,8 +24,7 @@ export default async function(image: ObjectMetadata): Promise<void> {
   // Check if the filename matches the hash
   const fileName = image.name.split('/').pop()
   if (fileName !== hash) {
-    console.warn('Deleting', image.name, 'because the hash does not match the filename.')
-    console.info('Uploader:', image.metadata?.userId)
+    console.warn('Deleting', image.name, 'because the hash does not match the filename. Uploader:', image.metadata?.userId)
     await fileRef.delete()
   }
 }

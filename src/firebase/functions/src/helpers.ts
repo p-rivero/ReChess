@@ -1,20 +1,23 @@
 import { MAX_BATCH_SIZE } from './config'
+import type { App } from 'firebase-admin/lib/app'
 
 // True if the admin SDK has been initialized for this cloud function instance
-let adminInitialized = false
+let appInstance: App | null = null
 
 /**
  * Lazy load the admin SDK and initialize it if it hasn't been already
  * @return {app} The admin SDK
  */
-export async function useAdmin(): Promise<typeof admin> {
+export async function useAdmin() {
   // See https://youtu.be/v3eG9xpzNXM
   const admin = await import('firebase-admin')
-  if (!adminInitialized) {
-    admin.initializeApp()
-    adminInitialized = true
+  if (!appInstance) {
+    appInstance = admin.initializeApp()
   }
-  return admin
+  return {
+    db: admin.firestore(appInstance),
+    storage: admin.storage(appInstance),
+  }
 }
 
 

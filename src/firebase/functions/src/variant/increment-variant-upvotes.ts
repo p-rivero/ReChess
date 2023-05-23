@@ -11,8 +11,7 @@ import { useAdmin } from '../helpers'
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function(variantId: string, upvoterId: string): Promise<void> {
-  const admin = await useAdmin()
-  const db = admin.firestore()
+  const { db } = await useAdmin()
   const baseDoc = db.collection('variants').doc(variantId)
 
   const p1 = baseDoc.update('numUpvotes', FieldValue.increment(1)).catch((err) => {
