@@ -1,9 +1,10 @@
 import { functions, initialize } from '../init'
 import type { ObjectMetadata } from 'firebase-functions/lib/v1/providers/storage'
 
-const { app, fnTest } = initialize('check-piece-hash-test')
+const { app, testEnv } = initialize('check-piece-hash-test')
 const bucket = app.storage().bucket('rechess-web-piece-images')
-const checkPieceHash = fnTest.wrap(functions.checkPieceHash)
+const db = app.firestore()
+const checkPieceHash = testEnv.wrap(functions.checkPieceHash)
 
 function makeMetadata(filename: string): ObjectMetadata {
   return {
@@ -52,7 +53,8 @@ test('rejects images with an incorrect name', async () => {
   // spy on console.warn
   const spy = jest.spyOn(console, 'warn').mockImplementation((...args) => { 
     const msg = args.join(' ')
-    if (msg !== 'Deleting piece-images/some-name because the hash does not match the filename.') {
+    // TODO: Uploader: 1234
+    if (msg !== 'Deleting piece-images/some-name because the hash does not match the filename. Uploader: ') {
       throw new Error('Unexpected console.warn call: ' + msg)
     }
   })

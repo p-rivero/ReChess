@@ -5,7 +5,7 @@ import type { FeaturesList } from 'firebase-functions-test/lib/features'
 
 export interface TestUtils {
   app: admin.app.App,
-  fnTest: FeaturesList, // TODO: Rename to testEnv
+  testEnv: FeaturesList,
 }
 
 export const functions = require('../../src/firebase/functions/src/index') as typeof import('../../src/firebase/functions/src/index')
@@ -16,17 +16,16 @@ process.env.FIREBASE_STORAGE_EMULATOR_HOST = "localhost:9199"
 
 let currentUtils: TestUtils | null = null
 export function initialize(projectId: string): TestUtils {
-  const fnTest = initFunctions({ projectId })
+  const testEnv = initFunctions({ projectId })
   const config = {
     projectId,
     credential: admin.credential.applicationDefault(),
   }
   const app = admin.initializeApp(config, projectId)
-  jest.spyOn(admin, 'initializeApp').mockImplementation(() => {
-    console.warn('CALLING MOCKED initializeApp')
-    return app
-  })
-  currentUtils = { app, fnTest }
+  jest.spyOn(admin, 'initializeApp').mockImplementation(
+    (config, id) => id === projectId ? app : admin.initializeApp(config, id)
+  )
+  currentUtils = { app, testEnv }
   return currentUtils
 }
 
@@ -58,6 +57,6 @@ afterEach(async () => {
 
 afterAll(async () => {
   await currentUtils?.app.delete()
-  currentUtils?.fnTest.cleanup()
+  currentUtils?.testEnv.cleanup()
 })
 

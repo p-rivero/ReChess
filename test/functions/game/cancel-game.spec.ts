@@ -5,9 +5,9 @@ import type { https } from 'firebase-functions'
 import type { GameDoc } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
 
-const { app, fnTest } = initialize('cancel-game-test')
+const { app, testEnv } = initialize('cancel-game-test')
 const db = app.firestore()
-const cancelGame = fnTest.wrap(functions.cancelGame)
+const cancelGame = testEnv.wrap(functions.cancelGame)
 
 function dummyContext(appCheck = true, auth = true, emailVerified = true): https.CallableContext {
   const token = {
@@ -120,8 +120,14 @@ test('cannot cancel a game that does not exist', async () => {
   
   let e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The game does not exist.')
+})
+
+test('caller must be one of the players', async () => {
+  const context = dummyContext()
+  const arg = makeArgs()
   
   await insertGame()
   
-  await cancelGame(arg, context)
+  let e = await expectHttpsError(cancelGame(arg, context))
+  expect(e.message).toMatch('The function must be called by either the white or black player.')
 })

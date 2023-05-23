@@ -5,7 +5,7 @@ import { assertEmulatorsRunning } from '../test-common'
 // to see the requests in the emulator UI (http://127.0.0.1:4000/firestore/requests)
 
 export function setupJest(projectId: string, onInit: (testEnv: RulesTestEnvironment) => void) {
-  let testEnv: RulesTestEnvironment
+  let testEnv: RulesTestEnvironment | null = null
   
   beforeAll(async () => {
     // Make sure the emulator is running (Use: firebase emulators:start --only firestore,storage,auth)
@@ -34,11 +34,11 @@ export function setupJest(projectId: string, onInit: (testEnv: RulesTestEnvironm
   })
   
   afterAll(async () => {
-    await testEnv.cleanup()
+    await testEnv?.cleanup()
   })
   
   // Clear data between tests
   afterEach(async () => {
-    await testEnv.clearFirestore()
+    await testEnv?.clearFirestore()
   })
 }
