@@ -21,12 +21,13 @@ export type SignInProvider = 'password' | 'google.com' | 'github.com'
 export class AuthUser extends User {
   public readonly email: string
   public readonly verified: boolean
+  public readonly moderator: boolean
   public readonly signInProvider: SignInProvider
   public upvotedVariants: string[] = []
   public reportedVariants: string[] = []
   public reportedUsers: string[] = []
   
-  constructor(authUser: fb.User, dbUser?: UserDoc, userCache?: UserPrivateCacheDoc) {
+  constructor(authUser: fb.User, dbUser?: UserDoc, userCache?: UserPrivateCacheDoc, moderator = false) {
     if (!authUser.email) throw new Error('User has no email')
     // If the user has logged in with a third-party provider, the document
     // doesn't exist until they choose a username.
@@ -51,6 +52,7 @@ export class AuthUser extends User {
     
     this.email = authUser.email
     this.verified = authUser.emailVerified
+    this.moderator = moderator
     
     if (authUser.providerData.length === 0) {
       throw new Error('User has no provider data')
@@ -84,11 +86,12 @@ export const useAuthStore = defineStore('auth-user', () => {
       return
     }
     
-    const [user, cache] = await Promise.all([
+    const [user, cache, token] = await Promise.all([
       UserDB.getUserById(newUser.uid),
       UserDB.getUserPrivateCache(newUser.uid),
+      newUser.getIdTokenResult(),
     ])
-    persistUser(new AuthUser(newUser, user, cache))
+    persistUser(new AuthUser(newUser, user, cache, token.claims.moderator))
     
     // If the user has just verified their email, the popup may already be showing.
     // If needed, hide it.
