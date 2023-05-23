@@ -80,10 +80,17 @@ If you use VSCode, install the [Vue Language extension](https://marketplace.visu
 npm run dev
 ```
 
+This will also start the Firebase emulator suite.
+
 ### Run unit tests
 
 ```sh
-npm run test
+# Run in 2 different terminals:
+firebase emulators:start --only firestore,storage,auth
+npm test
+
+# Or, if you only need to run the tests once:
+firebase emulators:exec --only firestore,storage,auth 'npm test'
 ```
 
 If you use VSCode, I recommend installing the [Jest extension](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest) and adding the following to your `settings.json`:
@@ -126,6 +133,17 @@ firebase login
 npm run build
 firebase deploy
 ```
+
+### Assign moderators
+
+```sh
+npm run make-moderator -- <username>
+```
+
+Where `<username>` is the same text as the user's URL (`https://rechess.org/user/___`).
+If the user is already a moderator, this will remove their moderator privileges.
+
+This command requires the `admin-key.json` file to be present in [`.config`](.config).
 
 ---
 

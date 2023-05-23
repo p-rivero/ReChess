@@ -7,6 +7,7 @@
     "preview": "vite preview --port 4173 --config .config/vite.config.ts",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --config .config/.eslintrc.cjs",
     "test": "jest --config .config/jest.config.js",
+    "make-moderator": "node --no-warnings ./src/make-moderator.mjs",
     "pre-compile": "run-p build-wasm generate-type-guard generate-icons minify-svg",
     "generate-type-guard": "ts-auto-guard ./src/protochess/types.d.ts && sed -i 's/import {/import type {/g' ./src/protochess/types.guard.ts",
     "generate-icons": "./src/assets/img/icons/generate-icons.sh",

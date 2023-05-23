@@ -16,7 +16,7 @@ module.exports = {
   },
   // Ignore the submodule directories
   // Also ignore the functions directory and any file that ends with .guard.ts
-  ignorePatterns: ['protochess-engine', 'chessgroundx', 'functions', '*.guard.ts'],
+  ignorePatterns: ['protochess-engine', 'chessgroundx', 'functions', '*.guard.ts', 'src/make-moderator.mjs'],
   plugins: [
     'import',
     'sort-imports-es6-autofix',
