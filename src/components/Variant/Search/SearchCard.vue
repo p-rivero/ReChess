@@ -74,7 +74,7 @@
       break
     case 'popular': {
       // upvoteScore could be arbitrarily large, so we make it more reasonable by calculating
-      // the log. If upvoteScore is 0, then log(0) = -Inf. Add 1 to it so that log(1) = 0.
+      // the log. If upvoteScore is 0, then ln(0) = -Inf. Add 1 to it so that ln(1) = 0.
       // Use the multiplier to control the weight of the upvoteScore in the popularity score
       // (vs. variant.popularity, which is the number of current players in this variant).
       const MULTIPLIER = 0.5

@@ -28,30 +28,30 @@ try {
   setTerminalColor('white')
   process.exit(1)
 }
-console.log(`User ID: ${id}`)
+console.info(`User ID: ${id}`)
 
 if (await isModerator(id)) {
   setTerminalColor('red')
-  console.log(`The user ${username} is a moderator. Press 'y' to REMOVE moderator status.`)
+  console.info(`The user ${username} is a moderator. Press 'y' to REMOVE moderator status.`)
 } else {
   setTerminalColor('green')
-  console.log(`This will GIVE ${username} moderator status. Press 'y' to confirm.`)
+  console.info(`This will GIVE ${username} moderator status. Press 'y' to confirm.`)
 }
 setTerminalColor('white')
-console.log('(press anything else to cancel)\n')
+console.info('(press anything else to cancel)\n')
 
 onKeyPress(
   'y',
   async () => {
     const isMod = await toggleModerator(id)
     setTerminalColor('yellow')
-    console.log(`Moderator status for ${username} is now`, isMod ? 'ENABLED' : 'DISABLED')
+    console.info(`Moderator status for ${username} is now`, isMod ? 'ENABLED' : 'DISABLED')
     setTerminalColor('white')
-    console.log('Refresh the user token by visiting https://rechess.org/?refresh-auth=true')
+    console.info('Refresh the user token by visiting https://rechess.org/?refresh-auth=true')
     process.exit(0)
   },
   () => {
-    console.log('Operation cancelled, no changes made.')
+    console.info('Operation cancelled, no changes made.')
     process.exit(1)
   }
 )

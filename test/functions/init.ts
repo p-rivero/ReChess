@@ -1,4 +1,3 @@
-import dotenv from 'dotenv'
 import admin from 'firebase-admin'
 import initFunctions from 'firebase-functions-test'
 import { assertEmulatorsRunning } from '../test-common'
@@ -6,7 +5,7 @@ import type { FeaturesList } from 'firebase-functions-test/lib/features'
 
 export interface TestUtils {
   app: admin.app.App,
-  fnTest: FeaturesList, // Rename to testEnv
+  fnTest: FeaturesList, // TODO: Rename to testEnv
 }
 
 export const functions = require('../../src/firebase/functions/src/index') as typeof import('../../src/firebase/functions/src/index')
