@@ -22,9 +22,7 @@ export function initialize(projectId: string): TestUtils {
     credential: admin.credential.applicationDefault(),
   }
   const app = admin.initializeApp(config, projectId)
-  jest.spyOn(admin, 'initializeApp').mockImplementation(
-    (config, id) => id === projectId ? app : admin.initializeApp(config, id)
-  )
+  jest.spyOn(admin, 'initializeApp').mockImplementation(() => app)
   currentUtils = { app, testEnv }
   return currentUtils
 }

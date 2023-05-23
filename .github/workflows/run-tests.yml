@@ -16,15 +16,6 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
-          
-      - name: Setup secrets
-        run: |
-          echo "VITE_RECHESS_FIREBASE_API_KEY=${{ secrets.RECHESS_FIREBASE_API_KEY }}" >> .config/.env.local
-          
-      - uses: jsdaniell/create-json@v1.2.2
-        with:
-          name: ".config/admin-key.json"
-          json: ${{ secrets.ADMIN_KEY_JSON }}
       
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -32,14 +23,6 @@ jobs:
           node-version: 16
       
       - run: npm install
-      
-      - name: Cache firebase emulators
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('**/firebase.json') }}
-          restore-keys: |
-            ${{ runner.os }}-firebase-emulators-
         
       - name: Test with Firebase emulators
         uses: w9jds/firebase-action@master
