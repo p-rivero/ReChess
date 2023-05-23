@@ -16,3 +16,22 @@ export async function expectHttpsError(promise: Promise<any>): Promise<https.Htt
     return e
   }
 }
+
+export function expectWarn(expectedMessage: string, expectedTimesCalled = 1) {
+  const spy = jest.spyOn(console, 'warn').mockImplementationOnce((...args) => { 
+    const msg = args.join(' ')
+    if (msg !== expectedMessage) {
+      throw new Error(`Unexpected warning:\n${msg}\n\nExpected:\n${expectedMessage}`)
+    }
+  })
+  
+  return {
+    done() {
+      if (spy.mock.calls.length !== expectedTimesCalled) {
+        throw new Error(`Expected console.warn to be called ${expectedTimesCalled} times, ` +
+            `instead called ${spy.mock.calls.length} times`)
+      }
+      spy.mockRestore()
+    }
+  }
+}

@@ -13,12 +13,17 @@ export default async function(image: ObjectMetadata): Promise<void> {
   if (!image.name) return
   if (!image.name.startsWith('piece-images/')) return
   
-  // Download the image
   const { storage } = await useAdmin()
   const fileRef = storage.bucket(image.bucket).file(image.name)
-  const [file] = await fileRef.download()
+  
+  if (!(image.metadata?.userId)) {
+    console.warn('Deleting', image.name, 'because it does not have an uploader ID')
+    await fileRef.delete()
+    return
+  }
   
   // Compute the hash of the image
+  const [file] = await fileRef.download()
   const hash = createHash('sha256').update(file).digest('hex')
   
   // Check if the filename matches the hash
