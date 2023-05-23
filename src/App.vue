@@ -12,8 +12,8 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import { setMessagePopup } from '@/components/PopupMsg/popup-manager'
-  import { setSignInPopup, signInRefresh } from '@/components/Auth/auth-manager'
+  import { setMessagePopup } from '@/helpers/managers/popup-manager'
+  import { setSignInPopup, signInRefresh } from '@/helpers/managers/auth-manager'
   import NavbarComponent from '@/components/Navbar/NavbarComponent.vue'
   import PopupMessage from '@/components/PopupMsg/PopupMessage.vue'
   import SignInPopup from '@/components/Auth/SignInPopup.vue'

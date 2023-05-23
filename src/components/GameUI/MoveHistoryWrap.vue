@@ -17,7 +17,7 @@
   import { isScrolledIntoView } from '@/helpers/web-utils'
   import { ref, watch } from 'vue'
   import MoveHistoryView from './MoveHistoryView.vue'
-  import type { MoveTreeNode } from '@/helpers/chess/move-history-manager'
+  import type { MoveTreeNode } from '@/helpers/managers/move-history-manager'
   
   const updateKey = ref(0)
   const listElement = ref<InstanceType<typeof MoveHistoryView>>()

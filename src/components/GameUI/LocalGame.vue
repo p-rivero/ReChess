@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { returnHome } from '@/helpers/managers/navigation-manager'
   import { useRoute, useRouter } from 'vue-router'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useVariantStore } from '@/stores/variant'
@@ -49,25 +49,16 @@
   onMounted(async () => {
     const fetchedVariant = await getVariant()
     if (!fetchedVariant) {
-      showPopup(
-        'Variant not found',
-        'We couldn\'t find the variant you were looking for. You were redirected to the home page.',
-        'ok'
-      )
-      router.push({ name: 'home' })
+      returnHome(router, 404, 'We can\'t find the variant you are looking for.')
       return
     }
     board.value?.setState(fetchedVariant)
   })
   
   function invalidVariant() {
-    showPopup(
-      'Invalid variant',
-      'This variant seems to be invalid, it may have been uploaded using an incompatible version \
-        of the site or by a malicious user. You were redirected to the home page.',
-      'ok'
-    )
-    router.push({ name: 'home' })
+    returnHome(router, 503, 'This variant seems to be invalid. It may have been uploaded \
+        using an incompatible version of the site or by a malicious user. \
+        \n\nPlease report this by [opening an issue on GitHub](https://github.com/p-rivero/ReChess/issues).')
   }
   
   

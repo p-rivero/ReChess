@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
+  import { returnHome } from '@/helpers/managers/navigation-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
   import { useRoute, useRouter } from 'vue-router'
@@ -45,9 +46,12 @@
   // When the route changes, reload the variant list
   onMounted(async () => {
     const username = route.params.username
-    if (!username || typeof username !== 'string' || username !== authStore.loggedUser?.username) {
-      // Invalid username, redirect to home page
-      router.push({ name: 'home' })
+    if (!username || typeof username !== 'string') {
+      returnHome(router, 400, 'This URL seems to be incorrect.')
+      return
+    }
+    if (username !== authStore.loggedUser?.username) {
+      returnHome(router, 403, 'You cannot see the upvotes of other users. Please make sure the URL is correct.')
       return
     }
     

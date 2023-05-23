@@ -71,7 +71,7 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { showPopup } from '@/helpers/managers/popup-manager'
   import { useRouter } from 'vue-router'
   import { useUserPrefsStore } from '@/stores/user-preferences'
   import { useVariantDraftStore } from '@/stores/variant-draft'

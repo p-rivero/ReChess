@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
+  import { returnHome } from '@/helpers/managers/navigation-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
   import { useRoute, useRouter } from 'vue-router'
@@ -51,8 +52,7 @@
   onMounted(async () => {
     const username = route.params.username
     if (!username || typeof username !== 'string') {
-      // Invalid username, redirect to home page
-      router.push({ name: 'home' })
+      returnHome(router, 400, 'This URL seems to be incorrect.')
       return
     }
     
@@ -64,8 +64,7 @@
       // User is not logged in or is viewing another user's profile
       const fetchedUser = await userStore.getUserByUsername(username)
       if (!fetchedUser) {
-        // User not found, redirect to home page
-        router.push({ name: 'home' })
+        returnHome(router, 404, 'We can\'t find the user you were looking for.')
         return
       }
       loadedUser = fetchedUser

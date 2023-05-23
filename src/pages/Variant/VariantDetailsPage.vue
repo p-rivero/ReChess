@@ -121,8 +121,9 @@
   
   import { clone } from '@/helpers/ts-utils'
   import { nTimes } from '@/helpers/locale'
-  import { requestSignIn } from '@/components/Auth/auth-manager'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { requestSignIn } from '@/helpers/managers/auth-manager'
+  import { returnHome } from '@/helpers/managers/navigation-manager'
+  import { showPopup } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
   import { useUserStore } from '@/stores/user'
@@ -151,16 +152,13 @@
     
   watchEffect(async () => {
     if (!route.params.variantId || typeof route.params.variantId !== 'string') {
-      // Variant ID is missing, redirect to home page
-      router.push({ name: 'home' })
+      returnHome(router, 400, 'This URL seems to be incorrect.')
       return
     }
     
-    // Get variant info from the server
     const newVariant = await variantStore.getVariant(route.params.variantId)
     if (!newVariant) {
-      // Variant ID is incorrect (or the uploader of this variant is malicious), redirect to home page
-      router.push({ name: 'home' })
+      returnHome(router, 404, 'We can\'t find the variant you were looking for.')
       return
     }
     

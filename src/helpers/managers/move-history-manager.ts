@@ -1,6 +1,6 @@
 
 import { clone, objectEquals } from '@/helpers/ts-utils'
-import { moveToString } from './chess-coords'
+import { moveToString } from '@/helpers/chess/chess-coords'
 import type { GameState, InitialState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from '@/protochess/types'
 
 export type MoveResult = { flag: MakeMoveFlag, winner: MakeMoveWinner }

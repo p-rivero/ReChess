@@ -112,7 +112,7 @@
   import { debounce } from '@/helpers/ts-utils'
   import { gameOverMessage } from '@/helpers/chess/game-over-message'
   import { getProtochess } from '@/protochess'
-  import { showPopup, showPopupImportant } from '@/components/PopupMsg/popup-manager'
+  import { showPopup, showPopupImportant } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import EvaluationGauge from '@/components/GameUI/EvaluationGauge.vue'
   import MoveHistoryWrap from '@/components/GameUI/MoveHistoryWrap.vue'

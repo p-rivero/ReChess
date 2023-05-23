@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-  import { MoveHistoryManager, type MoveHistoryQueryResult, type MoveTreeNode } from '@/helpers/chess/move-history-manager'
+  import { MoveHistoryManager, type MoveHistoryQueryResult, type MoveTreeNode } from '@/helpers/managers/move-history-manager'
   import { computed, nextTick, ref } from 'vue'
   import { getProtochess } from '@/protochess'
   import PromotionPopup from '@/components/GameUI/PromotionPopup.vue'

@@ -327,7 +327,8 @@
   import { letterToNumber, numberToLetter } from '@/helpers/chess/chess-coords'
   import { paramToInt } from '@/helpers/web-utils'
   import { removePiecesById } from '@/helpers/chess/fen'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { returnHome } from '@/helpers/managers/navigation-manager'
+  import { showPopup } from '@/helpers/managers/popup-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { useRoute, useRouter } from 'vue-router'
   import { useVariantDraftStore } from '@/stores/variant-draft'
@@ -351,14 +352,13 @@
   const pieceIndex = paramToInt(route.params.pieceIndex)
   let piece: FullPieceDef|null = null
   
-  // This page is only accessible when logged in
   if (!authStore.loggedUser) {
-    router.push({ name: 'home' })
+    returnHome(router, 401, 'You must be logged in to edit a variant.')
   }
   
   // Incorrect piece index, redirect to home page
   if (Number.isNaN(pieceIndex) || pieceIndex < 0 || pieceIndex >= draftStore.state.pieceTypes.length) {
-    router.push({ name: 'home' })
+    returnHome(router, 400, 'This URL seems to be incorrect.')
   } else {
     piece = draftStore.state.pieceTypes[pieceIndex]
   }

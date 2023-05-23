@@ -244,7 +244,8 @@
   import { AuthUser, useAuthStore } from '@/stores/auth-user'
   import { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
   import { User, useUserStore } from '@/stores/user'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { returnHome } from '@/helpers/managers/navigation-manager'
+  import { showPopup } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useGameStore } from '@/stores/game'
   import EditableMarkdown from '@/components/BasicWrappers/EditableMarkdown.vue'
@@ -273,8 +274,7 @@
   async function updateUser() {
     const username = route.params.username
     if (!username || typeof username !== 'string') {
-      // Invalid username, redirect to home page
-      router.push({ name: 'home' })
+      returnHome(router, 400, 'This URL seems to be incorrect.')
       return
     }
     
@@ -287,8 +287,7 @@
     
     const fetchedUser = await userStore.getUserByUsername(username)
     if (!fetchedUser) {
-      // User not found, redirect to home page
-      router.push({ name: 'home' })
+      returnHome(router, 404, 'We can\'t find the user you were looking for.')
       return
     }
     user.value = fetchedUser
@@ -399,7 +398,7 @@
   async function deleteAccountConfirmed() {
     try {
       await authStore.deleteUser()
-      router.push({ name: 'home' })
+      router.replace({ name: 'home' })
       showPopup(
         'Account deleted',
         'Your account has been deleted successfully. We are sorry to see you go! \

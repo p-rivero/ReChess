@@ -10,7 +10,7 @@ import { auth } from '@/firebase'
 import * as fb from 'firebase/auth'
 import { FirebaseError } from '@firebase/util'
 import { PopupClosedError } from '@/helpers/errors/PopupClosedError'
-import { hideSignInPopup } from '@/components/Auth/auth-manager'
+import { hideSignInPopup } from '@/helpers/managers/auth-manager'
 import type { UserDoc, UserPrivateCacheDoc } from '@/firebase/db/schema'
 
 const AUTH_USER_KEY = 'loggedUser'

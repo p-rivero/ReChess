@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 
-  import { checkEmailVerified } from './auth-manager'
+  import { checkEmailVerified } from '@/helpers/managers/auth-manager'
   import { ref } from 'vue'
   import ChooseUsernameStage from './ChooseUsernameStage.vue'
   import LoginRegisterStage from './LoginRegisterStage.vue'

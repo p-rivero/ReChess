@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import type { MoveTreeNode } from '@/helpers/chess/move-history-manager'
+  import type { MoveTreeNode } from '@/helpers/managers/move-history-manager'
 
   const props = defineProps<{
     root: MoveTreeNode

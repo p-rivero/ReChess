@@ -283,10 +283,11 @@
 
 <script setup lang="ts">
   import { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
-  import { checkState } from '@/components/Variant/Edit/check-state'
+  import { checkState } from '@/helpers/chess/check-protochess-state'
   import { importFile } from '@/helpers/file-io'
   import { onMounted, ref, watch } from 'vue'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { returnHome } from '@/helpers/managers/navigation-manager'
+  import { showPopup } from '@/helpers/managers/popup-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { useRouter } from 'vue-router'
   import { useVariantDraftStore } from '@/stores/variant-draft'
@@ -319,7 +320,7 @@
   
   // This page is only accessible when logged in
   if (!authStore.loggedUser) {
-    router.push({ name: 'home' })
+    returnHome(router, 401, 'You must be logged in to edit a variant.')
   }
     
   // When state changes, check if the state is valid, and update the board
@@ -449,7 +450,7 @@
         loading.value = true
         const id = await draftStore.publish()
         loading.value = false
-        if (id) router.push({ name: 'variant-details', params: { variantId: id } })
+        if (id) router.replace({ name: 'variant-details', params: { variantId: id } })
         else showPopup(
           'Could not publish variant',
           'Please try again later. If the problem persists, back up your variant and \

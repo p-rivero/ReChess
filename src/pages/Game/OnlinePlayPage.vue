@@ -14,7 +14,8 @@
 
 <script setup lang="ts">
   import { onUnmounted, ref, watchEffect } from 'vue'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { returnHome } from '@/helpers/managers/navigation-manager'
+  import { showPopup } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useGameStore } from '@/stores/game'
   import { useRoute, useRouter } from 'vue-router'
@@ -34,8 +35,7 @@
   // When the route changes, update the game
   watchEffect(() => {
     if (!route.params.gameId || typeof route.params.gameId !== 'string') {
-      // Variant ID is missing, redirect to home page
-      router.push({ name: 'home' })
+      returnHome(router, 400, 'This URL seems to be incorrect.')
       return
     }
     
@@ -51,24 +51,19 @@
     })
     
     gameStore.onGameNotExists(() => {
-      router.push({ name: 'home' })
+      returnHome(router, 404, 'We can\'t find the game you were looking for.')
     })
     
     gameStore.onInvalidVariant(() => {
-      showPopup(
-        'Invalid game',
-        'The variant of this game seems to be invalid, it may have been uploaded using an old version \
-          of the site or by a malicious user. You were redirected to the home page.',
-        'ok'
-      )
-      router.push({ name: 'home' })
+      returnHome(router, 503, 'This variant seems to be invalid. It may have been uploaded \
+          using an incompatible version of the site or by a malicious user. \
+          \n\nPlease report this by [opening an issue on GitHub](https://github.com/p-rivero/ReChess/issues).')
     })
     
     try {
       gameStore.listenForUpdates(route.params.gameId)
     } catch (e) {
-      // Game might not exist, redirect to home page
-      router.push({ name: 'home' })
+      returnHome(router, 404, 'We can\'t find the game you were looking for.')
       return
     }
   })

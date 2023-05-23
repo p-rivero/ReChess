@@ -65,7 +65,7 @@
   import { DEFAULT_ORDER, searchVariants } from '@/helpers/chess/variant-search'
   import { computed, ref, watch } from 'vue'
   import { debounce } from '@/helpers/ts-utils'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { showPopup } from '@/helpers/managers/popup-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { useVariantStore } from '@/stores/variant'
   import DraftCard from '@/components/Variant/View/DraftCard.vue'

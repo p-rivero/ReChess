@@ -192,7 +192,7 @@
   import { PopupClosedError } from '@/helpers/errors/PopupClosedError'
   import { RechessError } from '@/helpers/errors/RechessError'
   import { UserNotFoundError } from '@/helpers/errors/UserNotFoundError'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { showPopup } from '@/helpers/managers/popup-manager'
   import SmartErrorMessage from '@/components/BasicWrappers/SmartErrorMessage.vue'
   import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
   import UsernameTextbox from './UsernameTextbox.vue'

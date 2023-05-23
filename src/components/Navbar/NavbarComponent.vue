@@ -67,8 +67,8 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { requestSignIn } from '@/components/Auth/auth-manager'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { requestSignIn } from '@/helpers/managers/auth-manager'
+  import { showPopup } from '@/helpers/managers/popup-manager'
   import { toggleTheme } from '@/helpers/theme'
   import { useAuthStore } from '@/stores/auth-user'
   import { useRouter } from 'vue-router'

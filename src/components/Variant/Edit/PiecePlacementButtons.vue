@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
   import { ref , watch } from 'vue'
-  import { showPopup } from '@/components/PopupMsg/popup-manager'
+  import { showPopup } from '@/helpers/managers/popup-manager'
   import PieceImageView from '@/components/Variant/PieceImageView.vue'
   import type { FullPieceDef, Player, Variant } from '@/protochess/types'
   

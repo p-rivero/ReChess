@@ -119,6 +119,11 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/Legal/TermsOfServicePage.vue'),
     meta: { title: 'Terms of Service' },
   },
+  
+  {
+    path: '/:pathMatch(.*)*',
+    component: () => import('@/pages/NotFoundPage.vue'),
+  },
 ]
 export const router = createRouter({
   history: createWebHistory(),
