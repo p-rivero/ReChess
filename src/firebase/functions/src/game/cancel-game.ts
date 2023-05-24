@@ -10,6 +10,7 @@ import type { Timestamp } from 'firebase/firestore'
  * illegal move. This function will cancel the game immediately.
  * The cancelled game will be moved to the `cancelledGames` collection for
  * the moderators to review.
+ * Additionally, it updates the game popularity (-1 point).
  * @param {any} data The data passed to the function
  * @param {string} data.gameId The game to cancel
  * @param {string} data.reason The user-provided reason why the game was cancelled
@@ -67,7 +68,14 @@ export default async function(data: unknown, context: CallableContext): Promise<
   }
   const cancelledGameRef = db.collection('cancelledGames').doc(gameId)
   await cancelledGameRef.set(cancelledGameDoc)
+    .catch((e) => console.error('Cannot add cancelled game', gameId, e, cancelledGameDoc))
   
   // Delete the game from the games collection
   await gameRef.delete()
+    .catch((e) => console.error('Cannot delete game', gameId, e))
+  
+  // Update the variant popularity
+  const variantRef = db.collection('variants').doc(gameDoc.IMMUTABLE.variantId)
+  await variantRef.update({ popularity: FieldValue.increment(-1) })
+    .catch((e) => console.error('Cannot update variant popularity', gameDoc.IMMUTABLE.variantId, e))
 }

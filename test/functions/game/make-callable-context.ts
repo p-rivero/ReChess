@@ -3,13 +3,11 @@ import type { https } from 'firebase-functions'
 /**
  * Creates a mock context for an HTTPS callable function.
  * @param {string|false|undefined} userId The user ID to use for the context.
- * Pass a string to provide a custom ID, or false to make the context unauthenticated.
- * Leave undefined to use the default ID (`test_id`).
+ * Pass a string to provide a custom ID, or null to make the context unauthenticated.
  * @param {boolean} appCheck True if the caller has an App Check token.
  * @param {boolean} emailVerified True if the caller's email is verified.
  */
-export default function(userId?: string|false, appCheck = true, emailVerified = true): https.CallableContext {
-  if (userId === undefined) userId = 'test_id'
+export default function(userId: string|null, appCheck = true, emailVerified = true): https.CallableContext {
   const token = {
     aud: 'test',
     auth_time: 123,

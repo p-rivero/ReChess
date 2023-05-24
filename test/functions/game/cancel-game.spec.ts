@@ -2,20 +2,37 @@ import { expectHttpsError, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
 import makeContext from './make-callable-context'
 import admin from 'firebase-admin'
-import type { GameDoc } from '@/firebase/db/schema'
+import type { GameDoc, VariantDoc } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
 
 const { app, testEnv } = initialize('cancel-game-test')
 const db = app.firestore()
 const cancelGame = testEnv.wrap(functions.cancelGame)
 
+const VARIANT_ID = 'some_variant_id'
 const GAME_ID = 'some_game_id'
 
 function makeArgs(gameId = GAME_ID, reason = 'a cancel reason') {
   return { gameId, reason }
 }
 
+async function insertVariant(variantId = VARIANT_ID) {
+  const doc: VariantDoc = {
+    name: 'Variant Name',
+    description: 'Standard chess rules',
+    creationTime: admin.firestore.Timestamp.now() as Timestamp,
+    creatorDisplayName: 'test',
+    creatorId: null,
+    numUpvotes: 123,
+    popularity: 12,
+    tags: [],
+    initialState: '{}',
+  }
+  await db.collection('variants').doc(variantId).set(doc)
+  return doc
+}
 async function insertGame(gameId = GAME_ID) {
+  const variant = await insertVariant()
   const doc: GameDoc = {
     moveHistory: '',
     playerToMove: 'white',
@@ -24,20 +41,10 @@ async function insertGame(gameId = GAME_ID) {
       players: ['whiteName', 'blackName'],
       timeCreated: admin.firestore.Timestamp.now() as Timestamp,
       variantId: 'some_variant_id',
-      variant: {
-        name: 'Standard',
-        description: 'Standard chess rules',
-        creationTime: admin.firestore.Timestamp.now() as Timestamp,
-        creatorDisplayName: 'test',
-        creatorId: null,
-        numUpvotes: 0,
-        popularity: 0,
-        tags: [],
-        initialState: '{}',
-      },
-      whiteId: 'whiteId',
+      variant,
+      whiteId: 'white_id',
       whiteDisplayName: 'whiteName',
-      blackId: 'blackId',
+      blackId: 'black_id',
       blackDisplayName: 'blackName',
       requestedColor: 'white',
       calledFinishGame: false,
@@ -49,7 +56,7 @@ async function insertGame(gameId = GAME_ID) {
 
 
 test('white player can cancel a game', async () => {
-  const context = makeContext('whiteId')
+  const context = makeContext('white_id')
   const arg = makeArgs(GAME_ID, 'the other player is a cheater')
   const insertedDoc = await insertGame()
   
@@ -64,7 +71,7 @@ test('white player can cancel a game', async () => {
   expect(cancelledGame.exists).toBe(true)
   expect(cancelledGame.data()).toEqual({
     ...insertedDoc,
-    cancelledByUserId: 'whiteId',
+    cancelledByUserId: 'white_id',
     cancelReason: 'the other player is a cheater',
     cancelTime: expect.anything(),
   })
@@ -76,7 +83,7 @@ test('white player can cancel a game', async () => {
 })
 
 test('black player can cancel a game', async () => {
-  const context = makeContext('blackId')
+  const context = makeContext('black_id')
   const arg = makeArgs(GAME_ID, 'illegal move detected')
   const insertedDoc = await insertGame()
   
@@ -91,7 +98,7 @@ test('black player can cancel a game', async () => {
   expect(cancelledGame.exists).toBe(true)
   expect(cancelledGame.data()).toEqual({
     ...insertedDoc,
-    cancelledByUserId: 'blackId',
+    cancelledByUserId: 'black_id',
     cancelReason: 'illegal move detected',
     cancelTime: expect.anything(),
   })
@@ -102,9 +109,21 @@ test('black player can cancel a game', async () => {
   expect(cancelTime.valueOf() > startTime.valueOf()).toBe(true)
 })
 
+test('cancelling a game decrements the variant popularity', async () => {
+  const context = makeContext('white_id')
+  const arg = makeArgs(GAME_ID, 'the other player is a cheater')
+  await insertGame()
+  const variantBefore = await db.collection('variants').doc(VARIANT_ID).get()
+  
+  await expectSuccess(cancelGame(arg, context))
+  
+  const variantAfter = await db.collection('variants').doc(VARIANT_ID).get()
+  expect(variantAfter.data()!.popularity).toBe(variantBefore.data()!.popularity - 1)
+})
+
 
 test('arguments must be correct', async () => {
-  const context = makeContext()
+  const context = makeContext('my_id')
   await insertGame()
   
   let arg = {}
@@ -142,12 +161,12 @@ test('user must be authenticated to cancel a game', async () => {
   const arg = makeArgs()
   await insertGame()
   
-  let context = makeContext(false, true, true)
+  let context = makeContext(null)
   let e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The function must be called while authenticated.')
   expect(e.code).toBe('unauthenticated')
   
-  context = makeContext('some_id', false, true)
+  context = makeContext('some_id', false)
   e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The function must be called from an App Check verified app.')
   expect(e.code).toBe('unauthenticated')
@@ -159,7 +178,7 @@ test('user must be authenticated to cancel a game', async () => {
 })
 
 test('cannot cancel a game that does not exist', async () => {
-  const context = makeContext()
+  const context = makeContext('my_user_id')
   const arg = makeArgs('nonexistent_game_id')
   await insertGame()
   
@@ -169,7 +188,7 @@ test('cannot cancel a game that does not exist', async () => {
 })
 
 test('caller must be one of the players', async () => {
-  let context = makeContext('not_white_or_black')
+  let context = makeContext('neither_of_the_players')
   const arg = makeArgs()
   await insertGame()
   
@@ -177,6 +196,6 @@ test('caller must be one of the players', async () => {
   expect(e.message).toMatch('The function must be called by either the white or black player.')
   expect(e.code).toBe('permission-denied')
   
-  context = makeContext('whiteId')
+  context = makeContext('white_id')
   await expectSuccess(cancelGame(arg, context))
 })
