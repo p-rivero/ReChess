@@ -24,7 +24,7 @@ try {
   id = await getIdFromUsername(username)
 } catch (err) {
   setTerminalColor('red')
-  console.error(err)
+  console.error(err.message)
   setTerminalColor('white')
   process.exit(1)
 }
@@ -43,9 +43,10 @@ console.info('(press anything else to cancel)\n')
 onKeyPress(
   'y',
   async () => {
+    process.stdout.write('Updating...')
     const isMod = await toggleModerator(id)
     setTerminalColor('yellow')
-    console.info(`Moderator status for ${username} is now`, isMod ? 'ENABLED' : 'DISABLED')
+    console.info(`\rModerator status for ${username} is now`, isMod ? 'ENABLED' : 'DISABLED')
     setTerminalColor('white')
     console.info('Refresh the user token by visiting https://rechess.org/?refresh-auth=true')
     process.exit(0)
@@ -63,7 +64,7 @@ async function getIdFromUsername(username) {
   const userRef = db.collection('usernames').doc(username)
   const usernameDoc = await userRef.get()
   if (!usernameDoc.exists) {
-    throw `User ${username} does not exist`
+    throw new Error(`User ${username} does not exist`)
   }
   return usernameDoc.data().userId
 }
@@ -71,7 +72,7 @@ async function getIdFromUsername(username) {
 async function isModerator(id) {
   const auth = admin.auth()
   const user = await auth.getUser(id)
-  return user.customClaims && user.customClaims.moderator
+  return user.customClaims?.moderator === true
 }
 
 async function toggleModerator(id) {
