@@ -18,6 +18,7 @@ export type AppRouteNames =
   | 'user-profile'
   | 'user-published-variants'
   | 'user-upvoted-variants'
+  | 'moderator-dashboard'
   | 'privacy'
   | 'cookies'
   | 'tos'
@@ -98,6 +99,13 @@ export const routes: RouteRecordRaw[] = [
     name: 'user-upvoted-variants',
     path: '/user/:username/upvoted',
     component: () => import('@/pages/User/UserUpvotedVariantsPage.vue'),
+  },
+  
+  {
+    name: 'moderator-dashboard',
+    path: '/moderate',
+    component: () => import('@/pages/Moderator/ModeratorDashboardPage.vue'),
+    meta: { title: 'Moderator Dashboard' },
   },
   
   

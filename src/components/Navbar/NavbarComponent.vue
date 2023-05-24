@@ -48,6 +48,12 @@
           class="navbar-item"
           @click="create"
         >Create</a>
+        <a
+          v-if="authStore.loggedUser?.moderator"
+          href="/moderate"
+          class="navbar-item"
+          @click="hideNavBarMenu"
+        >Moderator dashboard</a>
       </div>
       <div class="navbar-end">
         <div class="navbar-item is-hidden-touch">
