@@ -48,7 +48,7 @@ async function insertGame(gameId = GAME_ID) {
 }
 
 
-test('a player can cancel a game', async () => {
+test('white player can cancel a game', async () => {
   const context = makeContext('whiteId')
   const arg = makeArgs(GAME_ID, 'the other player is a cheater')
   const insertedDoc = await insertGame()
@@ -62,18 +62,46 @@ test('a player can cancel a game', async () => {
   
   const cancelledGame = await db.collection('cancelledGames').doc(arg.gameId).get()
   expect(cancelledGame.exists).toBe(true)
-  const cancelTime = cancelledGame.data()!.cancelTime as Timestamp
   expect(cancelledGame.data()).toEqual({
     ...insertedDoc,
     cancelledByUserId: 'whiteId',
     cancelReason: 'the other player is a cheater',
-    cancelTime,
+    cancelTime: expect.anything(),
   })
   
   const endTime = admin.firestore.Timestamp.now()
+  const cancelTime = cancelledGame.data()!.cancelTime as Timestamp
   expect(cancelTime.valueOf() < endTime.valueOf()).toBe(true)
   expect(cancelTime.valueOf() > startTime.valueOf()).toBe(true)
 })
+
+test('black player can cancel a game', async () => {
+  const context = makeContext('blackId')
+  const arg = makeArgs(GAME_ID, 'illegal move detected')
+  const insertedDoc = await insertGame()
+  
+  const startTime = admin.firestore.Timestamp.now()
+  
+  await expectSuccess(cancelGame(arg, context))
+  
+  const oldGame = await db.collection('games').doc(arg.gameId).get()
+  expect(oldGame.exists).toBe(false)
+  
+  const cancelledGame = await db.collection('cancelledGames').doc(arg.gameId).get()
+  expect(cancelledGame.exists).toBe(true)
+  expect(cancelledGame.data()).toEqual({
+    ...insertedDoc,
+    cancelledByUserId: 'blackId',
+    cancelReason: 'illegal move detected',
+    cancelTime: expect.anything(),
+  })
+  
+  const endTime = admin.firestore.Timestamp.now()
+  const cancelTime = cancelledGame.data()!.cancelTime as Timestamp
+  expect(cancelTime.valueOf() < endTime.valueOf()).toBe(true)
+  expect(cancelTime.valueOf() > startTime.valueOf()).toBe(true)
+})
+
 
 test('arguments must be correct', async () => {
   const context = makeContext()
@@ -141,7 +169,7 @@ test('cannot cancel a game that does not exist', async () => {
 })
 
 test('caller must be one of the players', async () => {
-  let context = makeContext()
+  let context = makeContext('not_white_or_black')
   const arg = makeArgs()
   await insertGame()
   

@@ -33,17 +33,27 @@ export function initialize(projectId: string): TestUtils {
 beforeAll(assertEmulatorsRunning)
 
 afterEach(async () => {
+  const db = currentUtils!.app.firestore()
+  const storage = currentUtils!.app.storage()
   async function clearBucket(name: string) {
-    const bucket = currentUtils!.app.storage().bucket(name)
+    const bucket = storage.bucket(name)
     const [files] = await bucket.getFiles()
     await Promise.all(files.map(file => file.delete()))
   }
+  async function clearCollection(collectionPath: string) {
+    const docs = await db.collection(collectionPath).listDocuments()
+    await Promise.all(docs.map(async doc => {
+      const subcollections = await doc.listCollections()
+      for (const subcollection of subcollections) {
+        await clearCollection(subcollection.path)
+      }
+      await doc.delete()
+    }))
+  }
   async function clearFirestore() {
-    const firestore = currentUtils!.app.firestore()
-    const collections = await firestore.listCollections()
+    const collections = await db.listCollections()
     for (const collection of collections) {
-      const documents = await collection.listDocuments()
-      await Promise.all(documents.map(doc => doc.delete()))
+      await clearCollection(collection.path)
     }
   }
   await Promise.all([
