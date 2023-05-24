@@ -1,7 +1,7 @@
 import { expectHttpsError, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
+import makeContext from './make-callable-context'
 import admin from 'firebase-admin'
-import type { https } from 'firebase-functions'
 import type { GameDoc } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
 
@@ -11,40 +11,9 @@ const cancelGame = testEnv.wrap(functions.cancelGame)
 
 const GAME_ID = 'some_game_id'
 
-function makeContext(userId?: string|false, appCheck = true, emailVerified = true): https.CallableContext {
-  if (userId === undefined) userId = 'test_id'
-  const token = {
-    aud: 'test',
-    auth_time: 123,
-    email_verified: emailVerified,
-    exp: 123,
-    firebase: {
-      identities: {},
-      sign_in_provider: 'test',
-    },
-    iat: 123,
-    iss: 'test',
-    sub: 'test',
-    uid: 'test',
-  }
-  return {
-    auth: userId ? {
-      uid: userId,
-      token,
-    } : undefined,
-    app: appCheck ? {
-      appId: 'rechess-web',
-      token,
-      alreadyConsumed: false,
-    } : undefined,
-    rawRequest: 'test',
-  } as unknown as https.CallableContext
-}
-
 function makeArgs(gameId = GAME_ID, reason = 'a cancel reason') {
   return { gameId, reason }
 }
-
 
 async function insertGame(gameId = GAME_ID) {
   const doc: GameDoc = {
