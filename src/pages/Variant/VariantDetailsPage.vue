@@ -83,6 +83,14 @@
           <div class="sz-icon icon-flag color-theme" />
           Report
         </button>
+        <button
+          v-if="authStore.loggedUser?.moderator"
+          class="button is-danger is-fullwidth mb-4"
+          @click="deleteVariant"
+        >
+          <div class="sz-icon icon-trash color-white" />
+          Delete variant
+        </button>
       </div>
       
       <div class="column mt-2 is-7 board-column">
@@ -266,7 +274,31 @@
       }
     )
   }
-  
+  function deleteVariant() {
+    showPopup(
+      'Delete variant',
+      'This will delete the variant and all the **games** played with it.\
+      \n\nThis action cannot be undone. Do you want to continue?',
+      'ok-cancel',
+      async () => {
+        try {
+          // TODO
+          showPopup(
+            'Variant deleted',
+            'The variant and all the games played with it have been deleted.',
+            'ok'
+          )
+        } catch (e) {
+          console.error(e)
+          showPopup(
+            'Error',
+            'An unexpected error occurred while deleting the variant. Check the console.',
+            'ok'
+          )
+        }
+      }
+    )
+  }
   
   function reportVariant() {
     reportPopup.value?.show(
@@ -298,6 +330,7 @@
       }
     )
   }
+  
   
   
   

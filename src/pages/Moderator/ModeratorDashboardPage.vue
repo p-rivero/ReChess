@@ -1,12 +1,12 @@
 <template>
   <div>
-    <p class="is-size-5">
+    <p class="is-size-4">
       Reported users
     </p>
   </div>
   <hr>
   <div>
-    <p class="is-size-5">
+    <p class="is-size-4">
       Reported variants
     </p>
   </div>

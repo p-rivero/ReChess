@@ -221,6 +221,14 @@
 }
 
 
+/* gavel.svg */
+.icon-gavel {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/gavel.svg");
+  mask-image: url("@/assets/img/icons/gavel.svg");
+}
+
+
 /* github.svg */
 .icon-github {
   @extend .icon-common;

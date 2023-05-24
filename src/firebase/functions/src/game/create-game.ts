@@ -4,7 +4,6 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { useAdmin } from '../helpers'
 import type { GameDoc, LobbySlotDoc, VariantDoc } from 'db/schema'
 import type { Timestamp } from 'firebase/firestore'
-import console = require('node:console')
 
 /**
  * Called directly by the client in order to create a new game.

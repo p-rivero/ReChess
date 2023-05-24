@@ -123,20 +123,40 @@
       
       <div
         v-if="!myProfile(user) && authStore.loggedUser && !authStore.loggedUser.reportedUsers?.includes(user.uid)"
+        class="is-flex is-flex-wrap-wrap mt-6"
       >
         <button
-          class="button mt-6 mr-4"
+          class="button mt-1 mr-4"
           @click="blockUser"
         >
           <div class="sz-icon icon-block color-theme" />
           Block user
         </button>
         <button
-          class="button mt-6"
+          class="button mt-1"
           @click="reportUser"
         >
           <div class="sz-icon icon-flag color-theme" />
           Report user
+        </button>
+      </div>
+      <div
+        v-if="!myProfile(user) && authStore.loggedUser?.moderator"
+        class="is-flex is-flex-wrap-wrap mt-3"
+      >
+        <button
+          class="button is-danger mt-2 mr-4"
+          @click="banUser"
+        >
+          <div class="sz-icon icon-gavel color-white" />
+          Ban user
+        </button>
+        <button
+          class="button is-danger mt-2"
+          @click="wipeUser"
+        >
+          <div class="sz-icon icon-trash color-white" />
+          Wipe user data
         </button>
       </div>
       
@@ -474,6 +494,58 @@
             'Error',
             'An unexpected error occurred while blocking the user. \
             \n\nThis usually means that the user has already been blocked.',
+            'ok'
+          )
+        }
+      }
+    )
+  }
+  
+  function banUser() {
+    showPopup(
+      'Ban user',
+      'You are about to ban this user. Do you want to continue?',
+      'ok-cancel',
+      async () => {
+        if (!user.value) throw new Error('User is undefined')
+        try {
+          // TODO
+          showPopup(
+            'User banned',
+            'The user has been successfully banned.',
+            'ok'
+          )
+        } catch (e) {
+          console.error(e)
+          showPopup(
+            'Error',
+            'An unexpected error occurred while banning the user. Check the console.',
+            'ok'
+          )
+        }
+      }
+    )
+  }
+  function wipeUser() {
+    showPopup(
+      'Wipe user data',
+      'This will ban the user and delete all of their **variants** and **reports**. \
+      Upvotes will not be removed. Do you want to continue?',
+      'ok-cancel',
+      async () => {
+        if (!user.value) throw new Error('User is undefined')
+        try {
+          // TODO
+          showPopup(
+            'User wiped',
+            'The user has been banned and their variants and reports have been deleted.',
+            'ok'
+          )
+        } catch (e) {
+          console.error(e)
+          showPopup(
+            'Error',
+            'An unexpected error occurred while wiping the user. Check the console.',
             'ok'
           )
         }
