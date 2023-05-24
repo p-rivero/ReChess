@@ -39,6 +39,9 @@ export default async function(data: unknown, context: CallableContext): Promise<
   if (typeof reason !== 'string') {
     throw new HttpsError('invalid-argument', 'The reason must be a string.')
   }
+  if (reason.length > 500) {
+    throw new HttpsError('invalid-argument', 'The reason must be at most 500 characters.')
+  }
   
   const { db } = await useAdmin()
   

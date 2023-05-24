@@ -23,6 +23,13 @@ export async function expectHttpsError(promise: Promise<any>): Promise<https.Htt
   throw new Error('should throw an HttpsError, instead succeeded')
 }
 
+/**
+ * Asserts that the given promise succeeds. This only serves to make the test more readable
+ */
+export async function expectSuccess<T>(promise: Promise<T>): Promise<T> {
+  return promise
+}
+
 
 /**
  * Sets a spu on console.warn that asserts that the given message is logged

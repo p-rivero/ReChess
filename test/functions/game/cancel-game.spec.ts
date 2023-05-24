@@ -1,4 +1,4 @@
-import { expectHttpsError } from '../utils'
+import { expectHttpsError, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
 import admin from 'firebase-admin'
 import type { https } from 'firebase-functions'
@@ -9,7 +9,10 @@ const { app, testEnv } = initialize('cancel-game-test')
 const db = app.firestore()
 const cancelGame = testEnv.wrap(functions.cancelGame)
 
-function dummyContext(appCheck = true, auth = true, emailVerified = true): https.CallableContext {
+const GAME_ID = 'some_game_id'
+
+function makeContext(userId?: string|false, appCheck = true, emailVerified = true): https.CallableContext {
+  if (userId === undefined) userId = 'test_id'
   const token = {
     aud: 'test',
     auth_time: 123,
@@ -25,8 +28,8 @@ function dummyContext(appCheck = true, auth = true, emailVerified = true): https
     uid: 'test',
   }
   return {
-    auth: auth ? {
-      uid: 'test',
+    auth: userId ? {
+      uid: userId,
       token,
     } : undefined,
     app: appCheck ? {
@@ -38,12 +41,12 @@ function dummyContext(appCheck = true, auth = true, emailVerified = true): https
   } as unknown as https.CallableContext
 }
 
-function makeArgs(gameId = '1234', reason = 'a cancel reason') {
+function makeArgs(gameId = GAME_ID, reason = 'a cancel reason') {
   return { gameId, reason }
 }
 
 
-async function insertGame(gameId = '1234') {
+async function insertGame(gameId = GAME_ID) {
   const doc: GameDoc = {
     moveHistory: '',
     playerToMove: 'white',
@@ -51,7 +54,7 @@ async function insertGame(gameId = '1234') {
     IMMUTABLE: {
       players: ['whiteName', 'blackName'],
       timeCreated: admin.firestore.Timestamp.now() as Timestamp,
-      variantId: 'standard',
+      variantId: 'some_variant_id',
       variant: {
         name: 'Standard',
         description: 'Standard chess rules',
@@ -72,62 +75,111 @@ async function insertGame(gameId = '1234') {
     },
   }
   await db.collection('games').doc(gameId).set(doc)
+  return doc
 }
 
+
+test('a player can cancel a game', async () => {
+  const context = makeContext('whiteId')
+  const arg = makeArgs(GAME_ID, 'the other player is a cheater')
+  const insertedDoc = await insertGame()
+  
+  const startTime = admin.firestore.Timestamp.now()
+  
+  await expectSuccess(cancelGame(arg, context))
+  
+  const oldGame = await db.collection('games').doc(arg.gameId).get()
+  expect(oldGame.exists).toBe(false)
+  
+  const cancelledGame = await db.collection('cancelledGames').doc(arg.gameId).get()
+  expect(cancelledGame.exists).toBe(true)
+  const cancelTime = cancelledGame.data()!.cancelTime as Timestamp
+  expect(cancelledGame.data()).toEqual({
+    ...insertedDoc,
+    cancelledByUserId: 'whiteId',
+    cancelReason: 'the other player is a cheater',
+    cancelTime,
+  })
+  
+  const endTime = admin.firestore.Timestamp.now()
+  expect(cancelTime.valueOf() < endTime.valueOf()).toBe(true)
+  expect(cancelTime.valueOf() > startTime.valueOf()).toBe(true)
+})
+
 test('arguments must be correct', async () => {
-  const context = dummyContext()
+  const context = makeContext()
+  await insertGame()
   
   let arg = {}
   let e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The function must be called with a gameId and reason.')
+  expect(e.code).toBe('invalid-argument')
   
-  arg = { gameId: '1234' }
+  arg = { gameId: GAME_ID }
   e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The function must be called with a gameId and reason.')
+  expect(e.code).toBe('invalid-argument')
   
   arg = { reason: 'a cancel reason' }
   e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The function must be called with a gameId and reason.')
+  expect(e.code).toBe('invalid-argument')
   
   arg = { gameId: 1234, reason: 'a cancel reason' }
   e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The gameId must be a string.')
+  expect(e.code).toBe('invalid-argument')
   
-  arg = { gameId: '1234', reason: 1234 }
+  arg = { gameId: GAME_ID, reason: 1234 }
   e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The reason must be a string.')
+  expect(e.code).toBe('invalid-argument')
+  
+  arg = { gameId: GAME_ID, reason: 'a'.repeat(501) }
+  e = await expectHttpsError(cancelGame(arg, context))
+  expect(e.message).toMatch('The reason must be at most 500 characters.')
+  expect(e.code).toBe('invalid-argument')
 })
 
 test('user must be authenticated to cancel a game', async () => {
   const arg = makeArgs()
+  await insertGame()
   
-  let context = dummyContext(false, true, true)
+  let context = makeContext(false, true, true)
   let e = await expectHttpsError(cancelGame(arg, context))
-  expect(e.message).toMatch('The function must be called from an App Check verified app.')
-  
-  context = dummyContext(true, false, true)
-  e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The function must be called while authenticated.')
+  expect(e.code).toBe('unauthenticated')
   
-  context = dummyContext(true, true, false)
+  context = makeContext('some_id', false, true)
+  e = await expectHttpsError(cancelGame(arg, context))
+  expect(e.message).toMatch('The function must be called from an App Check verified app.')
+  expect(e.code).toBe('unauthenticated')
+  
+  context = makeContext('some_id', true, false)
   e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The email is not verified.')
+  expect(e.code).toBe('unauthenticated')
 })
 
 test('cannot cancel a game that does not exist', async () => {
-  const context = dummyContext()
-  const arg = makeArgs()
+  const context = makeContext()
+  const arg = makeArgs('nonexistent_game_id')
+  await insertGame()
   
   let e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The game does not exist.')
+  expect(e.code).toBe('not-found')
 })
 
 test('caller must be one of the players', async () => {
-  const context = dummyContext()
+  let context = makeContext()
   const arg = makeArgs()
-  
   await insertGame()
   
   let e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The function must be called by either the white or black player.')
+  expect(e.code).toBe('permission-denied')
+  
+  context = makeContext('whiteId')
+  await expectSuccess(cancelGame(arg, context))
 })
