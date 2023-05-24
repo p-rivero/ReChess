@@ -71,10 +71,10 @@ export async function removeSlot(variantId: string, creatorId: string) {
 
 // Creates a new game in the database by calling the createGame cloud function
 // and then updates the lobby slot with the game id. Returns the game id.
-export async function createGame(variantId: string, creatorId: string): Promise<string> {
-  const result = await dbCreateGame({ variantId, creatorId })
+export async function createGame(variantId: string, lobbySlotCreatorId: string): Promise<string> {
+  const result = await dbCreateGame({ variantId, lobbySlotCreatorId })
   const gameDocId = result.data.gameId
-  await updateDoc(doc(db, 'variants', variantId, 'lobby', creatorId), { gameDocId })
+  await updateDoc(doc(db, 'variants', variantId, 'lobby', lobbySlotCreatorId), { gameDocId })
   return gameDocId
 }
 

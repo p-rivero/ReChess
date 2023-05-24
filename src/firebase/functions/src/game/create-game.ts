@@ -10,12 +10,12 @@ import type { Timestamp } from 'firebase/firestore'
  * Additionally, it updates the game popularity (+1 point).
  * @param {any} data The data passed to the function
  * @param {string} data.variantId UID of the variant that the user wishes to play
- * @param {string} data.creatorId UID of the user that created the lobby slot.
+ * @param {string} data.lobbySlotCreatorId UID of the user that created the lobby slot.
  *  There MUST be a lobby slot for this user and variant.
  * @param {CallableContext} context The context of the function call
  * @return {Promise<{gameId: string}>} The UID of the newly created game
  * @throws An HTTP error is returned if some of the following errors occur:
- * - The user is not authenticated as the creator of the lobby slot (i.e. `creatorId !== auth.uid`)
+ * - The user is not authenticated as the creator of the lobby slot (i.e. `lobbySlotCreatorId !== auth.uid`)
  * - There is no lobby slot for the given variant and creator
  * - The lobby slot has no challenger
  */
@@ -29,24 +29,24 @@ export default async function(data: unknown, context: CallableContext): Promise<
   }
   
   // Validate input
-  const { variantId, creatorId } = data as { variantId: unknown, creatorId: unknown }
-  if (!variantId || !creatorId) {
-    throw new HttpsError('invalid-argument', 'The function must be called with a variantId and creatorId.')
+  const { variantId, lobbySlotCreatorId } = data as { variantId: unknown, lobbySlotCreatorId: unknown }
+  if (!variantId || !lobbySlotCreatorId) {
+    throw new HttpsError('invalid-argument', 'The function must be called with a variantId and lobbySlotCreatorId.')
   }
   if (typeof variantId !== 'string') {
     throw new HttpsError('invalid-argument', 'The variantId must be a string.')
   }
-  if (typeof creatorId !== 'string') {
-    throw new HttpsError('invalid-argument', 'The creatorId must be a string.')
+  if (typeof lobbySlotCreatorId !== 'string') {
+    throw new HttpsError('invalid-argument', 'The lobbySlotCreatorId must be a string.')
   }
-  if (context.auth.uid !== creatorId) {
+  if (context.auth.uid !== lobbySlotCreatorId) {
     throw new HttpsError('permission-denied', 'The function must be called by the user that created the lobby slot.')
   }
   
   const { db } = await useAdmin()
   
   // Fetch the lobby slot
-  const lobbySlotRef = db.collection('variants').doc(variantId).collection('lobby').doc(creatorId)
+  const lobbySlotRef = db.collection('variants').doc(variantId).collection('lobby').doc(lobbySlotCreatorId)
   const lobbySlotSnapshot = await lobbySlotRef.get()
   if (!lobbySlotSnapshot.exists) {
     throw new HttpsError('failed-precondition', 'The lobby slot does not exist: ' + lobbySlotRef.path)
@@ -92,12 +92,12 @@ export default async function(data: unknown, context: CallableContext): Promise<
     (slotDoc.IMMUTABLE.requestedColor === 'random' && Math.random() < 0.5)
     
   const [whiteId, whiteDisplayName] = creatorPlaysAsWhite ?
-    [creatorId, slotDoc.IMMUTABLE.creatorDisplayName] :
+    [lobbySlotCreatorId, slotDoc.IMMUTABLE.creatorDisplayName] :
     [slotDoc.challengerId, slotDoc.challengerDisplayName]
     
   const [blackId, blackDisplayName] = creatorPlaysAsWhite ?
     [slotDoc.challengerId, slotDoc.challengerDisplayName] :
-    [creatorId, slotDoc.IMMUTABLE.creatorDisplayName]
+    [lobbySlotCreatorId, slotDoc.IMMUTABLE.creatorDisplayName]
   
     
   // Add a new game document to the games collection

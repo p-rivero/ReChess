@@ -55,7 +55,7 @@ initializeAppCheck(app, {
 
 
 // Export references to the callable functions
-type CreateGameParams = {variantId: string, creatorId: string}
+type CreateGameParams = {variantId: string, lobbySlotCreatorId: string}
 type CreateGameResult = {gameId: string}
 export const createGame = httpsCallable<CreateGameParams, CreateGameResult>(functions, 'createGame')
 
