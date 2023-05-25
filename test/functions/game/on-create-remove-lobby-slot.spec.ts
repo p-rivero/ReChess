@@ -4,7 +4,7 @@ import { insertVariant } from '../variant/variant-mock'
 import admin from 'firebase-admin'
 import type { LobbySlotDoc, VariantDoc } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
-import { expectLog, expectNoErrorLog } from '../utils'
+import { expectNoErrorLog } from '../utils'
 
 const { app, testEnv } = initialize('lobby-slot-test')
 const db = app.firestore()

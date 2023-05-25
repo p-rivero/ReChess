@@ -1,5 +1,6 @@
 import { LobbyDB } from '@/firebase/db'
 import { Timestamp, onSnapshot } from '@firebase/firestore'
+import { createGame } from '@/firebase'
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth-user'
 import type { GameDoc, LobbySlotDoc, RequestedColor } from '@/firebase/db/schema'
@@ -273,7 +274,12 @@ export const useLobbyStore = defineStore('lobby', () => {
     if (!currentVariantId) {
       throw new Error('Must call setUpdateListener before acceptChallenger')
     }
-    return LobbyDB.createGame(currentVariantId, authStore.loggedUser.uid)
+    // The cloud function already updates the lobby slot with the game id. Returns the game id.
+    const result = await createGame({
+      variantId: currentVariantId,
+      lobbySlotCreatorId: authStore.loggedUser.uid,
+    })
+    return result.data.gameId
   }
   
   // Reject the incoming challenger

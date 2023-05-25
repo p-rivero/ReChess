@@ -55,10 +55,23 @@ initializeAppCheck(app, {
 
 
 // Export references to the callable functions
-type CreateGameParams = {variantId: string, lobbySlotCreatorId: string}
-type CreateGameResult = {gameId: string}
-export const createGame = httpsCallable<CreateGameParams, CreateGameResult>(functions, 'createGame')
+type CreateGameParams = { variantId: string, lobbySlotCreatorId: string }
+export const createGame = httpsCallable<CreateGameParams, { gameId: string }>(functions, 'createGame')
 
-type CancelGameParams = {gameId: string, reason: string}
-type CancelGameResult = void
-export const cancelGame = httpsCallable<CancelGameParams, CancelGameResult>(functions, 'cancelGame')
+type CancelGameParams = { gameId: string, reason: string }
+export const cancelGame = httpsCallable<CancelGameParams, void>(functions, 'cancelGame')
+
+type BanUserParams = { userId: string }
+export const banUser = httpsCallable<BanUserParams, void>(functions, 'cancelGame')
+
+type DeleteVariantParams = { variantId: string }
+export const deleteVariant = httpsCallable<DeleteVariantParams, void>(functions, 'deleteVariant')
+
+type DiscardUserReportParams = { userId: string }
+export const discardUserReport = httpsCallable<DiscardUserReportParams, void>(functions, 'discardUserReport')
+
+type DiscardVariantReportParams = { variantId: string }
+export const discardVariantReport = httpsCallable<DiscardVariantReportParams, void>(functions, 'discardVariantReport')
+
+type WipeUserParams = { userId: string }
+export const wipeUser = httpsCallable<WipeUserParams, void>(functions, 'wipeUser')

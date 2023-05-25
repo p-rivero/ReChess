@@ -1,5 +1,7 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
+import assertCallerIsModerator from './assert-caller-is-moderator'
+
 /**
  * Called directly by the moderator in order to wipe a user's content.
  * If the user is already banned, this function will still wipe their content (if it exists) and return successfully.
@@ -19,16 +21,7 @@ import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
  * - The user to be wiped does not exist
  */
 export default async function(data: unknown, context: CallableContext): Promise<void> {
-  // Check user authentication
-  if (!context.app) {
-    throw new HttpsError('unauthenticated', 'The function must be called from an App Check verified app.')
-  }
-  if (!context.auth) {
-    throw new HttpsError('unauthenticated', 'The function must be called while authenticated.')
-  }
-  if (!context.auth.token.moderator) {
-    throw new HttpsError('unauthenticated', 'The user must be a moderator.')
-  }
+  await assertCallerIsModerator(context)
   
   // Validate input
   const { userId } = data as { userId: unknown }
@@ -38,7 +31,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
   if (typeof userId !== 'string') {
     throw new HttpsError('invalid-argument', 'The userId must be a string.')
   }
-  if (context.auth.uid === userId) {
+  if (context.auth?.uid === userId) {
     throw new HttpsError('invalid-argument', 'Please do not ban yourself :(')
   }
   

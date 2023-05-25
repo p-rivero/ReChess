@@ -1,5 +1,5 @@
 import { collection, deleteDoc, doc, orderBy, query, serverTimestamp, setDoc, updateDoc, where } from '@firebase/firestore'
-import { db, createGame as dbCreateGame } from '@/firebase'
+import { db } from '@/firebase'
 import type { LobbySlotDoc, RequestedColor } from './schema'
 
 export function getLobbySlots(variantId: string) {
@@ -68,11 +68,4 @@ export async function removeSlot(variantId: string, creatorId: string) {
   await deleteDoc(doc(db, 'variants', variantId, 'lobby', creatorId))
 }
 
-
-// Creates a new game in the database by calling the createGame cloud function.
-// The function already updates the lobby slot with the game id. Returns the game id.
-export async function createGame(variantId: string, lobbySlotCreatorId: string): Promise<string> {
-  const result = await dbCreateGame({ variantId, lobbySlotCreatorId })
-  return result.data.gameId
-}
 

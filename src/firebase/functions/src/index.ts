@@ -64,6 +64,49 @@ region(FUNCTIONS_REGION)
   })
 
 
+// MODERATOR
+
+export const banUser =
+region(FUNCTIONS_REGION)
+  .runWith({ enforceAppCheck: true })
+  .https
+  .onCall((data, context) => {
+    return callFunction(import('./moderator/ban-user'), data, context)
+  })
+  
+export const deleteVariant =
+region(FUNCTIONS_REGION)
+  .runWith({ enforceAppCheck: true })
+  .https
+  .onCall((data, context) => {
+    return callFunction(import('./moderator/delete-variant'), data, context)
+  })
+  
+export const discardUserReport =
+region(FUNCTIONS_REGION)
+  .runWith({ enforceAppCheck: true })
+  .https
+  .onCall((data, context) => {
+    return callFunction(import('./moderator/discard-user-report'), data, context)
+  })
+
+export const discardVariantReport =
+region(FUNCTIONS_REGION)
+  .runWith({ enforceAppCheck: true })
+  .https
+  .onCall((data, context) => {
+    return callFunction(import('./moderator/discard-variant-report'), data, context)
+  })
+  
+export const wipeUser =
+region(FUNCTIONS_REGION)
+  .runWith({ enforceAppCheck: true })
+  .https
+  .onCall((data, context) => {
+    return callFunction(import('./moderator/wipe-user'), data, context)
+  })
+
+
 // USER
 
 export const deleteUser =
