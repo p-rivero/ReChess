@@ -51,16 +51,16 @@ export const onCreateLobbySlot =
 region(FUNCTIONS_REGION)
   .firestore
   .document('variants/{variantId}/lobby/{creatorUserId}')
-  .onCreate((snap) => {
-    return callFunction(import('./game/on-create-lobby-slot'), snap)
+  .onCreate((_snap, context) => {
+    return callFunction(import('./game/on-create-lobby-slot'), context.params.variantId)
   })
 
 export const onRemoveLobbySlot =
 region(FUNCTIONS_REGION)
   .firestore
   .document('variants/{variantId}/lobby/{creatorUserId}')
-  .onDelete((snap) => {
-    return callFunction(import('./game/on-remove-lobby-slot'), snap)
+  .onDelete((_snap, context) => {
+    return callFunction(import('./game/on-remove-lobby-slot'), context.params.variantId)
   })
 
 

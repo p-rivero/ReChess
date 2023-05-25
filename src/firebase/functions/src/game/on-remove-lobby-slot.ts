@@ -1,19 +1,15 @@
 
 import { FieldValue } from 'firebase-admin/firestore'
-import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
+import { useAdmin } from '../helpers'
 
 /**
  * Called when a lobby slot document is deleted. Updates the variant popularity (+3 points).
- * @param {Change<QueryDocumentSnapshot>} snap Snapshot of the document that was removed
+ * @param {Change<QueryDocumentSnapshot>} variantId ID of the variant for which the lobby slot was deleted
  * @return {Promise<void>} A promise that resolves when the function is done
  */
-export default async function(snap: QueryDocumentSnapshot): Promise<void> {
-  const lobbyCollection = snap.ref.parent
-  const variantRef = lobbyCollection.parent
-  if (variantRef === null) {
-    console.error('Variant ref is null', snap.ref.path)
-    return
-  }
+export default async function(variantId: string): Promise<void> {
+  const { db } = await useAdmin()
+  const variantRef = db.collection('variants').doc(variantId)
   
   try {
     await variantRef.update({ popularity: FieldValue.increment(-3) })

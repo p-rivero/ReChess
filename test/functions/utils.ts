@@ -68,8 +68,8 @@ export function expectNoErrorLog(): () => void {
   const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => { })
   const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => { })
   return () => {
-    const errorMsg = warnSpy.mock.calls.at(0)?.join(' ')
-    const warnMsg = errorSpy.mock.calls.at(0)?.join(' ')
+    const errorMsg = errorSpy.mock.calls.at(0)?.join(' ')
+    const warnMsg = warnSpy.mock.calls.at(0)?.join(' ')
     errorSpy.mockRestore()
     warnSpy.mockRestore()
     if (errorMsg) {
