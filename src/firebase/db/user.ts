@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import type { ReportDoc, UserDoc, UserPrivateCacheDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
+import type { ModerationDoc, ReportDoc, UserDoc, UserPrivateCacheDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
 
 import { Timestamp, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore'
 import type { User } from '@firebase/auth'
@@ -83,4 +83,11 @@ export async function reportUser(reporterId: string, reportedUserId: string, onl
     onlyBlock,
   }
   await setDoc(doc(db, 'users', reporterId, 'reportedUsers', reportedUserId), reportDoc)
+}
+
+// Gets a user's reports
+export async function getUserReports(userId: string): Promise<ModerationDoc | undefined> {
+  const docSnapshot = await getDoc(doc(db, 'users', userId, 'moderation', 'doc'))
+  if (!docSnapshot.exists()) return undefined
+  return docSnapshot.data() as ModerationDoc
 }

@@ -58,7 +58,7 @@ async function makeSummaryLine(userId: string, reportReason: string): Promise<st
   if (!reportReason) return ''
   const username = await getUsername(userId)
   const currentTimestamp = Date.now()
-  return `${username} ${reportReason} ${currentTimestamp}\n`
+  return `${username}\t${reportReason}\t${currentTimestamp}\n`
 }
 
 /**

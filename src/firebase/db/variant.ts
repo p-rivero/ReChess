@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import type { ReportDoc, TimestampDoc, VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
+import type { ModerationDoc, ReportDoc, TimestampDoc, VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
 import type { Variant } from '@/protochess/types'
 import type { VariantListOrder } from '@/helpers/chess/variant-search'
 
@@ -73,6 +73,13 @@ export async function reportVariant(userId: string, variantId: string, reason: s
     onlyBlock: false,
   }
   await setDoc(doc(db, 'users', userId, 'reportedVariants', variantId), reportDoc)
+}
+
+// Gets a variant's reports
+export async function getVariantReports(variantId: string): Promise<ModerationDoc | undefined> {
+  const docSnapshot = await getDoc(doc(db, 'variants', variantId, 'moderation', 'doc'))
+  if (!docSnapshot.exists()) return undefined
+  return docSnapshot.data() as ModerationDoc
 }
 
 
