@@ -60,7 +60,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
   if (!slotDoc.challengerId || !slotDoc.challengerDisplayName) {
     throw new HttpsError('failed-precondition', 'The lobby slot has no challenger.')
   }
-  if (slotDoc.gameDocId) {
+  if (slotDoc.IMMUTABLE.gameDocId) {
     throw new HttpsError('failed-precondition', 'The lobby slot already has a game.')
   }
   
@@ -121,8 +121,14 @@ export default async function(data: unknown, context: CallableContext): Promise<
       calledFinishGame: false,
     },
   }
-  const p2 = db.collection('games').add(newGame)
+  const gameRef = await db.collection('games').add(newGame)
+  const gameId = gameRef.id
   
-  const [_, gameRef] = await Promise.all([p1, p2])
-  return { gameId: gameRef.id }
+  // Update the lobby slot
+  const p2 = lobbySlotRef.update({
+    'IMMUTABLE.gameDocId': gameId,
+  }).catch((e) => console.error('Cannot update lobby slot', lobbySlotRef.path, e))
+  
+  await Promise.all([p1, p2])
+  return { gameId }
 }

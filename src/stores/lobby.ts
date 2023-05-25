@@ -198,7 +198,7 @@ export const useLobbyStore = defineStore('lobby', () => {
       challengerId: doc.challengerId ?? undefined,
       challengerDisplayName: doc.challengerDisplayName ?? undefined,
       challengerImage: doc.challengerImageUrl ?? undefined,
-      gameDocId: doc.gameDocId ?? undefined,
+      gameDocId: doc.IMMUTABLE.gameDocId ?? undefined,
     }
   }
   

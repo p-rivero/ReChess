@@ -50,11 +50,11 @@ async function insertLobbySlot(challengerId: string|null, requestedColor: Reques
       creatorImageUrl: null,
       timeCreated: admin.firestore.Timestamp.now() as Timestamp,
       requestedColor,
+      gameDocId: hasGameDoc ? 'some_game_id' : null,
     },
     challengerId,
     challengerDisplayName: challengerId ? 'Challenger Name' : null,
     challengerImageUrl: null,
-    gameDocId: hasGameDoc ? 'some_game_id' : null,
   }
   await db.collection('variants').doc(VARIANT_ID).collection('lobby').doc(USER_ID).set(doc)
   return doc
@@ -180,6 +180,22 @@ test('creating a game increments the variant popularity', async () => {
   const variantAfter = await db.collection('variants').doc(VARIANT_ID).get()
   expect(variantAfter.data()!.popularity).toBe(variantBefore.data()!.popularity + 1)
 })
+
+test('creating a game sets the gameDocId of the slot', async () => {
+  const context = makeContext(USER_ID)
+  const arg = makeArgs()
+  await insertVariant('white')
+  await insertLobbySlot('the_challenger', 'white')
+  await db.collection('variants').doc(VARIANT_ID).get()
+  
+  const { gameId } = await expectSuccess(createGame(arg, context)) as {gameId: string}
+  
+  const slotAfter = await db.collection('variants').doc(VARIANT_ID).collection('lobby').doc(USER_ID).get()
+  const slotDoc = slotAfter.data() as LobbySlotDoc
+  
+  console.log(slotDoc)
+  expect(slotDoc.IMMUTABLE.gameDocId).toBe(gameId)
+})
   
 
 
@@ -294,4 +310,16 @@ test('variant must have a valid starting player', async () => {
   let e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The variant has an invalid initial state.')
   expect(e.code).toBe('internal')
+})
+
+test('cannot create a game twice', async () => {
+  const arg = makeArgs()
+  const context = makeContext(USER_ID)
+  await insertVariant('white')
+  await insertLobbySlot('a_challenger', 'white')
+  
+  await expectSuccess(createGame(arg, context))
+  let e = await expectHttpsError(createGame(arg, context))
+  expect(e.message).toMatch('The lobby slot already has a game.')
+  expect(e.code).toBe('failed-precondition')
 })

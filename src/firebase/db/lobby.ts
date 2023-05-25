@@ -32,11 +32,11 @@ export async function createSlot(
       creatorDisplayName: creatorName,
       creatorImageUrl: creatorImage,
       requestedColor: color,
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await setDoc(doc(db, 'variants', variantId, 'lobby', creatorId), newDoc)
   return newDoc
@@ -69,12 +69,10 @@ export async function removeSlot(variantId: string, creatorId: string) {
 }
 
 
-// Creates a new game in the database by calling the createGame cloud function
-// and then updates the lobby slot with the game id. Returns the game id.
+// Creates a new game in the database by calling the createGame cloud function.
+// The function already updates the lobby slot with the game id. Returns the game id.
 export async function createGame(variantId: string, lobbySlotCreatorId: string): Promise<string> {
   const result = await dbCreateGame({ variantId, lobbySlotCreatorId })
-  const gameDocId = result.data.gameId
-  await updateDoc(doc(db, 'variants', variantId, 'lobby', lobbySlotCreatorId), { gameDocId })
-  return gameDocId
+  return result.data.gameId
 }
 

@@ -133,28 +133,13 @@ test('cannot join a slot that does not exist', async () => {
   )
 })
 
-test('challenger cannot edit game doc', async () => {
+test('cannot edit immutable fields', async () => {
   await setupUsersAndVariant(set)
-  await setupLobbySlot(set, 'alice')
+  await setupLobbySlot(set, 'alice', 'myself')
   
   await assertFails(
     update('verified', {
-      gameDocId: 'some_id',
-    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
-  )
-  await assertFails(
-    update('verified', {
-      challengerId: MY_ID,
-      challengerDisplayName: 'My name',
-      challengerImageUrl: 'http://example.com/myself.jpg',
-      gameDocId: 'some_id',
-    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
-  )
-  await assertSucceeds(
-    update('verified', {
-      challengerId: MY_ID,
-      challengerDisplayName: 'My name',
-      challengerImageUrl: 'http://example.com/myself.jpg',
+      'IMMUTABLE.gameDocId': 'some_id',
     }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
 })
@@ -219,14 +204,6 @@ test('when leaving must remove all fields', async () => {
     update('verified', {
       challengerId: null,
       challengerDisplayName: null,
-    }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
-  )
-  await assertFails(
-    update('verified', {
-      challengerId: null,
-      challengerDisplayName: null,
-      challengerImageUrl: null,
-      gameDocId: 'some_id',
     }, 'variants', VARIANT_ID, 'lobby', ALICE_ID)
   )
   await assertSucceeds(

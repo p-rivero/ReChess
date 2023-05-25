@@ -45,11 +45,11 @@ test('can create lobby slot', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await assertSucceeds(
     set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
@@ -65,11 +65,11 @@ test('cannot create lobby slot if not authenticated', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await assertFails(
     set('unverified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
@@ -91,11 +91,11 @@ test('cannot create lobby slot for a variant that does not exist', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await assertFails(
     set('verified', slot, 'variants', 'wrong_id', 'lobby', MY_ID)
@@ -112,11 +112,11 @@ test('cannot create 2 entries for the same variant', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await assertFails(
     add('verified', slot, 'variants', VARIANT_ID, 'lobby')
@@ -136,11 +136,11 @@ test('can create 2 entries for different variants', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await assertSucceeds(
     set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
@@ -160,11 +160,11 @@ test('2 creators can create entries for the same variant', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await assertSucceeds(
     set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
@@ -180,11 +180,11 @@ test('cannot create slot with challenger already set', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
+      gameDocId: null,
     },
     challengerId: ALICE_ID,
     challengerDisplayName: 'Alice',
     challengerImageUrl: 'http://example.com/alice.jpg',
-    gameDocId: null,
   }
   await assertFails(
     set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
@@ -207,16 +207,16 @@ test('cannot create slot with game id already set', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'white',
+      gameDocId: gameId,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: gameId,
   }
   await assertFails(
     set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
-  slot.gameDocId = null
+  slot.IMMUTABLE.gameDocId = null
   await assertSucceeds(
     set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
@@ -231,11 +231,11 @@ test('creator display name must be correct', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'random',
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await assertFails(
     set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
@@ -255,11 +255,11 @@ test('creator profile image must be correct', async () => {
       creatorImageUrl: 'http://example.com/ANOTHER_PERSON.jpg',
       timeCreated: now(),
       requestedColor: 'random',
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await assertFails(
     set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
@@ -279,11 +279,11 @@ test('time created must be correct', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: afterSeconds(123),
       requestedColor: 'black',
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await assertFails(
     set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)
@@ -303,11 +303,11 @@ test('requested color must be correct', async () => {
       creatorImageUrl: 'http://example.com/myself.jpg',
       timeCreated: now(),
       requestedColor: 'wrong_color' as 'white',
+      gameDocId: null,
     },
     challengerId: null,
     challengerDisplayName: null,
     challengerImageUrl: null,
-    gameDocId: null,
   }
   await assertFails(
     set('verified', slot, 'variants', VARIANT_ID, 'lobby', MY_ID)

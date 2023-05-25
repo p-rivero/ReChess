@@ -64,8 +64,8 @@ test('white player can cancel a game', async () => {
   
   await expectSuccess(cancelGame(arg, context))
   
-  const oldGame = await db.collection('games').doc(arg.gameId).get()
-  expect(oldGame.exists).toBe(false)
+  const oldGameLocation = await db.collection('games').doc(arg.gameId).get()
+  expect(oldGameLocation.exists).toBe(false)
   
   const cancelledGame = await db.collection('cancelledGames').doc(arg.gameId).get()
   expect(cancelledGame.exists).toBe(true)

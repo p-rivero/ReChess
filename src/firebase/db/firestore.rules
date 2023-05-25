@@ -353,16 +353,16 @@ service cloud.firestore {
       match /lobby/{creatorUserId} {
         function isLobbySlotDoc(doc) {
           return
-            hasFields(doc, ['IMMUTABLE'], ['challengerId', 'challengerDisplayName', 'challengerImageUrl', 'gameDocId']) &&
-            hasFields(doc.IMMUTABLE, ['creatorDisplayName', 'timeCreated', 'requestedColor'], ['creatorImageUrl']) &&
+            hasFields(doc, ['IMMUTABLE'], ['challengerId', 'challengerDisplayName', 'challengerImageUrl']) &&
+            hasFields(doc.IMMUTABLE, ['creatorDisplayName', 'timeCreated', 'requestedColor'], ['creatorImageUrl', 'gameDocId']) &&
             doc.IMMUTABLE.creatorDisplayName is string &&
             doc.IMMUTABLE.timeCreated is timestamp &&
             doc.IMMUTABLE.requestedColor in ['white', 'black', 'random'] &&
+            (doc.IMMUTABLE.gameDocId == null || doc.IMMUTABLE.gameDocId is string) &&
             (doc.IMMUTABLE.creatorImageUrl == null || doc.IMMUTABLE.creatorImageUrl is string) &&
             (doc.challengerId == null || doc.challengerId is string) &&
             (doc.challengerDisplayName == null || doc.challengerDisplayName is string) &&
-            (doc.challengerImageUrl == null || doc.challengerImageUrl is string) &&
-            (doc.gameDocId == null || doc.gameDocId is string);
+            (doc.challengerImageUrl == null || doc.challengerImageUrl is string);
         }
         function checkUserNameAndImage(userId, expectedName, expectedImage) {
           // Fetch the user doc only when strictly necessary
@@ -379,28 +379,11 @@ service cloud.firestore {
             exists(/databases/$(database)/documents/variants/$(variantId)) &&
             checkUserNameAndImage(creatorUserId, doc.IMMUTABLE.creatorDisplayName, doc.IMMUTABLE.creatorImageUrl) &&
             isServerTimestamp(doc.IMMUTABLE.timeCreated) &&
+            doc.IMMUTABLE.gameDocId == null &&
             // Creator initializes the slot with no challenger
             doc.challengerId == null &&
             doc.challengerDisplayName == null &&
-            doc.challengerImageUrl == null &&
-            doc.gameDocId == null;
-        }
-        // Checks that the game sent to the challenger is (probably) the same as the one created by the
-        // cloud function at the creator's request. It's not a perfect check, but it should make cheating
-        // very difficult.
-        function validateCreatedGame(lobbyDoc) {
-          let gameDoc = fetchGame(lobbyDoc.gameDocId);
-          return
-            gameDoc.IMMUTABLE.variantId == variantId &&
-            gameDoc.IMMUTABLE.requestedColor == lobbyDoc.IMMUTABLE.requestedColor &&
-            gameDoc.IMMUTABLE.timeCreated > lobbyDoc.IMMUTABLE.timeCreated &&
-            ((
-              gameDoc.IMMUTABLE.whiteId == creatorUserId &&
-              gameDoc.IMMUTABLE.blackId == lobbyDoc.challengerId
-            ) || (
-              gameDoc.IMMUTABLE.whiteId == lobbyDoc.challengerId &&
-              gameDoc.IMMUTABLE.blackId == creatorUserId
-            ));
+            doc.challengerImageUrl == null;
         }
         function allowUpdateLobbySlot() {
           let old = resource.data;
@@ -408,33 +391,21 @@ service cloud.firestore {
           return
             isLobbySlotDoc(new) &&
             unchanged(old.IMMUTABLE, new.IMMUTABLE) &&
+            // Cannot change the lobby slot once the game has been created, only delete it
+            old.IMMUTABLE.gameDocId == null &&
             // Challenger clicks "Join"
             ((
               loggedAs(new.challengerId) &&
               old.challengerId == null &&
-              old.gameDocId == null &&
               new.challengerId != creatorUserId &&
-              new.gameDocId == null &&
               checkUserNameAndImage(new.challengerId, new.challengerDisplayName, new.challengerImageUrl)
             )
             // Challenger clicks "Cancel", or creator rejects challenger
             || (
               (loggedAs(old.challengerId) || loggedAs(creatorUserId)) &&
-              old.gameDocId == null &&
               new.challengerId == null &&
               new.challengerDisplayName == null &&
-              new.challengerImageUrl == null &&
-              new.gameDocId == null
-            )
-            // Creator accepts challenger
-            || (
-              loggedAs(creatorUserId) &&
-              old.gameDocId == null &&
-              new.gameDocId != null &&
-              new.challengerId == old.challengerId &&
-              new.challengerDisplayName == old.challengerDisplayName &&
-              new.challengerImageUrl == old.challengerImageUrl &&
-              validateCreatedGame(new)
+              new.challengerImageUrl == null
             ));
         }
         function allowDeleteLobbySlot() {
@@ -443,10 +414,7 @@ service cloud.firestore {
             isLobbySlotDoc(doc) &&
             // Creator cancels the game, OR
             // Challenger acknowledges the created game and clears the slot
-            (loggedAs(creatorUserId) || (
-              loggedAs(doc.challengerId) &&
-              doc.gameDocId != null
-            ));
+            (loggedAs(creatorUserId) || (loggedAs(doc.challengerId) && doc.IMMUTABLE.gameDocId != null));
         }
         
         allow read;

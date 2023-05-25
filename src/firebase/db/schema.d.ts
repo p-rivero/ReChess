@@ -105,12 +105,12 @@ export interface LobbySlotDoc {
     creatorImageUrl: string | null
     timeCreated: Timestamp | FieldValue
     requestedColor: RequestedColor
+    // null if the creator has not accepted the challenge yet
+    gameDocId: string | null
   }
   challengerId: string | null
   challengerDisplayName: string | null
   challengerImageUrl: string | null
-  // null if the creator has not accepted the challenge yet
-  gameDocId: string | null
 }
 
 

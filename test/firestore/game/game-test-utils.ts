@@ -110,11 +110,11 @@ export async function setupLobbySlot(
       creatorImageUrl: creatorImage,
       timeCreated: serverTimestamp() as Timestamp,
       requestedColor,
+      gameDocId: gameDocId ?? null,
     },
     challengerId,
     challengerDisplayName,
     challengerImageUrl: challengerImage,
-    gameDocId: gameDocId ?? null,
   }
   await set('admin', slot, 'variants', VARIANT_ID, 'lobby', creatorId)
 }
