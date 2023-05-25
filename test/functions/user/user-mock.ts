@@ -1,6 +1,5 @@
 import type { UserDoc } from '@/firebase/db/schema'
 import admin from 'firebase-admin'
-import type { Timestamp } from 'firebase/firestore'
 
 type DB = admin.firestore.Firestore
 

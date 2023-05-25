@@ -49,8 +49,8 @@ test('game finishes and white player wins game', async () => {
       last5Games: expect.any(String),
     },
   })
-  const whiteLast5GamesBefore = JSON.parse(whiteUserBefore!.IMMUTABLE.last5Games)
-  const whiteLast5Games = JSON.parse(whiteUserAfter!.IMMUTABLE.last5Games)
+  const whiteLast5GamesBefore = JSON.parse(whiteUserBefore.IMMUTABLE.last5Games)
+  const whiteLast5Games = JSON.parse(whiteUserAfter.IMMUTABLE.last5Games)
   expect(whiteLast5GamesBefore).toHaveLength(0)
   expect(whiteLast5Games).toHaveLength(1)
   expect(whiteLast5Games[0]).toEqual({
@@ -73,8 +73,8 @@ test('game finishes and white player wins game', async () => {
       last5Games: expect.any(String),
     },
   })
-  const blackLast5GamesBefore = JSON.parse(blackUserBefore!.IMMUTABLE.last5Games)
-  const blackLast5Games = JSON.parse(blackUserAfter!.IMMUTABLE.last5Games)
+  const blackLast5GamesBefore = JSON.parse(blackUserBefore.IMMUTABLE.last5Games)
+  const blackLast5Games = JSON.parse(blackUserAfter.IMMUTABLE.last5Games)
   expect(blackLast5GamesBefore).toHaveLength(5)
   expect(blackLast5Games).toHaveLength(5)
   expect(blackLast5Games[0]).toEqual({
@@ -131,7 +131,7 @@ test('game finishes and black player wins game', async () => {
       last5Games: expect.any(String),
     },
   })
-  const whiteLast5Games = JSON.parse(whiteUserAfter!.IMMUTABLE.last5Games)
+  const whiteLast5Games = JSON.parse(whiteUserAfter.IMMUTABLE.last5Games)
   expect(whiteLast5Games).toHaveLength(1)
   expect(whiteLast5Games[0]).toEqual({
     gameId: GAME_ID,
@@ -154,7 +154,7 @@ test('game finishes and black player wins game', async () => {
       last5Games: expect.any(String),
     },
   })
-  const blackLast5Games = JSON.parse(blackUserAfter!.IMMUTABLE.last5Games)
+  const blackLast5Games = JSON.parse(blackUserAfter.IMMUTABLE.last5Games)
   expect(blackLast5Games).toHaveLength(5)
   expect(blackLast5Games[0]).toEqual({
     gameId: GAME_ID,
@@ -197,7 +197,7 @@ test('game finishes and there is a draw', async () => {
       last5Games: expect.any(String),
     },
   })
-  const whiteLast5Games = JSON.parse(whiteUserAfter!.IMMUTABLE.last5Games)
+  const whiteLast5Games = JSON.parse(whiteUserAfter.IMMUTABLE.last5Games)
   expect(whiteLast5Games).toHaveLength(1)
   expect(whiteLast5Games[0]).toEqual({
     gameId: GAME_ID,
@@ -220,7 +220,7 @@ test('game finishes and there is a draw', async () => {
       last5Games: expect.any(String),
     },
   })
-  const blackLast5Games = JSON.parse(blackUserAfter!.IMMUTABLE.last5Games)
+  const blackLast5Games = JSON.parse(blackUserAfter.IMMUTABLE.last5Games)
   expect(blackLast5Games).toHaveLength(5)
   expect(blackLast5Games[0]).toEqual({
     gameId: GAME_ID,

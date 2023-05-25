@@ -1,5 +1,4 @@
 import type { https, EventContext } from 'firebase-functions'
-import { QueryDocumentSnapshot } from 'firebase/firestore'
 
 /**
  * Creates a mock context for an HTTPS callable function.

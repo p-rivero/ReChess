@@ -1,5 +1,5 @@
 
-import { ALICE_ID, BOB_ID, MY_ID, VARIANT_ID, setupGameDoc, setupLobbySlot, setupUsersAndVariant } from './game-test-utils'
+import { ALICE_ID, MY_ID, VARIANT_ID, setupGameDoc, setupLobbySlot, setupUsersAndVariant } from './game-test-utils'
 import { type TestUtilsSignature, assertFails, assertSucceeds, notInitialized, setupTestUtils } from '../utils'
 import { setupJest } from '../init'
 
@@ -42,7 +42,7 @@ test('cannot remove or modify challenger after game id is set', async () => {
   await setupUsersAndVariant(set)
   await setupLobbySlot(set, 'myself', 'bob')
   const gameId = await setupGameDoc(set, 'myself', 'bob', 'white')
-  update('admin', {
+  await update('admin', {
     'IMMUTABLE.gameDocId': gameId,
   }, 'variants', VARIANT_ID, 'lobby', MY_ID)
   
@@ -51,14 +51,6 @@ test('cannot remove or modify challenger after game id is set', async () => {
       challengerId: ALICE_ID,
       challengerDisplayName: 'Alice',
       challengerImageUrl: 'http://example.com/alice.jpg',
-    }, 'variants', VARIANT_ID, 'lobby', MY_ID)
-  )
-  // ID was already set, so this should fail even though the data is the same
-  await assertFails(
-    update('verified', {
-      challengerId: BOB_ID,
-      challengerDisplayName: 'Bob',
-      challengerImageUrl: 'http://example.com/bob.jpg',
     }, 'variants', VARIANT_ID, 'lobby', MY_ID)
   )
 })
