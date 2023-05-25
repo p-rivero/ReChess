@@ -29,7 +29,8 @@ export default async function(image: ObjectMetadata): Promise<void> {
   // Check if the filename matches the hash
   const fileName = image.name.split('/').pop()
   if (fileName !== hash) {
-    console.warn('Deleting', image.name, 'because the hash does not match the filename. Uploader:', image.metadata?.userId)
+    const uploader = image.metadata?.userId
+    console.warn('Deleting', image.name, 'because the hash does not match the filename. Uploader:', uploader)
     await fileRef.delete()
   }
 }

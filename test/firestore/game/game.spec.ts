@@ -330,3 +330,71 @@ test('winner must be set if and only if the game is over', async () => {
   }, 'games', gameId, 'gameOverTrigger', 'doc')
   await assertSucceeds(batch.commit())
 })
+
+test('only players of the game can create gameOverTrigger', async () => {
+  await setupUsersAndVariant(set)
+  // Not a player of the game
+  let gameId = await setupGameDoc(set, 'alice', 'bob', 'white')
+  await setMoveHistory(update, gameId, 'e2e4 e7e5 ', 'white')
+  
+  let batch = startBatch('verified')
+  batch.update({
+    moveHistory: 'e2e4 e7e5 g1f3 ',
+    playerToMove: 'game-over',
+    winner: 'black',
+  }, 'games', gameId)
+  batch.set({
+    gameOverTime: now(),
+  }, 'games', gameId, 'gameOverTrigger', 'doc')
+  await assertFails(batch.commit())
+  
+  // Black player
+  gameId = await setupGameDoc(set, 'alice', 'myself', 'white')
+  await setMoveHistory(update, gameId, 'e2e4 e7e5 ', 'black')
+  
+  batch = startBatch('verified')
+  batch.update({
+    moveHistory: 'e2e4 e7e5 g1f3 ',
+    playerToMove: 'game-over',
+    winner: 'black',
+  }, 'games', gameId)
+  batch.set({
+    gameOverTime: now(),
+  }, 'games', gameId, 'gameOverTrigger', 'doc')
+  await assertSucceeds(batch.commit())
+})
+
+test('cannot create 2 gameOverTriggers', async () => {
+  await setupUsersAndVariant(set)
+  let gameId = await setupGameDoc(set, 'myself', 'bob', 'white')
+  await setMoveHistory(update, gameId, 'e2e4 e7e5 ', 'white')
+    
+  let batch = startBatch('verified')
+  batch.update({
+    moveHistory: 'e2e4 e7e5 g1f3 ',
+    playerToMove: 'game-over',
+    winner: 'black',
+  }, 'games', gameId)
+  batch.set({
+    gameOverTime: now(),
+  }, 'games', gameId, 'gameOverTrigger', 'doc')
+  await assertSucceeds(batch.commit())
+  
+  await assertFails(
+    set('verified', { gameOverTime: now() }, 'games', gameId, 'gameOverTrigger', 'doc')
+  )
+  
+  gameId = await setupGameDoc(set, 'myself', 'bob', 'white')
+  await setMoveHistory(update, gameId, 'e2e4 e7e5 ', 'white')
+    
+  batch = startBatch('verified')
+  batch.update({
+    moveHistory: 'e2e4 e7e5 g1f3 ',
+    playerToMove: 'game-over',
+    winner: 'black',
+  }, 'games', gameId)
+  batch.set({
+    gameOverTime: now(),
+  }, 'games', gameId, 'gameOverTrigger', 'another_name')
+  await assertFails(batch.commit())
+})

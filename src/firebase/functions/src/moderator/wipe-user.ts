@@ -3,12 +3,12 @@ import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 /**
  * Called directly by the moderator in order to wipe a user's content.
  * If the user is already banned, this function will still wipe their content (if it exists) and return successfully.
- * 
+ *
  * This does the following:
  * - Removes all of the user's variants
  * - Removes all of the user's reports
  * - Bans the user (see `ban-user.ts`)
- * 
+ *
  * The user's upvotes are NOT removed.
  * @param {any} data The data passed to the function
  * @param {string} data.userId UID of the user that the moderator wishes to wipe

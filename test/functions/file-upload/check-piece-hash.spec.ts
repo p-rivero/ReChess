@@ -1,9 +1,8 @@
 import { functions, initialize } from '../init'
-import { expectWarn } from '../utils'
+import { expectLog } from '../utils'
 
 const { app, testEnv } = initialize('check-piece-hash-test')
 const bucket = app.storage().bucket('rechess-web-piece-images')
-const db = app.firestore()
 const checkPieceHash = testEnv.wrap(functions.checkPieceHash)
 
 test('accepts images with correct hash', async () => {
@@ -35,7 +34,7 @@ test('rejects images with an incorrect name', async () => {
     },
   })
   
-  const spy = expectWarn('Deleting piece-images/some-name because the hash does not match the filename. Uploader: 1234')
+  const spy = expectLog('warn', 'Deleting piece-images/some-name because the hash does not match the filename. Uploader: 1234')
   
   await checkPieceHash(metadata)
   
@@ -57,7 +56,7 @@ test('rejects images without uploader ID', async () => {
     },
   })
   
-  const spy = expectWarn('Deleting piece-images/10afa016896de2ed687187497b6c8e4f1e0b285baaf5899cae35f157aaf4e5d3 ' +
+  const spy = expectLog('warn', 'Deleting piece-images/10afa016896de2ed687187497b6c8e4f1e0b285baaf5899cae35f157aaf4e5d3 ' +
       'because it does not have an uploader ID')
   
   await checkPieceHash(metadata)

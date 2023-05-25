@@ -1,4 +1,5 @@
-import type { https } from 'firebase-functions'
+import type { https, EventContext } from 'firebase-functions'
+import { QueryDocumentSnapshot } from 'firebase/firestore'
 
 /**
  * Creates a mock context for an HTTPS callable function.
@@ -7,7 +8,7 @@ import type { https } from 'firebase-functions'
  * @param {boolean} appCheck True if the caller has an App Check token.
  * @param {boolean} emailVerified True if the caller's email is verified.
  */
-export default function(userId: string|null, appCheck = true, emailVerified = true): https.CallableContext {
+export function makeCallableContext(userId: string|null, appCheck = true, emailVerified = true): https.CallableContext {
   const token = {
     aud: 'test',
     auth_time: 123,
@@ -34,4 +35,20 @@ export default function(userId: string|null, appCheck = true, emailVerified = tr
     } : undefined,
     rawRequest: 'test',
   } as unknown as https.CallableContext
+}
+
+/**
+ * Creates a mock context for firebase trigger.
+ * @param {T} pathParams The values of the wildcards in the path.
+ */
+export function makeFirestoreContext<T>(pathParams: T): EventContext<T> {
+  return {
+    eventId: 'event_id',
+    timestamp: 'timestamp',
+    params: pathParams,
+    resource: {
+      name: 'test',
+      service: 'test',
+    },
+  } as unknown as EventContext<T>
 }

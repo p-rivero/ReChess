@@ -1,15 +1,15 @@
 import { expectHttpsError, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
-import makeContext from './make-callable-context'
+import { makeCallableContext as makeContext } from '../make-context'
+import { insertVariant, insertLobbySlot } from './games-mock'
 import admin from 'firebase-admin'
-import type { VariantDoc, LobbySlotDoc, RequestedColor } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
+import type { LobbySlotDoc } from '@/firebase/db/schema'
 
 const { app, testEnv } = initialize('create-game-test')
 const db = app.firestore()
 const createGame = testEnv.wrap(functions.createGame)
 
-// In this test, the creator of the lobby slot (and therefore the game) is USER_ID.
 const USER_ID = 'my_user_id'
 const VARIANT_ID = 'some_variant_id'
 
@@ -17,56 +17,13 @@ function makeArgs(variantId = VARIANT_ID, lobbySlotCreatorId = USER_ID) {
   return { variantId, lobbySlotCreatorId }
 }
 
-async function insertVariant(firstPlayerToMove: 'white'|'black'|'invalid-variant') {
-  let initialState: string
-  if (firstPlayerToMove === 'white') {
-    initialState = '{"playerToMove":0}'
-  } else if (firstPlayerToMove === 'black') {
-    initialState = '{"playerToMove":1}'
-  } else if (firstPlayerToMove === 'invalid-variant') {
-    initialState = '{}'
-  } else {
-    throw new Error('invalid firstPlayerToMove')
-  }
-  const doc: VariantDoc = {
-    name: 'Variant Name',
-    description: 'Variant Description',
-    creationTime: admin.firestore.Timestamp.now() as Timestamp,
-    creatorDisplayName: 'test',
-    creatorId: null,
-    numUpvotes: 123,
-    popularity: 11,
-    tags: [],
-    initialState,
-  }
-  await db.collection('variants').doc(VARIANT_ID).set(doc)
-  return doc
-}
-
-async function insertLobbySlot(challengerId: string|null, requestedColor: RequestedColor, hasGameDoc = false) {
-  const doc: LobbySlotDoc = {
-    IMMUTABLE: {
-      creatorDisplayName: 'Creator Name',
-      creatorImageUrl: null,
-      timeCreated: admin.firestore.Timestamp.now() as Timestamp,
-      requestedColor,
-      gameDocId: hasGameDoc ? 'some_game_id' : null,
-    },
-    challengerId,
-    challengerDisplayName: challengerId ? 'Challenger Name' : null,
-    challengerImageUrl: null,
-  }
-  await db.collection('variants').doc(VARIANT_ID).collection('lobby').doc(USER_ID).set(doc)
-  return doc
-}
-
 
 test('a player can create a game', async () => {
   const context = makeContext(USER_ID)
   const arg = makeArgs()
   const startTime = admin.firestore.Timestamp.now()
-  const createdVariant = await insertVariant('white')
-  await insertLobbySlot('some_challenger_id', 'white')
+  const createdVariant = await insertVariant(db, VARIANT_ID, 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'some_challenger_id', 'white')
   
   const { gameId } = await expectSuccess(createGame(arg, context)) as {gameId: string}
   
@@ -99,8 +56,8 @@ test('a player can create a game', async () => {
 test('variant starting player can be black', async () => {
   const context = makeContext(USER_ID)
   const arg = makeArgs()
-  const createdVariant = await insertVariant('black')
-  await insertLobbySlot('another_challenger', 'white')
+  const createdVariant = await insertVariant(db, VARIANT_ID, 'black')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'another_challenger', 'white')
   
   const { gameId } = await expectSuccess(createGame(arg, context)) as {gameId: string}
   
@@ -128,8 +85,8 @@ test('variant starting player can be black', async () => {
 test('slot creator can play as black', async () => {
   const context = makeContext(USER_ID)
   const arg = makeArgs()
-  const createdVariant = await insertVariant('white')
-  await insertLobbySlot('the_challenger', 'black')
+  const createdVariant = await insertVariant(db, VARIANT_ID, 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'the_challenger', 'black')
   
   const { gameId } = await expectSuccess(createGame(arg, context)) as {gameId: string}
   
@@ -157,8 +114,8 @@ test('slot creator can play as black', async () => {
 test('slot creator can play as random side', async () => {
   const context = makeContext(USER_ID)
   const arg = makeArgs()
-  await insertVariant('white')
-  await insertLobbySlot('the_challenger', 'random')
+  await insertVariant(db, VARIANT_ID, 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'the_challenger', 'random')
   
   const { gameId } = await expectSuccess(createGame(arg, context)) as {gameId: string}
   
@@ -171,8 +128,8 @@ test('slot creator can play as random side', async () => {
 test('creating a game increments the variant popularity', async () => {
   const context = makeContext(USER_ID)
   const arg = makeArgs()
-  await insertVariant('white')
-  await insertLobbySlot('the_challenger', 'white')
+  await insertVariant(db, VARIANT_ID, 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'the_challenger', 'white')
   const variantBefore = await db.collection('variants').doc(VARIANT_ID).get()
   
   await expectSuccess(createGame(arg, context))
@@ -184,8 +141,8 @@ test('creating a game increments the variant popularity', async () => {
 test('creating a game sets the gameDocId of the slot', async () => {
   const context = makeContext(USER_ID)
   const arg = makeArgs()
-  await insertVariant('white')
-  await insertLobbySlot('the_challenger', 'white')
+  await insertVariant(db, VARIANT_ID, 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'the_challenger', 'white')
   await db.collection('variants').doc(VARIANT_ID).get()
   
   const { gameId } = await expectSuccess(createGame(arg, context)) as {gameId: string}
@@ -201,8 +158,8 @@ test('creating a game sets the gameDocId of the slot', async () => {
 
 test('arguments must be correct', async () => {
   const context = makeContext(USER_ID)
-  await insertVariant('white')
-  await insertLobbySlot('some_challenger_id', 'white')
+  await insertVariant(db, VARIANT_ID, 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'some_challenger_id', 'white')
   
   let arg = {}
   let e = await expectHttpsError(createGame(arg, context))
@@ -232,7 +189,7 @@ test('arguments must be correct', async () => {
 
 test('user must be authenticated to create a game', async () => {
   const arg = makeArgs()
-  await insertVariant('white')
+  await insertVariant(db, VARIANT_ID, 'white')
   
   let context = makeContext(null)
   let e = await expectHttpsError(createGame(arg, context))
@@ -252,7 +209,7 @@ test('user must be authenticated to create a game', async () => {
 
 test('only the slot creator can create the game', async () => {
   const arg = makeArgs()
-  await insertVariant('white')
+  await insertVariant(db, VARIANT_ID, 'white')
   
   let context = makeContext('not_the_slot_creator')
   let e = await expectHttpsError(createGame(arg, context))
@@ -264,15 +221,15 @@ test('only the slot creator can create the game', async () => {
   expect(e.message).toMatch('The lobby slot does not exist: variants/some_variant_id/lobby/my_user_id')
   expect(e.code).toBe('failed-precondition')
   
-  await insertLobbySlot('a_challenger', 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'a_challenger', 'white')
   await expectSuccess(createGame(arg, context))
 })
 
 test('cannot create a game if slot has no challenger', async () => {
   const arg = makeArgs()
   const context = makeContext(USER_ID)
-  await insertVariant('white')
-  await insertLobbySlot(null, 'white')
+  await insertVariant(db, VARIANT_ID, 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, null, 'white')
   
   let e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The lobby slot has no challenger.')
@@ -282,8 +239,8 @@ test('cannot create a game if slot has no challenger', async () => {
 test('cannot create a game for a slot that already has a game', async () => {
   const arg = makeArgs()
   const context = makeContext(USER_ID)
-  await insertVariant('white')
-  await insertLobbySlot('a_challenger', 'white', true)
+  await insertVariant(db, VARIANT_ID, 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'a_challenger', 'white', true)
   
   let e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The lobby slot already has a game.')
@@ -294,7 +251,7 @@ test('cannot create a game for a variant that does not exist', async () => {
   // In practice this will never happen, since it's impossible to create the lobby slot.
   const arg = makeArgs()
   const context = makeContext(USER_ID)
-  await insertLobbySlot('a_challenger', 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'a_challenger', 'white')
   
   let e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The variant does not exist.')
@@ -304,8 +261,8 @@ test('cannot create a game for a variant that does not exist', async () => {
 test('variant must have a valid starting player', async () => {
   const arg = makeArgs()
   const context = makeContext(USER_ID)
-  await insertVariant('invalid-variant')
-  await insertLobbySlot('a_challenger', 'white')
+  await insertVariant(db, VARIANT_ID, 'invalid-variant')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'a_challenger', 'white')
   
   let e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The variant has an invalid initial state.')
@@ -315,8 +272,8 @@ test('variant must have a valid starting player', async () => {
 test('cannot create a game twice', async () => {
   const arg = makeArgs()
   const context = makeContext(USER_ID)
-  await insertVariant('white')
-  await insertLobbySlot('a_challenger', 'white')
+  await insertVariant(db, VARIANT_ID, 'white')
+  await insertLobbySlot(db, VARIANT_ID, USER_ID, 'a_challenger', 'white')
   
   await expectSuccess(createGame(arg, context))
   let e = await expectHttpsError(createGame(arg, context))

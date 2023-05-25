@@ -3,14 +3,14 @@ import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 /**
  * Called directly by the moderator in order to ban a user.
  * If the user is already banned, this function does nothing and returns successfully.
- * 
+ *
  * This does the following:
  * - Replaces the user's name with "[deleted]" in their profile and all of their variants.
  * - Removes the user's profile picture
  * - Removes the user's about information
  * - Prevents the user from logging in
  * - Expires all of the user's sessions
- * 
+ *
  * The user's variants, reports, and upvotes are NOT affected. See `wipe-user.ts` for a more thorough wipe.
  * @param {any} data The data passed to the function
  * @param {string} data.userId UID of the user that the moderator wishes to ban

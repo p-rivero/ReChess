@@ -31,6 +31,8 @@ export async function expectSuccess<T>(promise: Promise<T>): Promise<T> {
 }
 
 
+type LogType = 'log' | 'warn' | 'error'
+
 /**
  * Sets a spu on console.warn that asserts that the given message is logged
  * @param expectedMessage The message that should be logged
@@ -38,18 +40,18 @@ export async function expectSuccess<T>(promise: Promise<T>): Promise<T> {
  * @return {{done: () => void}} An object with a `done` method. Call this method when you
  *    are done testing to assert that the message was logged the expected number of times
  */
-export function expectWarn(expectedMessage: string, expectedTimesCalled = 1): {done: () => void} {
-  const spy = jest.spyOn(console, 'warn').mockImplementationOnce((...args) => { 
+export function expectLog(fn: LogType, expectedMessage: string, expectedTimesCalled = 1): {done: () => void} {
+  const spy = jest.spyOn(console, fn).mockImplementationOnce((...args) => { 
     const msg = args.join(' ')
     if (msg !== expectedMessage) {
-      throw new Error(`Unexpected warning:\n${msg}\n\nExpected:\n${expectedMessage}`)
+      throw new Error(`Unexpected print:\n${msg}\n\nExpected:\n${expectedMessage}`)
     }
   })
   
   return {
     done() {
       if (spy.mock.calls.length !== expectedTimesCalled) {
-        throw new Error(`Expected console.warn to be called ${expectedTimesCalled} times, ` +
+        throw new Error(`Expected console.${fn} to be called ${expectedTimesCalled} times, ` +
             `instead called ${spy.mock.calls.length} times`)
       }
       spy.mockRestore()
