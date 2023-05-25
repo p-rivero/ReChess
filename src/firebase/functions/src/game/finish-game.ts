@@ -36,10 +36,8 @@ export default async function(gameId: string): Promise<void> {
   
   // Update the profiles
   const p2 = updateProfile(db, gameId, gameDoc, gameDoc.IMMUTABLE.whiteId)
-    .catch((e) => console.error('Cannot update profile', gameDoc.IMMUTABLE.whiteId, e))
   const p3 = updateProfile(db, gameId, gameDoc, gameDoc.IMMUTABLE.blackId)
-    .catch((e) => console.error('Cannot update profile', gameDoc.IMMUTABLE.blackId, e))
-    
+  
   // Update the variant popularity
   const variantRef = db.collection('variants').doc(gameDoc.IMMUTABLE.variantId)
   const p4 = variantRef.update({ popularity: FieldValue.increment(-1) })
@@ -108,9 +106,11 @@ async function updateProfile(
   if (newLen > 5) last5Games.pop()
   
   // Update the profile
-  await profileRef.update({
+  const updateObj = {
     'IMMUTABLE.numGamesPlayed': FieldValue.increment(1),
     'IMMUTABLE.numWinPoints': FieldValue.increment(earnedPoints),
     'IMMUTABLE.last5Games': JSON.stringify(last5Games),
-  })
+  }
+  await profileRef.update(updateObj)
+    .catch((e) => console.error('Cannot update profile', playerId, e))
 }

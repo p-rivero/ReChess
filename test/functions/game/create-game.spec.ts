@@ -1,7 +1,8 @@
 import { expectHttpsError, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
 import { makeCallableContext as makeContext } from '../make-context'
-import { insertVariant, insertLobbySlot } from './games-mock'
+import { insertLobbySlot } from './games-mock'
+import { insertVariant } from '../variant/variant-mock'
 import admin from 'firebase-admin'
 import type { Timestamp } from 'firebase/firestore'
 import type { LobbySlotDoc } from '@/firebase/db/schema'
@@ -150,7 +151,6 @@ test('creating a game sets the gameDocId of the slot', async () => {
   const slotAfter = await db.collection('variants').doc(VARIANT_ID).collection('lobby').doc(USER_ID).get()
   const slotDoc = slotAfter.data() as LobbySlotDoc
   
-  console.log(slotDoc)
   expect(slotDoc.IMMUTABLE.gameDocId).toBe(gameId)
 })
   
@@ -256,6 +256,17 @@ test('cannot create a game for a variant that does not exist', async () => {
   let e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The variant does not exist.')
   expect(e.code).toBe('not-found')
+})
+
+test('challenger cannot create the game', async () => {
+  // In practice this will never happen, since it's impossible to create the lobby slot.
+  const arg = makeArgs()
+  const context = makeContext('challenger_id')
+  await insertLobbySlot(db, VARIANT_ID, 'creator_id', 'challenger_id', 'white')
+  
+  let e = await expectHttpsError(createGame(arg, context))
+  expect(e.message).toMatch('The function must be called by the user that created the lobby slot.')
+  expect(e.code).toBe('permission-denied')
 })
 
 test('variant must have a valid starting player', async () => {

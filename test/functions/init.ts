@@ -64,7 +64,7 @@ afterEach(async () => {
 })
 
 afterAll(async () => {
-  await currentUtils?.app.delete()
   currentUtils?.testEnv.cleanup()
+  await currentUtils?.app.delete()
 })
 

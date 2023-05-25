@@ -34,11 +34,11 @@ test('rejects images with an incorrect name', async () => {
     },
   })
   
-  const spy = expectLog('warn', 'Deleting piece-images/some-name because the hash does not match the filename. Uploader: 1234')
+  const done = expectLog('warn', 'Deleting piece-images/some-name because the hash does not match the filename. Uploader: 1234')
   
   await checkPieceHash(metadata)
   
-  spy.done()
+  done()
   
   const exists = await bucket.file(FILE_PATH).exists()
   expect(exists).toEqual([false])
@@ -56,12 +56,12 @@ test('rejects images without uploader ID', async () => {
     },
   })
   
-  const spy = expectLog('warn', 'Deleting piece-images/10afa016896de2ed687187497b6c8e4f1e0b285baaf5899cae35f157aaf4e5d3 ' +
+  const done = expectLog('warn', 'Deleting piece-images/10afa016896de2ed687187497b6c8e4f1e0b285baaf5899cae35f157aaf4e5d3 ' +
       'because it does not have an uploader ID')
   
   await checkPieceHash(metadata)
   
-  spy.done()
+  done()
   
   const exists = await bucket.file(FILE_PATH).exists()
   expect(exists).toEqual([false])

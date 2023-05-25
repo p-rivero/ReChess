@@ -34,27 +34,49 @@ export async function expectSuccess<T>(promise: Promise<T>): Promise<T> {
 type LogType = 'log' | 'warn' | 'error'
 
 /**
- * Sets a spu on console.warn that asserts that the given message is logged
+ * Sets a spy on `console.log`, `console.warn` or `console.error` that asserts that
+ * the given message is logged the expected number of times.
  * @param expectedMessage The message that should be logged
  * @param expectedTimesCalled The number of times the message should be logged
- * @return {{done: () => void}} An object with a `done` method. Call this method when you
- *    are done testing to assert that the message was logged the expected number of times
+ * @return {() => void} Call this method when you are done testing.
+ *  It asserts that the message was logged the expected number of times.
  */
-export function expectLog(fn: LogType, expectedMessage: string, expectedTimesCalled = 1): {done: () => void} {
-  const spy = jest.spyOn(console, fn).mockImplementationOnce((...args) => { 
+export function expectLog(fn: LogType, expectedMessage: string, expectedTimesCalled = 1): () => void {
+  const spy = jest.spyOn(console, fn).mockImplementation((...args) => {
     const msg = args.join(' ')
     if (msg !== expectedMessage) {
-      throw new Error(`Unexpected print:\n${msg}\n\nExpected:\n${expectedMessage}`)
+      spy.mockRestore()
+      throw new Error(`Unexpected ${fn} print:\n${msg}\n\nExpected:\n${expectedMessage}`)
     }
   })
   
-  return {
-    done() {
-      if (spy.mock.calls.length !== expectedTimesCalled) {
-        throw new Error(`Expected console.${fn} to be called ${expectedTimesCalled} times, ` +
-            `instead called ${spy.mock.calls.length} times`)
-      }
-      spy.mockRestore()
+  return () => {
+    const numCalls = spy.mock.calls.length
+    spy.mockRestore()
+    if (numCalls !== expectedTimesCalled) {
+      throw new Error(`Expected console.${fn} to be called ${expectedTimesCalled} times, ` +
+          `instead called ${numCalls} times`)
+    }
+  }
+}
+
+/**
+ * Asserts that `console.warn` and `console.error` are not called during the execution of some code.
+ * @return {() => void} Call this method when you are done testing (the console methods can be called again).
+ */
+export function expectNoErrorLog(): () => void {
+  const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => { })
+  const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => { })
+  return () => {
+    const errorMsg = warnSpy.mock.calls.at(0)?.join(' ')
+    const warnMsg = errorSpy.mock.calls.at(0)?.join(' ')
+    errorSpy.mockRestore()
+    warnSpy.mockRestore()
+    if (errorMsg) {
+      throw new Error(`Unexpected ERROR log:\n${errorMsg}`)
+    }
+    if (warnMsg) {
+      throw new Error(`Unexpected WARNING log:\n${warnMsg}`)
     }
   }
 }
