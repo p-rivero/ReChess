@@ -45,6 +45,10 @@
     user-select: none;
 }
 
+.borderless {
+    border: none !important;
+}
+
 .is-break-word {
     word-break: break-word;
 }
@@ -70,4 +74,10 @@
 img.is-rounded {
     border-radius: 50%;
     object-fit: cover;
+}
+
+[data-tooltip]:hover:before {
+    font-size: 0.9rem;
+    font-family: $family-serif;
+    border-radius: 0.25rem;
 }

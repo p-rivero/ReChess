@@ -277,6 +277,14 @@
 }
 
 
+/* help.svg */
+.icon-help {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/help.svg");
+  mask-image: url("@/assets/img/icons/help.svg");
+}
+
+
 /* info.svg */
 .icon-info {
   @extend .icon-common;
@@ -362,6 +370,14 @@
   @extend .icon-common;
   -webkit-mask-image: url("@/assets/img/icons/points-half.svg");
   mask-image: url("@/assets/img/icons/points-half.svg");
+}
+
+
+/* reload.svg */
+.icon-reload {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/img/icons/reload.svg");
+  mask-image: url("@/assets/img/icons/reload.svg");
 }
 
 

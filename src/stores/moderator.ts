@@ -1,3 +1,4 @@
+import { type User, useUserStore } from './user'
 import { UserDB, VariantDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
 import {
@@ -8,7 +9,9 @@ import {
   wipeUser as modWipeUser,
 } from '@/firebase'
 import { ref } from 'vue'
+import { useVariantStore } from './variant'
 import type { ModerationDoc } from '@/firebase/db/schema'
+import type { PublishedVariant } from '@/protochess/types'
 
 export type Report = {
   reporterUsername: string
@@ -16,52 +19,66 @@ export type Report = {
   time: Date
 }
 export type UserReports = {
-  userId: string
-  // More info about the user
+  reportedUser: User
   reports: Report[]
 }
 export type VariantReports = {
-  variantId: string
-  // More info about the variant
+  reportedVariant: PublishedVariant
   reports: Report[]
 }
 
 export const useModeratorStore = defineStore('moderator', () => {
   
-  const selectedReportIndexes = ref<Set<number>>(new Set())
+  const userStore = useUserStore()
+  const variantStore = useVariantStore()
+  
   const userReports = ref<UserReports[]>([])
   const variantReports = ref<VariantReports[]>([])
   
-  async function refreshReports(): Promise<void> {
-    const [userModDocs, variantModDocs] = await Promise.all([
-      UserDB.getModerationReports(),
-      VariantDB.getModerationReports(),
-    ])
+  async function refreshUserReports(): Promise<void> {
+    userReports.value = []
+    const userModDocs = await UserDB.getModerationReports()
     
-    userReports.value = userModDocs.map(([userId, doc]) => {
+    // Fetch all reported users at the same time
+    userReports.value = await Promise.all(userModDocs.map(async ([userId, doc]) => {
+      const user = await userStore.getUserById(userId)
+      if (!user) throw new Error(`Reported user ${userId} not found`)
       return {
-        userId,
-        // TODO: Get more info about the user
+        reportedUser: user,
         reports: extractReports(doc),
       }
-    })
+    }))
+  }
+  
+  async function refreshVariantReports(): Promise<void> {
+    variantReports.value = []
+    const variantModDocs = await VariantDB.getModerationReports()
     
-    variantReports.value = variantModDocs.map(([variantId, doc]) => {
+    // Fetch all reported variants at the same time
+    variantReports.value = await Promise.all(variantModDocs.map(async ([variantId, doc]) => {
+      const variant = await variantStore.getVariant(variantId)
+      if (!variant) throw new Error(`Reported variant ${variantId} not found`)
       return {
-        variantId,
-        // TODO: Get more info about the variant
+        reportedVariant: variant,
         reports: extractReports(doc),
       }
-    })
+    }))
   }
   
   function extractReports(doc?: ModerationDoc): Report[] {
     if (!doc) return []
-    return doc.reportsSummary.split('\n').map(line => {
-      const [reporterUsername, reasonText, time] = line.split('\t')
-      const timestamp = parseInt(time)
-      return { reporterUsername, reasonText, time: new Date(timestamp) }
-    })
+    const reports = doc.reportsSummary
+      .split('\n')
+      .filter(line => line.length > 0)
+      .map(line => {
+        const [reporterUsername, reasonText, time] = line.split('\t')
+        const timestamp = parseInt(time)
+        return { reporterUsername, reasonText, time: new Date(timestamp) }
+      })
+    if (reports.length !== doc.numReports) {
+      throw new Error(`Number of reports (${reports.length}) does not match numReports (${doc.numReports})`)
+    }
+    return reports
   }
   
   async function deleteVariant(variantId: string): Promise<void> {
@@ -76,17 +93,35 @@ export const useModeratorStore = defineStore('moderator', () => {
     await modWipeUser({ userId })
   }
   
-  async function discardUserReport(userId: string): Promise<void> {
-    await modDiscardUserReport({ userId, reportIndexes: Array.from(selectedReportIndexes.value) })
+  async function discardUserReports(userId: string, indexes: Set<number>): Promise<void> {
+    // Update in backend
+    await modDiscardUserReport({ userId, reportIndexes: Array.from(indexes) })
+    // Update the local store
+    const reports = userReports.value
+    const i = reports.findIndex(userReports => userReports.reportedUser.uid === userId)
+    reports[i].reports = reports[i].reports.filter((_, i) => !indexes.has(i))
+    if (reports[i].reports.length === 0) {
+      reports.splice(i, 1)
+    }
+    userReports.value = reports
   }
   
-  async function discardVariantReport(variantId: string): Promise<void> {
-    await modDiscardVariantReport({ variantId, reportIndexes: Array.from(selectedReportIndexes.value) })
+  async function discardVariantReports(variantId: string, indexes: Set<number>): Promise<void> {
+    // Update in backend
+    await modDiscardVariantReport({ variantId, reportIndexes: Array.from(indexes) })
+    // Update the local store
+    const reports = variantReports.value
+    const i = reports.findIndex(variantReports => variantReports.reportedVariant.uid === variantId)
+    reports[i].reports = reports[i].reports.filter((_, i) => !indexes.has(i))
+    if (reports[i].reports.length === 0) {
+      reports.splice(i, 1)
+    }
+    variantReports.value = reports
   }
   
   return {
-    selectedReportIndexes, userReports, variantReports,
-    refreshReports,
-    deleteVariant, banUser, wipeUser, discardUserReport, discardVariantReport,
+    userReports, variantReports,
+    refreshUserReports, refreshVariantReports,
+    deleteVariant, banUser, wipeUser, discardUserReports, discardVariantReports,
   }
 })
