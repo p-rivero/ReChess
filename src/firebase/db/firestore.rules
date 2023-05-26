@@ -21,6 +21,9 @@ function loggedAs(id) {
 function loggedAsUnverified(id) {
   return request.auth != null && request.auth.uid != null && request.auth.uid == id;
 }
+function isModerator() {
+  return request.auth != null && request.auth.token.moderator;
+}
 
 // Checks that a field was created with serverTimestamp()
 function isServerTimestamp(field) {
@@ -269,9 +272,6 @@ service cloud.firestore {
         allow read: if loggedAsUnverified(userId) && docName == 'doc';
       }
       
-      // users/{userId}/moderation/doc cannot be read or written directly,
-      // it can only be accessed by moderators and cloud functions.
-      
       
       match /renameTrigger/{docName} {
         function isRenameTriggerDoc(doc) {
@@ -345,9 +345,6 @@ service cloud.firestore {
       allow read;
       allow create: if allowCreateVariant();
       // Disallow editing and deleting variants
-      
-      // variants/{variantId}/moderation/doc cannot be read or written directly,
-      // it can only be accessed by moderators and cloud functions.
       
       
       match /lobby/{creatorUserId} {
@@ -500,10 +497,20 @@ service cloud.firestore {
     
     
     
+    // MODERATION
+    // Regular users cannot read or write to these collections
+    
     // cancelGame() stores cancelled games here so moderators can review them
     match /cancelledGames/{gameId} {
-      // Users cannot read or write to this collection
-      allow read: if false;
+      allow read: if isModerator();
+    }
+    
+    match /userModeration/{userId} {
+      allow read: if isModerator();
+    }
+    
+    match /variantModeration/{variantId} {
+      allow read: if isModerator();
     }
   }
 }

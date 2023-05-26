@@ -1,7 +1,7 @@
 import { db } from '@/firebase'
 import type { ModerationDoc, ReportDoc, UserDoc, UserPrivateCacheDoc, UserPrivateDoc, UsernameDoc } from '@/firebase/db/schema'
 
-import { Timestamp, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore'
+import { Timestamp, collection, doc, getDoc, getDocs, orderBy, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore'
 import type { User } from '@firebase/auth'
 
 // Creates a new user in the database (public data + private data + username)
@@ -85,9 +85,9 @@ export async function reportUser(reporterId: string, reportedUserId: string, onl
   await setDoc(doc(db, 'users', reporterId, 'reportedUsers', reportedUserId), reportDoc)
 }
 
-// Gets a user's reports
-export async function getUserReports(userId: string): Promise<ModerationDoc | undefined> {
-  const docSnapshot = await getDoc(doc(db, 'users', userId, 'moderation', 'doc'))
-  if (!docSnapshot.exists()) return undefined
-  return docSnapshot.data() as ModerationDoc
+// Gets a list of all moderation reports for users that have been reported 1 or more times
+export async function getModerationReports(): Promise<[string, ModerationDoc][]> {
+  const q = query(collection(db, 'userModeration'), where('numReports', '>=', 1), orderBy('numReports', 'desc'))
+  const querySnapshot = await getDocs(q)
+  return querySnapshot.docs.map(doc => [doc.id, doc.data() as ModerationDoc])
 }

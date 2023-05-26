@@ -75,11 +75,11 @@ export async function reportVariant(userId: string, variantId: string, reason: s
   await setDoc(doc(db, 'users', userId, 'reportedVariants', variantId), reportDoc)
 }
 
-// Gets a variant's reports
-export async function getVariantReports(variantId: string): Promise<ModerationDoc | undefined> {
-  const docSnapshot = await getDoc(doc(db, 'variants', variantId, 'moderation', 'doc'))
-  if (!docSnapshot.exists()) return undefined
-  return docSnapshot.data() as ModerationDoc
+// Gets a list of all moderation reports for variants that have been reported 1 or more times
+export async function getModerationReports(): Promise<[string, ModerationDoc][]> {
+  const q = query(collection(db, 'variantModeration'), where('numReports', '>=', 1), orderBy('numReports', 'desc'))
+  const querySnapshot = await getDocs(q)
+  return querySnapshot.docs.map(doc => [doc.id, doc.data() as ModerationDoc])
 }
 
 

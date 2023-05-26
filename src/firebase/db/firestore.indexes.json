@@ -131,7 +131,13 @@
       "indexes": []
     },
     {
-      "collectionGroup": "moderation",
+      "collectionGroup": "userModeration",
+      "fieldPath": "reportsSummary",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "variantModeration",
       "fieldPath": "reportsSummary",
       "ttl": false,
       "indexes": []

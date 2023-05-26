@@ -66,5 +66,11 @@ export default async function(user: UserRecord): Promise<void> {
     console.error(err)
   })
   
-  await Promise.all([p1, p2, p3, p4, p5, p6, p7, p8])
+  // Remove the moderation document
+  const p9 = db.collection('userModeration').doc(userId).delete().catch((err) => {
+    console.error('Error deleting moderation document for user', userId)
+    console.error(err)
+  })
+  
+  await Promise.all([p1, p2, p3, p4, p5, p6, p7, p8, p9])
 }

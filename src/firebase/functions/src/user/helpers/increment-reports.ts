@@ -6,21 +6,22 @@ import { useAdmin } from '../../helpers'
 /**
  * Increments the report count of a variant or user, and updates
  * the private cache of the user that made the report.
- * @param {'users' | 'variants'} collectionName Whether to report a variant or a user
+ * @param {'users' | 'variants'} mode Whether to report a variant or a user
  * @param {string} docId UID of the variant or user that was reported
  * @param {string} reporterId UID of the user who reported the variant or user
  * @param {string} reportReason User-provided reason for the report. Can be empty.
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export async function incrementReports(
-  collectionName: 'users' | 'variants',
+  mode: 'users' | 'variants',
   docId: string,
   reporterId: string,
   reportReason: string
 ): Promise<void> {
   const { db } = await useAdmin()
   
-  const moderationRef = db.collection(collectionName).doc(docId).collection('moderation').doc('doc')
+  const collection = mode === 'users' ? 'userModeration' : 'variantModeration'
+  const moderationRef = db.collection(collection).doc(docId)
   const newSummaryLine = await makeSummaryLine(reporterId, reportReason)
   const p1 = db.runTransaction(async (transaction) => {
     const moderationSnap = await transaction.get(moderationRef)
@@ -36,12 +37,12 @@ export async function incrementReports(
     }
     transaction.set(moderationRef, newDoc)
   }).catch((err) => {
-    console.error('Error while incrementing upvotes or reports:', collectionName, docId)
+    console.error('Error while incrementing upvotes or reports:', mode, docId)
     console.error(err)
   })
   
-  const mode = collectionName === 'users' ? 'reportUser' : 'reportVariant'
-  const p2 = updatePrivateCache(mode, docId, reporterId)
+  const cacheOperation = mode === 'users' ? 'reportUser' : 'reportVariant'
+  const p2 = updatePrivateCache(cacheOperation, docId, reporterId)
   
   await Promise.all([p1, p2])
 }
@@ -54,8 +55,14 @@ export async function incrementReports(
  * if nothing should be added to the summary.
  */
 async function makeSummaryLine(userId: string, reportReason: string): Promise<string> {
+  reportReason = reportReason.trim()
   // No reason provided: don't add anything to the summary
   if (!reportReason) return ''
+  // Ignore reports that contain \n or \t
+  if (reportReason.match(/[\n\t]/)) {
+    console.warn('Ignoring report invalid characters:', reportReason, userId)
+    return ''
+  }
   const username = await getUsername(userId)
   const currentTimestamp = Date.now()
   return `${username}\t${reportReason}\t${currentTimestamp}\n`

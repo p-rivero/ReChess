@@ -150,8 +150,8 @@ export interface CancelledGameDoc extends GameDoc {
 }
 
 
-// users/{userId}/moderation/doc
-// variants/{variantId}/moderation/doc
+// userModeration/{userId}
+// variantModeration/{variantId}
 export interface ModerationDoc {
   numReports: number
   reportsSummary: string

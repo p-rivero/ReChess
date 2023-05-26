@@ -15,20 +15,47 @@ export type Report = {
   reasonText: string
   time: Date
 }
+export type UserReports = {
+  userId: string
+  // More info about the user
+  reports: Report[]
+}
+export type VariantReports = {
+  variantId: string
+  // More info about the variant
+  reports: Report[]
+}
 
 export const useModeratorStore = defineStore('moderator', () => {
   
   const selectedReportIndexes = ref<Set<number>>(new Set())
+  const userReports = ref<UserReports[]>([])
+  const variantReports = ref<VariantReports[]>([])
   
-  async function getUserReports(userId: string): Promise<Report[]> {
-    const modDoc = await UserDB.getUserReports(userId)
-    return extractReports(modDoc)
+  async function refreshReports(): Promise<void> {
+    const [userModDocs, variantModDocs] = await Promise.all([
+      UserDB.getModerationReports(),
+      VariantDB.getModerationReports(),
+    ])
+    
+    userReports.value = userModDocs.map(([userId, doc]) => {
+      return {
+        userId,
+        // TODO: Get more info about the user
+        reports: extractReports(doc),
+      }
+    })
+    
+    variantReports.value = variantModDocs.map(([variantId, doc]) => {
+      return {
+        variantId,
+        // TODO: Get more info about the variant
+        reports: extractReports(doc),
+      }
+    })
   }
-  async function getVariantReports(variantId: string): Promise<Report[]> {
-    const modDoc = await VariantDB.getVariantReports(variantId)
-    return extractReports(modDoc)
-  }
-  function extractReports(doc?: ModerationDoc) {
+  
+  function extractReports(doc?: ModerationDoc): Report[] {
     if (!doc) return []
     return doc.reportsSummary.split('\n').map(line => {
       const [reporterUsername, reasonText, time] = line.split('\t')
@@ -58,8 +85,8 @@ export const useModeratorStore = defineStore('moderator', () => {
   }
   
   return {
-    selectedIndexes: selectedReportIndexes,
-    getUserReports, getVariantReports,
+    selectedReportIndexes, userReports, variantReports,
+    refreshReports,
     deleteVariant, banUser, wipeUser, discardUserReport, discardVariantReport,
   }
 })
