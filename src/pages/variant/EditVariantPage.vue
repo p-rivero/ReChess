@@ -320,7 +320,7 @@
   
   // This page is only accessible when logged in
   if (!authStore.loggedUser) {
-    returnHome(router, 401, 'You must be logged in to edit a variant.')
+    returnHome(401, 'You must be logged in to edit a variant.')
   }
     
   // When state changes, check if the state is valid, and update the board

@@ -91,21 +91,21 @@
       </div>
       
       <div class="field is-grouped is-grouped-multiline mb-5">
-        <button
+        <RouterLink
           class="button mr-4 mb-1"
-          @click="router.push({ name: 'user-published-variants', params: { username: user?.username } })"
+          :to="{ name: 'user-published-variants', params: { username: user?.username } }"
         >
           <div class="sz-icon icon-rocket color-theme" />
           Published variants
-        </button>
-        <button
+        </RouterLink>
+        <RouterLink
           v-if="myProfile(user)"
           class="button mb-1"
-          @click="router.push({ name: 'user-upvoted-variants', params: { username: user?.username } })"
+          :to="{ name: 'user-upvoted-variants', params: { username: user?.username } }"
         >
           <div class="sz-icon icon-heart color-theme" />
           Upvoted variants
-        </button>
+        </RouterLink>
       </div>
       
       <div class="content mb-0 pt-4">
@@ -156,7 +156,7 @@
           @click="wipeUser"
         >
           <div class="sz-icon icon-trash color-white" />
-          Wipe user data
+          Ban & Remove data
         </button>
       </div>
       
@@ -292,9 +292,12 @@
   
   // When the route or logged user changes, update the user
   async function updateUser() {
+    if (route.name !== 'user-profile') return
+    
     const username = route.params.username
     if (!username || typeof username !== 'string') {
-      returnHome(router, 400, 'This URL seems to be incorrect.')
+      console.error('Invalid username in route: ' + username)
+      returnHome(400, 'This URL seems to be incorrect.')
       return
     }
     
@@ -307,7 +310,7 @@
     
     const fetchedUser = await userStore.getUserByUsername(username)
     if (!fetchedUser) {
-      returnHome(router, 404, 'We can\'t find the user you were looking for.')
+      returnHome(404, 'We can\'t find the user you were looking for.')
       return
     }
     user.value = fetchedUser

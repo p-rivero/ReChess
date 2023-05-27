@@ -35,7 +35,7 @@
       v-if="variant.creatorId"
       class="mb-0 has-text-weight-light is-break-word"
     >
-      By <a @click="creatorClicked">{{ variant.creatorDisplayName }}</a>
+      By <a @click="goToProfile(userStore, variant.creatorId)">{{ variant.creatorDisplayName }}</a>
     </p>
     <div class="columns is-mobile mb-0 mt-0">
       <div class="column is-narrow pr-0">
@@ -82,6 +82,7 @@
 <script setup lang="ts">
   import { clone } from '@/helpers/ts-utils'
   import { getTextWidth, remToPx } from '@/helpers/web-utils'
+  import { goToProfile } from '@/helpers/managers/navigation-manager'
   import { onMounted, ref } from 'vue'
   import { requestSignIn } from '@/helpers/managers/auth-manager'
   import { showPopup } from '@/helpers/managers/popup-manager'
@@ -136,18 +137,6 @@
         router.push({ name: 'edit-draft' })
       }
     )
-  }
-  
-  async function creatorClicked() {
-    if (!props.variant.creatorId) {
-      throw new Error('Creator should not be clickable if user has been deleted')
-    }
-    // Get the username of the creator
-    const user = await userStore.getUserById(props.variant.creatorId)
-    if (!user) {
-      throw new Error('Could not find user with id ' + props.variant.creatorId)
-    }
-    router.push({ name: 'user-profile', params: { username: user.username } })
   }
   
 </script>

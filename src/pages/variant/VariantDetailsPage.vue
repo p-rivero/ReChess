@@ -10,7 +10,9 @@
         class="is-size-5 has-text-weight-semibold mb-4 is-break-word"
       >
         Created by
-        <a @click="creatorClicked">{{ variant?.creatorDisplayName }}</a>
+        <a @click="goToProfile(userStore, variant.creatorId)">
+          {{ variant?.creatorDisplayName }}
+        </a>
       </p>
       
       <PillList
@@ -94,17 +96,19 @@
       </div>
       
       <div class="column mt-2 is-7 board-column">
-        <div class="w-100">
-          <ViewableChessBoard
-            ref="board"
-            class="not-clickable"
-            max-height="40rem"
-            :white-pov="true"
-            :view-only="true"
-            :show-coordinates="true"
-            :capture-wheel-events="false"
-            :disable-refresh="true"
-          />
+        <div class="w-100 board-container">
+          <div class="w-100">
+            <ViewableChessBoard
+              ref="board"
+              class="not-clickable"
+              max-height="40rem"
+              :white-pov="true"
+              :view-only="true"
+              :show-coordinates="true"
+              :capture-wheel-events="false"
+              :disable-refresh="true"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -128,9 +132,9 @@
   import VueMarkdown from 'vue-markdown-render'
   
   import { clone } from '@/helpers/ts-utils'
+  import { goToProfile, returnHome } from '@/helpers/managers/navigation-manager'
   import { nTimes } from '@/helpers/locale'
   import { requestSignIn } from '@/helpers/managers/auth-manager'
-  import { returnHome } from '@/helpers/managers/navigation-manager'
   import { showPopup } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
@@ -159,14 +163,16 @@
   const reportPopup = ref<InstanceType<typeof PopupWithTextbox>>()
     
   watchEffect(async () => {
+    if (route.name !== 'variant-details') return
+      
     if (!route.params.variantId || typeof route.params.variantId !== 'string') {
-      returnHome(router, 400, 'This URL seems to be incorrect.')
+      returnHome(400, 'This URL seems to be incorrect.')
       return
     }
     
     const newVariant = await variantStore.getVariant(route.params.variantId)
     if (!newVariant) {
-      returnHome(router, 404, 'We can\'t find the variant you were looking for.')
+      returnHome(404, 'We can\'t find the variant you were looking for.')
       return
     }
     
@@ -332,24 +338,6 @@
   }
   
   
-  
-  
-  async function creatorClicked() {
-    if (!variant.value) {
-      throw new Error('variant is null')
-    }
-    if (!variant.value.creatorId) {
-      throw new Error('Creator should not be clickable if user has been deleted')
-    }
-    // Get the username of the creator
-    const user = await userStore.getUserById(variant.value.creatorId)
-    if (!user) {
-      throw new Error('Could not find user with id ' + variant.value.creatorId)
-    }
-    router.push({ name: 'user-profile', params: { username: user.username } })
-  }
-  
-  
   // Returns true if a given player has a leader piece
   function playerHasLeader(player: 0|1) {
     if (!variant.value) {
@@ -397,6 +385,11 @@
   
   .board-column {
     padding-right: 0.75;
+  }
+  .board-container {
+    min-height: 10rem;
+    display: flex;
+    align-items: center;
   }
 
 </style>

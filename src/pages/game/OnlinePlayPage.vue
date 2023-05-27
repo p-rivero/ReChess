@@ -18,12 +18,11 @@
   import { showPopup } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useGameStore } from '@/stores/game'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
   import BoardWithGui from '@/components/game-ui/BoardWithGui.vue'
   import type { Player } from '@/protochess/types'
   
   const route = useRoute()
-  const router = useRouter()
   const gameStore = useGameStore()
   
   const board = ref<InstanceType<typeof BoardWithGui>>()
@@ -35,7 +34,7 @@
   // When the route changes, update the game
   watchEffect(() => {
     if (!route.params.gameId || typeof route.params.gameId !== 'string') {
-      returnHome(router, 400, 'This URL seems to be incorrect.')
+      returnHome(400, 'This URL seems to be incorrect.')
       return
     }
     
@@ -51,11 +50,11 @@
     })
     
     gameStore.onGameNotExists(() => {
-      returnHome(router, 404, 'We can\'t find the game you were looking for.')
+      returnHome(404, 'We can\'t find the game you were looking for.')
     })
     
     gameStore.onInvalidVariant(() => {
-      returnHome(router, 503, 'This variant seems to be invalid. It may have been uploaded \
+      returnHome(503, 'This variant seems to be invalid. It may have been uploaded \
           using an incompatible version of the site or by a malicious user. \
           \n\nPlease report this by [opening an issue on GitHub](https://github.com/p-rivero/ReChess/issues).')
     })
@@ -63,7 +62,7 @@
     try {
       gameStore.listenForUpdates(route.params.gameId)
     } catch (e) {
-      returnHome(router, 404, 'We can\'t find the game you were looking for.')
+      returnHome(404, 'We can\'t find the game you were looking for.')
       return
     }
   })

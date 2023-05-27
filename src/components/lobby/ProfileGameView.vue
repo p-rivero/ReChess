@@ -21,7 +21,7 @@
       </div>
       <div class="is-flex is-align-items-center">
         <p class="adjust-text is-break-word">
-          vs. <a @click="viewOpponent">{{ game.opponentName }}</a>
+          vs. <a @click="goToProfile(userStore, game.opponentId)">{{ game.opponentName }}</a>
         </p>
       </div>
     </div>
@@ -39,6 +39,7 @@
 </template>
 
 <script setup lang="ts">
+  import { goToProfile } from '@/helpers/managers/navigation-manager'
   import { useRouter } from 'vue-router'
   import { useUserStore } from '@/stores/user'
   import ExternalLinkButton from '@/components/basic-wrappers/ExternalLinkButton.vue'
@@ -50,12 +51,6 @@
   const props = defineProps<{
     game: GameSummary
   }>()
-  
-  async function viewOpponent() {
-    const user = await userStore.getUserById(props.game.opponentId)
-    if (!user) throw new Error('User not found')
-    router.push({ name: 'user-profile', params: { username: user.username } })
-  }
   
   function stringifyDate(dateMs: number): string {
     const date = new Date(dateMs)

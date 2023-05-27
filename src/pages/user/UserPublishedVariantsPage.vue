@@ -32,7 +32,7 @@
   import { returnHome } from '@/helpers/managers/navigation-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
   import { useUserStore } from '@/stores/user'
   import { useVariantStore } from '@/stores/variant'
   import VariantCard from '@/components/variant/view/VariantCard.vue'
@@ -43,7 +43,6 @@
   const authStore = useAuthStore()
   const userStore = useUserStore()
   const route = useRoute()
-  const router = useRouter()
   
   const user = ref<User>()
   const variantList = ref<PublishedVariant[]>([])
@@ -52,7 +51,7 @@
   onMounted(async () => {
     const username = route.params.username
     if (!username || typeof username !== 'string') {
-      returnHome(router, 400, 'This URL seems to be incorrect.')
+      returnHome(400, 'This URL seems to be incorrect.')
       return
     }
     
@@ -64,7 +63,7 @@
       // User is not logged in or is viewing another user's profile
       const fetchedUser = await userStore.getUserByUsername(username)
       if (!fetchedUser) {
-        returnHome(router, 404, 'We can\'t find the user you were looking for.')
+        returnHome(404, 'We can\'t find the user you were looking for.')
         return
       }
       loadedUser = fetchedUser

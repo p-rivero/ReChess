@@ -33,27 +33,34 @@
       class="navbar-menu"
     >
       <div class="navbar-start">
-        <a
+        <RouterLink
           class="navbar-item"
-          href="/"
+          :to="{ name: 'home' }"
         >
           <div class="logo" />
-        </a>
-        <a
+        </RouterLink>
+        <RouterLink
           class="navbar-item"
-          href="/"
+          :to="{ name: 'home' }"
           @click="hideNavBarMenu"
-        >Browse</a>
-        <a
+        >
+          Browse
+        </RouterLink>
+        <RouterLink
           class="navbar-item"
+          :to="{ name: 'edit-draft' }"
           @click="create"
-        >Create</a>
-        <a
+        >
+          Create
+        </RouterLink>
+        <RouterLink
           v-if="authStore.loggedUser?.moderator"
-          href="/moderate"
+          :to="{ name: 'moderator-dashboard' }"
           class="navbar-item"
           @click="hideNavBarMenu"
-        >Moderator dashboard</a>
+        >
+          Moderator dashboard
+        </RouterLink>
       </div>
       <div class="navbar-end">
         <div class="navbar-item is-hidden-touch">
@@ -103,6 +110,8 @@
     if (!authStore.loggedUser) {
       requestSignIn()
     } else if (userPrefsStore.suggestUsingTemplate) {
+      // Cancel navigation and show popup
+      router.replace(router.currentRoute.value)
       showPopup(
         'Create a variant from scratch',
         'Making small changes to a variant you like is much easier than creating a new one from scratch. \

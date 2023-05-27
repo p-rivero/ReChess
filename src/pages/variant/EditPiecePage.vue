@@ -330,7 +330,7 @@
   import { returnHome } from '@/helpers/managers/navigation-manager'
   import { showPopup } from '@/helpers/managers/popup-manager'
   import { useAuthStore } from '@/stores/auth-user'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import AddRemoveButtons from '@/components/variant/edit/AddRemoveButtons.vue'
   import CharPillList from '@/components/variant/edit/CharPillList.vue'
@@ -345,7 +345,6 @@
   import SmartTextInput from '@/components/basic-wrappers/SmartTextInput.vue'
   import type { FullPieceDef, Player } from '@/protochess/types'
   
-  const router = useRouter()
   const route = useRoute()
   const draftStore = useVariantDraftStore()
   const authStore = useAuthStore()
@@ -353,12 +352,12 @@
   let piece: FullPieceDef|null = null
   
   if (!authStore.loggedUser) {
-    returnHome(router, 401, 'You must be logged in to edit a variant.')
+    returnHome(401, 'You must be logged in to edit a variant.')
   }
   
   // Incorrect piece index, redirect to home page
   if (Number.isNaN(pieceIndex) || pieceIndex < 0 || pieceIndex >= draftStore.state.pieceTypes.length) {
-    returnHome(router, 400, 'This URL seems to be incorrect.')
+    returnHome(400, 'This URL seems to be incorrect.')
   } else {
     piece = draftStore.state.pieceTypes[pieceIndex]
   }

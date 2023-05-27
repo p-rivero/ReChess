@@ -46,7 +46,12 @@
           </RouterLink>
         </div>
         <div class="column is-break-word is-align-self-center px-0">
-          {{ report.reasonText }}
+          <p v-if="report.reasonText !== '-'">
+            {{ report.reasonText }}
+          </p>
+          <p v-else>
+            <i>No reason provided</i>
+          </p>
         </div>
         <div class="column is-2 is-align-self-center date-column">
           {{
@@ -90,20 +95,28 @@
 
 <script setup lang="ts">
   import { type Report } from '@/stores/moderator'
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import { showPopup } from '@/helpers/managers/popup-manager'
   import SmartCheckbox from '@/components/basic-wrappers/SmartCheckbox.vue'
   
-  const collapsed = ref(true)
   const deleting = ref(false)
   const selectedReportIndexes = ref<Set<number>>(new Set())
   const selectAllCheckbox = ref<InstanceType<typeof SmartCheckbox>>()
   const checkboxes = ref<InstanceType<typeof SmartCheckbox>[]>([])
-    
+  
   const props = defineProps<{
+    storeKey: string
     reports: Report[]
     discardReports: (indexes: Set<number>) => Promise<void>
   }>()
+  
+  // Load collapsed by default
+  const collapsedStored = sessionStorage.getItem('reports-collapsed-' + props.storeKey) ?? 'true'
+  const collapsed = ref(collapsedStored === 'true')
+  watch(collapsed, collapsed => {
+    // Store in session storage
+    sessionStorage.setItem('reports-collapsed-' + props.storeKey, collapsed.toString())
+  })
     
   function onSelectCheckboxChange(active: boolean, index: number) {
     if (active) {

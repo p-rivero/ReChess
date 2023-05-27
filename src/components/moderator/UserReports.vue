@@ -1,5 +1,6 @@
 <template>
   <GenericUserReports
+    :store-key="'user-' + storeKey"
     :reports="userReports.reports"
     :discard-reports="discardReports"
   >
@@ -48,6 +49,7 @@
   const moderatorStore = useModeratorStore()
   
   const props = defineProps<{
+    storeKey: string
     userReports: UserReports
   }>()
   

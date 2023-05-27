@@ -31,7 +31,7 @@
   import { returnHome } from '@/helpers/managers/navigation-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
   import { useVariantStore } from '@/stores/variant'
   import VariantCard from '@/components/variant/view/VariantCard.vue'
   import type { PublishedVariant } from '@/protochess/types'
@@ -39,7 +39,6 @@
   const variantStore = useVariantStore()
   const authStore = useAuthStore()
   const route = useRoute()
-  const router = useRouter()
   
   const variantList = ref<PublishedVariant[] | 'not fetched'>('not fetched')
   
@@ -47,11 +46,11 @@
   onMounted(async () => {
     const username = route.params.username
     if (!username || typeof username !== 'string') {
-      returnHome(router, 400, 'This URL seems to be incorrect.')
+      returnHome(400, 'This URL seems to be incorrect.')
       return
     }
     if (username !== authStore.loggedUser?.username) {
-      returnHome(router, 403, 'You cannot see the upvotes of other users. Please make sure the URL is correct.')
+      returnHome(403, 'You cannot see the upvotes of other users. Please make sure the URL is correct.')
       return
     }
     

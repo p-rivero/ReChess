@@ -36,7 +36,7 @@
   >
     <LobbySlotView
       :lobby-slot="slot"
-      @user-clicked="userClicked"
+      @user-clicked="id => goToProfile(userStore, id, true)"
       @join-slot="joinSlotClicked"
     />
   </div>
@@ -75,7 +75,7 @@
   >
     <OngoingGameView
       :game-slot="slot"
-      @user-clicked="userClicked"
+      @user-clicked="id => goToProfile(userStore, id, true)"
     />
   </div>
   
@@ -98,8 +98,8 @@
   import { useRoute, useRouter } from 'vue-router'
   
   import { type LobbySlot, type OngoingGameSlot, useLobbyStore } from '@/stores/lobby'
+  import { goToProfile, returnHome } from '@/helpers/managers/navigation-manager'
   import { requestSignIn } from '@/helpers/managers/auth-manager'
-  import { returnHome } from '@/helpers/managers/navigation-manager'
   import { showPopup } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
@@ -134,14 +134,14 @@
   // When the route changes, update the variant
   watchEffect(async () => {
     if (!route.params.variantId || typeof route.params.variantId !== 'string') {
-      returnHome(router, 400, 'This URL seems to be incorrect.')
+      returnHome(400, 'This URL seems to be incorrect.')
       return
     }
     
     // Get variant info from the server
     const newVariant = await variantStore.getVariant(route.params.variantId)
     if (!newVariant) {
-      returnHome(router, 404, 'We can\'t find the variant you were looking for.')
+      returnHome(404, 'We can\'t find the variant you were looking for.')
       return
     }
     
@@ -287,17 +287,6 @@
         'ok'
       )
     }
-  }
-  
-  async function userClicked(userId: string) {
-    // Get the username of the creator
-    const user = await userStore.getUserById(userId)
-    if (!user) {
-      throw new Error('Could not find user with id ' + userId)
-    }
-    const location = router.resolve({ name: 'user-profile', params: { username: user.username } })
-    // Open the user's profile in a new tab
-    window.open(location.href, '_blank')
   }
   
 </script>

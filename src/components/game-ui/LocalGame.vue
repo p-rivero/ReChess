@@ -19,14 +19,13 @@
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
   import { returnHome } from '@/helpers/managers/navigation-manager'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useVariantStore } from '@/stores/variant'
   import BoardWithGui from './BoardWithGui.vue'
   import type { Player, Variant } from '@/protochess/types'
   
   const route = useRoute()
-  const router = useRouter()
   
   const board = ref<InstanceType<typeof BoardWithGui>>()
   
@@ -49,14 +48,14 @@
   onMounted(async () => {
     const fetchedVariant = await getVariant()
     if (!fetchedVariant) {
-      returnHome(router, 404, 'We can\'t find the variant you are looking for.')
+      returnHome(404, 'We can\'t find the variant you are looking for.')
       return
     }
     board.value?.setState(fetchedVariant)
   })
   
   function invalidVariant() {
-    returnHome(router, 503, 'This variant seems to be invalid. It may have been uploaded \
+    returnHome(503, 'This variant seems to be invalid. It may have been uploaded \
         using an incompatible version of the site or by a malicious user. \
         \n\nPlease report this by [opening an issue on GitHub](https://github.com/p-rivero/ReChess/issues).')
   }

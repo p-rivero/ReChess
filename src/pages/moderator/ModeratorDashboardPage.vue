@@ -15,6 +15,7 @@
     <UserReports
       v-for="reports of moderatorStore.userReports"
       :key="reports.reportedUser.uid"
+      :store-key="reports.reportedUser.uid"
       :user-reports="reports"
     />
   </div>
@@ -34,6 +35,7 @@
     <VariantReports
       v-for="reports of moderatorStore.variantReports"
       :key="reports.reportedVariant.uid"
+      :store-key="reports.reportedVariant.uid"
       :variant-reports="reports"
     />
   </div>
@@ -45,12 +47,10 @@
   import { returnHome } from '@/helpers/managers/navigation-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { useModeratorStore } from '@/stores/moderator'
-  import { useRouter } from 'vue-router'
   import UserReports from '@/components/moderator/UserReports.vue'
   import VariantReports from '@/components/moderator/VariantReports.vue'
   
   const authStore = useAuthStore()
-  const router = useRouter()
   const moderatorStore = useModeratorStore()
   
   onMounted(() => {
@@ -60,11 +60,11 @@
   
   async function checkUserIsMod() {
     if (!authStore.loggedUser) {
-      returnHome(router, 401, 'If you are a moderator, please log in to access this page.')
+      returnHome(401, 'If you are a moderator, please log in to access this page.')
       return
     }
     if (!authStore.loggedUser.moderator) {
-      returnHome(router, 403, 'You need to be a moderator to access this page.')
+      returnHome(403, 'You need to be a moderator to access this page.')
       return
     }
   }
