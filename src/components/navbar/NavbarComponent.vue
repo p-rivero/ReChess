@@ -143,10 +143,10 @@
     background-repeat: no-repeat;
   }
   [data-theme="light"] .logo {
-    background-image: url('@/assets/img/logo-light.svg');
+    background-image: url('@/assets/logo-light.svg');
   }
   [data-theme="dark"] .logo {
-    background-image: url('@/assets/img/logo-dark.svg');
+    background-image: url('@/assets/logo-dark.svg');
   }
   .navbar-item {
     height: 4rem;

@@ -353,7 +353,7 @@
 
 <style scoped>
   .google-icon {
-    background: url("@/assets/img/icons/google-color.svg");
+    background: url("@/assets/icons/google-color.svg");
     background-size: 85%;
     background-position: center;
     background-repeat: no-repeat;

@@ -153,7 +153,7 @@
       width: 4rem;
       height: 4rem;
       &.random-side {
-        background-image: url('@/assets/img/pieces/king-half.svg');
+        background-image: url('@/assets/pieces/king-half.svg');
         background-size: cover;
       }
     }

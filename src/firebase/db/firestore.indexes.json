@@ -131,18 +131,6 @@
       "indexes": []
     },
     {
-      "collectionGroup": "userModeration",
-      "fieldPath": "reportsSummary",
-      "ttl": false,
-      "indexes": []
-    },
-    {
-      "collectionGroup": "variantModeration",
-      "fieldPath": "reportsSummary",
-      "ttl": false,
-      "indexes": []
-    },
-    {
       "collectionGroup": "private",
       "fieldPath": "email",
       "ttl": false,
@@ -179,6 +167,12 @@
       "indexes": []
     },
     {
+      "collectionGroup": "userModeration",
+      "fieldPath": "reportsSummary",
+      "ttl": false,
+      "indexes": []
+    },
+    {
       "collectionGroup": "users",
       "fieldPath": "about",
       "ttl": false,
@@ -199,6 +193,12 @@
     {
       "collectionGroup": "variantIndex",
       "fieldPath": "index",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "variantModeration",
+      "fieldPath": "reportsSummary",
       "ttl": false,
       "indexes": []
     },
