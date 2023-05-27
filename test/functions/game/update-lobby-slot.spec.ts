@@ -6,7 +6,7 @@ import type { LobbySlotDoc, VariantDoc } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
 import { expectNoErrorLog } from '../utils'
 
-const { app, testEnv } = initialize('lobby-slot-test')
+const { app, testEnv } = initialize('update-lobby-slot-test')
 const db = app.firestore()
 const onCreateLobbySlot = testEnv.wrap(functions.onCreateLobbySlot)
 const onRemoveLobbySlot = testEnv.wrap(functions.onRemoveLobbySlot)

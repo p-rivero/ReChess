@@ -1,5 +1,5 @@
-import type { UserDoc } from '@/firebase/db/schema'
-import admin from 'firebase-admin'
+import type { UserDoc, GameSummary } from '@/firebase/db/schema'
+import type admin from 'firebase-admin'
 
 type DB = admin.firestore.Firestore
 
@@ -41,16 +41,4 @@ export async function insertUser(db: DB, userId: string, gamesPlayed = 0): Promi
   }
   await db.collection('users').doc(userId).set(doc)
   return doc
-}
-
-
-export interface GameSummary {
-  gameId: string
-  variantId: string
-  variantName: string
-  timeCreatedMs: number
-  playedSide: 'white' | 'black'
-  result: 'win' | 'loss' | 'draw'
-  opponentId: string
-  opponentName: string
 }

@@ -1,6 +1,6 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
-import assertCallerIsModerator from './assert-caller-is-moderator'
+import assertCallerIsModerator from './helpers/assert-caller-is-moderator'
 
 /**
  * Called directly by the moderator in order to delete a variant.

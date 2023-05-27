@@ -2,6 +2,7 @@
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import { FieldValue } from 'firebase-admin/firestore'
 import { useAdmin } from '../helpers'
+import assertAuth from '../assert-auth'
 import type { GameDoc, LobbySlotDoc, VariantDoc } from 'db/schema'
 import type { Timestamp } from 'firebase/firestore'
 
@@ -20,16 +21,7 @@ import type { Timestamp } from 'firebase/firestore'
  * - The lobby slot has no challenger
  */
 export default async function(data: unknown, context: CallableContext): Promise<{gameId: string}> {
-  // Check user authentication
-  if (!context.app) {
-    throw new HttpsError('unauthenticated', 'The function must be called from an App Check verified app.')
-  }
-  if (!context.auth) {
-    throw new HttpsError('unauthenticated', 'The function must be called while authenticated.')
-  }
-  if (!context.auth.token.email_verified) {
-    throw new HttpsError('unauthenticated', 'The email is not verified.')
-  }
+  const auth = assertAuth(context)
   
   // Validate input
   const { variantId, lobbySlotCreatorId } = data as { variantId: unknown, lobbySlotCreatorId: unknown }
@@ -42,7 +34,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
   if (typeof lobbySlotCreatorId !== 'string') {
     throw new HttpsError('invalid-argument', 'The lobbySlotCreatorId must be a string.')
   }
-  if (context.auth.uid !== lobbySlotCreatorId) {
+  if (auth.uid !== lobbySlotCreatorId) {
     throw new HttpsError('permission-denied', 'The function must be called by the user that created the lobby slot.')
   }
   

@@ -82,20 +82,20 @@ region(FUNCTIONS_REGION)
     return callFunction(import('./moderator/delete-variant'), data, context)
   })
   
-export const discardUserReport =
+export const discardUserReports =
 region(FUNCTIONS_REGION)
   .runWith({ enforceAppCheck: true })
   .https
   .onCall((data, context) => {
-    return callFunction(import('./moderator/discard-user-report'), data, context)
+    return callFunction(import('./moderator/discard-user-reports'), data, context)
   })
 
-export const discardVariantReport =
+export const discardVariantReports =
 region(FUNCTIONS_REGION)
   .runWith({ enforceAppCheck: true })
   .https
   .onCall((data, context) => {
-    return callFunction(import('./moderator/discard-variant-report'), data, context)
+    return callFunction(import('./moderator/discard-variant-reports'), data, context)
   })
   
 export const wipeUser =

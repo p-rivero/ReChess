@@ -37,7 +37,7 @@
         :key="report.reporterUsername"
         class="columns mt-2 is-mobile"
       >
-        <div class="column is-2">
+        <div class="column is-2 username-column">
           <RouterLink
             class="is-size-5 is-break-word"
             :to="{ name: 'user-profile', params: { username: report.reporterUsername } }"
@@ -45,11 +45,20 @@
             @{{ report.reporterUsername }}
           </RouterLink>
         </div>
-        <div class="column is-break-word is-align-self-center">
+        <div class="column is-break-word is-align-self-center px-0">
           {{ report.reasonText }}
         </div>
-        <div class="column is-narrow is-align-self-center">
-          {{ report.time.toDateString() }}
+        <div class="column is-2 is-align-self-center date-column">
+          {{
+            report.time.toLocaleDateString(undefined, {
+              year: 'numeric',
+              month: 'numeric',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: false,
+            })
+          }}
         </div>
         <div class="column is-narrow is-align-self-center">
           <SmartCheckbox
@@ -151,5 +160,11 @@
   hr {
     margin-top: 0.5rem;
     margin-bottom: 1rem;
+  }
+  .username-column {
+    min-width: 5rem;
+  }
+  .date-column {
+    min-width: 6rem;
   }
 </style>

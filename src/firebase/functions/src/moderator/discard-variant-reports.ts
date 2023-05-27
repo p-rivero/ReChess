@@ -1,6 +1,8 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
-import assertCallerIsModerator from './assert-caller-is-moderator'
+import { discardReports } from './helpers/discard-reports'
+import { useAdmin } from '../helpers'
+import assertModerator from './helpers/assert-moderator'
 
 /**
  * Called directly by the moderator when a variant report is not useful.
@@ -13,10 +15,10 @@ import assertCallerIsModerator from './assert-caller-is-moderator'
  * @throws An HTTP error is returned if some of the following errors occur:
  * - The user is not authenticated as a moderator
  * - There is no variant with the given ID
- * - An element of `reportIndexes` is `>= user.reports.length`
+ * - An element of `reportIndexes` is out of range (`>= user.reports.length`)
  */
 export default async function(data: unknown, context: CallableContext): Promise<void> {
-  await assertCallerIsModerator(context)
+  assertModerator(context)
   
   // Validate input
   const { variantId, reportIndexes } = data as { variantId: unknown, reportIndexes: unknown }
@@ -26,14 +28,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
   if (typeof variantId !== 'string') {
     throw new HttpsError('invalid-argument', 'The variantId must be a string.')
   }
-  if (!Array.isArray(reportIndexes) || reportIndexes.some(index => typeof index !== 'number')) {
-    throw new HttpsError('invalid-argument', 'The reportIndexes must be a list of numbers.')
-  }
-  if (reportIndexes.some(index => index < 0 || !Number.isInteger(index))) {
-    throw new HttpsError('invalid-argument', 'All indexes must be a positive integer.')
-  }
-  // const idexes = new Set(reportIndexes as number[])
-  
-  
-  // TODO
+  const { db } = await useAdmin()
+  const moderationDocRef = db.collection('variantModeration').doc(variantId)
+  await discardReports(reportIndexes, moderationDocRef)
 }

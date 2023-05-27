@@ -4,8 +4,8 @@ import { defineStore } from 'pinia'
 import {
   banUser as modBanUser,
   deleteVariant as modDeleteVariant,
-  discardUserReport as modDiscardUserReport,
-  discardVariantReport as modDiscardVariantReport,
+  discardUserReports as modDiscardUserReports,
+  discardVariantReports as modDiscardVariantReports,
   wipeUser as modWipeUser,
 } from '@/firebase'
 import { ref } from 'vue'
@@ -95,7 +95,7 @@ export const useModeratorStore = defineStore('moderator', () => {
   
   async function discardUserReports(userId: string, indexes: Set<number>): Promise<void> {
     // Update in backend
-    await modDiscardUserReport({ userId, reportIndexes: Array.from(indexes) })
+    await modDiscardUserReports({ userId, reportIndexes: Array.from(indexes) })
     // Update the local store
     const reports = userReports.value
     const i = reports.findIndex(userReports => userReports.reportedUser.uid === userId)
@@ -108,7 +108,7 @@ export const useModeratorStore = defineStore('moderator', () => {
   
   async function discardVariantReports(variantId: string, indexes: Set<number>): Promise<void> {
     // Update in backend
-    await modDiscardVariantReport({ variantId, reportIndexes: Array.from(indexes) })
+    await modDiscardVariantReports({ variantId, reportIndexes: Array.from(indexes) })
     // Update the local store
     const reports = variantReports.value
     const i = reports.findIndex(variantReports => variantReports.reportedVariant.uid === variantId)
