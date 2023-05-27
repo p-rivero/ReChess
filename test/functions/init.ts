@@ -14,6 +14,8 @@ process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080"
 process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099"
 process.env.FIREBASE_STORAGE_EMULATOR_HOST = "localhost:9199"
 
+const test: string[] = []
+
 let currentUtils: TestUtils | null = null
 export function initialize(projectId: string): TestUtils {
   const testEnv = initFunctions({ projectId })
@@ -22,6 +24,8 @@ export function initialize(projectId: string): TestUtils {
     credential: admin.credential.applicationDefault(),
   }
   const app = admin.initializeApp(config, projectId)
+  test.push(app.name)
+  console.log('initialize', test)
   jest.spyOn(admin, 'initializeApp').mockImplementation(() => app)
   currentUtils = { app, testEnv }
   return currentUtils

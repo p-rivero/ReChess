@@ -1,6 +1,6 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
-import assertCallerIsModerator from './helpers/assert-caller-is-moderator'
+import assertModerator from './helpers/assert-moderator'
 
 /**
  * Called directly by the moderator in order to wipe a user's content.
@@ -21,7 +21,7 @@ import assertCallerIsModerator from './helpers/assert-caller-is-moderator'
  * - The user to be wiped does not exist
  */
 export default async function(data: unknown, context: CallableContext): Promise<void> {
-  await assertCallerIsModerator(context)
+  await assertModerator(context)
   
   // Validate input
   const { userId } = data as { userId: unknown }

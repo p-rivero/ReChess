@@ -1,6 +1,6 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
-import assertCallerIsModerator from './helpers/assert-caller-is-moderator'
+import assertModerator from './helpers/assert-moderator'
 
 /**
  * Called directly by the moderator in order to ban a user.
@@ -23,7 +23,7 @@ import assertCallerIsModerator from './helpers/assert-caller-is-moderator'
  * - The user to be banned does not exist
  */
 export default async function(data: unknown, context: CallableContext): Promise<void> {
-  await assertCallerIsModerator(context)
+  await assertModerator(context)
   
   // Validate input
   const { userId } = data as { userId: unknown }
