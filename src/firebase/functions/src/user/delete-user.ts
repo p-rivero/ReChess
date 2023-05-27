@@ -51,8 +51,8 @@ export default async function(user: UserRecord): Promise<void> {
     console.error(err)
   })
   
-  // Update the user name in denormalized fields
-  const p7 = updateName(db, userId, '[deleted]', true).catch((err) => {
+  // Remove the user name in denormalized fields
+  const p7 = updateName(userId, null).catch((err) => {
     console.error('Error while updating name for user', userId + ':')
     console.error(err)
   })

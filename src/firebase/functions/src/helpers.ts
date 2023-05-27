@@ -17,6 +17,7 @@ export async function useAdmin() {
   return {
     db: admin.firestore(appInstance),
     storage: admin.storage(appInstance),
+    auth: admin.auth(appInstance),
   }
 }
 

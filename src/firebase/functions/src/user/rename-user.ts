@@ -14,10 +14,7 @@ import type { UserRenameTriggerDoc } from 'db/schema'
  * @param {string} userId The UID of the user that changed
  * @return {Promise<void>} A promise that resolves when the function is done
  */
-export default async function(
-  change: Change<QueryDocumentSnapshot>,
-  userId: string
-): Promise<void> {
+export default async function(change: Change<QueryDocumentSnapshot>, userId: string): Promise<void> {
   const TIMEOUT_SECONDS = 5 * 60 // 5 minutes
   
   const doc = change.after.data() as UserRenameTriggerDoc
@@ -27,7 +24,7 @@ export default async function(
   
   // If this write was allowed by the rules, the current timestamp must be after the renameAllowedAt
   const newName = doc.name || `@${doc.username}`
-  await updateName(db, userId, newName, false)
+  await updateName(userId, newName)
   
   // Update the timeout to prevent spamming
   const timeout = Date.now() + 1000 * TIMEOUT_SECONDS
@@ -45,19 +42,17 @@ export default async function(
 /**
  * Update the name of a user in all the denormalized fields across the database
  * (except for the user document itself)
- * @param {FirebaseFirestore.Firestore} db The Firestore database
  * @param {string} userId The UID of the user to update
- * @param {string} newName The new name of the user
- * @param {boolean} removeId If true, the user ID will be removed from the denormalized fields
- * to indicate that the user no longer exists
+ * @param {string|null} newName The new name of the user.
+ * If null, the user ID will be removed from the denormalized fields to indicate that the user no longer exists
  * @return {Promise<void>} A promise that resolves when the function is done
  */
-export async function updateName(
-  db: FirebaseFirestore.Firestore,
-  userId: string,
-  newName: string,
-  removeId: boolean
-): Promise<void> {
+export async function updateName(userId: string, newName: string | null): Promise<void> {
+  const { db } = await useAdmin()
+  
+  const removeId = newName === null
+  newName = newName ?? '[deleted]'
+  
   // Update the creator name of the variants this user has created
   const updatedVariants = await db.collection('variants').where('creatorId', '==', userId).get()
   const p1 = batchedUpdate(db, updatedVariants, (batch, ref) => {
@@ -70,10 +65,18 @@ export async function updateName(
     console.error(err)
   })
   
+  // When deleting the user, stop all their games
+  const stopGame = removeId ? {
+    'playerToMove': 'game-over',
+    'winner': 'draw',
+    'IMMUTABLE.calledFinishGame': true,
+  } : {}
+  
   // Update the opponent name of the games this user has played as white
   const updatedGamesWhite = await db.collection('games').where('IMMUTABLE.whiteId', '==', userId).get()
   const p2 = batchedUpdate(db, updatedGamesWhite, (batch, ref) => {
     batch.update(ref, {
+      ...stopGame,
       'IMMUTABLE.whiteDisplayName': newName,
       'IMMUTABLE.whiteId': removeId ? null : userId,
     })
@@ -86,6 +89,7 @@ export async function updateName(
   const updatedGamesBlack = await db.collection('games').where('IMMUTABLE.blackId', '==', userId).get()
   const p3 = batchedUpdate(db, updatedGamesBlack, (batch, ref) => {
     batch.update(ref, {
+      ...stopGame,
       'IMMUTABLE.blackDisplayName': newName,
       'IMMUTABLE.blackId': removeId ? null : userId,
     })

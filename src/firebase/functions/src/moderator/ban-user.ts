@@ -1,6 +1,11 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
+import { UserRecord } from 'firebase-admin/auth'
+import { FirebaseError } from 'firebase-admin'
 import assertModerator from './helpers/assert-moderator'
+import { updateName } from '../user/rename-user'
+import { useAdmin } from '../helpers'
+import { UserDoc } from 'db/schema'
 
 /**
  * Called directly by the moderator in order to ban a user.
@@ -11,7 +16,6 @@ import assertModerator from './helpers/assert-moderator'
  * - Removes the user's profile picture
  * - Removes the user's about information
  * - Prevents the user from logging in
- * - Expires all of the user's sessions
  *
  * The user's variants, reports, and upvotes are NOT affected. See `wipe-user.ts` for a more thorough wipe.
  * @param {any} data The data passed to the function
@@ -23,7 +27,7 @@ import assertModerator from './helpers/assert-moderator'
  * - The user to be banned does not exist
  */
 export default async function(data: unknown, context: CallableContext): Promise<void> {
-  await assertModerator(context)
+  assertModerator(context)
   
   // Validate input
   const { userId } = data as { userId: unknown }
@@ -37,5 +41,63 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('invalid-argument', 'Please do not ban yourself :(')
   }
   
-  // TODO
+  const user = await fetchUser(userId)
+  
+  if (user.customClaims?.moderator) {
+    throw new HttpsError('invalid-argument', 'You cannot ban moderators directly. Please demote them first.')
+  }
+  if (user.disabled) {
+    console.warn('The user is already banned: ' + userId)
+    return
+  }
+  
+  await banUser(userId)
+  
+  const { db } = await useAdmin()
+  const updateObj: Partial<UserDoc> = {
+    name: '[deleted]',
+    about: '',
+    profileImg: null,
+    banned: true,
+  }
+  await db.collection('users').doc(userId).update(updateObj)
+  await updateName(userId, null)
+}
+
+/**
+ * Gets the user data given a user ID.
+ * @param {string} userId The UID of the user to fetch
+ * @return {Promise<UserRecord>} A promise that resolves with the user data
+ * @throws An HTTP error is returned if the user does not exist
+ */
+async function fetchUser(userId: string): Promise<UserRecord> {
+  const { auth } = await useAdmin()
+  try {
+    return await auth.getUser(userId)
+  } catch (untypedErr) {
+    const e = untypedErr as FirebaseError
+    if (e.code === 'auth/user-not-found') {
+      throw new HttpsError('not-found', 'The user to be banned does not exist.')
+    }
+    console.error(e)
+    throw new HttpsError('internal', 'An unexpected error occurred while fetching the user to be banned: ' + e.message)
+  }
+}
+
+async function banUser(userId: string) {
+  const { auth } = await useAdmin()
+  try {
+    await auth.updateUser(userId, {
+      displayName: '[deleted]',
+      photoURL: null,
+      disabled: true,
+    })
+  } catch (untypedErr) {
+    console.error('Failed to ban user: ' + userId)
+    const e = untypedErr as FirebaseError
+    console.error(e)
+    throw new HttpsError('internal', 'An unexpected error occurred while banning the user: ' + e.message)
+  }
+  // The user's session token will expire in 1 hour, at which point they will be logged out.
+  // Until then, they can still use the app normally (but are unable to update their profile).
 }

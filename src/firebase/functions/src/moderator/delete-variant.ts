@@ -15,7 +15,7 @@ import assertModerator from './helpers/assert-moderator'
  * - The variant to be deleted does not exist
  */
 export default async function(data: unknown, context: CallableContext): Promise<void> {
-  await assertModerator(context)
+  assertModerator(context)
   
   // Validate input
   const { variantId } = data as { variantId: unknown }

@@ -25,6 +25,8 @@ export interface UserDoc {
     numWinPoints: number
     last5Games: string // JSON of GameSummary[], updated by cloud function
   }
+  // Hidden flag (disallowed by security rules)
+  banned?: true
 }
 export interface GameSummary {
   gameId: string

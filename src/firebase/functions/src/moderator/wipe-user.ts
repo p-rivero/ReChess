@@ -21,7 +21,7 @@ import assertModerator from './helpers/assert-moderator'
  * - The user to be wiped does not exist
  */
 export default async function(data: unknown, context: CallableContext): Promise<void> {
-  await assertModerator(context)
+  assertModerator(context)
   
   // Validate input
   const { userId } = data as { userId: unknown }

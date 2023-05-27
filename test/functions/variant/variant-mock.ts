@@ -5,7 +5,8 @@ import type { Timestamp } from 'firebase/firestore'
 export async function insertVariant(
   db: admin.firestore.Firestore,
   variantId: string,
-  firstPlayerToMove: 'white' | 'black' | 'invalid-variant'
+  firstPlayerToMove: 'white' | 'black' | 'invalid-variant',
+  creatorId = 'creator_id',
 ): Promise<VariantDoc> {
   let initialState: string
   if (firstPlayerToMove === 'white') {
@@ -22,8 +23,8 @@ export async function insertVariant(
     name: 'Variant Name',
     description: 'Standard chess rules',
     creationTime: admin.firestore.Timestamp.now() as Timestamp,
-    creatorDisplayName: 'test',
-    creatorId: null,
+    creatorDisplayName: 'The Creator Name',
+    creatorId,
     numUpvotes: 123,
     popularity: 12,
     tags: [],

@@ -235,7 +235,7 @@ test('variant arguments must be correct', async () => {
   expect(e.code).toBe('invalid-argument')
 })
 
-test('user must be authenticated as a moderator', async () => {
+test('caller must be authenticated as a moderator', async () => {
   const userArg = userArgs(REPORTED_ID, [1, 2, 3])
   const variantArg = variantArgs(VARIANT_ID, [1, 2, 3])
   await insertModerationDoc(db, 'user', REPORTED_ID, 7)

@@ -32,7 +32,7 @@ export async function insertUser(db: DB, userId: string, gamesPlayed = 0): Promi
     about: 'About me',
     profileImg: null,
     IMMUTABLE: {
-      username: 'username',
+      username: 'username_' + randomId(),
       renameAllowedAt: null,
       numGamesPlayed: gamesPlayed,
       numWinPoints: 0,

@@ -129,6 +129,23 @@ test('cannot edit immutable private fields', async () => {
   )
 })
 
+test('cannot edit profile if banned flag is set', async () => {
+  await setupUser()
+  await update('admin', { 'banned': true }, 'users', MY_ID)
+    
+  await assertFails(
+    update('verified', { 'name': 'this is my new name' }, 'users', MY_ID)
+  )
+})
+
+test('cannot manually set banned flag', async () => {
+  await setupUser()
+    
+  await assertFails(
+    update('verified', { 'banned': true }, 'users', MY_ID)
+  )
+})
+
 
 
 test('can create renameTrigger without name', async () => {
