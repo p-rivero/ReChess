@@ -5,7 +5,7 @@ import { makeCallableContext } from '../make-context'
 import type { ModerationDoc } from '@/firebase/db/schema'
 import type { https } from 'firebase-functions'
 
-const { app, testEnv } = initialize('discard-reports-test')
+const { app, testEnv } = initialize('discard-report-test')
 const db = app.firestore()
 const discardUserReports = testEnv.wrap(functions.discardUserReports)
 const discardVariantReports = testEnv.wrap(functions.discardVariantReports)
@@ -25,11 +25,14 @@ test('moderator can delete user report', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = userArgs(REPORTED_ID, [0])
   await insertModerationDoc(db, 'user', REPORTED_ID, 1)
+  const moderationDocBefore = (await db.collection('userModeration').doc(REPORTED_ID).get()).data() as ModerationDoc
   
   await expectSuccess(discardUserReports(args, context))
   
-  const moderationDoc = await db.collection('userModeration').doc(REPORTED_ID).get()
-  expect(moderationDoc.data()).toEqual({
+  const moderationDoc = (await db.collection('userModeration').doc(REPORTED_ID).get()).data() as ModerationDoc
+  console.log('usr reportsBefore', moderationDocBefore.reportsSummary.split('\n'))
+  console.log('usr reportsAfter', moderationDoc.reportsSummary.split('\n'))
+  expect(moderationDoc).toEqual({
     numReports: 0,
     reportsSummary: '',
   })
@@ -39,11 +42,14 @@ test('moderator can delete variant report', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = variantArgs(VARIANT_ID, [0])
   await insertModerationDoc(db, 'variant', VARIANT_ID, 1)
+  const moderationDocBefore = (await db.collection('variantModeration').doc(VARIANT_ID).get()).data() as ModerationDoc
   
   await expectSuccess(discardVariantReports(args, context))
   
-  const moderationDoc = await db.collection('variantModeration').doc(VARIANT_ID).get()
-  expect(moderationDoc.data()).toEqual({
+  const moderationDoc = (await db.collection('variantModeration').doc(VARIANT_ID).get()).data() as ModerationDoc
+  console.log('var reportsBefore', moderationDocBefore.reportsSummary.split('\n'))
+  console.log('var reportsAfter', moderationDoc.reportsSummary.split('\n'))
+  expect(moderationDoc).toEqual({
     numReports: 0,
     reportsSummary: '',
   })
@@ -65,6 +71,8 @@ test('moderator can delete many user reports', async () => {
   await expectSuccess(discardUserReports(args, context))
   
   const moderationDoc = (await db.collection('userModeration').doc(REPORTED_ID).get()).data() as ModerationDoc
+  console.log('many reportsBefore', reportsBefore)
+  console.log('many reportsAfter', moderationDoc.reportsSummary.split('\n'))
   expect(moderationDoc).toEqual({
     numReports: 3,
     reportsSummary: expect.stringMatching(REPORT_SUMMARY_REGEX),

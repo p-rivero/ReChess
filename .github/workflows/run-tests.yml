@@ -27,7 +27,7 @@ jobs:
       - name: Test with Firebase emulators
         uses: w9jds/firebase-action@master
         with:
-          args: emulators:exec --only firestore,storage,auth 'npm test'
+          args: emulators:exec --only firestore,storage,auth 'npm test -- --runInBand --detectOpenHandles'
         env:
           GCP_SA_KEY: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_RECHESS_WEB }}'
           

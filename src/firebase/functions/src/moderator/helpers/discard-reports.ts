@@ -47,7 +47,8 @@ export async function discardReports(reportIndexes: unknown, docRef: FirebaseFir
   const newReports = reports.filter((_, index) => !indexes.has(index))
   const newReportsSummary = newReports.join('\n')
   // Update the document
-  docRef.update({
+  console.log('Discarding reports: ' + reportIndexes.join(', ') + ' result: ' + newReports.length + ', ' + newReportsSummary)
+  await docRef.update({
     numReports: newReports.length,
     reportsSummary: newReportsSummary,
   })

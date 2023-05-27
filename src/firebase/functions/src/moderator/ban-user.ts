@@ -1,11 +1,11 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
-import { UserRecord } from 'firebase-admin/auth'
 import { FirebaseError } from 'firebase-admin'
-import assertModerator from './helpers/assert-moderator'
+import { UserDoc } from 'db/schema'
+import { UserRecord } from 'firebase-admin/auth'
 import { updateName } from '../user/rename-user'
 import { useAdmin } from '../helpers'
-import { UserDoc } from 'db/schema'
+import assertModerator from './helpers/assert-moderator'
 
 /**
  * Called directly by the moderator in order to ban a user.
@@ -64,6 +64,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
   await updateName(userId, null)
 }
 
+
 /**
  * Gets the user data given a user ID.
  * @param {string} userId The UID of the user to fetch
@@ -84,7 +85,13 @@ async function fetchUser(userId: string): Promise<UserRecord> {
   }
 }
 
-async function banUser(userId: string) {
+/**
+ * Updates the user auth record to ban them.
+ * @param {string} userId The UID of the user to ban
+ * @return {Promise<void>} A promise that resolves when the user is banned
+ * @throws An HTTP error is returned if an unexpected error occurs
+ */
+async function banUser(userId: string): Promise<void> {
   const { auth } = await useAdmin()
   try {
     await auth.updateUser(userId, {
@@ -93,7 +100,6 @@ async function banUser(userId: string) {
       disabled: true,
     })
   } catch (untypedErr) {
-    console.error('Failed to ban user: ' + userId)
     const e = untypedErr as FirebaseError
     console.error(e)
     throw new HttpsError('internal', 'An unexpected error occurred while banning the user: ' + e.message)

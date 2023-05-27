@@ -1,4 +1,4 @@
-import { expectHttpsError, expectSuccess } from '../utils'
+import { expectHttpsError, expectLog, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
 import { insertModerationDoc, makeModeratorContext } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
@@ -124,7 +124,9 @@ test('banning a user twice does nothing', async () => {
   const newUserDoc = (await db.collection('users').doc(BANNED_ID).get()).data() as UserDoc
   const newUserRecord = await auth.getUser(BANNED_ID)
   
+  const done = expectLog('warn', 'The user is already banned: banned_user_id')
   await expectSuccess(banUser(args, context))
+  done()
   const veryNewUserDoc = (await db.collection('users').doc(BANNED_ID).get()).data() as UserDoc
   const veryNewUserRecord = await auth.getUser(BANNED_ID)
   
@@ -192,10 +194,28 @@ test('cannot ban a user that does not exist', async () => {
 })
 
 test('moderators cannot ban themselves', async () => {
-  throw new Error('not implemented')
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(MODERATOR_ID)
+  await auth.createUser({ uid: MODERATOR_ID })
+  await insertUser(db, MODERATOR_ID)
+  
+  const e = await expectHttpsError(banUser(args, context))
+  expect(e.message).toMatch('Please do not ban yourself :(')
+  expect(e.code).toBe('invalid-argument')
 })
 
 test('moderators cannot ban another moderator', async () => {
-  throw new Error('not implemented')
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(BANNED_ID)
+  await auth.createUser({
+    uid: BANNED_ID,
+    displayName: 'The Banned User',
+    photoURL: 'https://example.com/banned-user.png',
+  })
+  await auth.setCustomUserClaims(BANNED_ID, { moderator: true })
+  await insertUser(db, BANNED_ID)
   
+  const e = await expectHttpsError(banUser(args, context))
+  expect(e.message).toMatch('You cannot ban moderators directly. Please demote them first.')
+  expect(e.code).toBe('invalid-argument')
 })
