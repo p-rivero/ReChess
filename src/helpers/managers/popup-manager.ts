@@ -1,5 +1,5 @@
 import { type Ref, nextTick } from 'vue'
-import type PopupMessage from '@/components/PopupMsg/PopupMessage.vue'
+import type PopupMessage from '@/components/popup-message/PopupMessage.vue'
 
 let messagePopup: Ref<InstanceType<typeof PopupMessage> | undefined> | null = null
 

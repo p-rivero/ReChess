@@ -35,52 +35,52 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'variant-details',
     path: '/variant/:variantId',
-    component: () => import('@/pages/Variant/VariantDetailsPage.vue'),
+    component: () => import('@/pages/variant/VariantDetailsPage.vue'),
   },
   {
     name: 'variant-lobby',
     path: '/variant/:variantId/lobby',
-    component: () => import('@/pages/Game/LobbyPage.vue'),
+    component: () => import('@/pages/game/LobbyPage.vue'),
   },
   {
     name: 'variant-analysis',
     path: '/variant/:variantId/analysis',
-    component: () => import('@/pages/Game/AnalysisPage.vue'),
+    component: () => import('@/pages/game/AnalysisPage.vue'),
     meta: { title: 'Analysis Board' },
   },
   {
     name: 'play-offline',
     path: '/variant/:variantId/play',
-    component: () => import('@/pages/Game/LocalPlayPage.vue'),
+    component: () => import('@/pages/game/LocalPlayPage.vue'),
   },
   {
     name: 'play-online',
     path: '/game/:gameId',
-    component: () => import('@/pages/Game/OnlinePlayPage.vue'),
+    component: () => import('@/pages/game/OnlinePlayPage.vue'),
   },
   
   
   {
     name: 'edit-draft',
     path: '/draft',
-    component: () => import('@/pages/Variant/EditVariantPage.vue'),
+    component: () => import('@/pages/variant/EditVariantPage.vue'),
     meta: { title: 'Edit Draft' },
   },
   {
     name: 'edit-piece',
     path: '/draft/pieces/:pieceIndex',
-    component: () => import('@/pages/Variant/EditPiecePage.vue'),
+    component: () => import('@/pages/variant/EditPiecePage.vue'),
     meta: { title: 'Edit Piece' },
   },
   {
     name: 'draft-play',
     path: '/draft/play',
-    component: () => import('@/pages/Game/LocalPlayPage.vue'),
+    component: () => import('@/pages/game/LocalPlayPage.vue'),
   },
   {
     name: 'draft-analysis',
     path: '/draft/analysis',
-    component: () => import('@/pages/Game/AnalysisPage.vue'),
+    component: () => import('@/pages/game/AnalysisPage.vue'),
     meta: { title: 'Analysis Board' },
   },
   
@@ -88,23 +88,23 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'user-profile',
     path: '/user/:username',
-    component: () => import('@/pages/User/UserProfilePage.vue'),
+    component: () => import('@/pages/user/UserProfilePage.vue'),
   },
   {
     name: 'user-published-variants',
     path: '/user/:username/variants',
-    component: () => import('@/pages/User/UserPublishedVariantsPage.vue'),
+    component: () => import('@/pages/user/UserPublishedVariantsPage.vue'),
   },
   {
     name: 'user-upvoted-variants',
     path: '/user/:username/upvoted',
-    component: () => import('@/pages/User/UserUpvotedVariantsPage.vue'),
+    component: () => import('@/pages/user/UserUpvotedVariantsPage.vue'),
   },
   
   {
     name: 'moderator-dashboard',
     path: '/moderate',
-    component: () => import('@/pages/Moderator/ModeratorDashboardPage.vue'),
+    component: () => import('@/pages/moderator/ModeratorDashboardPage.vue'),
     meta: { title: 'Moderator Dashboard' },
   },
   
@@ -112,19 +112,19 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'privacy',
     path: '/privacy',
-    component: () => import('@/pages/Legal/PrivacyPolicyPage.vue'),
+    component: () => import('@/pages/legal/PrivacyPolicyPage.vue'),
     meta: { title: 'Privacy Policy' },
   },
   {
     name: 'cookies',
     path: '/cookies',
-    component: () => import('@/pages/Legal/CookiePolicyPage.vue'),
+    component: () => import('@/pages/legal/CookiePolicyPage.vue'),
     meta: { title: 'Cookie Policy' },
   },
   {
     name: 'tos',
     path: '/tos',
-    component: () => import('@/pages/Legal/TermsOfServicePage.vue'),
+    component: () => import('@/pages/legal/TermsOfServicePage.vue'),
     meta: { title: 'Terms of Service' },
   },
   

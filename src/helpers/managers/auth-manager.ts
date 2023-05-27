@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import type SigninPopup from '@/components/Auth/SignInPopup.vue'
+import type SigninPopup from '@/components/auth/SignInPopup.vue'
 
 import { useAuthStore } from '@/stores/auth-user'
 import { useUserStore } from '@/stores/user'

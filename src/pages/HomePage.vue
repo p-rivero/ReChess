@@ -68,11 +68,11 @@
   import { showPopup } from '@/helpers/managers/popup-manager'
   import { useAuthStore } from '@/stores/auth-user'
   import { useVariantStore } from '@/stores/variant'
-  import DraftCard from '@/components/Variant/View/DraftCard.vue'
-  import SearchCard from '@/components/Variant/Search/SearchCard.vue'
-  import SearchOrderDropdown from '@/components/Variant/Search/SearchOrderDropdown.vue'
-  import SmartTextInput from '@/components/BasicWrappers/SmartTextInput.vue'
-  import VariantCard from '@/components/Variant/View/VariantCard.vue'
+  import DraftCard from '@/components/variant/view/DraftCard.vue'
+  import SearchCard from '@/components/variant/search/SearchCard.vue'
+  import SearchOrderDropdown from '@/components/variant/search/SearchOrderDropdown.vue'
+  import SmartTextInput from '@/components/basic-wrappers/SmartTextInput.vue'
+  import VariantCard from '@/components/variant/view/VariantCard.vue'
   import type { SearchOrder, VariantIndexResult } from '@/helpers/chess/variant-search'
   
   const variantStore = useVariantStore()

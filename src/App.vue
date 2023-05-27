@@ -14,9 +14,9 @@
   import { onMounted, ref } from 'vue'
   import { setMessagePopup } from '@/helpers/managers/popup-manager'
   import { setSignInPopup, signInRefresh } from '@/helpers/managers/auth-manager'
-  import NavbarComponent from '@/components/Navbar/NavbarComponent.vue'
-  import PopupMessage from '@/components/PopupMsg/PopupMessage.vue'
-  import SignInPopup from '@/components/Auth/SignInPopup.vue'
+  import NavbarComponent from '@/components/navbar/NavbarComponent.vue'
+  import PopupMessage from '@/components/popup-message/PopupMessage.vue'
+  import SignInPopup from '@/components/auth/SignInPopup.vue'
   
   const signInPopup = ref<InstanceType<typeof SignInPopup>>()
   const messagePopup = ref<InstanceType<typeof PopupMessage>>()
