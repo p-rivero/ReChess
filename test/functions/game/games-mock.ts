@@ -1,6 +1,6 @@
 import admin from 'firebase-admin'
 import { insertVariant } from '../variant/variant-mock'
-import type { GameDoc, LobbySlotDoc, RequestedColor } from '@/firebase/db/schema'
+import type { GameDoc, LobbySlotDoc, RequestedColor, VariantDoc } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
 
 
@@ -10,7 +10,10 @@ export async function insertGame(
   variantId: string,
   winner?: 'white' | 'black' | 'draw'
 ): Promise<GameDoc> {
-  const variant = await insertVariant(db, variantId, 'white')
+  const variantSnap = await db.collection('variants').doc(variantId).get()
+  const variant = variantSnap.exists ?
+      variantSnap.data() as VariantDoc :
+      await insertVariant(db, variantId, 'white')
   const doc: GameDoc = {
     moveHistory: winner ? 'e2e4 e7e5 g1f3 b8c6 f1b5 c8g4 ' : '',
     playerToMove: winner ? 'game-over' : 'white',
@@ -18,7 +21,7 @@ export async function insertGame(
     IMMUTABLE: {
       players: ['white_id', 'black_id'],
       timeCreated: admin.firestore.Timestamp.now() as Timestamp,
-      variantId: 'some_variant_id',
+      variantId,
       variant,
       whiteId: 'white_id',
       whiteDisplayName: 'White Name',

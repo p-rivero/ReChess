@@ -57,6 +57,9 @@ export async function batchedUpdate(input: QuerySnapshot, operation: BatchCallba
   const { db } = await useAdmin()
   const numDocs = input.size
   const numBatches = Math.ceil(numDocs / MAX_BATCH_SIZE)
+  if (numBatches > 1) {
+    console.info(`Batching ${numDocs} documents into ${numBatches} batches`)
+  }
   for (let nBatch = 0; nBatch < numBatches; nBatch++) {
     const batch = db.batch()
     for (let i = 0; i < MAX_BATCH_SIZE; i++) {

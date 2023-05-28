@@ -31,7 +31,7 @@ export async function expectSuccess<T>(promise: Promise<T>): Promise<T> {
 }
 
 
-type LogType = 'log' | 'warn' | 'error'
+type LogType = 'info' | 'warn' | 'error'
 
 /**
  * Sets a spy on `console.log`, `console.warn` or `console.error` that asserts that

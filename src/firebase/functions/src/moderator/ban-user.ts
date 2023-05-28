@@ -3,10 +3,9 @@ import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import { FirebaseError } from 'firebase-admin'
 import { UserDoc } from 'db/schema'
 import { UserRecord } from 'firebase-admin/auth'
+import { batchedUpdate, useAdmin } from '../helpers'
 import { updateName } from '../user/rename-user'
-import { useAdmin, batchedUpdate } from '../helpers'
 import assertModerator from './helpers/assert-moderator'
-import { and, or, where } from 'firebase/firestore'
 
 /**
  * Called directly by the moderator in order to ban a user.

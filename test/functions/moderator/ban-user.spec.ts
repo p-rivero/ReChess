@@ -150,7 +150,7 @@ test('banning a user twice does nothing', async () => {
 
 
 
-test('user arguments must be correct', async () => {
+test('arguments must be correct', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   await auth.createUser({ uid: BANNED_ID })
   await insertUser(db, BANNED_ID)

@@ -91,5 +91,7 @@ export async function updateName(userId: string, newName: string | null): Promis
   // Do not update the name in the lobby entries, because they are short-lived and
   // it's not a problem to have the old name there for a while
   
+  // TODO: User caches
+  
   await Promise.all([p1, p2, p3])
 }

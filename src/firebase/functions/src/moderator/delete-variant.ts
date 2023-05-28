@@ -1,11 +1,12 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import assertModerator from './helpers/assert-moderator'
+import { batchedUpdate, useAdmin } from '../helpers'
 
 /**
  * Called directly by the moderator in order to delete a variant.
- * All the games played on the variant are deleted as well, and the players' game
- * caches and points are updated accordingly.
+ * All the games played on the variant are deleted as well.
+ * If the variant does not exist, this function does nothing and returns successfully.
  * @param {any} data The data passed to the function
  * @param {string} data.variantId UID of the variant that the moderator wishes to delete
  * @param {CallableContext} context The context of the function call
@@ -26,5 +27,9 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('invalid-argument', 'The variantId must be a string.')
   }
   
-  // TODO
+  const { db } = await useAdmin()
+  const games = await db.collection('games').where('IMMUTABLE.variantId', '==', variantId).get()
+  await batchedUpdate(games, async (batch, ref) => batch.delete(ref))
+  
+  await db.collection('variants').doc(variantId).delete()
 }

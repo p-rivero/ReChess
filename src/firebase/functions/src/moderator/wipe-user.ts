@@ -1,6 +1,11 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import assertModerator from './helpers/assert-moderator'
+import banUser from './ban-user'
+import { useAdmin } from '../helpers'
+import deleteVariant from './delete-variant'
+import discardUserReports from './discard-user-reports'
+import discardVariantReports from './discard-variant-reports'
 
 /**
  * Called directly by the moderator in order to wipe a user's content.
@@ -31,9 +36,25 @@ export default async function(data: unknown, context: CallableContext): Promise<
   if (typeof userId !== 'string') {
     throw new HttpsError('invalid-argument', 'The userId must be a string.')
   }
-  if (context.auth?.uid === userId) {
-    throw new HttpsError('invalid-argument', 'Please do not ban yourself :(')
-  }
   
-  // TODO
+  // Important: Detete the variants before banning the user (banUser would remove the userId)
+  const { db } = await useAdmin()
+  const variants = await db.collection('variants').where('creatorId', '==', userId).get()
+  const variantIds = variants.docs.map(doc => doc.id)
+  await Promise.all(variantIds.map(async id => await deleteVariant({ id }, context)))
+  
+  await banUser({ userId }, context)
+  
+  // Remove the user's reports
+  const reportedVariants = await db.collection('users').doc(userId).collection('reportedVariants').get()
+  const reportedVariantIds = reportedVariants.docs.map(doc => doc.id)
+  await Promise.all(reportedVariantIds.map(async id => {
+    await discardVariantReports({ variantId: id, reporters: [userId] }, context)
+  }))
+  
+  const reportedUsers = await db.collection('users').doc(userId).collection('reportedUsers').get()
+  const reportedUserIds = reportedUsers.docs.map(doc => doc.id)
+  await Promise.all(reportedUserIds.map(async id => {
+    await discardUserReports({ userId: id, reporters: [userId] }, context)
+  }))
 }

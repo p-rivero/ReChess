@@ -138,6 +138,7 @@
   import { showPopup } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
+  import { useModeratorStore } from '@/stores/moderator'
   import { useUserStore } from '@/stores/user'
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useVariantStore } from '@/stores/variant'
@@ -156,6 +157,7 @@
   const draftStore = useVariantDraftStore()
   const authStore = useAuthStore()
   const userStore = useUserStore()
+  const moderatorStore = useModeratorStore()
   
   const variant = ref<PublishedVariant>()
   const board = ref<InstanceType<typeof ViewableChessBoard>>()
@@ -287,8 +289,9 @@
       \n\nThis action cannot be undone. Do you want to continue?',
       'ok-cancel',
       async () => {
+        if (!variant.value) throw new Error('variant is null')
         try {
-          // TODO
+          await moderatorStore.deleteVariant(variant.value.uid)
           showPopup(
             'Variant deleted',
             'The variant and all the games played with it have been deleted.',
