@@ -14,9 +14,6 @@ export type ErrorCode = keyof typeof ERROR_CODES
 
 export function returnHome(error: ErrorCode, reason: string) {
   console.info('Redirecting to home page from:', window.location.pathname)
-  if (reason === 'This URL seems to be incorrect.') {
-    throw new Error('User is not logged in')
-  }
   const popupText = reason + '\n\nYou were redirected to the home page.'
   showPopup(ERROR_CODES[error], popupText, 'ok')
   router.replace({ name: 'home' })

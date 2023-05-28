@@ -298,7 +298,6 @@
     
     const username = route.params.username
     if (!username || typeof username !== 'string') {
-      console.error('Invalid username in route: ' + username)
       returnHome(400, 'This URL seems to be incorrect.')
       return
     }

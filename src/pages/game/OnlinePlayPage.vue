@@ -33,6 +33,8 @@
   
   // When the route changes, update the game
   watchEffect(() => {
+    if (route.name !== 'play-online') return
+    
     if (!route.params.gameId || typeof route.params.gameId !== 'string') {
       returnHome(400, 'This URL seems to be incorrect.')
       return

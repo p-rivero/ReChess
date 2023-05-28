@@ -133,6 +133,8 @@
   
   // When the route changes, update the variant
   watchEffect(async () => {
+    if (route.name !== 'variant-lobby') return
+    
     if (!route.params.variantId || typeof route.params.variantId !== 'string') {
       returnHome(400, 'This URL seems to be incorrect.')
       return

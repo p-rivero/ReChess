@@ -107,11 +107,11 @@
   
   function create() {
     hideNavBarMenu()
+    // Cancel navigation
+    router.replace(router.currentRoute.value)
     if (!authStore.loggedUser) {
       requestSignIn()
     } else if (userPrefsStore.suggestUsingTemplate) {
-      // Cancel navigation and show popup
-      router.replace(router.currentRoute.value)
       showPopup(
         'Create a variant from scratch',
         'Making small changes to a variant you like is much easier than creating a new one from scratch. \

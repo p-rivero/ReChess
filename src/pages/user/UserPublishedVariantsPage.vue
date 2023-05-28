@@ -47,7 +47,6 @@
   const user = ref<User>()
   const variantList = ref<PublishedVariant[]>([])
   
-  // When the route changes, reload the variant list
   onMounted(async () => {
     const username = route.params.username
     if (!username || typeof username !== 'string') {
