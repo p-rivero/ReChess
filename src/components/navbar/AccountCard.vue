@@ -15,7 +15,7 @@
       >
       <div
         v-else
-        class="icon-account color-theme w-100 h-100"
+        class="icon-account color-theme force-color w-100 h-100"
       />
     </div>
     <p class="pl-0 card-header-title unselectable is-break-word">

@@ -1,8 +1,8 @@
 <template>
   <div class="card px-2 py-2 mx-3 my-4">
-    <div
-      class="is-clickable"
-      @click="$router.push({ name: 'variant-details', params: { variantId: id } })"
+    <RouterLink
+      class="no-color"
+      :to="{ name: 'variant-details', params: { variantId: id } }"
     >
       <ViewableChessBoard
         ref="board"
@@ -21,10 +21,10 @@
           :find-chunks="() => matches"
         />
       </p>
-    </div>
+    </RouterLink>
     
     <p class="mb-0 has-text-weight-light">
-      By <a>loading...</a>
+      By loading...
     </p>
     <div class="columns is-mobile mb-0 mt-0">
       <div class="column is-narrow pr-0">

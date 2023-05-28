@@ -28,13 +28,13 @@
       
       <div class="columns mb-5">
         <div class="column is-6 pr-2">
-          <button
+          <RouterLink
             class="button is-primary is-fullwidth"
-            @click="$router.push({name: 'edit-draft'})"
+            :to="{name: 'edit-draft'}"
           >
             <div class="sz-icon icon-check color-white" />
             <span>Done</span>
-          </button>
+          </RouterLink>
         </div>
       </div>
     </div>

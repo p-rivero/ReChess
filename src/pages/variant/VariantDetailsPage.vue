@@ -56,20 +56,20 @@
     
     <div class="column is-6 columns reverse-columns px-0 mx-0">
       <div class="column mt-2 is-5 is-narrow">
-        <button
+        <RouterLink
           class="button is-primary is-fullwidth mb-4"
-          @click="$router.push({ name: 'variant-lobby', params: {variantId: variant?.uid} })"
+          :to="{ name: 'variant-lobby', params: {variantId: variant?.uid} }"
         >
           <div class="sz-icon icon-knight color-white" />
           Play
-        </button>
-        <button
+        </RouterLink>
+        <RouterLink
           class="button is-fullwidth mb-4"
-          @click="$router.push({ name: 'variant-analysis', params: {variantId: variant?.uid} })"
+          :to="{ name: 'variant-analysis', params: {variantId: variant?.uid} }"
         >
           <div class="sz-icon icon-analysis color-theme" />
           Analysis board
-        </button>
+        </RouterLink>
         <button
           class="button is-fullwidth mb-4"
           @click="useAsTemplate"

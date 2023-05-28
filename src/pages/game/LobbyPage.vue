@@ -15,13 +15,13 @@
       <div class="sz-icon icon-cpu color-theme" />
       Against computer
     </button>
-    <button
+    <RouterLink
       class="button"
-      @click="router.push({ name: 'play-offline', query: {mode: 'otb'} })"
+      :to="{ name: 'play-offline', query: {mode: 'otb'} }"
     >
       <div class="sz-icon icon-people color-theme" />
       Over the board
-    </button>
+    </RouterLink>
   </div>
   
   

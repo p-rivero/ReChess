@@ -27,13 +27,13 @@
     </div>
     
     <div class="column is-narrow pl-1">
-      <button
+      <RouterLink
         class="button is-primary is-fullwidth"
-        @click="$router.push({ name: 'play-online', params: { gameId: game.gameId } })"
+        :to="{ name: 'play-online', params: { gameId: game.gameId } }"
       >
         <div class="sz-icon icon-eye color-white" />
         View
-      </button>
+      </RouterLink>
     </div>
   </div>
 </template>

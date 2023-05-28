@@ -22,9 +22,11 @@
     background-color: $danger;
 }
 
+a:focus .color-theme:not(.force-color),
 button:focus .color-theme {
     background-color: $link-focus;
 }
+a:active .color-theme:not(.force-color),
 button:active .color-theme {
     background-color: $link-active;
 }

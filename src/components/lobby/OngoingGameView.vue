@@ -30,9 +30,9 @@
   </div>
   
   <div class="column is-3 is-flex is-align-items-center">
-    <button
+    <RouterLink
       class="button is-fullwidth is-primary"
-      @click="$router.push({ name: 'play-online', params: { gameId: gameSlot.gameId } })"
+      :to="{ name: 'play-online', params: { gameId: gameSlot.gameId } }"
     >
       <div
         class="sz-icon color-white"
@@ -42,7 +42,7 @@
         }"
       />
       {{ gameSlot.currentUserIsPlayer ? 'Resume' : 'Watch' }}
-    </button>
+    </RouterLink>
   </div>
 </template>
 

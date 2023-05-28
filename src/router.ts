@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { updateTitle } from '@/helpers/web-utils'
 import HomePage from '@/pages/HomePage.vue'
-import type { RouteParams, RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 // https://github.com/mutoe/vue3-realworld-example-app/blob/master/src/router.ts
 
 export type AppRouteNames =
@@ -143,7 +143,3 @@ router.beforeEach((to, _from, next) => {
   updateTitle(toTitle)
   next()
 })
-
-export function routerPush (name: AppRouteNames, params?: RouteParams): ReturnType<typeof router.push> {
-  return params === undefined ? router.push({ name }) : router.push({ name, params })
-}

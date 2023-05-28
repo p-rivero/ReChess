@@ -1,8 +1,8 @@
 <template>
   <div class="card px-2 py-2 mx-3 my-4">
-    <div
-      class="is-clickable"
-      @click="$router.push({ name: 'variant-details', params: { variantId: variant.uid } })"
+    <RouterLink
+      class="no-color"
+      :to="{ name: 'variant-details', params: { variantId: variant.uid } }"
     >
       <div
         ref="container"
@@ -29,7 +29,7 @@
           :find-chunks="() => highlightMatches ?? []"
         />
       </div>
-    </div>
+    </RouterLink>
     
     <p
       v-if="variant.creatorId"
@@ -48,13 +48,13 @@
         </button>
       </div>
       <div class="column">
-        <button
+        <RouterLink
           class="button is-fullwidth"
-          @click="$router.push({ name: 'variant-lobby', params: {variantId: variant.uid} })"
+          :to="{ name: 'variant-lobby', params: {variantId: variant.uid} }"
         >
           <div class="sz-icon icon-knight color-theme" />
           Play
-        </button>
+        </RouterLink>
       </div>
     </div>
     <div
