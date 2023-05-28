@@ -1,7 +1,7 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
-import assertModerator from './helpers/assert-moderator'
 import { batchedUpdate, useAdmin } from '../helpers'
+import assertModerator from './helpers/assert-moderator'
 
 /**
  * Called directly by the moderator in order to delete a variant.

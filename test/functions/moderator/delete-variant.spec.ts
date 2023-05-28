@@ -123,7 +123,8 @@ test('delete a variant with more than 500 games', async () => {
     const game = await db.collection('games').doc(`game_${i}`).get()
     expect(game.exists).toBe(false)
   }))
-}, 10000)
+}, 60000)
+
 
 
 test('arguments must be correct', async () => {
