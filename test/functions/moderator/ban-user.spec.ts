@@ -1,9 +1,8 @@
 import { expectHttpsError, expectLog, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
-import { insertModerationDoc, makeModeratorContext } from './moderator-mock'
+import { makeModeratorContext } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
-import type { https } from 'firebase-functions'
 import type { UserDoc, GameDoc, VariantDoc } from '@/firebase/db/schema'
 import { insertGame } from '../game/games-mock'
 import { insertVariant } from '../variant/variant-mock'
@@ -152,7 +151,7 @@ test('user arguments must be correct', async () => {
   expect(e.code).toBe('invalid-argument')
   
   arg = { userId: BANNED_ID }
-  e = await expectSuccess(banUser(arg, context))
+  await expectSuccess(banUser(arg, context))
 })
 
 test('caller must be authenticated as a moderator', async () => {

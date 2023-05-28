@@ -10,7 +10,7 @@ import type { UserDoc } from 'db/schema'
 export async function makeSummaryLine(userId: string, reportReason: string): Promise<string> {
   reportReason = reportReason.trim()
   // Ignore reports that contain \n or \t
-  if (reportReason.match(/[\n\t]/)) {
+  if (/[\n\t]/.exec(reportReason)) {
     console.warn('Ignoring report invalid characters:', reportReason, userId)
     reportReason = '[INVALID CHARACTERS DETECTED]'
   }
