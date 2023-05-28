@@ -163,7 +163,8 @@
       console.error(e)
       showPopup(
         'Error',
-        'An unexpected error occurred while discarding the reports. Check the console.',
+        'An unexpected error occurred while discarding the reports. \
+        \n\n```\n' + e + '\n```',
         'ok'
       )
     }

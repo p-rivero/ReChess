@@ -298,7 +298,8 @@
           console.error(e)
           showPopup(
             'Error',
-            'An unexpected error occurred while deleting the variant. Check the console.',
+            'An unexpected error occurred while deleting the variant. \
+            \n\n```\n' + e + '\n```',
             'ok'
           )
         }

@@ -268,6 +268,7 @@
   import { showPopup } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useGameStore } from '@/stores/game'
+  import { useModeratorStore } from '@/stores/moderator'
   import EditableMarkdown from '@/components/basic-wrappers/EditableMarkdown.vue'
   import EditableTitle from '@/components/basic-wrappers/EditableTitle.vue'
   import ImageSelectPopup from '@/components/image-select/ImageSelectPopup.vue'
@@ -280,6 +281,7 @@
   const authStore = useAuthStore()
   const userStore = useUserStore()
   const gameStore = useGameStore()
+  const moderatorStore = useModeratorStore()
   
   const user = ref<User | AuthUser>()
   const hasError = ref(false)
@@ -512,7 +514,7 @@
       async () => {
         if (!user.value) throw new Error('User is undefined')
         try {
-          // TODO
+          await moderatorStore.banUser(user.value.uid)
           showPopup(
             'User banned',
             'The user has been successfully banned.',
@@ -522,7 +524,8 @@
           console.error(e)
           showPopup(
             'Error',
-            'An unexpected error occurred while banning the user. Check the console.',
+            'An unexpected error occurred while banning the user. \
+            \n\n```\n' + e + '\n```',
             'ok'
           )
         }
@@ -538,7 +541,7 @@
       async () => {
         if (!user.value) throw new Error('User is undefined')
         try {
-          // TODO
+          await moderatorStore.wipeUser(user.value.uid)
           showPopup(
             'User wiped',
             'The user has been banned and their variants and reports have been deleted.',
@@ -548,7 +551,8 @@
           console.error(e)
           showPopup(
             'Error',
-            'An unexpected error occurred while wiping the user. Check the console.',
+            'An unexpected error occurred while wiping the user. \
+            \n\n```\n' + e + '\n```',
             'ok'
           )
         }

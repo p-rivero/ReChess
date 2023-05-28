@@ -125,6 +125,8 @@ export const useAuthStore = defineStore('auth-user', () => {
         throw new UserNotFoundError()
       case 'auth/wrong-password':
         throw new RechessError('WRONG_PASSWORD')
+      case 'auth/user-disabled':
+          throw new RechessError('USER_DISABLED')
       default:
         console.error('Unknown error while logging in with email and password', e)
         throw e
@@ -187,9 +189,10 @@ export const useAuthStore = defineStore('auth-user', () => {
       switch (e.code) {
       case 'auth/popup-closed-by-user':
         throw new PopupClosedError()
-      case 'auth/account-exists-with-different-credential': {
+      case 'auth/account-exists-with-different-credential':
         throw new RechessError('WRONG_PASSWORD_PROVIDER', { provider: signInprovider === 'google' ? 'GitHub' : 'Google' })
-      }
+      case 'auth/user-disabled':
+        throw new RechessError('USER_DISABLED')
       default:
         throw e
       }

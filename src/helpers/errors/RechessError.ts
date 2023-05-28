@@ -30,6 +30,7 @@ const ERROR_TOKENS = [
   'CANNOT_CREATE_USER',
   'WRONG_PASSWORD',
   'WRONG_PASSWORD_PROVIDER',
+  'USER_DISABLED',
 ] as const
 
 export type ErrorToken = typeof ERROR_TOKENS[number]
@@ -40,9 +41,11 @@ export type ErrorLocale = 'en'
 
 const LOCALES: Record<ErrorLocale, Record<ErrorToken, string>> = {
   'en': {
-    'EMAIL_ALREADY_IN_USE': 'This email is already in use, please use a different one',
-    'CANNOT_CREATE_USER': 'Could not create the user profile, try again later',
-    'WRONG_PASSWORD': 'The password is incorrect',
-    'WRONG_PASSWORD_PROVIDER': 'This email is linked to a {provider} account, please use the correct button to log in',
+    'EMAIL_ALREADY_IN_USE': 'This email is already in use, please use a different one.',
+    'CANNOT_CREATE_USER': 'Could not create the user profile, try again later.',
+    'WRONG_PASSWORD': 'The password is incorrect.',
+    'WRONG_PASSWORD_PROVIDER': 'This email is linked to a *{provider}* account, please use the correct button to log in.',
+    'USER_DISABLED': 'Your account has been disabled for violating our terms of service. \n\nIf you think this is a mistake, please \
+      [open an issue on GitHub](https://github.com/p-rivero/ReChess/issues).',
   },
 }

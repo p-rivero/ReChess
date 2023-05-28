@@ -62,7 +62,7 @@ type CancelGameParams = { gameId: string, reason: string }
 export const cancelGame = httpsCallable<CancelGameParams, void>(functions, 'cancelGame')
 
 type BanUserParams = { userId: string }
-export const banUser = httpsCallable<BanUserParams, void>(functions, 'cancelGame')
+export const banUser = httpsCallable<BanUserParams, void>(functions, 'banUser')
 
 type DeleteVariantParams = { variantId: string }
 export const deleteVariant = httpsCallable<DeleteVariantParams, void>(functions, 'deleteVariant')
