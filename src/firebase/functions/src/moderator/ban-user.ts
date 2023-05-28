@@ -4,8 +4,9 @@ import { FirebaseError } from 'firebase-admin'
 import { UserDoc } from 'db/schema'
 import { UserRecord } from 'firebase-admin/auth'
 import { updateName } from '../user/rename-user'
-import { useAdmin } from '../helpers'
+import { useAdmin, batchedUpdate } from '../helpers'
 import assertModerator from './helpers/assert-moderator'
+import { and, or, where } from 'firebase/firestore'
 
 /**
  * Called directly by the moderator in order to ban a user.
@@ -52,6 +53,13 @@ export default async function(data: unknown, context: CallableContext): Promise<
   }
   
   await banUser(userId)
+  
+  // Important: Find and stop games *before* removing the userId from them
+  try {
+    await stopOngoingGames(userId)
+  } catch (e) {
+    throw new HttpsError('internal', 'Cannot stop ongoing games: ' + e)
+  }
   
   const { db } = await useAdmin()
   const updateObj: Partial<UserDoc> = {
@@ -106,4 +114,31 @@ async function banUser(userId: string): Promise<void> {
   }
   // The user's session token will expire in 1 hour, at which point they will be logged out.
   // Until then, they can still use the app normally (but are unable to update their profile).
+}
+
+/**
+ * Finds all games that the user is currently playing and makes them a draw.
+ * @param {string} userId The UID of the user to ban
+ * @return {Promise<void>} A promise that resolves when all games are stopped
+ */
+async function stopOngoingGames(userId: string): Promise<void> {
+  const { db } = await useAdmin()
+  
+  const stopGame = {
+    'playerToMove': 'game-over',
+    'winner': 'draw',
+    'IMMUTABLE.calledFinishGame': true,
+  }
+  
+  const ongoingGamesWhite = await db.collection('games')
+    .where('IMMUTABLE.whiteId', '==', userId)
+    .where('winner', '==', null)
+    .get()
+  await batchedUpdate(ongoingGamesWhite, (batch, ref) => batch.update(ref, stopGame))
+  
+  const ongoingGamesBlack = await db.collection('games')
+    .where('IMMUTABLE.blackId', '==', userId)
+    .where('winner', '==', null)
+    .get()
+  await batchedUpdate(ongoingGamesBlack, (batch, ref) => batch.update(ref, stopGame))
 }

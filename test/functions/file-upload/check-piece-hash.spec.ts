@@ -2,7 +2,7 @@ import { functions, initialize } from '../init'
 import { expectLog } from '../utils'
 
 const { app, testEnv } = initialize('check-piece-hash-test')
-const bucket = app.storage().bucket('rechess-web-piece-images')
+const bucket = app.storage().bucket()
 const checkPieceHash = testEnv.wrap(functions.checkPieceHash)
 
 test('accepts images with correct hash', async () => {

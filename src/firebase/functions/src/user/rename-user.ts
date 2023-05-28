@@ -65,18 +65,10 @@ export async function updateName(userId: string, newName: string | null): Promis
     console.error(err)
   })
   
-  // When deleting the user, stop all their games
-  const stopGame = removeId ? {
-    'playerToMove': 'game-over',
-    'winner': 'draw',
-    'IMMUTABLE.calledFinishGame': true,
-  } : {}
-  
   // Update the opponent name of the games this user has played as white
   const updatedGamesWhite = await db.collection('games').where('IMMUTABLE.whiteId', '==', userId).get()
   const p2 = batchedUpdate(updatedGamesWhite, (batch, ref) => {
     batch.update(ref, {
-      ...stopGame,
       'IMMUTABLE.whiteDisplayName': newName,
       'IMMUTABLE.whiteId': removeId ? null : userId,
     })
@@ -89,7 +81,6 @@ export async function updateName(userId: string, newName: string | null): Promis
   const updatedGamesBlack = await db.collection('games').where('IMMUTABLE.blackId', '==', userId).get()
   const p3 = batchedUpdate(updatedGamesBlack, (batch, ref) => {
     batch.update(ref, {
-      ...stopGame,
       'IMMUTABLE.blackDisplayName': newName,
       'IMMUTABLE.blackId': removeId ? null : userId,
     })

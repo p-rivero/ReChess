@@ -56,6 +56,11 @@ test('user name is removed from games', async () => {
     'IMMUTABLE.whiteId': BANNED_ID,
     'IMMUTABLE.whiteDisplayName': 'The Banned User',
   })
+  const ongoingGameBefore2 = await insertGame(db, 'game_id_ongoing_2', 'some_variant_id')
+  await db.collection('games').doc('game_id_ongoing_2').update({ 
+    'IMMUTABLE.blackId': BANNED_ID,
+    'IMMUTABLE.blackDisplayName': 'The Banned User',
+  })
   const finishedGameBefore = await insertGame(db, 'game_id_finished', 'some_variant_id', 'white')
   await db.collection('games').doc('game_id_finished').update({
     'IMMUTABLE.blackId': BANNED_ID,
@@ -65,6 +70,7 @@ test('user name is removed from games', async () => {
   await expectSuccess(banUser(args, context))
   
   const ongoingGameAfter = (await db.collection('games').doc('game_id_ongoing').get()).data() as GameDoc
+  const ongoingGameAfter2 = (await db.collection('games').doc('game_id_ongoing_2').get()).data() as GameDoc
   const finishedGameAfter = (await db.collection('games').doc('game_id_finished').get()).data() as GameDoc
   
   expect(ongoingGameAfter).toEqual({
@@ -78,15 +84,24 @@ test('user name is removed from games', async () => {
       calledFinishGame: true,
     }
   })
-  expect(finishedGameAfter).toEqual({
-    ...finishedGameBefore,
+  expect(ongoingGameAfter2).toEqual({
+    ...ongoingGameBefore2,
     playerToMove: 'game-over',
     winner: 'draw',
+    IMMUTABLE: {
+      ...ongoingGameBefore2.IMMUTABLE,
+      blackId: null,
+      blackDisplayName: '[deleted]',
+      calledFinishGame: true,
+    }
+  })
+  expect(finishedGameAfter).toEqual({
+    ...finishedGameBefore,
+    winner: 'white', // Winner is not changed
     IMMUTABLE: {
       ...finishedGameBefore.IMMUTABLE,
       blackId: null,
       blackDisplayName: '[deleted]',
-      calledFinishGame: true,
     }
   })
 })

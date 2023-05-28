@@ -2,6 +2,7 @@ import admin from 'firebase-admin'
 import initFunctions from 'firebase-functions-test'
 import { assertEmulatorsRunning } from '../test-common'
 import type { FeaturesList } from 'firebase-functions-test/lib/features'
+import type { AppOptions } from 'firebase-admin'
 
 export interface TestUtils {
   app: admin.app.App,
@@ -17,8 +18,9 @@ process.env.FIREBASE_STORAGE_EMULATOR_HOST = "localhost:9199"
 let currentUtils: TestUtils | null = null
 export function initialize(projectId: string): TestUtils {
   const testEnv = initFunctions({ projectId })
-  const config = {
+  const config: AppOptions = {
     projectId,
+    storageBucket: `${projectId}.appspot.com`,
     credential: admin.credential.applicationDefault(),
   }
   const app = admin.initializeApp(config, projectId)
@@ -35,9 +37,8 @@ beforeAll(assertEmulatorsRunning)
 afterEach(async () => {
   const db = currentUtils!.app.firestore()
   const storage = currentUtils!.app.storage()
-  async function clearBucket(name: string) {
-    const bucket = storage.bucket(name)
-    const [files] = await bucket.getFiles()
+  async function clearStorage() {
+    const [files] = await storage.bucket().getFiles()
     await Promise.all(files.map(file => file.delete()))
   }
   async function clearCollection(collectionPath: string) {
@@ -62,8 +63,7 @@ afterEach(async () => {
     await Promise.all(users.users.map(user => auth.deleteUser(user.uid)))
   }
   await Promise.all([
-    clearBucket('rechess-web.appspot.com'),
-    clearBucket('rechess-web-piece-images'),
+    clearStorage(),
     clearFirestore(),
     clearAuth(),
   ])

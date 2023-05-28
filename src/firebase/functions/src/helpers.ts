@@ -44,7 +44,7 @@ export async function callFunction< F extends(...args: any[]) => Promise<any> >
 type QuerySnapshot = FirebaseFirestore.QuerySnapshot
 type WriteBatch = FirebaseFirestore.WriteBatch
 type DocumentReference = FirebaseFirestore.DocumentReference
-type BatchCallback = (batch: WriteBatch, ref: DocumentReference) => void | Promise<void>
+type BatchCallback = (batch: WriteBatch, ref: DocumentReference) => unknown | Promise<unknown>
 
 /**
  * Generic function to perform a batched update of possibly more than 500 documents.
