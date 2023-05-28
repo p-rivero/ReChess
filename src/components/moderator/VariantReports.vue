@@ -77,9 +77,9 @@
     board.value?.setState(variant.value)
   })
   
-  async function discardReports(indexes: Set<number>) {
+  async function discardReports(reporterUsernames: string[]) {
     const variantId = variant.value.uid
-    await moderatorStore.discardVariantReports(variantId, indexes)
+    await moderatorStore.discardVariantReports(variantId, reporterUsernames)
   }
 </script>
 

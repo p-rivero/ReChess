@@ -23,8 +23,14 @@ export async function insertModerationDoc(db: DB, type: 'user'|'variant', id: st
   }
   const collectionName = type === 'user' ? 'userModeration' : 'variantModeration'
   await db.collection(collectionName).doc(id).set(doc)
+  return doc
 }
 
 export function makeModeratorContext(userId: string) {
   return makeCallableContext(userId, true, true, { moderator: true })
+}
+
+export function extractReporters(doc: ModerationDoc, ...indexes: number[]): string[] {
+  const lines = doc.reportsSummary.split('\n').filter(line => line.length > 0)
+  return indexes.map(i => lines[i].split('\t')[0])
 }

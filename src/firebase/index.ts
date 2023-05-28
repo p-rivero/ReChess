@@ -67,10 +67,10 @@ export const banUser = httpsCallable<BanUserParams, void>(functions, 'cancelGame
 type DeleteVariantParams = { variantId: string }
 export const deleteVariant = httpsCallable<DeleteVariantParams, void>(functions, 'deleteVariant')
 
-type DiscardUserReportsParams = { userId: string, reportIndexes: number[] }
+type DiscardUserReportsParams = { userId: string, reporters: string[] }
 export const discardUserReports = httpsCallable<DiscardUserReportsParams, void>(functions, 'discardUserReports')
 
-type DiscardVariantReportsParams = { variantId: string, reportIndexes: number[] }
+type DiscardVariantReportsParams = { variantId: string, reporters: string[] }
 export const discardVariantReports = httpsCallable<DiscardVariantReportsParams, void>(functions, 'discardVariantReports')
 
 type WipeUserParams = { userId: string }

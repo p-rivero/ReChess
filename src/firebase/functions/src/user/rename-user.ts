@@ -55,7 +55,7 @@ export async function updateName(userId: string, newName: string | null): Promis
   
   // Update the creator name of the variants this user has created
   const updatedVariants = await db.collection('variants').where('creatorId', '==', userId).get()
-  const p1 = batchedUpdate(db, updatedVariants, (batch, ref) => {
+  const p1 = batchedUpdate(updatedVariants, (batch, ref) => {
     batch.update(ref, {
       'creatorDisplayName': newName,
       'creatorId': removeId ? null : userId,
@@ -74,7 +74,7 @@ export async function updateName(userId: string, newName: string | null): Promis
   
   // Update the opponent name of the games this user has played as white
   const updatedGamesWhite = await db.collection('games').where('IMMUTABLE.whiteId', '==', userId).get()
-  const p2 = batchedUpdate(db, updatedGamesWhite, (batch, ref) => {
+  const p2 = batchedUpdate(updatedGamesWhite, (batch, ref) => {
     batch.update(ref, {
       ...stopGame,
       'IMMUTABLE.whiteDisplayName': newName,
@@ -87,7 +87,7 @@ export async function updateName(userId: string, newName: string | null): Promis
   
   // Update the opponent name of the games this user has played as black
   const updatedGamesBlack = await db.collection('games').where('IMMUTABLE.blackId', '==', userId).get()
-  const p3 = batchedUpdate(db, updatedGamesBlack, (batch, ref) => {
+  const p3 = batchedUpdate(updatedGamesBlack, (batch, ref) => {
     batch.update(ref, {
       ...stopGame,
       'IMMUTABLE.blackDisplayName': newName,

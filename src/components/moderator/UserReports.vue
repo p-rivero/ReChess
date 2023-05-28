@@ -55,8 +55,8 @@
   
   const user = computed(() => props.userReports.reportedUser)
   
-  async function discardReports(indexes: Set<number>) {
+  async function discardReports(reporterUsernames: string[]) {
     const userId = user.value.uid
-    await moderatorStore.discardUserReports(userId, indexes)
+    await moderatorStore.discardUserReports(userId, reporterUsernames)
   }
 </script>

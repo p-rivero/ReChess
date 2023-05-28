@@ -11,8 +11,6 @@ const MAX_INDEX_SIZE = 1_040_000 // 1 MiB - 8576 bytes (plenty of space for meta
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function(snap: QueryDocumentSnapshot): Promise<void> {
-  const { db } = await useAdmin()
-  
   let { name, description, tags } = snap.data() as VariantDoc
   
   // Enforce the 35 character limit on tags
@@ -32,7 +30,7 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
   let index = 0
   let success = false
   while (!success) {
-    success = await appendToIndex(db, line, index)
+    success = await appendToIndex(line, index)
     index++
   }
 }
@@ -40,12 +38,12 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
 
 /**
  * Appends a line to the a given index document.
- * @param {FirebaseFirestore.Firestore} db Database instance to use
  * @param {string} line Text to append to the index
  * @param {number} index Number of the index document to append to, incremented until a free index is found
  * @return {Promise<boolean>} True if the line was appended, false if the index is full
  */
-async function appendToIndex(db: FirebaseFirestore.Firestore, line: string, index: number): Promise<boolean> {
+async function appendToIndex(line: string, index: number): Promise<boolean> {
+  const { db } = await useAdmin()
   const indexRef = db.collection('variantIndex').doc(index.toString())
   const indexDoc = await indexRef.get()
   

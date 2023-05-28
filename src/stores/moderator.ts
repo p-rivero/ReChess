@@ -93,26 +93,26 @@ export const useModeratorStore = defineStore('moderator', () => {
     await modWipeUser({ userId })
   }
   
-  async function discardUserReports(userId: string, indexes: Set<number>): Promise<void> {
+  async function discardUserReports(userId: string, reporters: string[]): Promise<void> {
     // Update in backend
-    await modDiscardUserReports({ userId, reportIndexes: Array.from(indexes) })
+    await modDiscardUserReports({ userId, reporters: reporters })
     // Update the local store
     const reports = userReports.value
     const i = reports.findIndex(userReports => userReports.reportedUser.uid === userId)
-    reports[i].reports = reports[i].reports.filter((_, i) => !indexes.has(i))
+    reports[i].reports = reports[i].reports.filter(r => !reporters.includes(r.reporterUsername))
     if (reports[i].reports.length === 0) {
       reports.splice(i, 1)
     }
     userReports.value = reports
   }
   
-  async function discardVariantReports(variantId: string, indexes: Set<number>): Promise<void> {
+  async function discardVariantReports(variantId: string, reporters: string[]): Promise<void> {
     // Update in backend
-    await modDiscardVariantReports({ variantId, reportIndexes: Array.from(indexes) })
+    await modDiscardVariantReports({ variantId, reporters: reporters })
     // Update the local store
     const reports = variantReports.value
     const i = reports.findIndex(variantReports => variantReports.reportedVariant.uid === variantId)
-    reports[i].reports = reports[i].reports.filter((_, i) => !indexes.has(i))
+    reports[i].reports = reports[i].reports.filter(r => !reporters.includes(r.reporterUsername))
     if (reports[i].reports.length === 0) {
       reports.splice(i, 1)
     }

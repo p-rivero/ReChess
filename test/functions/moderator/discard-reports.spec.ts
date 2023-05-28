@@ -1,6 +1,6 @@
 import { expectHttpsError, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
-import { insertModerationDoc, makeModeratorContext, REPORT_SUMMARY_REGEX } from './moderator-mock'
+import { extractReporters, insertModerationDoc, makeModeratorContext, REPORT_SUMMARY_REGEX } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import type { ModerationDoc } from '@/firebase/db/schema'
 import type { https } from 'firebase-functions'
@@ -14,24 +14,22 @@ const MODERATOR_ID = 'moderator_user_id'
 const REPORTED_ID = 'reported_user_id'
 const VARIANT_ID = 'reported_variant_id'
 
-function userArgs(userId: string, reportIndexes: number[]) {
-  return { userId, reportIndexes }
+function userArgs(userId: string, reporters: string[]) {
+  return { userId, reporters }
 }
-function variantArgs(variantId: string, reportIndexes: number[]) {
-  return { variantId, reportIndexes }
+function variantArgs(variantId: string, reporters: string[]) {
+  return { variantId, reporters }
 }
 
 test('moderator can delete user report', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  const args = userArgs(REPORTED_ID, [0])
-  await insertModerationDoc(db, 'user', REPORTED_ID, 1)
-  const moderationDocBefore = (await db.collection('userModeration').doc(REPORTED_ID).get()).data() as ModerationDoc
+  const modDoc = await insertModerationDoc(db, 'user', REPORTED_ID, 1)
+  const reporters = extractReporters(modDoc, 0)
+  const args = userArgs(REPORTED_ID, reporters)
   
   await expectSuccess(discardUserReports(args, context))
   
   const moderationDoc = (await db.collection('userModeration').doc(REPORTED_ID).get()).data() as ModerationDoc
-  console.log('usr reportsBefore', moderationDocBefore.reportsSummary.split('\n'))
-  console.log('usr reportsAfter', moderationDoc.reportsSummary.split('\n'))
   expect(moderationDoc).toEqual({
     numReports: 0,
     reportsSummary: '',
@@ -40,15 +38,13 @@ test('moderator can delete user report', async () => {
 
 test('moderator can delete variant report', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  const args = variantArgs(VARIANT_ID, [0])
-  await insertModerationDoc(db, 'variant', VARIANT_ID, 1)
-  const moderationDocBefore = (await db.collection('variantModeration').doc(VARIANT_ID).get()).data() as ModerationDoc
+  const modDoc = await insertModerationDoc(db, 'variant', VARIANT_ID, 1)
+  const reporters = extractReporters(modDoc, 0)
+  const args = variantArgs(VARIANT_ID, reporters)
   
   await expectSuccess(discardVariantReports(args, context))
   
   const moderationDoc = (await db.collection('variantModeration').doc(VARIANT_ID).get()).data() as ModerationDoc
-  console.log('var reportsBefore', moderationDocBefore.reportsSummary.split('\n'))
-  console.log('var reportsAfter', moderationDoc.reportsSummary.split('\n'))
   expect(moderationDoc).toEqual({
     numReports: 0,
     reportsSummary: '',
@@ -57,8 +53,9 @@ test('moderator can delete variant report', async () => {
 
 test('moderator can delete many user reports', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  const args = userArgs(REPORTED_ID, [0, 2, 4, 6])
-  await insertModerationDoc(db, 'user', REPORTED_ID, 7)
+  const modDoc =  await insertModerationDoc(db, 'user', REPORTED_ID, 7)
+  const reporters = extractReporters(modDoc, 0, 2, 4, 6)
+  const args = userArgs(REPORTED_ID, reporters)
   
   const moderationDocBefore = (await db.collection('userModeration').doc(REPORTED_ID).get()).data() as ModerationDoc
   expect(moderationDocBefore).toEqual({
@@ -71,8 +68,6 @@ test('moderator can delete many user reports', async () => {
   await expectSuccess(discardUserReports(args, context))
   
   const moderationDoc = (await db.collection('userModeration').doc(REPORTED_ID).get()).data() as ModerationDoc
-  console.log('many reportsBefore', reportsBefore)
-  console.log('many reportsAfter', moderationDoc.reportsSummary.split('\n'))
   expect(moderationDoc).toEqual({
     numReports: 3,
     reportsSummary: expect.stringMatching(REPORT_SUMMARY_REGEX),
@@ -87,8 +82,9 @@ test('moderator can delete many user reports', async () => {
 
 test('moderator can delete many variant reports', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  const args = variantArgs(VARIANT_ID, [1, 2, 3])
-  await insertModerationDoc(db, 'variant', VARIANT_ID, 6)
+  const modDoc = await insertModerationDoc(db, 'variant', VARIANT_ID, 6)
+  const reporters = extractReporters(modDoc, 1, 2, 3)
+  const args = variantArgs(VARIANT_ID, reporters)
   
   const moderationDocBefore = (await db.collection('variantModeration').doc(VARIANT_ID).get()).data() as ModerationDoc
   expect(moderationDocBefore).toEqual({
@@ -113,10 +109,10 @@ test('moderator can delete many variant reports', async () => {
   ])
 })
 
-test('empty index list preserves moderationDoc', async () => {
+test('empty reporter list preserves moderationDoc', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  const args = userArgs(REPORTED_ID, []) // empty
   await insertModerationDoc(db, 'user', REPORTED_ID, 7)
+  const args = userArgs(REPORTED_ID, []) // empty
   
   const moderationDocBefore = (await db.collection('userModeration').doc(REPORTED_ID).get()).data() as ModerationDoc
     
@@ -126,10 +122,12 @@ test('empty index list preserves moderationDoc', async () => {
   expect(moderationDocAfter).toEqual(moderationDocBefore)
 })
 
-test('duplicate indexes are ignored', async () => {
+test('duplicate reporters are ignored', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  const args = variantArgs(VARIANT_ID, [1, 2, 2, 2, 3, 3])
-  await insertModerationDoc(db, 'variant', VARIANT_ID, 6)
+  const modDoc = await insertModerationDoc(db, 'variant', VARIANT_ID, 6)
+  const reporters = extractReporters(modDoc, 1, 2, 2, 2, 3, 3)
+  expect(reporters.length).toBe(6)
+  const args = variantArgs(VARIANT_ID, reporters)
   
   const moderationDocBefore = (await db.collection('variantModeration').doc(VARIANT_ID).get()).data() as ModerationDoc
   expect(moderationDocBefore).toEqual({
@@ -151,6 +149,31 @@ test('duplicate indexes are ignored', async () => {
   ])
 })
 
+test('non-existent reporters are ignored', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const modDoc = await insertModerationDoc(db, 'variant', VARIANT_ID, 6)
+  const reporters = extractReporters(modDoc, 1, 2).concat('foo', 'bar', 'baz') // foo, bar, baz don't exist
+  expect(reporters.length).toBe(5)
+  const args = variantArgs(VARIANT_ID, reporters)
+  
+  const moderationDocBefore = (await db.collection('variantModeration').doc(VARIANT_ID).get()).data() as ModerationDoc
+  expect(moderationDocBefore.numReports).toBe(6)
+  const reportsBefore = moderationDocBefore.reportsSummary.split('\n')
+  expect(reportsBefore.length).toBe(6)
+  
+  await expectSuccess(discardVariantReports(args, context))
+  
+  const moderationDoc = (await db.collection('variantModeration').doc(VARIANT_ID).get()).data() as ModerationDoc
+  expect(moderationDoc.numReports).toEqual(4)
+  const reportsAfter = moderationDoc.reportsSummary.split('\n')
+  expect(reportsAfter).toEqual([
+    reportsBefore[0],
+    reportsBefore[3],
+    reportsBefore[4],
+    reportsBefore[5],
+  ])
+})
+
 
 
 test('user arguments must be correct', async () => {
@@ -159,42 +182,32 @@ test('user arguments must be correct', async () => {
   
   let arg = {}
   let e = await expectHttpsError(discardUserReports(arg, context))
-  expect(e.message).toMatch('The function must be called with a userId and reportIndexes.')
+  expect(e.message).toMatch('The function must be called with a userId and reporters.')
   expect(e.code).toBe('invalid-argument')
   
   arg = { userId: REPORTED_ID }
   e = await expectHttpsError(discardUserReports(arg, context))
-  expect(e.message).toMatch('The function must be called with a userId and reportIndexes.')
+  expect(e.message).toMatch('The function must be called with a userId and reporters.')
   expect(e.code).toBe('invalid-argument')
   
-  arg = { reportIndexes: [] }
+  arg = { reporters: [] }
   e = await expectHttpsError(discardUserReports(arg, context))
-  expect(e.message).toMatch('The function must be called with a userId and reportIndexes.')
+  expect(e.message).toMatch('The function must be called with a userId and reporters.')
   expect(e.code).toBe('invalid-argument')
   
-  arg = { userId: 1234, reportIndexes: [] }
+  arg = { userId: 1234, reporters: [] }
   e = await expectHttpsError(discardUserReports(arg, context))
   expect(e.message).toMatch('The userId must be a string.')
   expect(e.code).toBe('invalid-argument')
   
-  arg = { userId: REPORTED_ID, reportIndexes: 1234 }
+  arg = { userId: REPORTED_ID, reporters: 1234 }
   e = await expectHttpsError(discardUserReports(arg, context))
-  expect(e.message).toMatch('The reportIndexes must be a list of numbers.')
+  expect(e.message).toMatch('The reporters must be a list of strings.')
   expect(e.code).toBe('invalid-argument')
   
-  arg = { userId: REPORTED_ID, reportIndexes: [1, 2, '3'] }
+  arg = { userId: REPORTED_ID, reporters: ['a', 'b', 5] }
   e = await expectHttpsError(discardUserReports(arg, context))
-  expect(e.message).toMatch('The reportIndexes must be a list of numbers.')
-  expect(e.code).toBe('invalid-argument')
-  
-  arg = { userId: REPORTED_ID, reportIndexes: [1, 2, -3] }
-  e = await expectHttpsError(discardUserReports(arg, context))
-  expect(e.message).toMatch('All indexes must be a positive integer.')
-  expect(e.code).toBe('invalid-argument')
-  
-  arg = { userId: REPORTED_ID, reportIndexes: [1, 2, 3.5, 4] }
-  e = await expectHttpsError(discardUserReports(arg, context))
-  expect(e.message).toMatch('All indexes must be a positive integer.')
+  expect(e.message).toMatch('The reporters must be a list of strings.')
   expect(e.code).toBe('invalid-argument')
 })
 
@@ -204,48 +217,38 @@ test('variant arguments must be correct', async () => {
   
   let arg = {}
   let e = await expectHttpsError(discardVariantReports(arg, context))
-  expect(e.message).toMatch('The function must be called with a variantId and reportIndexes.')
+  expect(e.message).toMatch('The function must be called with a variantId and reporters.')
   expect(e.code).toBe('invalid-argument')
   
   arg = { variantId: VARIANT_ID }
   e = await expectHttpsError(discardVariantReports(arg, context))
-  expect(e.message).toMatch('The function must be called with a variantId and reportIndexes.')
+  expect(e.message).toMatch('The function must be called with a variantId and reporters.')
   expect(e.code).toBe('invalid-argument')
   
-  arg = { reportIndexes: [] }
+  arg = { reporters: [] }
   e = await expectHttpsError(discardVariantReports(arg, context))
-  expect(e.message).toMatch('The function must be called with a variantId and reportIndexes.')
+  expect(e.message).toMatch('The function must be called with a variantId and reporters.')
   expect(e.code).toBe('invalid-argument')
   
-  arg = { variantId: 1234, reportIndexes: [] }
+  arg = { variantId: 1234, reporters: [] }
   e = await expectHttpsError(discardVariantReports(arg, context))
   expect(e.message).toMatch('The variantId must be a string.')
   expect(e.code).toBe('invalid-argument')
   
-  arg = { variantId: VARIANT_ID, reportIndexes: 1234 }
+  arg = { variantId: VARIANT_ID, reporters: 1234 }
   e = await expectHttpsError(discardVariantReports(arg, context))
-  expect(e.message).toMatch('The reportIndexes must be a list of numbers.')
+  expect(e.message).toMatch('The reporters must be a list of strings.')
   expect(e.code).toBe('invalid-argument')
   
-  arg = { variantId: VARIANT_ID, reportIndexes: [1, 2, '3'] }
+  arg = { variantId: VARIANT_ID, reporters: ['a', 'b', 5] }
   e = await expectHttpsError(discardVariantReports(arg, context))
-  expect(e.message).toMatch('The reportIndexes must be a list of numbers.')
-  expect(e.code).toBe('invalid-argument')
-  
-  arg = { variantId: VARIANT_ID, reportIndexes: [1, 2, -3] }
-  e = await expectHttpsError(discardVariantReports(arg, context))
-  expect(e.message).toMatch('All indexes must be a positive integer.')
-  expect(e.code).toBe('invalid-argument')
-  
-  arg = { variantId: VARIANT_ID, reportIndexes: [1, 2, 3.5, 4] }
-  e = await expectHttpsError(discardVariantReports(arg, context))
-  expect(e.message).toMatch('All indexes must be a positive integer.')
+  expect(e.message).toMatch('The reporters must be a list of strings.')
   expect(e.code).toBe('invalid-argument')
 })
 
 test('caller must be authenticated as a moderator', async () => {
-  const userArg = userArgs(REPORTED_ID, [1, 2, 3])
-  const variantArg = variantArgs(VARIANT_ID, [1, 2, 3])
+  const userArg = userArgs(REPORTED_ID, ['a', 'b', 'c'])
+  const variantArg = variantArgs(VARIANT_ID, ['a', 'b', 'c'])
   await insertModerationDoc(db, 'user', REPORTED_ID, 7)
   await insertModerationDoc(db, 'variant', VARIANT_ID, 7)
   
@@ -280,8 +283,8 @@ test('caller must be authenticated as a moderator', async () => {
 
 test('cannot remove reports for a moderationDoc that does not exist', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  const userArg = userArgs(REPORTED_ID, [1, 2, 3])
-  const variantArg = variantArgs(VARIANT_ID, [1, 2, 3])
+  const userArg = userArgs(REPORTED_ID, ['a', 'b', 'c'])
+  const variantArg = variantArgs(VARIANT_ID, ['a', 'b', 'c'])
   
   let e = await expectHttpsError(discardUserReports(userArg, context))
   expect(e.message).toMatch('This moderation document does not exist.')
@@ -292,19 +295,4 @@ test('cannot remove reports for a moderationDoc that does not exist', async () =
   expect(e.code).toBe('not-found')
 })
 
-test('no index can be out of range', async () => {
-  const context = makeModeratorContext(MODERATOR_ID)
-  const userArg = userArgs(REPORTED_ID, [0, 1])
-  const variantArg = variantArgs(VARIANT_ID, [3])
-  await insertModerationDoc(db, 'user', REPORTED_ID, 1)
-  await insertModerationDoc(db, 'variant', VARIANT_ID, 2)
-  
-  let e = await expectHttpsError(discardUserReports(userArg, context))
-  expect(e.message).toMatch('Some of the given indexes are out of range.')
-  expect(e.code).toBe('invalid-argument')
-  
-  e = await expectHttpsError(discardVariantReports(variantArg, context))
-  expect(e.message).toMatch('Some of the given indexes are out of range.')
-  expect(e.code).toBe('invalid-argument')
-})
 

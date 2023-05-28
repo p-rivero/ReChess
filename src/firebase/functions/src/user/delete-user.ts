@@ -21,7 +21,7 @@ export default async function(user: UserRecord): Promise<void> {
   
   // Remove upvotes
   const userUpvotes = await userDoc.ref.collection('upvotedVariants').get()
-  const p1 = batchedUpdate(db, userUpvotes, (batch, ref) => {
+  const p1 = batchedUpdate(userUpvotes, (batch, ref) => {
     batch.delete(ref)
   }).catch((err) => {
     console.error('Error deleting upvotes for user', userId)

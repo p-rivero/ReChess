@@ -107,7 +107,7 @@
   const props = defineProps<{
     storeKey: string
     reports: Report[]
-    discardReports: (indexes: Set<number>) => Promise<void>
+    discardReports: (reporterUsernames: string[]) => Promise<void>
   }>()
   
   // Load collapsed by default
@@ -153,8 +153,10 @@
   }
   async function deleteSelectedReports() {
     deleting.value = true
+    const indexes = Array.from(selectedReportIndexes.value)
+    const usernames = indexes.map(index => props.reports[index].reporterUsername)
     try {
-      await props.discardReports(selectedReportIndexes.value)
+      await props.discardReports(usernames)
       selectedReportIndexes.value = new Set()
       selectAllCheckbox.value?.setChecked(false)
     } catch (e) {
