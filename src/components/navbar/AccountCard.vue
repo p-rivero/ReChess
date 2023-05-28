@@ -2,8 +2,8 @@
   <RouterLink
     v-if="authStore.loggedUser"
     class="card-header"
-    :class="{'not-clickable': $route.name === 'user-profile'}"
-    :to="{ name: 'user-profile', params: { username: authStore.loggedUser?.username } }"
+    :class="{'not-clickable': $route.name === 'user-profile' && $route.params.username === authStore.loggedUser.username}"
+    :to="{ name: 'user-profile', params: { username: authStore.loggedUser.username } }"
   >
     <div class="ml-3 mr-2 account-image-container is-align-self-center is-flex-shrink-0">
       <img

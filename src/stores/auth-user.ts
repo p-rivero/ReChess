@@ -36,7 +36,7 @@ export class AuthUser extends User {
       about: '',
       profileImg: null,
       IMMUTABLE: {
-        username: '',
+        username: '_', // This cannot be empty (AccountCard RouterLink throws an error)
         renameAllowedAt: null,
         numGamesPlayed: 0,
         numWinPoints: 0,

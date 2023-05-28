@@ -45,7 +45,7 @@ const LOCALES: Record<ErrorLocale, Record<ErrorToken, string>> = {
     'CANNOT_CREATE_USER': 'Could not create the user profile, try again later.',
     'WRONG_PASSWORD': 'The password is incorrect.',
     'WRONG_PASSWORD_PROVIDER': 'This email is linked to a *{provider}* account, please use the correct button to log in.',
-    'USER_DISABLED': 'Your account has been disabled for violating our terms of service. \n\nIf you think this is a mistake, please \
-      [open an issue on GitHub](https://github.com/p-rivero/ReChess/issues).',
+    'USER_DISABLED': 'Your account has been disabled.\n\nIf you think this is a mistake, please \
+      [contact us](mailto:admin@rechess.org).',
   },
 }

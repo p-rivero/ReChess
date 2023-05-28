@@ -21,7 +21,12 @@
       </div>
       <div class="is-flex is-align-items-center">
         <p class="adjust-text is-break-word">
-          vs. <a @click="goToProfile(userStore, game.opponentId)">{{ game.opponentName }}</a>
+          vs.
+          <a
+            v-if="game.opponentId"
+            @click="goToProfile(userStore, game.opponentId)"
+          >{{ game.opponentName }}</a>
+          <em v-else>Deleted user</em>
         </p>
       </div>
     </div>

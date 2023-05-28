@@ -35,7 +35,7 @@ export interface GameSummary {
   timeCreatedMs: number
   playedSide: 'white' | 'black'
   result: 'win' | 'loss' | 'draw'
-  opponentId: string
+  opponentId: string | null
   opponentName: string
 }
 
