@@ -31,7 +31,7 @@ export default async function(user: UserRecord): Promise<void> {
   const collections = await userDoc.ref.listCollections()
   const p2 = Promise.all(collections.map(async (collection) => {
     const docs = await collection.listDocuments()
-    await batchedUpdate(docs, (batch, ref) => batch.delete(ref))
+    await batchedUpdate(docs, (batch, ref) => { batch.delete(ref) })
   })).catch((err) => {
     console.error('Error deleting subcollections of user document for user', userId)
     console.error(err)

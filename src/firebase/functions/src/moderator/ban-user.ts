@@ -133,11 +133,11 @@ async function stopOngoingGames(userId: string): Promise<void> {
     .where('IMMUTABLE.whiteId', '==', userId)
     .where('winner', '==', null)
     .get()
-  await batchedUpdate(ongoingGamesWhite, (batch, ref) => batch.update(ref, stopGame))
+  await batchedUpdate(ongoingGamesWhite, (batch, ref) => { batch.update(ref, stopGame) })
   
   const ongoingGamesBlack = await db.collection('games')
     .where('IMMUTABLE.blackId', '==', userId)
     .where('winner', '==', null)
     .get()
-  await batchedUpdate(ongoingGamesBlack, (batch, ref) => batch.update(ref, stopGame))
+  await batchedUpdate(ongoingGamesBlack, (batch, ref) => { batch.update(ref, stopGame) })
 }
