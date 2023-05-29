@@ -21,7 +21,7 @@
           />
         </div>
       </div>
-      <div>
+      <div class="is-flex is-flex-direction-column">
         <RouterLink
           class="is-size-4 is-break-word"
           :to="{ name: 'variant-details', params: { variantId: variant.uid } }"

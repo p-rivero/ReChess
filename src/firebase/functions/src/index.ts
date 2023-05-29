@@ -9,6 +9,11 @@ import { region } from 'firebase-functions'
 // See each file for the function documentation
 
 
+// IMPORTANT: When creating a callable function, go to https://console.cloud.google.com/functions
+// and give the principal "allUsers" the role "Cloud Functions Invoker" for the function.
+// Otherwise, the CORS preflight request will fail.
+
+
 // FILE-UPLOAD
 
 export const checkPieceHash =
