@@ -37,13 +37,16 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('invalid-argument', 'The userId must be a string.')
   }
   
-  // Important: Detete the variants before banning the user (banUser would remove the userId)
+  // Important: Get the variants before banning the user (banUser would remove the userId)
   const { db } = await useAdmin()
   const variants = await db.collection('variants').where('creatorId', '==', userId).get()
   const variantIds = variants.docs.map((doc) => doc.id)
-  await Promise.all(variantIds.map(async (id) => await deleteVariant({ id }, context)))
   
+  // Start by banning the user, since this has the potential to fail
   await banUser({ userId }, context)
+  
+  // Remove the user's variants
+  await Promise.all(variantIds.map(async (id) => await deleteVariant({ variantId: id }, context)))
   
   // Remove the user's reports
   const reportedVariants = await db.collection('users').doc(userId).collection('reportedVariants').get()

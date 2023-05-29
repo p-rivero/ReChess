@@ -26,6 +26,15 @@ export async function insertModerationDoc(db: DB, type: 'user'|'variant', id: st
   return doc
 }
 
+export async function insertReportUser(db: DB, reporterId: string, reportedUserId: string) {
+  // TODO: Create a report. Create or update moderationDoc of the user.
+}
+
+export async function insertReportVariant(db: DB, reporterId: string, reportedVariantId: string) {
+  // TODO: Create a report. Create or update moderationDoc of the variant.
+}
+
+
 export function makeModeratorContext(userId: string) {
   return makeCallableContext(userId, true, true, { moderator: true })
 }
