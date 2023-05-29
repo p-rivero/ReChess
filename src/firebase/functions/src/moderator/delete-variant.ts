@@ -2,6 +2,7 @@
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import { batchedUpdate, useAdmin } from '../helpers'
 import assertModerator from './helpers/assert-moderator'
+import { VariantIndexDoc } from 'db/schema'
 
 /**
  * Called directly by the moderator in order to delete a variant.
@@ -35,4 +36,27 @@ export default async function(data: unknown, context: CallableContext): Promise<
   // Delete the variant
   await db.collection('variants').doc(variantId).delete()
   await db.collection('variantModeration').doc(variantId).delete()
+  
+  await updateIndex(variantId)
+}
+
+
+async function updateIndex(removedId: string) {
+  const { db } = await useAdmin()
+  const indexes = await db.collection('variantIndex').get()
+  let found = false
+  
+  for (const doc of indexes.docs) {
+    const data = doc.data() as VariantIndexDoc
+    const indexRows = data.index.split('\n')
+    const rowsFiltered = indexRows.filter(row => !row.startsWith(removedId + '\t'))
+    const indexFiltered = rowsFiltered.join('\n')
+    if (indexFiltered === data.index) continue
+    await db.collection('variantIndex').doc(doc.id).update({ index: indexFiltered })
+    found = true
+  }
+  
+  if (!found) {
+    console.error(`Could not find index entry for ${removedId}`)
+  }
 }

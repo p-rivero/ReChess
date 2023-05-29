@@ -1,9 +1,11 @@
 import admin from 'firebase-admin'
-import type { VariantDoc } from '@/firebase/db/schema'
+import type { VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
 
+type DB = admin.firestore.Firestore
+
 export async function insertVariant(
-  db: admin.firestore.Firestore,
+  db: DB,
   variantId: string,
   firstPlayerToMove: 'white' | 'black' | 'invalid-variant',
   creatorId = 'creator_id',
@@ -31,5 +33,22 @@ export async function insertVariant(
     initialState,
   }
   await db.collection('variants').doc(variantId).set(doc)
+  return doc
+}
+
+export type IndexEntry = {
+  id: string
+  name: string
+  description?: string
+  tags?: string[]
+}
+export async function insertIndex(db: DB, entries: IndexEntry[], indexNum = 0): Promise<VariantIndexDoc> {
+  const index = entries.map(e => {
+    const description = e.description ?? `This is the description for ${e.name}`
+    const tags = e.tags ? e.tags.join(',') : 'tag1,tag2'
+    return `${e.id}\t${e.name}\t${description}\t${tags}`
+  }).join('\n')
+  const doc: VariantIndexDoc = { index }
+  await db.collection('variantIndex').doc(indexNum.toString()).set(doc)
   return doc
 }

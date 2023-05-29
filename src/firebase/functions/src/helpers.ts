@@ -1,5 +1,6 @@
 import { MAX_BATCH_SIZE } from './config'
 import type { App } from 'firebase-admin/lib/app'
+import type { DocumentData } from 'firebase-admin/lib/firestore'
 
 // True if the admin SDK has been initialized for this cloud function instance
 let appInstance: App | null = null
@@ -44,7 +45,7 @@ export async function callFunction< F extends(...args: any[]) => Promise<any> >
 type QuerySnapshot = FirebaseFirestore.QuerySnapshot
 type WriteBatch = FirebaseFirestore.WriteBatch
 type DocumentReference = FirebaseFirestore.DocumentReference
-type BatchCallback = (batch: WriteBatch, ref: DocumentReference) => unknown | Promise<unknown>
+type BatchCallback = (batch: WriteBatch, ref: DocumentReference, data: DocumentData) => unknown | Promise<unknown>
 
 /**
  * Generic function to perform a batched update of possibly more than 500 documents.
@@ -65,7 +66,7 @@ export async function batchedUpdate(input: QuerySnapshot, operation: BatchCallba
     for (let i = 0; i < MAX_BATCH_SIZE; i++) {
       const doc = input.docs[nBatch * MAX_BATCH_SIZE + i]
       if (!doc) break
-      await operation(batch, doc.ref)
+      await operation(batch, doc.ref, doc.data())
     }
     await batch.commit()
   }

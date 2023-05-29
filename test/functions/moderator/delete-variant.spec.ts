@@ -3,7 +3,7 @@ import { functions, initialize } from '../init'
 import { makeModeratorContext, insertModerationDoc } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
-import { insertVariant } from '../variant/variant-mock'
+import { insertVariant, insertIndex } from '../variant/variant-mock'
 import { insertGame } from '../game/games-mock'
 
 const { app, testEnv } = initialize('delete-variant-test')
@@ -23,8 +23,11 @@ test('moderator can delete a variant', async () => {
   const args = makeArgs(VARIANT_ID)
   await insertVariant(db, VARIANT_ID, 'white')
   await insertVariant(db, 'another_variant', 'white')
+  await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
+  const done = expectNoErrorLog()
   await expectSuccess(deleteVariant(args, context))
+  done()
   
   const variant = await db.collection('variants').doc(VARIANT_ID).get()
   expect(variant.exists).toBe(false)
@@ -37,12 +40,15 @@ test('moderator can delete a variant with games', async () => {
   const args = makeArgs(VARIANT_ID)
   await insertVariant(db, VARIANT_ID, 'white')
   await insertVariant(db, 'another_variant', 'white')
+  await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
   await insertGame(db, 'game_1', VARIANT_ID, 'draw')
   await insertGame(db, 'game_2', VARIANT_ID)
   await insertGame(db, 'game_3', 'another_variant')
   
+  const done = expectNoErrorLog()
   await expectSuccess(deleteVariant(args, context))
+  done()
   
   const variant = await db.collection('variants').doc(VARIANT_ID).get()
   expect(variant.exists).toBe(false)
@@ -62,11 +68,14 @@ test('moderation document is deleted', async () => {
   const args = makeArgs(VARIANT_ID)
   await insertVariant(db, VARIANT_ID, 'white')
   await insertVariant(db, 'another_variant', 'white')
+  await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
   await insertModerationDoc(db, 'variant', VARIANT_ID, 10)
   const otherDoc = await insertModerationDoc(db, 'variant', 'another_variant', 4)
   
+  const done = expectNoErrorLog()
   await expectSuccess(deleteVariant(args, context))
+  done()
   
   const docAfter = await db.collection('variantModeration').doc(VARIANT_ID).get()
   expect(docAfter.exists).toBe(false)
@@ -75,13 +84,66 @@ test('moderation document is deleted', async () => {
   expect(otherDocAfter.data()).toEqual(otherDoc)
 })
 
+test('variant index is updated', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(VARIANT_ID)
+  await insertVariant(db, VARIANT_ID, 'white')
+  
+  const index1 = await insertIndex(db, [
+    { id: 'aaa', name: 'Variant A', description: 'abc', tags: [] },
+    { id: VARIANT_ID, name: 'Variant name', description: 'some description', tags: ['tag1', 'tag2'] },
+    { id: 'bbb', name: 'Variant B' },
+  ], 123)
+  expect(index1).toEqual({ index:
+      'aaa\tVariant A\tabc\t\n' +
+      VARIANT_ID + '\tVariant name\tsome description\ttag1,tag2\n' +
+      'bbb\tVariant B\tThis is the description for Variant B\ttag1,tag2'
+  })
+  
+  const index2 = await insertIndex(db, [{ id: 'ccc', name: 'Variant C' }], 456)
+  expect(index2).toEqual({
+    index: 'ccc\tVariant C\tThis is the description for Variant C\ttag1,tag2'
+  })
+  
+  const done = expectNoErrorLog()
+  await expectSuccess(deleteVariant(args, context))
+  done()
+  
+  const index1After = await db.collection('variantIndex').doc('123').get()
+  expect(index1After.data()).toEqual({ index:
+    'aaa\tVariant A\tabc\t\n' +
+    'bbb\tVariant B\tThis is the description for Variant B\ttag1,tag2'
+  })
+  const index2After = await db.collection('variantIndex').doc('456').get()
+  expect(index2After.data()).toEqual({ index:
+    'ccc\tVariant C\tThis is the description for Variant C\ttag1,tag2'
+  })
+})
+
+test('deleting a variant when index does not exist', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(VARIANT_ID)
+  await insertVariant(db, VARIANT_ID, 'white')
+  const index = await insertIndex(db, [
+    { id: 'another', name: 'Another variant' },
+    { id: 'not_this_id', name: 'Variant name' },
+  ])
+  
+  const done = expectLog('error', 'Could not find index entry for ' + VARIANT_ID)
+  await expectSuccess(deleteVariant(args, context))
+  done()
+  
+  const indexAfter = await db.collection('variantIndex').doc('0').get()
+  expect(indexAfter.data()).toEqual(index)
+})
+
 test('deleting a variant that does not exist does nothing', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
   await insertVariant(db, 'another_variant', 'white')
   await insertGame(db, 'game_1', 'another_variant', 'draw')
   
-  const done = expectNoErrorLog()
+  const done = expectLog('error', 'Could not find index entry for ' + VARIANT_ID)
   await expectSuccess(deleteVariant(args, context))
   done()
   
@@ -98,9 +160,10 @@ test('deleting a variant twice does nothing', async () => {
   await insertVariant(db, VARIANT_ID, 'white')
   await insertVariant(db, 'another_variant', 'white')
   await insertGame(db, 'game_1', VARIANT_ID, 'draw')
+  await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
   await expectSuccess(deleteVariant(args, context))
-  const done = expectNoErrorLog()
+  const done = expectLog('error', 'Could not find index entry for ' + VARIANT_ID)
   await expectSuccess(deleteVariant(args, context))
   done()
   
@@ -120,6 +183,7 @@ test('delete a variant with more than 500 games', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
   await insertVariant(db, VARIANT_ID, 'white')
+  await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
   await Promise.all(Array.from({ length: NUM_GAMES }, async (_, i) => {
     await insertGame(db, `game_${i}`, VARIANT_ID)
@@ -130,8 +194,10 @@ test('delete a variant with more than 500 games', async () => {
   }))
   
   const done = expectLog('info', 'Batching 501 documents into 2 batches')
+  const done2 = expectNoErrorLog()
   await expectSuccess(deleteVariant(args, context))
   done()
+  done2()
   
   const variant = await db.collection('variants').doc(VARIANT_ID).get()
   expect(variant.exists).toBe(false)
