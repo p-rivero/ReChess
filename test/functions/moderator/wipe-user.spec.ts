@@ -3,9 +3,9 @@ import { functions, initialize } from '../init'
 import { makeModeratorContext } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
-import type { UserDoc, GameDoc, VariantDoc } from '@/firebase/db/schema'
+import type { UserDoc, GameDoc } from '@/firebase/db/schema'
 import { insertGame } from '../game/games-mock'
-import { insertIndex, insertVariant } from '../variant/variant-mock'
+import { insertVariant } from '../variant/variant-mock'
 
 const { app, testEnv } = initialize('wipe-user-test')
 const db = app.firestore()

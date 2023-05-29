@@ -2,7 +2,7 @@ import { expectHttpsError, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
 import { extractReporters, insertModerationDoc, insertReport, makeModeratorContext, REPORT_SUMMARY_REGEX } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
-import type { ModerationDoc, ReportDoc } from '@/firebase/db/schema'
+import type { ModerationDoc } from '@/firebase/db/schema'
 import type { https } from 'firebase-functions'
 import { insertUser } from '../user/user-mock'
 
