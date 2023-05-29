@@ -5,7 +5,7 @@ import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
 import type { UserDoc, GameDoc, VariantDoc } from '@/firebase/db/schema'
 import { insertGame } from '../game/games-mock'
-import { insertVariant } from '../variant/variant-mock'
+import { insertIndex, insertVariant } from '../variant/variant-mock'
 
 const { app, testEnv } = initialize('wipe-user-test')
 const db = app.firestore()
@@ -115,7 +115,9 @@ test('created variants are removed', async () => {
   await insertGame(db, 'game_1', 'variant_id', 'draw')
   await insertGame(db, 'game_2', 'another_variant')
   
+  const done = expectLog('error', 'Could not find index entry for variant_id')
   await expectSuccess(wipeUser(args, context))
+  done()
   
   const variantAfter = await db.collection('variants').doc('variant_id').get()
   expect(variantAfter.exists).toBe(false)

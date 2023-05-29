@@ -4,7 +4,7 @@ import { makeModeratorContext, insertModerationDoc } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
 import { insertVariant, insertIndex } from '../variant/variant-mock'
-import { insertGame } from '../game/games-mock'
+import { insertGame, insertLobbySlot } from '../game/games-mock'
 
 const { app, testEnv } = initialize('delete-variant-test')
 const db = app.firestore()
@@ -16,6 +16,11 @@ const VARIANT_ID = 'deleted_variant_id'
 
 function makeArgs(deletedVariantId: string) {
   return { variantId: deletedVariantId }
+}
+
+async function gameOverTriggerExists(gameId: string): Promise<boolean> {
+  const doc = await db.collection('games').doc(gameId).collection('gameOverTrigger').doc('doc').get()
+  return doc.exists
 }
 
 test('moderator can delete a variant', async () => {
@@ -42,9 +47,12 @@ test('moderator can delete a variant with games', async () => {
   await insertVariant(db, 'another_variant', 'white')
   await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
-  await insertGame(db, 'game_1', VARIANT_ID, 'draw')
+  await insertGame(db, 'game_1', VARIANT_ID, 'draw', true)
   await insertGame(db, 'game_2', VARIANT_ID)
-  await insertGame(db, 'game_3', 'another_variant')
+  await insertGame(db, 'game_3', 'another_variant', 'white', true)
+  expect(await gameOverTriggerExists('game_1')).toBe(true)
+  expect(await gameOverTriggerExists('game_2')).toBe(false)
+  expect(await gameOverTriggerExists('game_3')).toBe(true)
   
   const done = expectNoErrorLog()
   await expectSuccess(deleteVariant(args, context))
@@ -61,6 +69,10 @@ test('moderator can delete a variant with games', async () => {
   expect(game2.exists).toBe(false)
   const game3 = await db.collection('games').doc('game_3').get()
   expect(game3.exists).toBe(true)
+  
+  expect(await gameOverTriggerExists('game_1')).toBe(false)
+  expect(await gameOverTriggerExists('game_2')).toBe(false)
+  expect(await gameOverTriggerExists('game_3')).toBe(true)
 })
 
 test('moderation document is deleted', async () => {
@@ -118,6 +130,28 @@ test('variant index is updated', async () => {
   expect(index2After.data()).toEqual({ index:
     'ccc\tVariant C\tThis is the description for Variant C\ttag1,tag2'
   })
+})
+
+test('lobby slots are deleted', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(VARIANT_ID)
+  await insertVariant(db, VARIANT_ID, 'white')
+  await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
+  
+  await insertLobbySlot(db, VARIANT_ID, 'creator_1', 'challenger_id', 'random', true)
+  await insertLobbySlot(db, VARIANT_ID, 'creator_2', null, 'white')
+  await insertLobbySlot(db, 'another_variant', 'creator_id', null, 'white')
+  
+  const done = expectNoErrorLog()
+  await expectSuccess(deleteVariant(args, context))
+  done()
+  
+  const slot1 = await db.collection('variants').doc(VARIANT_ID).collection('lobby').doc('creator_1').get()
+  expect(slot1.exists).toBe(false)
+  const slot2 = await db.collection('variants').doc(VARIANT_ID).collection('lobby').doc('creator_2').get()
+  expect(slot2.exists).toBe(false)
+  const slot3 = await db.collection('variants').doc('another_variant').collection('lobby').doc('creator_id').get()
+  expect(slot3.exists).toBe(true)
 })
 
 test('deleting a variant when index does not exist', async () => {
@@ -193,7 +227,7 @@ test('delete a variant with more than 500 games', async () => {
     expect(game.exists).toBe(true)
   }))
   
-  const done = expectLog('info', 'Batching 501 documents into 2 batches')
+  const done = expectLog('info', 'Batching 501 documents into 2 batches', 2)
   const done2 = expectNoErrorLog()
   await expectSuccess(deleteVariant(args, context))
   done()
@@ -207,6 +241,7 @@ test('delete a variant with more than 500 games', async () => {
     expect(game.exists).toBe(false)
   }))
 }, 60000)
+
 
 
 
@@ -224,9 +259,6 @@ test('arguments must be correct', async () => {
   e = await expectHttpsError(deleteVariant(arg, context))
   expect(e.message).toMatch('The variantId must be a string.')
   expect(e.code).toBe('invalid-argument')
-  
-  arg = { variantId: VARIANT_ID }
-  await expectSuccess(deleteVariant(arg, context))
 })
 
 test('caller must be authenticated as a moderator', async () => {
@@ -253,7 +285,4 @@ test('caller must be authenticated as a moderator', async () => {
   e = await expectHttpsError(deleteVariant(args, context))
   expect(e.message).toMatch('The user must be a moderator.')
   expect(e.code).toBe('permission-denied')
-  
-  context = makeModeratorContext(MODERATOR_ID)
-  await expectSuccess(deleteVariant(args, context))
 })

@@ -1,6 +1,6 @@
 import admin from 'firebase-admin'
 import { insertVariant } from '../variant/variant-mock'
-import type { GameDoc, LobbySlotDoc, RequestedColor, VariantDoc } from '@/firebase/db/schema'
+import type { GameDoc, LobbySlotDoc, RequestedColor, VariantDoc, GameOverTriggerDoc } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
 
 
@@ -8,7 +8,8 @@ export async function insertGame(
   db: admin.firestore.Firestore,
   gameId: string,
   variantId: string,
-  winner?: 'white' | 'black' | 'draw'
+  winner?: 'white' | 'black' | 'draw',
+  createGameOverTrigger = false,
 ): Promise<GameDoc> {
   const variantSnap = await db.collection('variants').doc(variantId).get()
   const variant = variantSnap.exists ?
@@ -32,6 +33,14 @@ export async function insertGame(
     },
   }
   await db.collection('games').doc(gameId).set(doc)
+  
+  if (createGameOverTrigger) {
+    const doc: GameOverTriggerDoc = {
+      gameOverTime: admin.firestore.Timestamp.now() as Timestamp,
+    }
+    await db.collection('games').doc(gameId).collection('gameOverTrigger').doc('doc').set(doc)
+  }
+  
   return doc
 }
 

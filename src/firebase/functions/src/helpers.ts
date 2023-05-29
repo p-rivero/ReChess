@@ -1,6 +1,6 @@
 import { MAX_BATCH_SIZE } from './config'
 import type { App } from 'firebase-admin/lib/app'
-import type { DocumentData } from 'firebase-admin/lib/firestore'
+import type { DocumentReference, QuerySnapshot, WriteBatch } from 'firebase-admin/lib/firestore'
 
 // True if the admin SDK has been initialized for this cloud function instance
 let appInstance: App | null = null
@@ -42,21 +42,22 @@ export async function callFunction< F extends(...args: any[]) => Promise<any> >
   return mod.default(...args)
 }
 
-type QuerySnapshot = FirebaseFirestore.QuerySnapshot
-type WriteBatch = FirebaseFirestore.WriteBatch
-type DocumentReference = FirebaseFirestore.DocumentReference
-type BatchCallback = (batch: WriteBatch, ref: DocumentReference, data: DocumentData) => unknown | Promise<unknown>
+type BatchUpdateInput = QuerySnapshot | DocumentReference[]
+type BatchCallback = (batch: WriteBatch, ref: DocumentReference) => unknown | Promise<unknown>
 
 /**
  * Generic function to perform a batched update of possibly more than 500 documents.
- * @param {QuerySnapshot} input A query snapshot of the documents to update
+ * @param {QuerySnapshot|DocumentReference[]} input The list of documents to update
  * @param {BatchCallback} operation A function that is called for each document in the snapshot.
  * It should add the required update to the batch.
  * @return {Promise<void>} A promise that resolves when all the batches have been committed
 */
-export async function batchedUpdate(input: QuerySnapshot, operation: BatchCallback): Promise<void> {
+export async function batchedUpdate(input: BatchUpdateInput, operation: BatchCallback): Promise<void> {
   const { db } = await useAdmin()
-  const numDocs = input.size
+  // Convert QuerySnapshot to DocumentReference[]
+  if (!Array.isArray(input)) input = input.docs.map((doc) => doc.ref)
+  
+  const numDocs = input.length
   const numBatches = Math.ceil(numDocs / MAX_BATCH_SIZE)
   if (numBatches > 1) {
     console.info(`Batching ${numDocs} documents into ${numBatches} batches`)
@@ -64,9 +65,9 @@ export async function batchedUpdate(input: QuerySnapshot, operation: BatchCallba
   for (let nBatch = 0; nBatch < numBatches; nBatch++) {
     const batch = db.batch()
     for (let i = 0; i < MAX_BATCH_SIZE; i++) {
-      const doc = input.docs[nBatch * MAX_BATCH_SIZE + i]
-      if (!doc) break
-      await operation(batch, doc.ref, doc.data())
+      const ref = input[nBatch * MAX_BATCH_SIZE + i]
+      if (!ref) break
+      await operation(batch, ref)
     }
     await batch.commit()
   }
