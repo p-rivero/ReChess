@@ -146,17 +146,18 @@
       >
         <button
           class="button is-danger mt-2 mr-4"
+          :disabled="user.banned"
           @click="banUser"
         >
           <div class="sz-icon icon-gavel color-white" />
-          Ban user
+          {{ user.banned ? 'Already banned' : 'Ban user' }}
         </button>
         <button
           class="button is-danger mt-2"
           @click="wipeUser"
         >
           <div class="sz-icon icon-trash color-white" />
-          Ban & Remove data
+          {{ user.banned ? 'Remove data' : 'Ban & Remove data' }}
         </button>
       </div>
       
@@ -265,7 +266,7 @@
   import { ErrorMessageHandler } from '@/helpers/errors/error-message-handler'
   import { User, useUserStore } from '@/stores/user'
   import { returnHome } from '@/helpers/managers/navigation-manager'
-  import { showPopup } from '@/helpers/managers/popup-manager'
+  import { showPopup, showPopupImportant } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useGameStore } from '@/stores/game'
   import { useModeratorStore } from '@/stores/moderator'
@@ -513,11 +514,14 @@
       async () => {
         if (!user.value) throw new Error('User is undefined')
         try {
+          showPopupImportant('⌛', 'Banning user, please wait...', 'ok')
           await moderatorStore.banUser(user.value.uid)
           showPopup(
             'User banned',
             'The user has been successfully banned.',
-            'ok'
+            'ok',
+            () => window.location.reload(),
+            () => window.location.reload()
           )
         } catch (e) {
           console.error(e)
@@ -540,11 +544,14 @@
       async () => {
         if (!user.value) throw new Error('User is undefined')
         try {
+          showPopupImportant('⌛', 'Wiping user data, please wait...', 'ok')
           await moderatorStore.wipeUser(user.value.uid)
           showPopup(
             'User wiped',
             'The user has been banned and their variants and reports have been deleted.',
-            'ok'
+            'ok',
+            () => window.location.reload(),
+            () => window.location.reload()
           )
         } catch (e) {
           console.error(e)

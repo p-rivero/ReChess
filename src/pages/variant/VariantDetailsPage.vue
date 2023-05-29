@@ -135,7 +135,7 @@
   import { goToProfile, returnHome } from '@/helpers/managers/navigation-manager'
   import { nTimes } from '@/helpers/locale'
   import { requestSignIn } from '@/helpers/managers/auth-manager'
-  import { showPopup } from '@/helpers/managers/popup-manager'
+  import { showPopup, showPopupImportant } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useAuthStore } from '@/stores/auth-user'
   import { useModeratorStore } from '@/stores/moderator'
@@ -285,13 +285,15 @@
   function deleteVariant() {
     showPopup(
       'Delete variant',
-      'This will delete the variant and all the **games** played with it.\
+      'This will delete the variant and **all the games** played with it.\
       \n\nThis action cannot be undone. Do you want to continue?',
       'ok-cancel',
       async () => {
         if (!variant.value) throw new Error('variant is null')
         try {
+          showPopupImportant('⌛', 'Deleting variant, please wait...', 'ok')
           await moderatorStore.deleteVariant(variant.value.uid)
+          router.replace({ name: 'home' })
           showPopup(
             'Variant deleted',
             'The variant and all the games played with it have been deleted.',

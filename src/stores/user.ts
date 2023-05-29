@@ -16,6 +16,7 @@ export class User {
   public renameAllowedAt: Date | undefined
   public displayName: string
   public latestGames: GameSummary[]
+  public banned: boolean
   
   constructor(id: string, doc: UserDoc) {
     const name = doc.name ?? undefined // null -> undefined
@@ -31,6 +32,7 @@ export class User {
     this.numWinPoints = doc.IMMUTABLE.numWinPoints
     this.last5GamesStr = doc.IMMUTABLE.last5Games
     this.latestGames = JSON.parse(this.last5GamesStr)
+    this.banned = doc.banned ?? false
     
     this.displayName = this.name ?? `@${this.username}`
   }
