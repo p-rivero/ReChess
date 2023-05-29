@@ -1,9 +1,8 @@
 import { expectHttpsError, expectLog, expectNoErrorLog, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
-import { makeModeratorContext } from './moderator-mock'
+import { makeModeratorContext, insertModerationDoc } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
-import type { UserDoc } from '@/firebase/db/schema'
 import { insertVariant } from '../variant/variant-mock'
 import { insertGame } from '../game/games-mock'
 
@@ -56,6 +55,24 @@ test('moderator can delete a variant with games', async () => {
   expect(game2.exists).toBe(false)
   const game3 = await db.collection('games').doc('game_3').get()
   expect(game3.exists).toBe(true)
+})
+
+test('moderation document is deleted', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(VARIANT_ID)
+  await insertVariant(db, VARIANT_ID, 'white')
+  await insertVariant(db, 'another_variant', 'white')
+  
+  await insertModerationDoc(db, 'variant', VARIANT_ID, 10)
+  const otherDoc = await insertModerationDoc(db, 'variant', 'another_variant', 4)
+  
+  await expectSuccess(deleteVariant(args, context))
+  
+  const docAfter = await db.collection('variantModeration').doc(VARIANT_ID).get()
+  expect(docAfter.exists).toBe(false)
+  const otherDocAfter = await db.collection('variantModeration').doc('another_variant').get()
+  expect(otherDocAfter.exists).toBe(true)
+  expect(otherDocAfter.data()).toEqual(otherDoc)
 })
 
 test('deleting a variant that does not exist does nothing', async () => {

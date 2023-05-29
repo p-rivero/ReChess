@@ -1,6 +1,7 @@
-import { ModerationDoc } from "@/firebase/db/schema"
-import type admin from 'firebase-admin'
+import { ModerationDoc, ReportDoc } from "@/firebase/db/schema"
+import admin from 'firebase-admin'
 import { makeCallableContext } from "../make-context"
+import type { Timestamp } from "firebase/firestore"
 
 type DB = admin.firestore.Firestore
 
@@ -26,12 +27,31 @@ export async function insertModerationDoc(db: DB, type: 'user'|'variant', id: st
   return doc
 }
 
-export async function insertReportUser(db: DB, reporterId: string, reportedUserId: string) {
-  // TODO: Create a report. Create or update moderationDoc of the user.
-}
-
-export async function insertReportVariant(db: DB, reporterId: string, reportedVariantId: string) {
-  // TODO: Create a report. Create or update moderationDoc of the variant.
+export async function insertReport(db: DB, reporterId: string, type: 'user'|'variant', reportedId: string) {
+  const report: ReportDoc = {
+    time: admin.firestore.Timestamp.now() as Timestamp,
+    reason: `The user ${reporterId} reported the ${type} ${reportedId}`,
+    onlyBlock: false,
+  }
+  const reportedCol = type === 'user' ? 'reportedUsers' : 'reportedVariants'
+  await db.collection('users').doc(reporterId).collection(reportedCol).doc(reportedId).set(report)
+  
+  const moderationCol = type === 'user' ? 'userModeration' : 'variantModeration'
+  const moderationDoc = await db.collection(moderationCol).doc(reportedId).get()
+  let modDoc: ModerationDoc
+  if (!moderationDoc.exists) {
+    modDoc = {
+      numReports: 1,
+      reportsSummary: `${reporterId}\t${report.reason}\t${report.time.toMillis()}`
+    }
+  } else {
+    const oldDoc = moderationDoc.data() as ModerationDoc
+    modDoc = {
+      numReports: oldDoc.numReports + 1,
+      reportsSummary: `${oldDoc.reportsSummary}\n${reporterId}\t${report.reason}\t${report.time.toMillis()}`,
+    }
+  }
+  await db.collection(moderationCol).doc(reportedId).set(modDoc)
 }
 
 

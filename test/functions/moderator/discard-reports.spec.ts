@@ -1,9 +1,10 @@
 import { expectHttpsError, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
-import { extractReporters, insertModerationDoc, makeModeratorContext, REPORT_SUMMARY_REGEX } from './moderator-mock'
+import { extractReporters, insertModerationDoc, insertReport, makeModeratorContext, REPORT_SUMMARY_REGEX } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
-import type { ModerationDoc } from '@/firebase/db/schema'
+import type { ModerationDoc, ReportDoc } from '@/firebase/db/schema'
 import type { https } from 'firebase-functions'
+import { insertUser } from '../user/user-mock'
 
 const { app, testEnv } = initialize('discard-report-test')
 const db = app.firestore()
@@ -172,6 +173,39 @@ test('non-existent reporters are ignored', async () => {
     reportsBefore[4],
     reportsBefore[5],
   ])
+})
+
+test('reports are not deleted from the user reports collection', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = userArgs(REPORTED_ID, ['a_reporter'])
+  await insertUser(db, 'a_reporter')
+  await insertReport(db, 'a_reporter', 'user', REPORTED_ID)
+  
+  const userReportBefore = await db.collection('users').doc('a_reporter')
+      .collection('reportedUsers').doc(REPORTED_ID).get()
+  expect(userReportBefore.data()).toEqual({
+    time: expect.anything(),
+    reason: 'The user a_reporter reported the user ' + REPORTED_ID,
+    onlyBlock: false,
+  })
+  
+  const moderationDocBefore = await db.collection('userModeration').doc(REPORTED_ID).get()
+  expect(moderationDocBefore.data()).toEqual({
+    numReports: 1,
+    reportsSummary: expect.stringMatching(/^a_reporter\tThe user a_reporter reported the user reported_user_id\t\d+$/),
+  })
+  
+  await expectSuccess(discardUserReports(args, context))
+  
+  const userReportAfter = await db.collection('users').doc('a_reporter')
+      .collection('reportedUsers').doc(REPORTED_ID).get()
+  expect(userReportAfter.data()).toEqual(userReportBefore.data())
+  
+  const moderationDocAfter = await db.collection('userModeration').doc(REPORTED_ID).get()
+  expect(moderationDocAfter.data()).toEqual({
+    numReports: 0,
+    reportsSummary: '',
+  })
 })
 
 

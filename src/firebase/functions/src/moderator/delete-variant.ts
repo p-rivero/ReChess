@@ -27,9 +27,12 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('invalid-argument', 'The variantId must be a string.')
   }
   
+  // Delete games played on the variant
   const { db } = await useAdmin()
   const games = await db.collection('games').where('IMMUTABLE.variantId', '==', variantId).get()
   await batchedUpdate(games, async (batch, ref) => batch.delete(ref))
   
+  // Delete the variant
   await db.collection('variants').doc(variantId).delete()
+  await db.collection('variantModeration').doc(variantId).delete()
 }
