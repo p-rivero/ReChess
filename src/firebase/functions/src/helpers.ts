@@ -1,25 +1,41 @@
 import { MAX_BATCH_SIZE } from './config'
 import type { App } from 'firebase-admin/lib/app'
+import type * as admin from 'firebase-admin'
 import type { DocumentReference, QuerySnapshot, WriteBatch } from 'firebase-admin/lib/firestore'
 
 // True if the admin SDK has been initialized for this cloud function instance
 let appInstance: App | null = null
 
+
+export type UseAdminReturn = {
+  db: admin.firestore.Firestore,
+  storage: admin.storage.Storage,
+  auth: admin.auth.Auth
+}
+
+type AdminType = typeof import('firebase-admin')
+export const injectApp = {
+  // Mocked in cloud functions tests
+  getAdminReturn(admin: AdminType, app: App): UseAdminReturn {
+    return {
+      db: admin.firestore(app),
+      storage: admin.storage(app),
+      auth: admin.auth(app),
+    }
+  }
+}
+
 /**
  * Lazy load the admin SDK and initialize it if it hasn't been already
  * @return {app} The admin SDK
  */
-export async function useAdmin() {
+export async function useAdmin(): Promise<UseAdminReturn> {
   // See https://youtu.be/v3eG9xpzNXM
   const admin = await import('firebase-admin')
   if (!appInstance) {
     appInstance = admin.initializeApp()
   }
-  return {
-    db: admin.firestore(appInstance),
-    storage: admin.storage(appInstance),
-    auth: admin.auth(appInstance),
-  }
+  return injectApp.getAdminReturn(admin, appInstance)
 }
 
 

@@ -1,6 +1,7 @@
 import admin from 'firebase-admin'
 import initFunctions from 'firebase-functions-test'
 import { assertEmulatorsRunning } from '../test-common'
+import { injectApp } from '@/firebase/functions/src/helpers'
 import type { FeaturesList } from 'firebase-functions-test/lib/features'
 import type { AppOptions } from 'firebase-admin'
 
@@ -24,7 +25,11 @@ export function initialize(projectId: string): TestUtils {
     credential: admin.credential.applicationDefault(),
   }
   const app = admin.initializeApp(config, projectId)
-  jest.spyOn(admin, 'initializeApp').mockImplementation(() => app)
+  jest.spyOn(injectApp, 'getAdminReturn').mockImplementation((admin, defaultApp) => ({
+    db: admin.firestore(defaultApp),
+    storage: admin.storage(app),
+    auth: admin.auth(app),
+  }))
   currentUtils = { app, testEnv }
   return currentUtils
 }

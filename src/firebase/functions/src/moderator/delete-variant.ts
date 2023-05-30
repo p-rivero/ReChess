@@ -31,14 +31,20 @@ export default async function(data: unknown, context: CallableContext): Promise<
   // Delete games played on the variant
   const { db } = await useAdmin()
   const games = await db.collection('games').where('IMMUTABLE.variantId', '==', variantId).get()
-  await batchedUpdate(games, (batch, ref) => { batch.delete(ref) })
-  await batchedUpdate(games, (batch, ref) => { batch.delete(ref.collection('gameOverTrigger').doc('doc')) })
+  await batchedUpdate(games, (batch, ref) => {
+    batch.delete(ref)
+  })
+  await batchedUpdate(games, (batch, ref) => {
+    batch.delete(ref.collection('gameOverTrigger').doc('doc'))
+  })
   
   // Delete the variant, reports and lobby slots
   await db.collection('variants').doc(variantId).delete()
   await db.collection('variantModeration').doc(variantId).delete()
   const lobbyDocs = await db.collection('variants').doc(variantId).collection('lobby').get()
-  await batchedUpdate(lobbyDocs, (batch, ref) => { batch.delete(ref) })
+  await batchedUpdate(lobbyDocs, (batch, ref) => {
+    batch.delete(ref)
+  })
   
   await updateIndex(variantId)
 }

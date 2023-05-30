@@ -151,10 +151,16 @@ export interface CancelledGameDoc extends GameDoc {
   cancelTime: Timestamp
 }
 
-
 // userModeration/{userId}
 // variantModeration/{variantId}
 export interface ModerationDoc {
   numReports: number
   reportsSummary: string
+}
+
+// bannedUserData/{userId}
+export interface BannedUserDataDoc {
+  name: string | null
+  about: string
+  profileImg: string | null
 }

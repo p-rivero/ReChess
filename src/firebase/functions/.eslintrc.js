@@ -46,5 +46,6 @@ module.exports = {
       exports: 'always-multiline',
     }],
     'sort-imports-es6-autofix/sort-imports-es6': ['warn'],
+    'require-jsdoc': 'off',
   },
 }

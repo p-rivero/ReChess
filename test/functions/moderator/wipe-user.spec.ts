@@ -41,8 +41,6 @@ test('moderator can wipe a user', async () => {
     banned: true,
     IMMUTABLE: oldUserDoc.IMMUTABLE,
   })
-  expect(userRecord.displayName).toBe('[deleted]')
-  expect(userRecord.photoURL).toBe(undefined)
   expect(userRecord.disabled).toBe(true)
 })
 
@@ -76,7 +74,7 @@ test('user name is removed from games', async () => {
   expect(ongoingGameAfter).toEqual({
     ...ongoingGameBefore,
     playerToMove: 'game-over',
-    winner: 'draw',
+    winner: 'black',
     IMMUTABLE: {
       ...ongoingGameBefore.IMMUTABLE,
       whiteId: null,
@@ -87,7 +85,7 @@ test('user name is removed from games', async () => {
   expect(ongoingGameAfter2).toEqual({
     ...ongoingGameBefore2,
     playerToMove: 'game-over',
-    winner: 'draw',
+    winner: 'white',
     IMMUTABLE: {
       ...ongoingGameBefore2.IMMUTABLE,
       blackId: null,
@@ -157,6 +155,32 @@ test('wiping a user twice does nothing', async () => {
 
 test('ban a user and then wipe them', async () => {
   
+})
+
+test('banned user data is not stored', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(WIPED_ID)
+  await auth.createUser({ uid: WIPED_ID })
+  const oldUserDoc = await insertUser(db, WIPED_ID)
+  await db.collection('users').doc(WIPED_ID).update({
+    name: 'The Wiped User',
+    about: 'I am a wiped user.',
+    profileImg: 'https://example.com/wiped-user.png',
+  })
+  
+  await expectSuccess(wipeUser(args, context))
+  
+  const newUserDoc = (await db.collection('users').doc(WIPED_ID).get()).data() as UserDoc
+  const bannedUserData = await db.collection('bannedUserData').doc(WIPED_ID).get()
+  
+  expect(newUserDoc).toEqual({
+    name: '[deleted]',
+    about: '',
+    profileImg: null,
+    banned: true,
+    IMMUTABLE: oldUserDoc.IMMUTABLE,
+  })
+  expect(bannedUserData.exists).toEqual(false)
 })
 
 

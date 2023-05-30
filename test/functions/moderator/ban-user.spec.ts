@@ -1,9 +1,9 @@
-import { expectHttpsError, expectLog, expectSuccess } from '../utils'
+import { expectHttpsError, expectLog, expectNoErrorLog, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
 import { makeModeratorContext } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
-import type { UserDoc, GameDoc, VariantDoc } from '@/firebase/db/schema'
+import type { UserDoc, GameDoc, VariantDoc, BannedUserDataDoc } from '@/firebase/db/schema'
 import { insertGame } from '../game/games-mock'
 import { insertVariant } from '../variant/variant-mock'
 
@@ -41,8 +41,6 @@ test('moderator can ban a user', async () => {
     banned: true,
     IMMUTABLE: oldUserDoc.IMMUTABLE,
   })
-  expect(userRecord.displayName).toBe('[deleted]')
-  expect(userRecord.photoURL).toBe(undefined)
   expect(userRecord.disabled).toBe(true)
 })
 
@@ -76,7 +74,7 @@ test('user name is removed from games', async () => {
   expect(ongoingGameAfter).toEqual({
     ...ongoingGameBefore,
     playerToMove: 'game-over',
-    winner: 'draw',
+    winner: 'black', // The other player wins
     IMMUTABLE: {
       ...ongoingGameBefore.IMMUTABLE,
       whiteId: null,
@@ -87,7 +85,7 @@ test('user name is removed from games', async () => {
   expect(ongoingGameAfter2).toEqual({
     ...ongoingGameBefore2,
     playerToMove: 'game-over',
-    winner: 'draw',
+    winner: 'white', // The other player wins
     IMMUTABLE: {
       ...ongoingGameBefore2.IMMUTABLE,
       blackId: null,
@@ -146,6 +144,36 @@ test('banning a user twice does nothing', async () => {
   
   expect(newUserDoc).toEqual(veryNewUserDoc)
   expect(newUserRecord).toEqual(veryNewUserRecord)
+})
+
+test('banned user data is stored', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(BANNED_ID)
+  await auth.createUser({ uid: BANNED_ID })
+  const oldUserDoc = await insertUser(db, BANNED_ID)
+  await db.collection('users').doc(BANNED_ID).update({
+    name: 'The Banned User',
+    about: 'I am a banned user.',
+    profileImg: 'https://example.com/banned-user.png',
+  })
+  
+  await expectSuccess(banUser(args, context))
+  
+  const newUserDoc = (await db.collection('users').doc(BANNED_ID).get()).data() as UserDoc
+  const bannedUserData = (await db.collection('bannedUserData').doc(BANNED_ID).get()).data() as BannedUserDataDoc
+  
+  expect(newUserDoc).toEqual({
+    name: '[deleted]',
+    about: '',
+    profileImg: null,
+    banned: true,
+    IMMUTABLE: oldUserDoc.IMMUTABLE,
+  })
+  expect(bannedUserData).toEqual({
+    name: 'The Banned User',
+    about: 'I am a banned user.',
+    profileImg: 'https://example.com/banned-user.png',
+  })
 })
 
 

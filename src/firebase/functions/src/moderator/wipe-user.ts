@@ -38,17 +38,30 @@ export default async function(data: unknown, context: CallableContext): Promise<
   }
   
   // Important: Get the variants before banning the user (banUser would remove the userId)
-  const { db } = await useAdmin()
-  const variants = await db.collection('variants').where('creatorId', '==', userId).get()
-  const variantIds = variants.docs.map((doc) => doc.id)
+  const variantIds = await getUserVariants(userId)
   
   // Start by banning the user, since this has the potential to fail
   await banUser({ userId }, context)
   
-  // Remove the user's variants
+  await removeVariants(variantIds, context)
+  await removeUserReports(userId, context)
+  await removeUserBackup(userId)
+}
+
+
+async function getUserVariants(userId: string): Promise<string[]> {
+  const { db } = await useAdmin()
+  const variants = await db.collection('variants').where('creatorId', '==', userId).get()
+  return variants.docs.map((doc) => doc.id)
+}
+
+async function removeVariants(variantIds: string[], context: CallableContext): Promise<void> {
   await Promise.all(variantIds.map(async (id) => await deleteVariant({ variantId: id }, context)))
+}
+
+async function removeUserReports(userId: string, context: CallableContext): Promise<void> {
+  const { db } = await useAdmin()
   
-  // Remove the user's reports
   const reportedVariants = await db.collection('users').doc(userId).collection('reportedVariants').get()
   const reportedVariantIds = reportedVariants.docs.map((doc) => doc.id)
   await Promise.all(reportedVariantIds.map(async (id) => {
@@ -60,4 +73,17 @@ export default async function(data: unknown, context: CallableContext): Promise<
   await Promise.all(reportedUserIds.map(async (id) => {
     await discardUserReports({ userId: id, reporters: [userId] }, context)
   }))
+}
+
+async function removeUserBackup(userId: string): Promise<void> {
+  const { db, storage } = await useAdmin()
+
+  await db.collection('bannedUserData').doc(userId).delete()
+  try {
+    await storage.bucket().file(`/profile-images/${userId}`).delete()
+  } catch (untypedErr) {
+    const e = untypedErr as { code: number }
+    // Ignore the error if the file doesn't exist
+    if (e.code !== 404) throw e
+  }
 }
