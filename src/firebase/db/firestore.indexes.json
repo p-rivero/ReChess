@@ -113,6 +113,24 @@
   ],
   "fieldOverrides": [
     {
+      "collectionGroup": "bannedUserData",
+      "fieldPath": "gamesAsBlack",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bannedUserData",
+      "fieldPath": "gamesAsWhite",
+      "ttl": false,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bannedUserData",
+      "fieldPath": "publishedVariants",
+      "ttl": false,
+      "indexes": []
+    },
+    {
       "collectionGroup": "cancelledGames",
       "fieldPath": "cancelReason",
       "ttl": false,

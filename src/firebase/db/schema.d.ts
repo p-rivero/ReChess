@@ -163,4 +163,8 @@ export interface BannedUserDataDoc {
   name: string | null
   about: string
   profileImg: string | null
+  // Space-separated lists of variant IDs
+  publishedVariants: string
+  gamesAsWhite: string
+  gamesAsBlack: string
 }

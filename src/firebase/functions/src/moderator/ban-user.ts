@@ -29,7 +29,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
   assertModerator(context)
   
   // Validate input
-  const { userId } = data as { userId: unknown }
+  const { userId, doNotBackup } = data as { userId: unknown, doNotBackup: unknown }
   if (!userId) {
     throw new HttpsError('invalid-argument', 'The function must be called with a userId.')
   }
@@ -38,6 +38,9 @@ export default async function(data: unknown, context: CallableContext): Promise<
   }
   if (context.auth?.uid === userId) {
     throw new HttpsError('invalid-argument', 'Please do not ban yourself :(')
+  }
+  if (doNotBackup !== undefined && typeof doNotBackup !== 'boolean') {
+    throw new HttpsError('invalid-argument', 'The doNotBackup parameter must be a boolean.')
   }
   
   const user = await fetchUser(userId)
@@ -53,7 +56,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
   // Important: Find and stop games *before* removing the userId from them
   await stopOngoingGames(userId)
   
-  await backupUserData(userId)
+  if (!doNotBackup) await backupUserData(userId)
   await removeUserData(userId)
   await banUser(userId)
 }
@@ -109,10 +112,17 @@ async function backupUserData(userId: string): Promise<void> {
   if (!user) {
     throw new HttpsError('not-found', 'The user to be banned does not exist.')
   }
+  const variants = await db.collection('variants').where('creatorId', '==', userId).select().get()
+  const gamesAsWhite = await db.collection('games').where('IMMUTABLE.whiteId', '==', userId).select().get()
+  const gamesAsBlack = await db.collection('games').where('IMMUTABLE.blackId', '==', userId).select().get()
+  
   const bannedUserData: BannedUserDataDoc = {
     name: user.name,
     about: user.about,
     profileImg: user.profileImg,
+    publishedVariants: variants.docs.map(doc => doc.id).join(' '),
+    gamesAsWhite: gamesAsWhite.docs.map(doc => doc.id).join(' '),
+    gamesAsBlack: gamesAsBlack.docs.map(doc => doc.id).join(' '),
   }
   await db.collection('bannedUserData').doc(userId).set(bannedUserData)
 }

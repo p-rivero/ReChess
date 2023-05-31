@@ -10,6 +10,7 @@ import { insertVariant } from '../variant/variant-mock'
 const { app, testEnv } = initialize('wipe-user-test')
 const db = app.firestore()
 const auth = app.auth()
+const storage = app.storage()
 const wipeUser = testEnv.wrap(functions.wipeUser)
 
 const MODERATOR_ID = 'moderator_user_id'
@@ -181,6 +182,24 @@ test('banned user data is not stored', async () => {
     IMMUTABLE: oldUserDoc.IMMUTABLE,
   })
   expect(bannedUserData.exists).toEqual(false)
+})
+
+test('user profile picture is deleted', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(WIPED_ID)
+  await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, WIPED_ID)
+  await storage.bucket().file(`profile-images/${WIPED_ID}`).save('some data')
+  
+  const fileBefore = storage.bucket().file(`profile-images/${WIPED_ID}`)
+  const [existsBefore] = await fileBefore.exists()
+  expect(existsBefore).toBe(true)
+  
+  await expectSuccess(wipeUser(args, context))
+  
+  const file = storage.bucket().file(`profile-images/${WIPED_ID}`)
+  const [exists] = await file.exists()
+  expect(exists).toBe(false)
 })
 
 

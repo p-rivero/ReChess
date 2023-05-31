@@ -33,6 +33,7 @@ export async function discardReports(reporters: unknown, docRef: FirebaseFiresto
     const newReportsSummary = newReports.join('\n')
     
     // Update the document
+    // TODO: If newReports is empty, delete the document
     transaction.set(docRef, {
       numReports: newReports.length,
       reportsSummary: newReportsSummary,

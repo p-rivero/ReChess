@@ -41,17 +41,17 @@ export default async function(data: unknown, context: CallableContext): Promise<
   const variantIds = await getUserVariants(userId)
   
   // Start by banning the user, since this has the potential to fail
-  await banUser({ userId }, context)
+  await banUser({ userId, doNotBackup: true }, context)
   
   await removeVariants(variantIds, context)
   await removeUserReports(userId, context)
-  await removeUserBackup(userId)
+  await removeStoredFile(`/profile-images/${userId}`)
 }
 
 
 async function getUserVariants(userId: string): Promise<string[]> {
   const { db } = await useAdmin()
-  const variants = await db.collection('variants').where('creatorId', '==', userId).get()
+  const variants = await db.collection('variants').where('creatorId', '==', userId).select().get()
   return variants.docs.map((doc) => doc.id)
 }
 
@@ -62,25 +62,24 @@ async function removeVariants(variantIds: string[], context: CallableContext): P
 async function removeUserReports(userId: string, context: CallableContext): Promise<void> {
   const { db } = await useAdmin()
   
-  const reportedVariants = await db.collection('users').doc(userId).collection('reportedVariants').get()
+  const reportedVariants = await db.collection('users').doc(userId).collection('reportedVariants').select().get()
   const reportedVariantIds = reportedVariants.docs.map((doc) => doc.id)
   await Promise.all(reportedVariantIds.map(async (id) => {
     await discardVariantReports({ variantId: id, reporters: [userId] }, context)
   }))
   
-  const reportedUsers = await db.collection('users').doc(userId).collection('reportedUsers').get()
+  const reportedUsers = await db.collection('users').doc(userId).collection('reportedUsers').select().get()
   const reportedUserIds = reportedUsers.docs.map((doc) => doc.id)
   await Promise.all(reportedUserIds.map(async (id) => {
     await discardUserReports({ userId: id, reporters: [userId] }, context)
   }))
 }
 
-async function removeUserBackup(userId: string): Promise<void> {
-  const { db, storage } = await useAdmin()
-
-  await db.collection('bannedUserData').doc(userId).delete()
+async function removeStoredFile(fileName: string): Promise<void> {
+  const { storage } = await useAdmin()
+  
   try {
-    await storage.bucket().file(`/profile-images/${userId}`).delete()
+    await storage.bucket().file(fileName).delete()
   } catch (untypedErr) {
     const e = untypedErr as { code: number }
     // Ignore the error if the file doesn't exist
