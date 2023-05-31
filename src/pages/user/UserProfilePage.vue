@@ -122,7 +122,7 @@
       </div>
       
       <div
-        v-if="!myProfile(user) && authStore.loggedUser && !authStore.loggedUser.reportedUsers?.includes(user.uid)"
+        v-if="!myProfile(user) && authStore.loggedUser && !authStore.loggedUser.reportedUsers?.includes(user.uid) && !user.banned"
         class="is-flex is-flex-wrap-wrap mt-6"
       >
         <button
@@ -145,12 +145,20 @@
         class="is-flex is-flex-wrap-wrap mt-3"
       >
         <button
+          v-if="!user.banned"
           class="button is-danger mt-2 mr-4"
-          :disabled="user.banned"
           @click="banUser"
         >
           <div class="sz-icon icon-gavel color-white" />
-          {{ user.banned ? 'Already banned' : 'Ban user' }}
+          Ban user
+        </button>
+        <button
+          v-else
+          class="button is-primary mt-2 mr-4"
+          @click="unbanUser"
+        >
+          <div class="sz-icon icon-gavel color-white" />
+          Unban user
         </button>
         <button
           class="button is-danger mt-2"
@@ -480,8 +488,7 @@
   function blockUser() {
     showPopup(
       'Block user',
-      'You will stop seeing this user in the online lobby. \
-      This does *not* block the variants created by this user. \
+      'You will stop seeing this user in the online lobby. This does **not** block the variants created by this user. \
       \n\nThis action cannot be undone.',
       'ok-cancel',
       async () => {
@@ -509,8 +516,9 @@
   function banUser() {
     showPopup(
       'Ban user',
-      'You are about to ban this user. Do you want to continue?',
-      'ok-cancel',
+      'You are about to ban this user. This does **not** remove their variants, reports and upvotes. \
+      \n\nDo you want to continue?',
+      'yes-no',
       async () => {
         if (!user.value) throw new Error('User is undefined')
         try {
@@ -527,8 +535,36 @@
           console.error(e)
           showPopup(
             'Error',
-            'An unexpected error occurred while banning the user. \
-            \n\n```\n' + e + '\n```',
+            'An unexpected error occurred while banning the user.\n\n```\n' + e + '\n```',
+            'ok'
+          )
+        }
+      }
+    )
+  }
+  function unbanUser() {
+    showPopup(
+      'Unban user',
+      'You are about to lift the ban on this user. The user will recover the ownership of their variants \
+      and played games, and will be able to log in again.\n\nDo you want to continue?',
+      'yes-no',
+      async () => {
+        if (!user.value) throw new Error('User is undefined')
+        try {
+          showPopupImportant('⌛', 'Unbanning user, please wait...', 'ok')
+          await moderatorStore.unbanUser(user.value.uid)
+          showPopup(
+            'User unbanned',
+            'The user is no longer banned.',
+            'ok',
+            () => window.location.reload(),
+            () => window.location.reload()
+          )
+        } catch (e) {
+          console.error(e)
+          showPopup(
+            'Error',
+            'An unexpected error occurred while unbanning the user.\n\n```\n' + e + '\n```',
             'ok'
           )
         }

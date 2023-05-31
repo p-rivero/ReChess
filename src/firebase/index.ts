@@ -61,8 +61,11 @@ export const createGame = httpsCallable<CreateGameParams, { gameId: string }>(fu
 type CancelGameParams = { gameId: string, reason: string }
 export const cancelGame = httpsCallable<CancelGameParams, void>(functions, 'cancelGame')
 
-type BanUserParams = { userId: string }
+type BanUserParams = { userId: string, doNotBackup?: boolean }
 export const banUser = httpsCallable<BanUserParams, void>(functions, 'banUser')
+
+type UnbanUserParams = { userId: string }
+export const unbanUser = httpsCallable<UnbanUserParams, void>(functions, 'unbanUser')
 
 type DeleteVariantParams = { variantId: string }
 export const deleteVariant = httpsCallable<DeleteVariantParams, void>(functions, 'deleteVariant')

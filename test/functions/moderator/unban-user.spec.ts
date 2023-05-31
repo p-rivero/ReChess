@@ -10,8 +10,9 @@ import { insertVariant } from '../variant/variant-mock'
 const { app, testEnv } = initialize('unban-user-test')
 const db = app.firestore()
 const auth = app.auth()
-const banUser = testEnv.wrap(functions.banUser)
 const unbanUser = testEnv.wrap(functions.unbanUser)
+const banUser = testEnv.wrap(functions.banUser)
+const wipeUser = testEnv.wrap(functions.wipeUser)
 
 const MODERATOR_ID = 'moderator_user_id'
 const BANNED_ID = 'banned_user_id'
@@ -343,5 +344,20 @@ test('cannot unban a user that does not exist', async () => {
   
   const e = await expectHttpsError(unbanUser(args, context))
   expect(e.message).toMatch(`The user ${BANNED_ID} does not exist.`)
+  expect(e.code).toBe('not-found')
+})
+
+test('cannot unban a user if their data has been wiped', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(BANNED_ID)
+  const user = await auth.createUser({ uid: BANNED_ID })
+  await insertUser(db, user)
+  await insertReport(db, BANNED_ID, 'user', 'a_reported_user_id')
+  await insertReport(db, BANNED_ID, 'variant', 'a_reported_variant_id')
+  
+  await expectSuccess(wipeUser(args, context))
+  
+  let e = await expectHttpsError(unbanUser(args, context))
+  expect(e.message).toMatch('Cannot find backup of user data.')
   expect(e.code).toBe('not-found')
 })

@@ -68,7 +68,7 @@ async function restoreDataFromBackup(userId: string): Promise<void> {
   const bannedUserData = await db.collection('bannedUserData').doc(userId).get()
   const data = bannedUserData.data() as BannedUserDataDoc | undefined
   if (!data) {
-    throw new HttpsError('internal', 'Cannot find backup of user data.')
+    throw new HttpsError('not-found', 'Cannot find backup of user data.')
   }
   const updateObj: Partial<UserDoc> = {
     name: data.name,

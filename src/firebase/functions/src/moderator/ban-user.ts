@@ -19,6 +19,7 @@ import assertModerator from './helpers/assert-moderator'
  * The user's variants, reports, and upvotes are NOT affected. See `wipe-user.ts` for a more thorough wipe.
  * @param {any} data The data passed to the function
  * @param {string} data.userId UID of the user that the moderator wants to ban
+ * @param {boolean} data.doNotBackup (Optional) If true, the user's data will not be backed up before being deleted
  * @param {CallableContext} context The context of the function call
  * @return {Promise<void>} A promise that resolves when the function is complete
  * @throws An HTTP error is returned if some of the following errors occur:

@@ -6,6 +6,7 @@ import {
   deleteVariant as modDeleteVariant,
   discardUserReports as modDiscardUserReports,
   discardVariantReports as modDiscardVariantReports,
+  unbanUser as modUnbanUser,
   wipeUser as modWipeUser,
 } from '@/firebase'
 import { ref } from 'vue'
@@ -89,6 +90,10 @@ export const useModeratorStore = defineStore('moderator', () => {
     await modBanUser({ userId })
   }
   
+  async function unbanUser(userId: string): Promise<void> {
+    await modUnbanUser({ userId })
+  }
+  
   async function wipeUser(userId: string): Promise<void> {
     await modWipeUser({ userId })
   }
@@ -122,6 +127,6 @@ export const useModeratorStore = defineStore('moderator', () => {
   return {
     userReports, variantReports,
     refreshUserReports, refreshVariantReports,
-    deleteVariant, banUser, wipeUser, discardUserReports, discardVariantReports,
+    deleteVariant, banUser, unbanUser, wipeUser, discardUserReports, discardVariantReports,
   }
 })
