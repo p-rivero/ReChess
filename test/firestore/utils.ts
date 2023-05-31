@@ -18,9 +18,10 @@ import type firebase from 'firebase/compat'
 - `verified`: logged user with a verified email
 - `unverified`: logged user with an unverified email
 - `not logged`: user that is not logged in
+- `moderator`: access the database with the moderator role
 - `admin`: access the database without any restrictions (for setting up the database before the test)
 */
-export type AuthType = 'verified' | 'unverified' | 'not logged' | 'admin'
+export type AuthType = 'verified' | 'unverified' | 'not logged' | 'moderator' | 'admin'
 
 
 export type TestUtilsSignature = {
@@ -93,6 +94,8 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
       return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: false }).firestore()
     case 'not logged':
       return testEnv.unauthenticatedContext().firestore()
+    case 'moderator':
+      return testEnv.authenticatedContext(myId, { email: myEmail, email_verified: true, moderator: true }).firestore()
     default:
       throw new Error(`Invalid auth type: ${authType}`)
     }

@@ -6,6 +6,7 @@ import banUser from './ban-user'
 import deleteVariant from './delete-variant'
 import discardUserReports from './discard-user-reports'
 import discardVariantReports from './discard-variant-reports'
+import type { BannedUserDataDoc } from 'db/schema'
 
 /**
  * Called directly by the moderator in order to wipe a user's content.
@@ -46,13 +47,22 @@ export default async function(data: unknown, context: CallableContext): Promise<
   await removeVariants(variantIds, context)
   await removeUserReports(userId, context)
   await removeStoredFile(`/profile-images/${userId}`)
+  await removeBackup(userId)
 }
 
 
 async function getUserVariants(userId: string): Promise<string[]> {
+  // If wipe-user is called on a user that has already been banned, createdVariants is empty
+  // because their id has been removed. Get the variants from the backup instead.
   const { db } = await useAdmin()
-  const variants = await db.collection('variants').where('creatorId', '==', userId).select().get()
-  return variants.docs.map((doc) => doc.id)
+  const [variants, userDataBackup] = await Promise.all([
+    db.collection('variants').where('creatorId', '==', userId).select().get(),
+    db.collection('bannedUserData').doc(userId).get(),
+  ])
+  const createdVariants = variants.docs.map((doc) => doc.id)
+  const backupDoc = userDataBackup.data() as BannedUserDataDoc | undefined
+  const backupVariants = backupDoc?.publishedVariants?.split(' ') ?? []
+  return [...createdVariants, ...backupVariants]
 }
 
 async function removeVariants(variantIds: string[], context: CallableContext): Promise<void> {
@@ -85,4 +95,9 @@ async function removeStoredFile(fileName: string): Promise<void> {
     // Ignore the error if the file doesn't exist
     if (e.code !== 404) throw e
   }
+}
+
+async function removeBackup(userId: string): Promise<void> {
+  const { db } = await useAdmin()
+  await db.collection('bannedUserData').doc(userId).delete()
 }

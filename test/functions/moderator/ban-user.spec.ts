@@ -265,9 +265,15 @@ test('user reports are not removed', async () => {
   
   const userReports = await db.collection('userModeration').doc('a_reported_user_id').get()
   const variantReports = await db.collection('variantModeration').doc('a_reported_variant_id').get()
+  const createdUserReport = await db.collection('users').doc(BANNED_ID)
+      .collection('reportedUsers').doc('a_reported_user_id').get()
+  const createdVariantReport = await db.collection('users').doc(BANNED_ID)
+      .collection('reportedVariants').doc('a_reported_variant_id').get()
   
   expect(userReports.data()?.numReports).toEqual(1)
   expect(variantReports.data()?.numReports).toEqual(1)
+  expect(createdUserReport.exists).toEqual(true)
+  expect(createdVariantReport.exists).toEqual(true)
 })
 
 

@@ -1,11 +1,12 @@
-import { expectHttpsError, expectLog, expectSuccess } from '../utils'
+import { expectHttpsError, expectLog, expectNoErrorLog, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
 import { makeModeratorContext, insertReport } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
 import type { UserDoc, GameDoc } from '@/firebase/db/schema'
 import { insertGame } from '../game/games-mock'
-import { insertVariant } from '../variant/variant-mock'
+import { insertIndex, insertVariant } from '../variant/variant-mock'
+import banUser from '@/firebase/functions/src/moderator/ban-user'
 
 const { app, testEnv } = initialize('wipe-user-test')
 const db = app.firestore()
@@ -138,9 +139,15 @@ test('created reports are removed', async () => {
   
   const userReports = await db.collection('userModeration').doc('a_reported_user_id').get()
   const variantReports = await db.collection('variantModeration').doc('a_reported_variant_id').get()
+  const createdUserReport = await db.collection('users').doc(WIPED_ID)
+      .collection('reportedUsers').doc('a_reported_user_id').get()
+  const createdVariantReport = await db.collection('users').doc(WIPED_ID)
+      .collection('reportedVariants').doc('a_reported_variant_id').get()
   
   expect(userReports.exists).toEqual(false)
   expect(variantReports.exists).toEqual(false)
+  expect(createdUserReport.exists).toEqual(true)
+  expect(createdVariantReport.exists).toEqual(true)
 })
 
 
@@ -169,7 +176,40 @@ test('wiping a user twice does nothing', async () => {
 })
 
 test('ban a user and then wipe them', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(WIPED_ID)
+  await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, WIPED_ID)
+  await insertVariant(db, 'variant_id', 'white', WIPED_ID)
+  await insertGame(db, 'game_id', 'variant_id', 'draw')
+  await insertIndex(db, [{ id: 'variant_id', name: 'Variant' }])
+  await insertReport(db, WIPED_ID, 'variant', 'a_reported_variant_id')
   
+  const done = expectNoErrorLog()
+  await expectSuccess(banUser(args, context))
+  done()
+  
+  const variantAfter = await db.collection('variants').doc('variant_id').get()
+  const gameAfter = await db.collection('games').doc('game_id').get()
+  const variantReportsAfter = await db.collection('variantModeration').doc('a_reported_variant_id').get()
+  const dataBackup = await db.collection('bannedUserData').doc('wiped_user_id').get()
+  expect(variantAfter.exists).toBe(true)
+  expect(gameAfter.exists).toBe(true)
+  expect(variantReportsAfter.exists).toBe(true)
+  expect(dataBackup.exists).toBe(true)
+  
+  const done2 = expectLog('warn', 'The user is already banned: wiped_user_id')
+  await expectSuccess(wipeUser(args, context))
+  done2()
+  
+  const variantAfterWipe = await db.collection('variants').doc('variant_id').get()
+  const gameAfterWipe = await db.collection('games').doc('game_id').get()
+  const variantReportsAfterWipe = await db.collection('variantModeration').doc('a_reported_variant_id').get()
+  const dataBackupAfterWipe = await db.collection('bannedUserData').doc('wiped_user_id').get()
+  expect(variantAfterWipe.exists).toBe(false)
+  expect(gameAfterWipe.exists).toBe(false)
+  expect(variantReportsAfterWipe.exists).toBe(false)
+  expect(dataBackupAfterWipe.exists).toBe(false)
 })
 
 test('banned user data is not stored', async () => {
