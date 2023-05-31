@@ -3,7 +3,7 @@ import { functions, initialize } from '../init'
 import { makeModeratorContext, insertReport } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
-import type { UserDoc, GameDoc, VariantDoc, BannedUserDataDoc } from '@/firebase/db/schema'
+import type { UserDoc, GameDoc, VariantDoc } from '@/firebase/db/schema'
 import { insertGame } from '../game/games-mock'
 import { insertVariant } from '../variant/variant-mock'
 
@@ -244,7 +244,7 @@ test('banned user data is cleared', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(BANNED_ID)
   const user = await auth.createUser({ uid: BANNED_ID })
-  const oldUserDoc = await insertUser(db, user)
+  await insertUser(db, user)
   await db.collection('users').doc(BANNED_ID).update({
     name: 'The Banned User',
     about: 'I am a banned user.',
@@ -306,7 +306,9 @@ test('arguments must be correct', async () => {
   expect(e.code).toBe('invalid-argument')
   
   arg = { userId: BANNED_ID }
+  const done = expectLog('warn', 'The user is not banned: banned_user_id')
   await expectSuccess(unbanUser(arg, context))
+  done()
 })
 
 test('caller must be authenticated as a moderator', async () => {
@@ -335,7 +337,9 @@ test('caller must be authenticated as a moderator', async () => {
   expect(e.code).toBe('permission-denied')
   
   context = makeModeratorContext(MODERATOR_ID)
+  const done = expectLog('warn', 'The user is not banned: banned_user_id')
   await expectSuccess(unbanUser(args, context))
+  done()
 })
 
 test('cannot unban a user that does not exist', async () => {

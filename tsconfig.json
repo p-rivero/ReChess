@@ -1,7 +1,7 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "include": [".config/env.d.ts", "src/**/*", "src/**/*.vue"],
-  "exclude": ["src/firebase/functions"],
+  "exclude": ["src/firebase/functions", "src/make-moderator.mts"],
   "compilerOptions": {
     "strict": true,
     "alwaysStrict": true,

@@ -2,13 +2,11 @@ import { expectHttpsError, expectLog, expectNoErrorLog, expectSuccess } from '..
 import { functions, initialize } from '../init'
 import { makeModeratorContext, insertModerationDoc } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
-import { insertUser } from '../user/user-mock'
 import { insertVariant, insertIndex } from '../variant/variant-mock'
 import { insertGame, insertLobbySlot } from '../game/games-mock'
 
 const { app, testEnv } = initialize('delete-variant-test')
 const db = app.firestore()
-const auth = app.auth()
 const deleteVariant = testEnv.wrap(functions.deleteVariant)
 
 const MODERATOR_ID = 'moderator_user_id'
