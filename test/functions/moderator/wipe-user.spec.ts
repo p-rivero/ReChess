@@ -1,6 +1,6 @@
 import { expectHttpsError, expectLog, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
-import { makeModeratorContext } from './moderator-mock'
+import { makeModeratorContext, insertReport } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
 import type { UserDoc, GameDoc } from '@/firebase/db/schema'
@@ -127,8 +127,22 @@ test('created variants are removed', async () => {
 })
 
 test('created reports are removed', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(WIPED_ID)
+  await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, WIPED_ID)
+  await insertReport(db, WIPED_ID, 'user', 'a_reported_user_id')
+  await insertReport(db, WIPED_ID, 'variant', 'a_reported_variant_id')
   
+  await expectSuccess(wipeUser(args, context))
+  
+  const userReports = await db.collection('userModeration').doc('a_reported_user_id').get()
+  const variantReports = await db.collection('variantModeration').doc('a_reported_variant_id').get()
+  
+  expect(userReports.exists).toEqual(false)
+  expect(variantReports.exists).toEqual(false)
 })
+
 
 test('wiping a user twice does nothing', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
@@ -267,7 +281,6 @@ test('moderators cannot wipe themselves', async () => {
   await auth.createUser({ uid: MODERATOR_ID })
   const user = await insertUser(db, MODERATOR_ID)
   const variant = await insertVariant(db, 'variant_id', 'white', MODERATOR_ID)
-  // TODO: Check reports
   
   const e = await expectHttpsError(wipeUser(args, context))
   expect(e.message).toMatch('Please do not ban yourself :(')
@@ -291,7 +304,7 @@ test('moderators cannot wipe another moderator', async () => {
   await auth.setCustomUserClaims(WIPED_ID, { moderator: true })
   await insertUser(db, WIPED_ID)
   const variant = await insertVariant(db, 'variant_id', 'white', WIPED_ID)
-  // TODO: Check reports
+  await insertReport(db, MODERATOR_ID, 'variant', 'some_variant_id')
   
   const e = await expectHttpsError(wipeUser(args, context))
   expect(e.message).toMatch('You cannot ban moderators directly. Please demote them first.')
@@ -299,4 +312,7 @@ test('moderators cannot wipe another moderator', async () => {
   
   const variantAfter = await db.collection('variants').doc('variant_id').get()
   expect(variantAfter.data()).toEqual(variant)
+  
+  const reportsAfter = await db.collection('variantModeration').doc('some_variant_id').get()
+  expect(reportsAfter.data()?.numReports).toEqual(1)
 })

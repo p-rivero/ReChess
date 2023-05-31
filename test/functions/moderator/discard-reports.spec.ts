@@ -24,7 +24,7 @@ function variantArgs(variantId: string, reporters: string[]) {
 
 test('moderator can delete user report', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  const modDoc = await insertModerationDoc(db, 'user', REPORTED_ID, 1)
+  const modDoc = await insertModerationDoc(db, 'user', REPORTED_ID, 2)
   const reporters = extractReporters(modDoc, 0)
   const args = userArgs(REPORTED_ID, reporters)
   
@@ -32,14 +32,14 @@ test('moderator can delete user report', async () => {
   
   const moderationDoc = (await db.collection('userModeration').doc(REPORTED_ID).get()).data() as ModerationDoc
   expect(moderationDoc).toEqual({
-    numReports: 0,
-    reportsSummary: '',
+    numReports: 1,
+    reportsSummary: expect.stringMatching(REPORT_SUMMARY_REGEX),
   })
 })
 
 test('moderator can delete variant report', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  const modDoc = await insertModerationDoc(db, 'variant', VARIANT_ID, 1)
+  const modDoc = await insertModerationDoc(db, 'variant', VARIANT_ID, 2)
   const reporters = extractReporters(modDoc, 0)
   const args = variantArgs(VARIANT_ID, reporters)
   
@@ -47,8 +47,8 @@ test('moderator can delete variant report', async () => {
   
   const moderationDoc = (await db.collection('variantModeration').doc(VARIANT_ID).get()).data() as ModerationDoc
   expect(moderationDoc).toEqual({
-    numReports: 0,
-    reportsSummary: '',
+    numReports: 1,
+    reportsSummary: expect.stringMatching(REPORT_SUMMARY_REGEX),
   })
 })
 
@@ -180,6 +180,7 @@ test('reports are not deleted from the user reports collection', async () => {
   const args = userArgs(REPORTED_ID, ['a_reporter'])
   await insertUser(db, 'a_reporter')
   await insertReport(db, 'a_reporter', 'user', REPORTED_ID)
+  await insertReport(db, 'another_reporter', 'user', REPORTED_ID)
   
   const userReportBefore = await db.collection('users').doc('a_reporter')
       .collection('reportedUsers').doc(REPORTED_ID).get()
@@ -191,8 +192,10 @@ test('reports are not deleted from the user reports collection', async () => {
   
   const moderationDocBefore = await db.collection('userModeration').doc(REPORTED_ID).get()
   expect(moderationDocBefore.data()).toEqual({
-    numReports: 1,
-    reportsSummary: expect.stringMatching(/^a_reporter\tThe user a_reporter reported the user reported_user_id\t\d+$/),
+    numReports: 2,
+    reportsSummary: expect.stringMatching(
+      /^a_reporter\tThe user a_reporter reported the user reported_user_id\t\d+\nanother_reporter\tThe user another_reporter reported the user reported_user_id\t\d+$/
+    ),
   })
   
   await expectSuccess(discardUserReports(args, context))
@@ -203,9 +206,31 @@ test('reports are not deleted from the user reports collection', async () => {
   
   const moderationDocAfter = await db.collection('userModeration').doc(REPORTED_ID).get()
   expect(moderationDocAfter.data()).toEqual({
-    numReports: 0,
-    reportsSummary: '',
+    numReports: 1,
+    reportsSummary: expect.stringMatching(
+      /^another_reporter\tThe user another_reporter reported the user reported_user_id\t\d+$/
+    ),
   })
+})
+
+test('removing all reports deletes the moderation doc', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = userArgs(REPORTED_ID, ['a_reporter'])
+  await insertUser(db, 'a_reporter')
+  await insertReport(db, 'a_reporter', 'user', REPORTED_ID)
+  
+  const moderationDocBefore = await db.collection('userModeration').doc(REPORTED_ID).get()
+  expect(moderationDocBefore.data()).toEqual({
+    numReports: 1,
+    reportsSummary: expect.stringMatching(
+      /^a_reporter\tThe user a_reporter reported the user reported_user_id\t\d+$/
+    ),
+  })
+  
+  await expectSuccess(discardUserReports(args, context))
+  
+  const moderationDocAfter = await db.collection('userModeration').doc(REPORTED_ID).get()
+  expect(moderationDocAfter.exists).toBe(false)
 })
 
 

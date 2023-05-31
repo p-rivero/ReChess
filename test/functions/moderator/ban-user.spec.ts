@@ -1,6 +1,6 @@
 import { expectHttpsError, expectLog, expectNoErrorLog, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
-import { makeModeratorContext } from './moderator-mock'
+import { makeModeratorContext, insertReport } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
 import { insertUser } from '../user/user-mock'
 import type { UserDoc, GameDoc, VariantDoc, BannedUserDataDoc } from '@/firebase/db/schema'
@@ -251,6 +251,23 @@ test('banned user data is not stored if doNotBackup is set', async () => {
     IMMUTABLE: oldUserDoc.IMMUTABLE,
   })
   expect(bannedUserData.exists).toEqual(false)
+})
+
+test('user reports are not removed', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const args = makeArgs(BANNED_ID)
+  await auth.createUser({ uid: BANNED_ID })
+  await insertUser(db, BANNED_ID)
+  await insertReport(db, BANNED_ID, 'user', 'a_reported_user_id')
+  await insertReport(db, BANNED_ID, 'variant', 'a_reported_variant_id')
+  
+  await expectSuccess(banUser(args, context))
+  
+  const userReports = await db.collection('userModeration').doc('a_reported_user_id').get()
+  const variantReports = await db.collection('variantModeration').doc('a_reported_variant_id').get()
+  
+  expect(userReports.data()?.numReports).toEqual(1)
+  expect(variantReports.data()?.numReports).toEqual(1)
 })
 
 

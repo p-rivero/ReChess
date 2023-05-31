@@ -32,8 +32,14 @@ export async function discardReports(reporters: unknown, docRef: FirebaseFiresto
     const newReports = reports.filter((r) => !reporters.includes(parseSummaryLine(r).reporter))
     const newReportsSummary = newReports.join('\n')
     
-    // Update the document
-    // TODO: If newReports is empty, delete the document
+    if (newReports.length === reports.length) {
+      // No reports were removed
+      return
+    }
+    if (newReports.length === 0) {
+      transaction.delete(docRef)
+      return
+    }
     transaction.set(docRef, {
       numReports: newReports.length,
       reportsSummary: newReportsSummary,
