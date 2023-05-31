@@ -16,9 +16,9 @@ export async function fetchUser(userId: string): Promise<UserRecord> {
   } catch (untypedErr) {
     const e = untypedErr as FirebaseError
     if (e.code === 'auth/user-not-found') {
-      throw new HttpsError('not-found', 'The user to be banned does not exist.')
+      throw new HttpsError('not-found', `The user ${userId} does not exist.`)
     }
     console.error(e)
-    throw new HttpsError('internal', 'An unexpected error occurred while fetching the user to be banned: ' + e.message)
+    throw new HttpsError('internal', 'An unexpected error occurred while fetching the user: ' + e.message)
   }
 }

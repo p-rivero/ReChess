@@ -1,7 +1,7 @@
 import { functions, initialize } from '../init'
 import { makeFirestoreContext } from '../make-context'
 import { insertGame } from './games-mock'
-import { insertUser } from '../user/user-mock'
+import { insertUserWithGames } from '../user/user-mock'
 import admin from 'firebase-admin'
 import type { GameOverTriggerDoc, VariantDoc, UserDoc, GameDoc } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
@@ -25,8 +25,8 @@ function makeContext() {
 
 
 test('game finishes and white player wins game', async () => {
-  const whiteUserBefore = await insertUser(db, 'white_id', 0)
-  const blackUserBefore = await insertUser(db, 'black_id', 5)
+  const whiteUserBefore = await insertUserWithGames(db, 'white_id', 0)
+  const blackUserBefore = await insertUserWithGames(db, 'black_id', 5)
   const gameBefore = await insertGame(db, GAME_ID, VARIANT_ID, 'white') // white wins
   const variantBefore = (await db.collection('variants').doc(VARIANT_ID).get()).data() as VariantDoc
   
@@ -108,8 +108,8 @@ test('game finishes and white player wins game', async () => {
 
 
 test('game finishes and black player wins game', async () => {
-  const whiteUserBefore = await insertUser(db, 'white_id', 0)
-  const blackUserBefore = await insertUser(db, 'black_id', 5)
+  const whiteUserBefore = await insertUserWithGames(db, 'white_id', 0)
+  const blackUserBefore = await insertUserWithGames(db, 'black_id', 5)
   const gameBefore = await insertGame(db, GAME_ID, VARIANT_ID, 'black') // Black wins
   const variantBefore = (await db.collection('variants').doc(VARIANT_ID).get()).data() as VariantDoc
   
@@ -173,8 +173,8 @@ test('game finishes and black player wins game', async () => {
 
 
 test('game finishes and there is a draw', async () => {
-  const whiteUserBefore = await insertUser(db, 'white_id', 0)
-  const blackUserBefore = await insertUser(db, 'black_id', 5)
+  const whiteUserBefore = await insertUserWithGames(db, 'white_id', 0)
+  const blackUserBefore = await insertUserWithGames(db, 'black_id', 5)
   const gameBefore = await insertGame(db, GAME_ID, VARIANT_ID, 'draw')
   const variantBefore = (await db.collection('variants').doc(VARIANT_ID).get()).data() as VariantDoc
   
@@ -240,8 +240,8 @@ test('game finishes and there is a draw', async () => {
 
 test('game must exist', async () => {
   // This will never happen, since the gameOverTrigger cannot be created without a game
-  const whiteUserBefore = await insertUser(db, 'white_id', 0)
-  const blackUserBefore = await insertUser(db, 'black_id', 5)
+  const whiteUserBefore = await insertUserWithGames(db, 'white_id', 0)
+  const blackUserBefore = await insertUserWithGames(db, 'black_id', 5)
   
   const done = expectLog('error', 'Game does not exist: ' + GAME_ID)
   await finishGame(makeSnap(), makeContext())
@@ -256,8 +256,8 @@ test('game must exist', async () => {
 
 test('game must have finished', async () => {
   // Firebase security rules prevent this from happening
-  const whiteUserBefore = await insertUser(db, 'white_id', 0)
-  const blackUserBefore = await insertUser(db, 'black_id', 5)
+  const whiteUserBefore = await insertUserWithGames(db, 'white_id', 0)
+  const blackUserBefore = await insertUserWithGames(db, 'black_id', 5)
   const gameBefore = await insertGame(db, GAME_ID, VARIANT_ID)
   
   const done = expectLog('error', 'Game is not finished: ' + GAME_ID)
@@ -275,8 +275,8 @@ test('game must have finished', async () => {
 
 test('game must have finished', async () => {
   // Firebase security rules prevent this from happening
-  const whiteUserBefore = await insertUser(db, 'white_id', 0)
-  const blackUserBefore = await insertUser(db, 'black_id', 5)
+  const whiteUserBefore = await insertUserWithGames(db, 'white_id', 0)
+  const blackUserBefore = await insertUserWithGames(db, 'black_id', 5)
   const gameBefore = await insertGame(db, GAME_ID, VARIANT_ID)
   
   const done = expectLog('error', 'Game is not finished: ' + GAME_ID)
@@ -295,7 +295,7 @@ test('game must have finished', async () => {
 
 test('white user must exist', async () => {
   // Firebase security rules prevent this from happening
-  await insertUser(db, 'black_id', 5)
+  await insertUserWithGames(db, 'black_id', 5)
   await insertGame(db, GAME_ID, VARIANT_ID, 'draw')
   
   const done = expectLog('error', 'Profile does not exist: white_id')
@@ -305,7 +305,7 @@ test('white user must exist', async () => {
 
 test('black user must exist', async () => {
   // Firebase security rules prevent this from happening
-  await insertUser(db, 'white_id', 2)
+  await insertUserWithGames(db, 'white_id', 2)
   await insertGame(db, GAME_ID, VARIANT_ID, 'draw')
   
   const done = expectLog('error', 'Profile does not exist: black_id')

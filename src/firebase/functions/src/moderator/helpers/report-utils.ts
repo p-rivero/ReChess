@@ -34,13 +34,24 @@ export function parseSummaryLine(line: string): { reporter: string, reason: stri
   return { reporter, reason, timestamp: parseInt(timestamp) }
 }
 
+/**
+ * Clears the stored backup of a user's data. If the user is still banned it's impossible
+ * to restore the user's data after this function is called.
+ * @param {string} userId UID of the user whose data should be cleared
+ * @return {Promise<void>} A promise that resolves when the function is complete
+ */
+export async function removeDataBackup(userId: string): Promise<void> {
+  const { db } = await useAdmin()
+  await db.collection('bannedUserData').doc(userId).delete()
+}
+
 
 /**
  * Returns the username of the user with the given ID.
  * @param {string} userId UID of the user
  * @return {string} The username of the user
  */
-async function getUsername(userId: string): Promise<string> {
+export async function getUsername(userId: string): Promise<string> {
   const { db } = await useAdmin()
   const userSnap = await db.collection('users').doc(userId).get()
   const userDoc = userSnap.data() as UserDoc

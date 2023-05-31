@@ -24,12 +24,12 @@ function makeArgs(wipedUserId: string) {
 test('moderator can wipe a user', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(WIPED_ID)
-  await auth.createUser({
+  const user = await auth.createUser({
     uid: WIPED_ID,
     displayName: 'The Wiped User',
     photoURL: 'https://example.com/wiped-user.png',
   })
-  const oldUserDoc = await insertUser(db, WIPED_ID)
+  const oldUserDoc = await insertUser(db, user)
   
   await expectSuccess(wipeUser(args, context))
   
@@ -49,8 +49,8 @@ test('moderator can wipe a user', async () => {
 test('user name is removed from games', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(WIPED_ID)
-  await auth.createUser({ uid: WIPED_ID })
-  await insertUser(db, WIPED_ID)
+  const user = await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, user)
   const ongoingGameBefore = await insertGame(db, 'game_id_ongoing', 'some_variant_id')
   await db.collection('games').doc('game_id_ongoing').update({ 
     'IMMUTABLE.whiteId': WIPED_ID,
@@ -109,8 +109,8 @@ test('user name is removed from games', async () => {
 test('created variants are removed', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(WIPED_ID)
-  await auth.createUser({ uid: WIPED_ID })
-  await insertUser(db, WIPED_ID)
+  const user = await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, user)
   await insertVariant(db, 'variant_id', 'white', WIPED_ID)
   await insertGame(db, 'game_1', 'variant_id', 'draw')
   await insertGame(db, 'game_2', 'another_variant')
@@ -130,8 +130,8 @@ test('created variants are removed', async () => {
 test('created reports are removed', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(WIPED_ID)
-  await auth.createUser({ uid: WIPED_ID })
-  await insertUser(db, WIPED_ID)
+  const user = await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, user)
   await insertReport(db, WIPED_ID, 'user', 'a_reported_user_id')
   await insertReport(db, WIPED_ID, 'variant', 'a_reported_variant_id')
   
@@ -154,12 +154,12 @@ test('created reports are removed', async () => {
 test('wiping a user twice does nothing', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(WIPED_ID)
-  await auth.createUser({
+  const user = await auth.createUser({
     uid: WIPED_ID,
     displayName: 'The Wiped User',
     photoURL: 'https://example.com/wiped-user.png',
   })
-  await insertUser(db, WIPED_ID)
+  await insertUser(db, user)
   
   await expectSuccess(wipeUser(args, context))
   const newUserDoc = (await db.collection('users').doc(WIPED_ID).get()).data() as UserDoc
@@ -178,8 +178,8 @@ test('wiping a user twice does nothing', async () => {
 test('ban a user and then wipe them', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(WIPED_ID)
-  await auth.createUser({ uid: WIPED_ID })
-  await insertUser(db, WIPED_ID)
+  const user = await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, user)
   await insertVariant(db, 'variant_id', 'white', WIPED_ID)
   await insertGame(db, 'game_id', 'variant_id', 'draw')
   await insertIndex(db, [{ id: 'variant_id', name: 'Variant' }])
@@ -215,8 +215,8 @@ test('ban a user and then wipe them', async () => {
 test('banned user data is not stored', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(WIPED_ID)
-  await auth.createUser({ uid: WIPED_ID })
-  const oldUserDoc = await insertUser(db, WIPED_ID)
+  const user = await auth.createUser({ uid: WIPED_ID })
+  const oldUserDoc = await insertUser(db, user)
   await db.collection('users').doc(WIPED_ID).update({
     name: 'The Wiped User',
     about: 'I am a wiped user.',
@@ -241,8 +241,8 @@ test('banned user data is not stored', async () => {
 test('user profile picture is deleted', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(WIPED_ID)
-  await auth.createUser({ uid: WIPED_ID })
-  await insertUser(db, WIPED_ID)
+  const user = await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, user)
   await storage.bucket().file(`profile-images/${WIPED_ID}`).save('some data')
   
   const fileBefore = storage.bucket().file(`profile-images/${WIPED_ID}`)
@@ -260,8 +260,8 @@ test('user profile picture is deleted', async () => {
 
 test('arguments must be correct', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  await auth.createUser({ uid: WIPED_ID })
-  await insertUser(db, WIPED_ID)
+  const user = await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, user)
   
   let arg = {}
   let e = await expectHttpsError(wipeUser(arg, context))
@@ -279,8 +279,8 @@ test('arguments must be correct', async () => {
 
 test('caller must be authenticated as a moderator', async () => {
   const args = makeArgs(WIPED_ID)
-  await auth.createUser({ uid: WIPED_ID })
-  await insertUser(db, WIPED_ID)
+  const user = await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, user)
   
   let context = makeCallableContext(null)
   let e = await expectHttpsError(wipeUser(args, context))
@@ -311,15 +311,15 @@ test('cannot wipe a user that does not exist', async () => {
   const args = makeArgs(WIPED_ID)
   
   const e = await expectHttpsError(wipeUser(args, context))
-  expect(e.message).toMatch('The user to be banned does not exist.')
+  expect(e.message).toMatch(`The user ${WIPED_ID} does not exist.`)
   expect(e.code).toBe('not-found')
 })
 
 test('moderators cannot wipe themselves', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(MODERATOR_ID)
-  await auth.createUser({ uid: MODERATOR_ID })
-  const user = await insertUser(db, MODERATOR_ID)
+  const user = await auth.createUser({ uid: MODERATOR_ID })
+  const userDoc = await insertUser(db, user)
   const variant = await insertVariant(db, 'variant_id', 'white', MODERATOR_ID)
   
   const e = await expectHttpsError(wipeUser(args, context))
@@ -328,7 +328,7 @@ test('moderators cannot wipe themselves', async () => {
   
   // User data is not changed
   const userAfter = await db.collection('users').doc(MODERATOR_ID).get()
-  expect(userAfter.data()).toEqual(user)
+  expect(userAfter.data()).toEqual(userDoc)
   const variantAfter = await db.collection('variants').doc('variant_id').get()
   expect(variantAfter.data()).toEqual(variant)
 })
@@ -336,13 +336,13 @@ test('moderators cannot wipe themselves', async () => {
 test('moderators cannot wipe another moderator', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(WIPED_ID)
-  await auth.createUser({
+  const user = await auth.createUser({
     uid: WIPED_ID,
     displayName: 'The Wiped User',
     photoURL: 'https://example.com/wiped-user.png',
   })
   await auth.setCustomUserClaims(WIPED_ID, { moderator: true })
-  await insertUser(db, WIPED_ID)
+  await insertUser(db, user)
   const variant = await insertVariant(db, 'variant_id', 'white', WIPED_ID)
   await insertReport(db, MODERATOR_ID, 'variant', 'some_variant_id')
   

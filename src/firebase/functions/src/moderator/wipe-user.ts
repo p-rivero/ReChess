@@ -2,6 +2,7 @@
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import { useAdmin } from '../helpers'
 import assertModerator from './helpers/assert-moderator'
+import { removeDataBackup } from './helpers/report-utils'
 import banUser from './ban-user'
 import deleteVariant from './delete-variant'
 import discardUserReports from './discard-user-reports'
@@ -47,7 +48,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
   await removeVariants(variantIds, context)
   await removeUserReports(userId, context)
   await removeStoredFile(`/profile-images/${userId}`)
-  await removeBackup(userId)
+  await removeDataBackup(userId)
 }
 
 
@@ -95,9 +96,4 @@ async function removeStoredFile(fileName: string): Promise<void> {
     // Ignore the error if the file doesn't exist
     if (e.code !== 404) throw e
   }
-}
-
-async function removeBackup(userId: string): Promise<void> {
-  const { db } = await useAdmin()
-  await db.collection('bannedUserData').doc(userId).delete()
 }

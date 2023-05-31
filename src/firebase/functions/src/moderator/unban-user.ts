@@ -3,9 +3,9 @@ import { BannedUserDataDoc, UserDoc } from 'db/schema'
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import { FieldValue } from 'firebase-admin/firestore'
 import { fetchUser } from '../user/helpers/fetch-user'
-import { updateName } from '../user/rename-user'
-import { useAdmin } from '../helpers'
+import { batchedUpdate, useAdmin } from '../helpers'
 import assertModerator from './helpers/assert-moderator'
+import { removeDataBackup, getUsername } from './helpers/report-utils'
 
 /**
  * Called directly by the moderator in order to lift a user's ban.
@@ -43,8 +43,9 @@ export default async function(data: unknown, context: CallableContext): Promise<
     return
   }
   
-  await restoreUserData(userId)
+  await restoreDataFromBackup(userId)
   await unbanUser(userId)
+  await removeDataBackup(userId)
 }
 
 async function unbanUser(userId: string): Promise<void> {
@@ -56,13 +57,13 @@ async function unbanUser(userId: string): Promise<void> {
   } catch (untypedErr) {
     const e = untypedErr as Error
     console.error(e)
-    throw new HttpsError('internal', 'An unexpected error occurred while banning the user: ' + e.message)
+    throw new HttpsError('internal', 'An unexpected error occurred while unbanning the user: ' + e.message)
   }
   // The user's session token will expire in 1 hour, at which point they will be logged out.
   // Until then, they can still use the app normally (but are unable to update their profile).
 }
 
-async function restoreUserData(userId: string): Promise<void> {
+async function restoreDataFromBackup(userId: string): Promise<void> {
   const { db } = await useAdmin()
   const bannedUserData = await db.collection('bannedUserData').doc(userId).get()
   const data = bannedUserData.data() as BannedUserDataDoc | undefined
@@ -76,7 +77,36 @@ async function restoreUserData(userId: string): Promise<void> {
     banned: FieldValue.delete() as unknown as undefined,
   }
   await db.collection('users').doc(userId).update(updateObj)
-  await updateName(userId, data.name)
   
-  // TODO: Restore variants
+  const displayName = data.name ?? `@${await getUsername(userId)}`
+  
+  const gamesAsWhite = data.gamesAsWhite.split(' ')
+      .filter(id => id !== '')
+      .map(gameId => db.collection('games').doc(gameId))
+  await batchedUpdate(gamesAsWhite, (batch, ref) => {
+    batch.update(ref, {
+      'IMMUTABLE.whiteId': userId,
+      'IMMUTABLE.whiteDisplayName': displayName,
+    })
+  })
+  
+  const gamesAsBlack = data.gamesAsBlack.split(' ')
+      .filter(id => id !== '')
+      .map(gameId => db.collection('games').doc(gameId))
+  await batchedUpdate(gamesAsBlack, (batch, ref) => {
+    batch.update(ref, {
+      'IMMUTABLE.blackId': userId,
+      'IMMUTABLE.blackDisplayName': displayName,
+    })
+  })
+  
+  const variants = data.publishedVariants.split(' ')
+      .filter(id => id !== '')
+      .map(variantId => db.collection('variants').doc(variantId))
+  await batchedUpdate(variants, (batch, ref) => {
+    batch.update(ref, {
+      creatorId: userId,
+      creatorDisplayName: displayName,
+    })
+  })
 }

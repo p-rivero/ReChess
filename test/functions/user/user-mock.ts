@@ -1,5 +1,6 @@
 import type { UserDoc, GameSummary } from '@/firebase/db/schema'
 import type admin from 'firebase-admin'
+import type { UserRecord } from 'firebase-functions/v1/auth'
 
 type DB = admin.firestore.Firestore
 
@@ -26,7 +27,7 @@ function makeGameSummaries(numGames: number): string {
   return JSON.stringify(summaries)
 }
 
-export async function insertUser(db: DB, userId: string, gamesPlayed = 0): Promise<UserDoc> {
+export async function insertUserWithGames(db: DB, userId: string, gamesPlayed: number): Promise<UserDoc> {
   const doc: UserDoc = {
     name: 'User Name',
     about: 'About me',
@@ -40,5 +41,22 @@ export async function insertUser(db: DB, userId: string, gamesPlayed = 0): Promi
     },
   }
   await db.collection('users').doc(userId).set(doc)
+  return doc
+}
+
+export async function insertUser(db: DB, user: UserRecord): Promise<UserDoc> {
+  const doc: UserDoc = {
+    name: user.displayName ?? null,
+    about: 'My about section',
+    profileImg: user.photoURL ?? null,
+    IMMUTABLE: {
+      username: 'username_' + randomId(),
+      renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
+    },
+  }
+  await db.collection('users').doc(user.uid).set(doc)
   return doc
 }

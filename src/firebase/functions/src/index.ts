@@ -103,6 +103,14 @@ region(FUNCTIONS_REGION)
     return callFunction(import('./moderator/discard-variant-reports'), data, context)
   })
   
+export const unbanUser =
+region(FUNCTIONS_REGION)
+  .runWith({ enforceAppCheck: true })
+  .https
+  .onCall((data, context) => {
+    return callFunction(import('./moderator/unban-user'), data, context)
+  })
+  
 export const wipeUser =
 region(FUNCTIONS_REGION)
   .runWith({ enforceAppCheck: true })

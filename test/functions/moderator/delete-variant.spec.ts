@@ -247,9 +247,6 @@ test('delete a variant with more than 500 games', async () => {
 
 test('arguments must be correct', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  await auth.createUser({ uid: VARIANT_ID })
-  await insertUser(db, VARIANT_ID)
-  
   let arg = {}
   let e = await expectHttpsError(deleteVariant(arg, context))
   expect(e.message).toMatch('The function must be called with a variantId.')
@@ -263,9 +260,6 @@ test('arguments must be correct', async () => {
 
 test('caller must be authenticated as a moderator', async () => {
   const args = makeArgs(VARIANT_ID)
-  await auth.createUser({ uid: VARIANT_ID })
-  await insertUser(db, VARIANT_ID)
-  
   let context = makeCallableContext(null)
   let e = await expectHttpsError(deleteVariant(args, context))
   expect(e.message).toMatch('The function must be called while authenticated.')

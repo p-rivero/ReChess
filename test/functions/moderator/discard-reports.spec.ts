@@ -4,7 +4,7 @@ import { extractReporters, insertModerationDoc, insertReport, makeModeratorConte
 import { makeCallableContext } from '../make-context'
 import type { ModerationDoc } from '@/firebase/db/schema'
 import type { https } from 'firebase-functions'
-import { insertUser } from '../user/user-mock'
+import { insertUserWithGames } from '../user/user-mock'
 
 const { app, testEnv } = initialize('discard-report-test')
 const db = app.firestore()
@@ -178,7 +178,7 @@ test('non-existent reporters are ignored', async () => {
 test('reports are not deleted from the user reports collection', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = userArgs(REPORTED_ID, ['a_reporter'])
-  await insertUser(db, 'a_reporter')
+  await insertUserWithGames(db, 'a_reporter', 0)
   await insertReport(db, 'a_reporter', 'user', REPORTED_ID)
   await insertReport(db, 'another_reporter', 'user', REPORTED_ID)
   
@@ -216,7 +216,7 @@ test('reports are not deleted from the user reports collection', async () => {
 test('removing all reports deletes the moderation doc', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = userArgs(REPORTED_ID, ['a_reporter'])
-  await insertUser(db, 'a_reporter')
+  await insertUserWithGames(db, 'a_reporter', 0)
   await insertReport(db, 'a_reporter', 'user', REPORTED_ID)
   
   const moderationDocBefore = await db.collection('userModeration').doc(REPORTED_ID).get()

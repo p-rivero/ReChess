@@ -1,4 +1,4 @@
-import { expectHttpsError, expectLog, expectNoErrorLog, expectSuccess } from '../utils'
+import { expectHttpsError, expectLog, expectSuccess } from '../utils'
 import { functions, initialize } from '../init'
 import { makeModeratorContext, insertReport } from './moderator-mock'
 import { makeCallableContext } from '../make-context'
@@ -22,12 +22,12 @@ function makeArgs(bannedUserId: string, doNotBackup?: boolean) {
 test('moderator can ban a user', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(BANNED_ID)
-  await auth.createUser({
+  const user = await auth.createUser({
     uid: BANNED_ID,
     displayName: 'The Banned User',
     photoURL: 'https://example.com/banned-user.png',
   })
-  const oldUserDoc = await insertUser(db, BANNED_ID)
+  const oldUserDoc = await insertUser(db, user)
   
   await expectSuccess(banUser(args, context))
   
@@ -47,8 +47,8 @@ test('moderator can ban a user', async () => {
 test('user name is removed from games', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(BANNED_ID)
-  await auth.createUser({ uid: BANNED_ID })
-  await insertUser(db, BANNED_ID)
+  const user = await auth.createUser({ uid: BANNED_ID })
+  await insertUser(db, user)
   const ongoingGameBefore = await insertGame(db, 'game_id_ongoing', 'some_variant_id')
   await db.collection('games').doc('game_id_ongoing').update({ 
     'IMMUTABLE.whiteId': BANNED_ID,
@@ -107,8 +107,8 @@ test('user name is removed from games', async () => {
 test('user name is removed from created variants', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(BANNED_ID)
-  await auth.createUser({ uid: BANNED_ID })
-  await insertUser(db, BANNED_ID)
+  const user = await auth.createUser({ uid: BANNED_ID })
+  await insertUser(db, user)
   const variantBefore = await insertVariant(db, 'variant_id', 'white', BANNED_ID)
   
   await expectSuccess(banUser(args, context))
@@ -125,12 +125,12 @@ test('user name is removed from created variants', async () => {
 test('banning a user twice does nothing', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(BANNED_ID)
-  await auth.createUser({
+  const user = await auth.createUser({
     uid: BANNED_ID,
     displayName: 'The Banned User',
     photoURL: 'https://example.com/banned-user.png',
   })
-  await insertUser(db, BANNED_ID)
+  await insertUser(db, user)
   
   await expectSuccess(banUser(args, context))
   const newUserDoc = (await db.collection('users').doc(BANNED_ID).get()).data() as UserDoc
@@ -149,8 +149,8 @@ test('banning a user twice does nothing', async () => {
 test('banned user data is stored', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(BANNED_ID)
-  await auth.createUser({ uid: BANNED_ID })
-  const oldUserDoc = await insertUser(db, BANNED_ID)
+  const user = await auth.createUser({ uid: BANNED_ID })
+  const oldUserDoc = await insertUser(db, user)
   await db.collection('users').doc(BANNED_ID).update({
     name: 'The Banned User',
     about: 'I am a banned user.',
@@ -184,8 +184,8 @@ test('banned user data is stored', async () => {
 test('banned user games are stored', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(BANNED_ID, false)
-  await auth.createUser({ uid: BANNED_ID })
-  await insertUser(db, BANNED_ID)
+  const user = await auth.createUser({ uid: BANNED_ID })
+  await insertUser(db, user)
   await db.collection('users').doc(BANNED_ID).update({
     name: 'The Banned User',
     about: 'I am a banned user.',
@@ -224,8 +224,8 @@ test('banned user games are stored', async () => {
 test('banned user data is not stored if doNotBackup is set', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(BANNED_ID, true)
-  await auth.createUser({ uid: BANNED_ID })
-  const oldUserDoc = await insertUser(db, BANNED_ID)
+  const user = await auth.createUser({ uid: BANNED_ID })
+  const oldUserDoc = await insertUser(db, user)
   await db.collection('users').doc(BANNED_ID).update({
     name: 'The Banned User',
     about: 'I am a banned user.',
@@ -256,8 +256,8 @@ test('banned user data is not stored if doNotBackup is set', async () => {
 test('user reports are not removed', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(BANNED_ID)
-  await auth.createUser({ uid: BANNED_ID })
-  await insertUser(db, BANNED_ID)
+  const user = await auth.createUser({ uid: BANNED_ID })
+  await insertUser(db, user)
   await insertReport(db, BANNED_ID, 'user', 'a_reported_user_id')
   await insertReport(db, BANNED_ID, 'variant', 'a_reported_variant_id')
   
@@ -280,8 +280,8 @@ test('user reports are not removed', async () => {
 
 test('arguments must be correct', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
-  await auth.createUser({ uid: BANNED_ID })
-  await insertUser(db, BANNED_ID)
+  const user = await auth.createUser({ uid: BANNED_ID })
+  await insertUser(db, user)
   
   let arg = {}
   let e = await expectHttpsError(banUser(arg, context))
@@ -309,8 +309,8 @@ test('arguments must be correct', async () => {
 
 test('caller must be authenticated as a moderator', async () => {
   const args = makeArgs(BANNED_ID)
-  await auth.createUser({ uid: BANNED_ID })
-  await insertUser(db, BANNED_ID)
+  const user = await auth.createUser({ uid: BANNED_ID })
+  await insertUser(db, user)
   
   let context = makeCallableContext(null)
   let e = await expectHttpsError(banUser(args, context))
@@ -341,15 +341,15 @@ test('cannot ban a user that does not exist', async () => {
   const args = makeArgs(BANNED_ID)
   
   const e = await expectHttpsError(banUser(args, context))
-  expect(e.message).toMatch('The user to be banned does not exist.')
+  expect(e.message).toMatch(`The user ${BANNED_ID} does not exist.`)
   expect(e.code).toBe('not-found')
 })
 
 test('moderators cannot ban themselves', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(MODERATOR_ID)
-  await auth.createUser({ uid: MODERATOR_ID })
-  await insertUser(db, MODERATOR_ID)
+  const user = await auth.createUser({ uid: MODERATOR_ID })
+  await insertUser(db, user)
   
   const e = await expectHttpsError(banUser(args, context))
   expect(e.message).toMatch('Please do not ban yourself :(')
@@ -359,13 +359,13 @@ test('moderators cannot ban themselves', async () => {
 test('moderators cannot ban another moderator', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(BANNED_ID)
-  await auth.createUser({
+  const user = await auth.createUser({
     uid: BANNED_ID,
     displayName: 'The Banned User',
     photoURL: 'https://example.com/banned-user.png',
   })
   await auth.setCustomUserClaims(BANNED_ID, { moderator: true })
-  await insertUser(db, BANNED_ID)
+  await insertUser(db, user)
   
   const e = await expectHttpsError(banUser(args, context))
   expect(e.message).toMatch('You cannot ban moderators directly. Please demote them first.')
