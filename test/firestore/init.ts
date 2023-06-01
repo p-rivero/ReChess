@@ -9,7 +9,6 @@ export function setupJest(projectId: string, onInit: (testEnv: RulesTestEnvironm
   
   beforeAll(async () => {
     // Make sure the emulator is running (Use: firebase emulators:start --only firestore,storage,auth)
-    // assertEmulatorRunning('Firestore', 8080, true)
     await assertEmulatorsRunning()
     
     try {
