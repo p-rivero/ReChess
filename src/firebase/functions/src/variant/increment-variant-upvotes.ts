@@ -15,7 +15,7 @@ export default async function(variantId: string, upvoterId: string): Promise<voi
   const baseDoc = db.collection('variants').doc(variantId)
 
   const p1 = baseDoc.update('numUpvotes', FieldValue.increment(1)).catch((err) => {
-    console.error('Error while incrementing upvotes or reports:', variantId, upvoterId)
+    console.error('Error while incrementing upvotes or reports:', variantId, upvoterId, err)
     console.error(err)
   })
   

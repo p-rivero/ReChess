@@ -1,5 +1,5 @@
 import { functions, initialize } from '../init'
-import { expectLog } from '../utils'
+import { expectLog, expectNoErrorLog } from '../utils'
 
 const { app, testEnv } = initialize('check-piece-hash-test')
 const bucket = app.storage().bucket()
@@ -20,7 +20,9 @@ test('accepts images with correct hash', async () => {
     },
   })
   
+  const done = expectNoErrorLog()
   await checkPieceHash(metadata)
+  done()
   
   const exists = await bucket.file(FILE_PATH).exists()
   expect(exists).toEqual([true])
@@ -77,7 +79,9 @@ test('ignores images in other directories', async () => {
     },
   })
   
+  const done = expectNoErrorLog()
   await checkPieceHash(metadata)
+  done()
   
   const exists = await bucket.file(FILE_PATH).exists()
   expect(exists).toEqual([true])

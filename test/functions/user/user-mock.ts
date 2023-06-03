@@ -1,6 +1,11 @@
-import type { UserDoc, GameSummary } from '@/firebase/db/schema'
-import type admin from 'firebase-admin'
+import type { UserDoc, GameSummary, UsernameDoc, UserPrivateDoc, TimestampDoc } from '@/firebase/db/schema'
+import { UserPrivateCacheDoc } from '@/firebase/db/schema'
+import { ReportDoc } from '@/firebase/db/schema'
+import { UserRenameTriggerDoc } from '@/firebase/db/schema'
+import admin from 'firebase-admin'
 import type { UserRecord } from 'firebase-functions/v1/auth'
+import type { Timestamp } from 'firebase/firestore'
+import type { FeaturesList } from 'firebase-functions-test/lib/features'
 
 type DB = admin.firestore.Firestore
 
@@ -44,7 +49,7 @@ export async function insertUserWithGames(db: DB, userId: string, gamesPlayed: n
   return doc
 }
 
-export async function insertUser(db: DB, user: UserRecord): Promise<UserDoc> {
+export async function insertUser(db: DB, user: UserRecord, insertAllDocs = false): Promise<UserDoc> {
   const doc: UserDoc = {
     name: user.displayName ?? null,
     about: 'My about section',
@@ -58,5 +63,39 @@ export async function insertUser(db: DB, user: UserRecord): Promise<UserDoc> {
     },
   }
   await db.collection('users').doc(user.uid).set(doc)
+  if (insertAllDocs) {
+    const usernameDoc: UsernameDoc = { userId: user.uid }
+    await db.collection('usernames').doc(doc.IMMUTABLE.username).set(usernameDoc)
+    const privateDoc: UserPrivateDoc = { IMMUTABLE: { email: user.email ?? 'some@email.com' } }
+    await db.collection('users').doc(user.uid).collection('private').doc('doc').set(privateDoc)
+    const renameTriggerDoc: UserRenameTriggerDoc = { name: doc.name ?? 'Name', username: doc.IMMUTABLE.username }
+    await db.collection('users').doc(user.uid).collection('renameTrigger').doc('doc').set(renameTriggerDoc)
+  }
   return doc
+}
+
+export async function insertUpvote(db: DB, testEnv: FeaturesList, userId: string, variantId: string) {
+  const doc: TimestampDoc = {
+    time: admin.firestore.Timestamp.now() as Timestamp
+  }
+  await db.collection('users').doc(userId).collection('upvotedVariants').doc(variantId).set(doc)
+  return testEnv.firestore.makeDocumentSnapshot(doc, `users/${userId}/upvotedVariants/${variantId}`)
+}
+export async function insertUserReport(db: DB, testEnv: FeaturesList, userId: string, reportedUserId: string, onlyBlock = false) {
+  const doc: ReportDoc = {
+    time: admin.firestore.Timestamp.now() as Timestamp,
+    reason: onlyBlock ? '' : 'Some reason',
+    onlyBlock,
+  }
+  await db.collection('users').doc(userId).collection('reportedUsers').doc(reportedUserId).set(doc)
+  return testEnv.firestore.makeDocumentSnapshot(doc, `users/${userId}/reportedUsers/${reportedUserId}`)
+}
+export async function insertVariantReport(db: DB, testEnv: FeaturesList, userId: string, reportedVariantId: string, onlyBlock = false) {
+  const doc: ReportDoc = {
+    time: admin.firestore.Timestamp.now() as Timestamp,
+    reason: onlyBlock ? '' : 'Some reason',
+    onlyBlock,
+  }
+  await db.collection('users').doc(userId).collection('reportedVariants').doc(reportedVariantId).set(doc)
+  return testEnv.firestore.makeDocumentSnapshot(doc, `users/${userId}/reportedVariants/${reportedVariantId}`)
 }
