@@ -1,7 +1,6 @@
 
-import { FieldValue } from 'firebase-admin/firestore'
 import { updatePrivateCache } from '../user/helpers/update-private-cache'
-import { useAdmin } from '../helpers'
+import { updateVariantUpvotes } from './helpers/update-variant-metrics'
 
 /**
  * Called when a user upvotes a variant. Increments the upvote count of the variant and
@@ -11,15 +10,8 @@ import { useAdmin } from '../helpers'
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function(variantId: string, upvoterId: string): Promise<void> {
-  const { db } = await useAdmin()
-  const baseDoc = db.collection('variants').doc(variantId)
-
-  const p1 = baseDoc.update('numUpvotes', FieldValue.increment(1)).catch((err) => {
-    console.error('Error while incrementing upvotes or reports:', variantId, upvoterId, err)
-    console.error(err)
-  })
-  
-  const p2 = updatePrivateCache('upvoteVariant', variantId, upvoterId)
-  
-  await Promise.all([p1, p2])
+  await Promise.all([
+    updateVariantUpvotes(variantId, 1),
+    updatePrivateCache('upvoteVariant', upvoterId, variantId),
+  ])
 }

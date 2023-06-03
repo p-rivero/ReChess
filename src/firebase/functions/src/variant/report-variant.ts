@@ -16,5 +16,5 @@ export default async function(
   snap: FirebaseFirestore.QueryDocumentSnapshot
 ): Promise<void> {
   const report = snap.data() as ReportDoc
-  await incrementReports('variants', variantId, reporterId, report.reason)
+  await incrementReports('variant', variantId, reporterId, report.reason)
 }

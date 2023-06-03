@@ -1,5 +1,6 @@
+import { fetchUserDoc } from '../../user/helpers/fetch-user'
 import { useAdmin } from '../../helpers'
-import type { UserDoc } from 'db/schema'
+import type { BannedUserDataDoc } from 'db/schema'
 
 /**
  * Returns a line to add to the reports summary of a variant or user.
@@ -17,7 +18,11 @@ export async function makeSummaryLine(userId: string, reportReason: string): Pro
   if (reportReason.length === 0) {
     reportReason = '-'
   }
-  const username = await getUsername(userId)
+  const userDoc = await fetchUserDoc(userId)
+  if (!userDoc) {
+    throw new Error(`Attempting to add a report for a user that does not exist: ${userId}`)
+  }
+  const username = userDoc.IMMUTABLE.username
   const currentTimestamp = Date.now()
   return `${username}\t${reportReason}\t${currentTimestamp}\n`
 }
@@ -34,6 +39,18 @@ export function parseSummaryLine(line: string): { reporter: string, reason: stri
   return { reporter, reason, timestamp: parseInt(timestamp) }
 }
 
+
+/**
+ * Retrieves the stored backup of a user's data, if it exists.
+ * @param {string} userId UID of the user whose data should be retrieved
+ * @return {Promise<BannedUserDataDoc | undefined>} A promise that resolves with the user's data
+ */
+export async function fetchDataBackup(userId: string): Promise<BannedUserDataDoc | undefined> {
+  const { db } = await useAdmin()
+  const snapshot = await db.collection('bannedUserData').doc(userId).get()
+  return snapshot.data() as BannedUserDataDoc | undefined
+}
+
 /**
  * Clears the stored backup of a user's data. If the user is still banned it's impossible
  * to restore the user's data after this function is called.
@@ -44,17 +61,3 @@ export async function removeDataBackup(userId: string): Promise<void> {
   const { db } = await useAdmin()
   await db.collection('bannedUserData').doc(userId).delete()
 }
-
-
-/**
- * Returns the username of the user with the given ID.
- * @param {string} userId UID of the user
- * @return {string} The username of the user
- */
-export async function getUsername(userId: string): Promise<string> {
-  const { db } = await useAdmin()
-  const userSnap = await db.collection('users').doc(userId).get()
-  const userDoc = userSnap.data() as UserDoc
-  return userDoc.IMMUTABLE.username
-}
-

@@ -362,6 +362,6 @@ test('cannot unban a user if their data has been wiped', async () => {
   await expectSuccess(wipeUser(args, context))
   
   let e = await expectHttpsError(unbanUser(args, context))
-  expect(e.message).toMatch('Cannot find backup of user data.')
+  expect(e.message).toMatch(`Cannot find backup of user ${BANNED_ID}.`)
   expect(e.code).toBe('not-found')
 })

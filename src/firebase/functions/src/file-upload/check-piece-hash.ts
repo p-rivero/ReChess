@@ -1,6 +1,7 @@
 
 import { createHash } from 'node:crypto'
 import { useAdmin } from '../helpers'
+import type { File } from '@google-cloud/storage'
 import type { ObjectMetadata } from 'firebase-functions/v1/storage'
 
 /**
@@ -22,15 +23,17 @@ export default async function(image: ObjectMetadata): Promise<void> {
     return
   }
   
-  // Compute the hash of the image
-  const [file] = await fileRef.download()
-  const hash = createHash('sha256').update(file).digest('hex')
-  
   // Check if the filename matches the hash
+  const hash = await computeImageHash(fileRef)
   const fileName = image.name.split('/').pop()
   if (fileName !== hash) {
     const uploader = image.metadata?.userId
     console.warn('Deleting', image.name, 'because the hash does not match the filename. Uploader:', uploader)
     await fileRef.delete()
   }
+}
+
+async function computeImageHash(fileRef: File) {
+  const [file] = await fileRef.download()
+  return createHash('sha256').update(file).digest('hex')
 }

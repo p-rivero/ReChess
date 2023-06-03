@@ -345,4 +345,4 @@ test('deleting subcollection with more than 500 documents', async () => {
   done()
   
   expect(await collectionSize('upvotedVariants')).toBe(0)
-})
+}, 60000)

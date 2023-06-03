@@ -1,4 +1,7 @@
 import { FieldValue } from 'firebase-admin/firestore'
+import { fetchGameDoc } from './helpers/fetch-game'
+import { fetchUserDoc } from '../user/helpers/fetch-user'
+import { updateVariantPopularity } from '../variant/helpers/update-variant-metrics'
 import { useAdmin } from '../helpers'
 import type { GameDoc, GameSummary, UserDoc } from 'db/schema'
 
@@ -11,16 +14,11 @@ import type { GameDoc, GameSummary, UserDoc } from 'db/schema'
  * @return {Promise<void>} A promise that resolves when the function completes
  */
 export default async function(gameId: string): Promise<void> {
-  const { db } = await useAdmin()
-  
-  // Fetch the game, make sure it exists and is finished
-  const gameRef = db.collection('games').doc(gameId)
-  const gameSnapshot = await gameRef.get()
-  if (!gameSnapshot.exists) {
+  const gameDoc = await fetchGameDoc(gameId)
+  if (!gameDoc) {
     console.error('Game does not exist: ' + gameId)
     return
   }
-  const gameDoc = gameSnapshot.data() as GameDoc
   if (gameDoc.winner === null) {
     console.error('Game is not finished: ' + gameId)
     return
@@ -31,19 +29,24 @@ export default async function(gameId: string): Promise<void> {
     console.warn('finishGame() already called for game: ' + gameId)
     return
   }
-  const p1 = gameRef.update({ 'IMMUTABLE.calledFinishGame': true })
-    .catch((e) => console.error('Cannot set calledFinishGame on game', gameId, e))
   
-  // Update the profiles
-  const p2 = updateProfile(db, gameId, gameDoc, gameDoc.IMMUTABLE.whiteId)
-  const p3 = updateProfile(db, gameId, gameDoc, gameDoc.IMMUTABLE.blackId)
-  
-  // Update the variant popularity
-  const variantRef = db.collection('variants').doc(gameDoc.IMMUTABLE.variantId)
-  const p4 = variantRef.update({ popularity: FieldValue.increment(-1) })
-    .catch((e) => console.error('Cannot update variant popularity', gameDoc.IMMUTABLE.variantId, e))
-    
-  await Promise.all([p1, p2, p3, p4])
+  await Promise.all([
+    setFinishGameFlag(gameId),
+    updateProfile([gameId, gameDoc], gameDoc.IMMUTABLE.whiteId),
+    updateProfile([gameId, gameDoc], gameDoc.IMMUTABLE.blackId),
+    updateVariantPopularity(gameDoc.IMMUTABLE.variantId, -1),
+  ])
+}
+
+async function setFinishGameFlag(gameId: string) {
+  const { db } = await useAdmin()
+  try {
+    await db.collection('games').doc(gameId).update({
+      'IMMUTABLE.calledFinishGame': true,
+    })
+  } catch (e) {
+    console.error('Cannot set calledFinishGame on game', gameId, e)
+  }
 }
 
 
@@ -53,64 +56,63 @@ const WIN_POINTS = {
   draw: 0.5,
 } as const
 
-/**
- * Updates the profile of a player after a game has finished.
- * @param {FirebaseFirestore.Firestore} db The Firestore database
- * @param {string} gameId The UID of the game that finished
- * @param {GameDoc} game The game that finished, corresponding to gameId
- * @param {string} playerId The player ID of the player whose profile should be updated
- * @return {Promise<void>} A promise that resolves when the function completes
- */
-async function updateProfile(
-  db: FirebaseFirestore.Firestore,
-  gameId: string,
-  game: GameDoc,
-  playerId: string
-): Promise<void> {
-  // Fetch the profile
-  const profileRef = db.collection('users').doc(playerId)
-  const profileSnapshot = await profileRef.get()
-  if (!profileSnapshot.exists) {
-    console.error('Profile does not exist: ' + playerId)
+async function updateProfile(game: [string, GameDoc], userId: string): Promise<void> {
+  const userDoc = await fetchUserDoc(userId)
+  if (!userDoc) {
+    console.error('Profile does not exist: ' + userId)
     return
   }
-  const profile = profileSnapshot.data() as UserDoc
+  const newGame = createGameSummary(game, userId)
+  await appendGameSummary([userId, userDoc], newGame)
+}
+
+function createGameSummary(game: [string, GameDoc], playerId: string): GameSummary {
+  const [gameId, gameDoc] = game
+  const playedSide = gameDoc.IMMUTABLE.whiteId === playerId ? 'white' : 'black'
   
-  // Calculate the new values
-  const playedSide = game.IMMUTABLE.whiteId === playerId ? 'white' : 'black'
-  
-  const result =
-    game.winner === 'draw' ? 'draw' :
-      game.winner === playedSide ? 'win' : 'loss'
-  
-  const earnedPoints = WIN_POINTS[result]
+  const result = playerResult(playedSide, gameDoc.winner)
   
   const [opponentId, opponentName] = playedSide === 'white' ?
-    [game.IMMUTABLE.blackId, game.IMMUTABLE.blackDisplayName] :
-    [game.IMMUTABLE.whiteId, game.IMMUTABLE.whiteDisplayName]
+    [gameDoc.IMMUTABLE.blackId, gameDoc.IMMUTABLE.blackDisplayName] :
+    [gameDoc.IMMUTABLE.whiteId, gameDoc.IMMUTABLE.whiteDisplayName]
   
-  const newGame: GameSummary = {
+  return {
     gameId,
-    variantId: game.IMMUTABLE.variantId,
-    variantName: game.IMMUTABLE.variant.name,
-    timeCreatedMs: game.IMMUTABLE.timeCreated.toMillis(),
+    variantId: gameDoc.IMMUTABLE.variantId,
+    variantName: gameDoc.IMMUTABLE.variant.name,
+    timeCreatedMs: gameDoc.IMMUTABLE.timeCreated.toMillis(),
     playedSide,
     result,
     opponentId,
     opponentName,
   }
+}
+
+async function appendGameSummary(user: [string, UserDoc], newGame: GameSummary) {
+  const MAX_CACHED_GAMES = 5
+  const { db } = await useAdmin()
+  const [userId, userDoc] = user
   
-  // Add the new game to the list of last 5 games
-  const last5Games = JSON.parse(profile.IMMUTABLE.last5Games) as GameSummary[]
-  const newLen = last5Games.unshift(newGame)
-  if (newLen > 5) last5Games.pop()
-  
-  // Update the profile
-  const updateObj = {
-    'IMMUTABLE.numGamesPlayed': FieldValue.increment(1),
-    'IMMUTABLE.numWinPoints': FieldValue.increment(earnedPoints),
-    'IMMUTABLE.last5Games': JSON.stringify(last5Games),
+  const last5Games = JSON.parse(userDoc.IMMUTABLE.last5Games) as GameSummary[]
+  const lengthAfterAddingGame = last5Games.unshift(newGame)
+  if (lengthAfterAddingGame > MAX_CACHED_GAMES) {
+    last5Games.pop()
   }
-  await profileRef.update(updateObj)
-    .catch((e) => console.error('Cannot update profile', playerId, e))
+  
+  try {
+    const earnedPoints = WIN_POINTS[newGame.result]
+    await db.collection('users').doc(userId).update({
+      'IMMUTABLE.numGamesPlayed': FieldValue.increment(1),
+      'IMMUTABLE.numWinPoints': FieldValue.increment(earnedPoints),
+      'IMMUTABLE.last5Games': JSON.stringify(last5Games),
+    })
+  } catch (e) {
+    console.error('Cannot update profile', userId, e)
+  }
+}
+
+function playerResult(side: 'white'|'black', winner: 'white'|'black'|'draw'|null): 'win'|'loss'|'draw' {
+  if (!winner) throw new Error('Game is not finished')
+  if (winner === 'draw') return 'draw'
+  return winner === side ? 'win' : 'loss'
 }

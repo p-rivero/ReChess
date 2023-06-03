@@ -1,6 +1,8 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import { FieldValue } from 'firebase-admin/firestore'
+import { fetchGameDoc } from './helpers/fetch-game'
+import { updateVariantPopularity } from '../variant/helpers/update-variant-metrics'
 import { useAdmin } from '../helpers'
 import assertAuth from '../assert-auth'
 import type { CancelledGameDoc, GameDoc } from 'db/schema'
@@ -36,38 +38,48 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('invalid-argument', 'The reason must be at most 500 characters.')
   }
   
-  const { db } = await useAdmin()
-  
-  // Fetch the game
-  const gameRef = db.collection('games').doc(gameId)
-  const gameSnapshot = await gameRef.get()
-  if (!gameSnapshot.exists) {
+  const gameDoc = await fetchGameDoc(gameId)
+  if (!gameDoc) {
     throw new HttpsError('not-found', 'The game does not exist.')
   }
-  const gameDoc = gameSnapshot.data() as GameDoc
   
-  // Check that the caller is a player in the game
-  if (auth.uid !== gameDoc.IMMUTABLE.whiteId && auth.uid !== gameDoc.IMMUTABLE.blackId) {
+  if (!userIsPlayerInGame(auth.uid, gameDoc)) {
     throw new HttpsError('permission-denied', 'The function must be called by either the white or black player.')
   }
   
-  // Add the game to the cancelledGames collection
+  await Promise.all([
+    backupCancelledGame([gameId, gameDoc], auth.uid, reason),
+    deleteGame(gameId),
+    updateVariantPopularity(gameDoc.IMMUTABLE.variantId, -1),
+  ])
+}
+
+function userIsPlayerInGame(userId: string, gameDoc: GameDoc): boolean {
+  return userId === gameDoc.IMMUTABLE.whiteId || userId === gameDoc.IMMUTABLE.blackId
+}
+
+async function backupCancelledGame(game: [string, GameDoc], userId: string, reason: string) {
+  const { db } = await useAdmin()
+  const [gameId, gameDoc] = game
+  
   const cancelledGameDoc: CancelledGameDoc = {
     ...gameDoc,
-    cancelledByUserId: auth.uid,
+    cancelledByUserId: userId,
     cancelReason: reason,
     cancelTime: FieldValue.serverTimestamp() as Timestamp,
   }
-  const cancelledGameRef = db.collection('cancelledGames').doc(gameId)
-  await cancelledGameRef.set(cancelledGameDoc)
-    .catch((e) => console.error('Cannot add cancelled game', gameId, e, cancelledGameDoc))
-  
-  // Delete the game from the games collection
-  await gameRef.delete()
-    .catch((e) => console.error('Cannot delete game', gameId, e))
-  
-  // Update the variant popularity
-  const variantRef = db.collection('variants').doc(gameDoc.IMMUTABLE.variantId)
-  await variantRef.update({ popularity: FieldValue.increment(-1) })
-    .catch((e) => console.error('Cannot update variant popularity', gameDoc.IMMUTABLE.variantId, e))
+  try {
+    await db.collection('cancelledGames').doc(gameId).set(cancelledGameDoc)
+  } catch (e) {
+    console.error('Cannot add cancelled game', gameId, e, cancelledGameDoc)
+  }
+}
+
+async function deleteGame(gameId: string) {
+  const { db } = await useAdmin()
+  try {
+    await db.collection('games').doc(gameId).delete()
+  } catch (e) {
+    console.error('Cannot delete game', gameId, e)
+  }
 }

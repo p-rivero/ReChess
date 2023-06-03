@@ -1,6 +1,6 @@
 import { MAX_BATCH_SIZE } from './config'
-import type { App } from 'firebase-admin/lib/app'
 import type * as admin from 'firebase-admin'
+import type { App } from 'firebase-admin/lib/app'
 import type { DocumentReference, QuerySnapshot, WriteBatch } from 'firebase-admin/lib/firestore'
 
 // True if the admin SDK has been initialized for this cloud function instance
@@ -22,7 +22,7 @@ export const injectApp = {
       storage: admin.storage(app),
       auth: admin.auth(app),
     }
-  }
+  },
 }
 
 /**

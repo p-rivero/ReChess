@@ -1,6 +1,7 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import { FieldValue } from 'firebase-admin/firestore'
+import { updateVariantPopularity } from '../variant/helpers/update-variant-metrics'
 import { useAdmin } from '../helpers'
 import assertAuth from '../assert-auth'
 import type { GameDoc, LobbySlotDoc, VariantDoc } from 'db/schema'
@@ -38,47 +39,50 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('permission-denied', 'The function must be called by the user that created the lobby slot.')
   }
   
-  const { db } = await useAdmin()
+  const [slotDoc, variantDoc] = await Promise.all([
+    fetchLobbySlot(variantId, lobbySlotCreatorId),
+    fetchVariant(variantId),
+  ])
   
-  // Fetch the lobby slot
-  const lobbySlotRef = db.collection('variants').doc(variantId).collection('lobby').doc(lobbySlotCreatorId)
-  const lobbySlotSnapshot = await lobbySlotRef.get()
-  if (!lobbySlotSnapshot.exists) {
-    throw new HttpsError('failed-precondition', 'The lobby slot does not exist: ' + lobbySlotRef.path)
-  }
-  
-  // Check that the lobby slot has a challenger and no game ID
-  const slotDoc = lobbySlotSnapshot.data() as LobbySlotDoc
-  if (!slotDoc.challengerId || !slotDoc.challengerDisplayName) {
-    throw new HttpsError('failed-precondition', 'The lobby slot has no challenger.')
-  }
   if (slotDoc.IMMUTABLE.gameDocId) {
     throw new HttpsError('failed-precondition', 'The lobby slot already has a game.')
   }
   
-  // Fetch the variant document
-  const variantRef = db.collection('variants').doc(variantId)
-  const variantSnapshot = await variantRef.get()
-  if (!variantSnapshot.exists) {
+  const gameId = await createGame([variantId, variantDoc], [lobbySlotCreatorId, slotDoc])
+  
+  await Promise.all([
+    updateVariantPopularity(variantId, 1),
+    addGameIdToSlot(variantId, lobbySlotCreatorId, gameId),
+  ])
+  return { gameId }
+}
+
+
+async function fetchLobbySlot(variantId: string, lobbySlotCreatorId: string): Promise<LobbySlotDoc> {
+  const { db } = await useAdmin()
+  const slot = await db.collection('variants').doc(variantId).collection('lobby').doc(lobbySlotCreatorId).get()
+  if (!slot.exists) {
+    throw new HttpsError('failed-precondition', 'The lobby slot does not exist: ' + slot.ref.path)
+  }
+  return slot.data() as LobbySlotDoc
+}
+
+async function fetchVariant(variantId: string): Promise<VariantDoc> {
+  const { db } = await useAdmin()
+  const variant = await db.collection('variants').doc(variantId).get()
+  if (!variant.exists) {
     throw new HttpsError('not-found', 'The variant does not exist.')
   }
-  const variantDoc = variantSnapshot.data() as VariantDoc
-  
-  // Update variant popularity
-  const p1 = variantRef.update({ popularity: FieldValue.increment(1) })
-    .catch((e) => console.error('Cannot update variant popularity', variantId, e))
-  
-  // Convert the playerToMove field from 0|1 to 'white'|'black'
-  const variantInitialState = JSON.parse(variantDoc.initialState)
-  if (variantInitialState.playerToMove !== 0 && variantInitialState.playerToMove !== 1) {
-    throw new HttpsError('internal', 'The variant has an invalid initial state.')
+  return variant.data() as VariantDoc
+}
+
+
+async function createGame(variant: [string, VariantDoc], slot: [string, LobbySlotDoc]): Promise<string> {
+  const [variantId, variantDoc] = variant
+  const [slotCreator, slotDoc] = slot
+  if (!slotDoc.challengerId || !slotDoc.challengerDisplayName) {
+    throw new HttpsError('failed-precondition', 'The lobby slot has no challenger.')
   }
-  const playerToMove = variantInitialState.playerToMove === 0 ? 'white' : 'black'
-  
-  
-  // Determine which player is white and which is black
-  // The game document is created here and not in the client because only server-side
-  // code can be trusted to assign a random side to each player
   
   // Here it's safe to use Math.random instead of crypto because this is not a cryptographic
   // operation, we just want users to be assigned each side approximately half the time
@@ -87,18 +91,16 @@ export default async function(data: unknown, context: CallableContext): Promise<
     (slotDoc.IMMUTABLE.requestedColor === 'random' && Math.random() < 0.5)
     
   const [whiteId, whiteDisplayName] = creatorPlaysAsWhite ?
-    [lobbySlotCreatorId, slotDoc.IMMUTABLE.creatorDisplayName] :
+    [slotCreator, slotDoc.IMMUTABLE.creatorDisplayName] :
     [slotDoc.challengerId, slotDoc.challengerDisplayName]
     
   const [blackId, blackDisplayName] = creatorPlaysAsWhite ?
     [slotDoc.challengerId, slotDoc.challengerDisplayName] :
-    [lobbySlotCreatorId, slotDoc.IMMUTABLE.creatorDisplayName]
+    [slotCreator, slotDoc.IMMUTABLE.creatorDisplayName]
   
-    
-  // Add a new game document to the games collection
   const newGame: GameDoc = {
     moveHistory: '',
-    playerToMove,
+    playerToMove: getFirstPlayerToMove(variantDoc),
     winner: null,
     IMMUTABLE: {
       timeCreated: FieldValue.serverTimestamp() as Timestamp,
@@ -113,14 +115,26 @@ export default async function(data: unknown, context: CallableContext): Promise<
       calledFinishGame: false,
     },
   }
+  const { db } = await useAdmin()
   const gameRef = await db.collection('games').add(newGame)
-  const gameId = gameRef.id
-  
-  // Update the lobby slot
-  const p2 = lobbySlotRef.update({
-    'IMMUTABLE.gameDocId': gameId,
-  }).catch((e) => console.error('Cannot update lobby slot', lobbySlotRef.path, e))
-  
-  await Promise.all([p1, p2])
-  return { gameId }
+  return gameRef.id
+}
+
+function getFirstPlayerToMove(variant: VariantDoc): 'white' | 'black' {
+  const variantInitialState = JSON.parse(variant.initialState) as {playerToMove: 0 | 1}
+  if (variantInitialState.playerToMove !== 0 && variantInitialState.playerToMove !== 1) {
+    throw new HttpsError('internal', 'The variant has an invalid initial state.')
+  }
+  return variantInitialState.playerToMove === 0 ? 'white' : 'black'
+}
+
+async function addGameIdToSlot(variantId: string, lobbySlotCreatorId: string, gameId: string) {
+  const { db } = await useAdmin()
+  try {
+    await db.collection('variants').doc(variantId).collection('lobby').doc(lobbySlotCreatorId).update({
+      'IMMUTABLE.gameDocId': gameId,
+    })
+  } catch (e) {
+    console.error('Cannot update lobby slot', variantId, lobbySlotCreatorId, e)
+  }
 }

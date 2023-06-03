@@ -1,10 +1,10 @@
 
 import { BannedUserDataDoc, UserDoc } from 'db/schema'
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
-import { useAdmin } from '../helpers'
+import { fetchUserAuth } from '../user/helpers/fetch-user'
 import { stopOngoingGames } from '../game/helpers/stop-ongoing-games'
-import { fetchUser } from '../user/helpers/fetch-user'
 import { updateName } from '../user/rename-user'
+import { useAdmin } from '../helpers'
 import assertModerator from './helpers/assert-moderator'
 
 /**
@@ -45,7 +45,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('invalid-argument', 'The doNotBackup parameter must be a boolean.')
   }
   
-  const user = await fetchUser(userId)
+  const user = await fetchUserAuth(userId)
   
   if (user.customClaims?.moderator) {
     throw new HttpsError('invalid-argument', 'You cannot ban moderators directly. Please demote them first.')
@@ -94,9 +94,9 @@ async function backupUserData(userId: string): Promise<void> {
     name: user.name,
     about: user.about,
     profileImg: user.profileImg,
-    publishedVariants: variants.docs.map(doc => doc.id).join(' '),
-    gamesAsWhite: gamesAsWhite.docs.map(doc => doc.id).join(' '),
-    gamesAsBlack: gamesAsBlack.docs.map(doc => doc.id).join(' '),
+    publishedVariants: variants.docs.map((doc) => doc.id).join(' '),
+    gamesAsWhite: gamesAsWhite.docs.map((doc) => doc.id).join(' '),
+    gamesAsBlack: gamesAsBlack.docs.map((doc) => doc.id).join(' '),
   }
   await db.collection('bannedUserData').doc(userId).set(bannedUserData)
 }

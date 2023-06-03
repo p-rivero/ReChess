@@ -1,8 +1,8 @@
-import { useAdmin, batchedUpdate } from '../../helpers'
+import { batchedUpdate, useAdmin } from '../../helpers'
 
 /**
  * Stops immediately all the ongoing games for a user. The other player is declared the winner.
- * 
+ *
  * **Important:** Call this function *before* removing the user ID from the games.
  * @param {string} userId The ID of the user to stop games for.
  * @return {Promise<void>} A promise that resolves when the function is complete

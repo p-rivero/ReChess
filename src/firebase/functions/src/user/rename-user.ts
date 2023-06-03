@@ -15,23 +15,28 @@ import type { UserRenameTriggerDoc } from 'db/schema'
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function(change: Change<QueryDocumentSnapshot>, userId: string): Promise<void> {
-  const TIMEOUT_SECONDS = 5 * 60 // 5 minutes
+  // Timeout to prevent spamming: 5 minutes
+  // Function is only triggered if current timestamp > renameAllowedAt
+  const TIMEOUT_SECONDS = 5 * 60
   
   const doc = change.after.data() as UserRenameTriggerDoc
-  
-  // The name has changed, initialize the admin SDK
-  const { db } = await useAdmin()
-  
-  // If this write was allowed by the rules, the current timestamp must be after the renameAllowedAt
   const newName = doc.name || `@${doc.username}`
-  await updateName(userId, newName)
   
-  // Update the timeout to prevent spamming
-  const timeout = Date.now() + 1000 * TIMEOUT_SECONDS
-  const timeoutDate = new Date(timeout)
+  await Promise.all([
+    updateName(userId, newName),
+    updateTimeout(userId, TIMEOUT_SECONDS),
+  ])
+}
+
+async function updateTimeout(userId: string, timeoutSeconds: number) {
+  const { db } = await useAdmin()
+  const timeoutMs = Date.now() + 1000 * timeoutSeconds
+  const timeoutDate = new Date(timeoutMs)
   const timeoutTimestamp = Timestamp.fromDate(timeoutDate)
   try {
-    await db.collection('users').doc(userId).update({ 'IMMUTABLE.renameAllowedAt': timeoutTimestamp })
+    await db.collection('users').doc(userId).update({
+      'IMMUTABLE.renameAllowedAt': timeoutTimestamp,
+    })
   } catch (err) {
     console.error('Error while updating rename timeout for user', userId + ':')
     console.error(err)
@@ -48,50 +53,65 @@ export default async function(change: Change<QueryDocumentSnapshot>, userId: str
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export async function updateName(userId: string, newName: string | null): Promise<void> {
-  const { db } = await useAdmin()
-  
   const removeId = newName === null
   newName = newName ?? '[deleted]'
   
-  // Update the creator name of the variants this user has created
-  const updatedVariants = await db.collection('variants').where('creatorId', '==', userId).get()
-  const p1 = batchedUpdate(updatedVariants, (batch, ref) => {
-    batch.update(ref, {
-      'creatorDisplayName': newName,
-      'creatorId': removeId ? null : userId,
-    })
-  }).catch((err) => {
-    console.error('Error while updating variants for user', userId + ':')
-    console.error(err)
-  })
+  await Promise.all([
+    updateNameOfVariantCreator(userId, newName, removeId),
+    updateNameOfWhitePlayer(userId, newName, removeId),
+    updateNameOfBlackPlayer(userId, newName, removeId),
+  ])
   
-  // Update the opponent name of the games this user has played as white
-  const updatedGamesWhite = await db.collection('games').where('IMMUTABLE.whiteId', '==', userId).get()
-  const p2 = batchedUpdate(updatedGamesWhite, (batch, ref) => {
-    batch.update(ref, {
-      'IMMUTABLE.whiteDisplayName': newName,
-      'IMMUTABLE.whiteId': removeId ? null : userId,
-    })
-  }).catch((err) => {
-    console.error('Error while updating games (white) for user', userId + ':')
-    console.error(err)
-  })
-  
-  // Update the opponent name of the games this user has played as black
-  const updatedGamesBlack = await db.collection('games').where('IMMUTABLE.blackId', '==', userId).get()
-  const p3 = batchedUpdate(updatedGamesBlack, (batch, ref) => {
-    batch.update(ref, {
-      'IMMUTABLE.blackDisplayName': newName,
-      'IMMUTABLE.blackId': removeId ? null : userId,
-    })
-  }).catch((err) => {
-    console.error('Error while updating games (black) for user', userId + ':')
-    console.error(err)
-  })
   // Do not update the name in the lobby entries, because they are short-lived and
   // it's not a problem to have the old name there for a while
   
   // TODO: User caches
-  
-  await Promise.all([p1, p2, p3])
+}
+
+async function updateNameOfVariantCreator(creatorId: string, newName: string, removeId: boolean) {
+  const { db } = await useAdmin()
+  const updatedVariants = await db.collection('variants').where('creatorId', '==', creatorId).get()
+  try {
+    await batchedUpdate(updatedVariants, (batch, ref) => {
+      batch.update(ref, {
+        'creatorDisplayName': newName,
+        'creatorId': removeId ? null : creatorId,
+      })
+    })
+  } catch (err) {
+    console.error(`Error while updating variants for user ${creatorId}:`)
+    console.error(err)
+  }
+}
+
+async function updateNameOfWhitePlayer(playerId: string, newName: string, removeId: boolean) {
+  const { db } = await useAdmin()
+  const updatedGamesWhite = await db.collection('games').where('IMMUTABLE.whiteId', '==', playerId).get()
+  try {
+    await batchedUpdate(updatedGamesWhite, (batch, ref) => {
+      batch.update(ref, {
+        'IMMUTABLE.whiteDisplayName': newName,
+        'IMMUTABLE.whiteId': removeId ? null : playerId,
+      })
+    })
+  } catch (err) {
+    console.error(`Error while updating games (white) for user ${playerId}:`)
+    console.error(err)
+  }
+}
+
+async function updateNameOfBlackPlayer(playerId: string, newName: string, removeId: boolean) {
+  const { db } = await useAdmin()
+  const updatedGamesBlack = await db.collection('games').where('IMMUTABLE.blackId', '==', playerId).get()
+  try {
+    await batchedUpdate(updatedGamesBlack, (batch, ref) => {
+      batch.update(ref, {
+        'IMMUTABLE.blackDisplayName': newName,
+        'IMMUTABLE.blackId': removeId ? null : playerId,
+      })
+    })
+  } catch (err) {
+    console.error(`Error while updating games (black) for user ${playerId}:`)
+    console.error(err)
+  }
 }

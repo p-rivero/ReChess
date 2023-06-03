@@ -1,8 +1,8 @@
 
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
+import { removeDataBackup } from './helpers/report-utils'
 import { useAdmin } from '../helpers'
 import assertModerator from './helpers/assert-moderator'
-import { removeDataBackup } from './helpers/report-utils'
 import banUser from './ban-user'
 import deleteVariant from './delete-variant'
 import discardUserReports from './discard-user-reports'

@@ -1,11 +1,11 @@
 
-import { BannedUserDataDoc, UserDoc } from 'db/schema'
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import { FieldValue } from 'firebase-admin/firestore'
-import { fetchUser } from '../user/helpers/fetch-user'
+import { UserDoc } from 'db/schema'
 import { batchedUpdate, useAdmin } from '../helpers'
+import { fetchDataBackup, removeDataBackup } from './helpers/report-utils'
+import { fetchUserAuth, fetchUserDoc } from '../user/helpers/fetch-user'
 import assertModerator from './helpers/assert-moderator'
-import { removeDataBackup, getUsername } from './helpers/report-utils'
 
 /**
  * Called directly by the moderator in order to lift a user's ban.
@@ -36,7 +36,7 @@ export default async function(data: unknown, context: CallableContext): Promise<
   if (typeof userId !== 'string') {
     throw new HttpsError('invalid-argument', 'The userId must be a string.')
   }
-  const user = await fetchUser(userId)
+  const user = await fetchUserAuth(userId)
   
   if (!user.disabled) {
     console.warn('The user is not banned: ' + userId)
@@ -63,26 +63,32 @@ async function unbanUser(userId: string): Promise<void> {
   // Until then, they can still use the app normally (but are unable to update their profile).
 }
 
+
 async function restoreDataFromBackup(userId: string): Promise<void> {
   const { db } = await useAdmin()
-  const bannedUserData = await db.collection('bannedUserData').doc(userId).get()
-  const data = bannedUserData.data() as BannedUserDataDoc | undefined
-  if (!data) {
-    throw new HttpsError('not-found', 'Cannot find backup of user data.')
+  const [userDoc, userBackup] = await Promise.all([
+    fetchUserDoc(userId),
+    fetchDataBackup(userId),
+  ])
+  if (!userDoc) {
+    throw new HttpsError('not-found', `Cannot find user ${userId}.`)
+  }
+  if (!userBackup) {
+    throw new HttpsError('not-found', `Cannot find backup of user ${userId}.`)
   }
   const updateObj: Partial<UserDoc> = {
-    name: data.name,
-    about: data.about,
-    profileImg: data.profileImg,
+    name: userBackup.name,
+    about: userBackup.about,
+    profileImg: userBackup.profileImg,
     banned: FieldValue.delete() as unknown as undefined,
   }
   await db.collection('users').doc(userId).update(updateObj)
   
-  const displayName = data.name ?? `@${await getUsername(userId)}`
+  const displayName = userBackup.name ?? `@${userDoc.IMMUTABLE.username}`
   
-  const gamesAsWhite = data.gamesAsWhite.split(' ')
-      .filter(id => id !== '')
-      .map(gameId => db.collection('games').doc(gameId))
+  const gamesAsWhite = userBackup.gamesAsWhite.split(' ')
+    .filter((id) => id !== '')
+    .map((gameId) => db.collection('games').doc(gameId))
   await batchedUpdate(gamesAsWhite, (batch, ref) => {
     batch.update(ref, {
       'IMMUTABLE.whiteId': userId,
@@ -90,9 +96,9 @@ async function restoreDataFromBackup(userId: string): Promise<void> {
     })
   })
   
-  const gamesAsBlack = data.gamesAsBlack.split(' ')
-      .filter(id => id !== '')
-      .map(gameId => db.collection('games').doc(gameId))
+  const gamesAsBlack = userBackup.gamesAsBlack.split(' ')
+    .filter((id) => id !== '')
+    .map((gameId) => db.collection('games').doc(gameId))
   await batchedUpdate(gamesAsBlack, (batch, ref) => {
     batch.update(ref, {
       'IMMUTABLE.blackId': userId,
@@ -100,9 +106,9 @@ async function restoreDataFromBackup(userId: string): Promise<void> {
     })
   })
   
-  const variants = data.publishedVariants.split(' ')
-      .filter(id => id !== '')
-      .map(variantId => db.collection('variants').doc(variantId))
+  const variants = userBackup.publishedVariants.split(' ')
+    .filter((id) => id !== '')
+    .map((variantId) => db.collection('variants').doc(variantId))
   await batchedUpdate(variants, (batch, ref) => {
     batch.update(ref, {
       creatorId: userId,

@@ -1,12 +1,12 @@
 
-import { batchedUpdate, useAdmin } from '../helpers'
-import { updateName } from './rename-user'
-import { discardReports as discardReportsFn } from '../moderator/helpers/discard-reports'
-import type { UserDoc, UserPrivateCacheDoc } from 'db/schema'
-import type { UserRecord } from 'firebase-admin/auth'
-import type { DocumentReference } from 'firebase-admin/firestore'
 import { HttpsError } from 'firebase-functions/v1/https'
+import { batchedUpdate, useAdmin } from '../helpers'
+import { discardReports as discardReportsFn } from '../moderator/helpers/discard-reports'
+import { fetchUserCache, fetchUserDoc } from './helpers/fetch-user'
 import { stopOngoingGames } from '../game/helpers/stop-ongoing-games'
+import { updateName } from './rename-user'
+import type { UserPrivateCacheDoc } from 'db/schema'
+import type { UserRecord } from 'firebase-admin/auth'
 
 /**
  * Called when a user Auth record is deleted. Deletes the user document
@@ -15,45 +15,43 @@ import { stopOngoingGames } from '../game/helpers/stop-ongoing-games'
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export default async function(user: UserRecord): Promise<void> {
-  const { db } = await useAdmin()
   const userId = user.uid
-  
-  const userRef = db.collection('users').doc(userId)
-  const [username, cache] = await Promise.all([
-    getUsername(userRef),
-    getCache(userRef),
+  const [userDoc, userCache] = await Promise.all([
+    fetchUserDoc(userId),
+    fetchUserCache(userId),
   ])
-  if (!username) {
+  if (!userDoc) {
     console.error('User document for user', userId, 'does not exist')
     return
   }
+  const username = userDoc.IMMUTABLE.username
   
   await stopOngoingGames(userId)
   
   await Promise.all([
-    deleteUserSubcollections(userRef),
-    deleteUserDocument(userRef),
+    deleteUserDocument(userId),
+    deleteUserSubcollections(userId),
     freeUsername(username),
     removeNameFromDenormalizedFields(userId),
     deleteProfilePicture(userId),
     deleteModerationDocument(userId),
-    discardAllReports(username, cache),
+    discardAllReports(username, userCache),
   ])
 }
 
-async function getUsername(userRef: DocumentReference): Promise<string | undefined> {
-  const userSnapshot = await userRef.get()
-  const userData = userSnapshot.data() as UserDoc | undefined
-  if (!userData) return undefined
-  return userData.IMMUTABLE.username
-}
-async function getCache(userRef: DocumentReference): Promise<UserPrivateCacheDoc | undefined> {
-  const cacheSnapshot = await userRef.collection('privateCache').doc('doc').get()
-  return cacheSnapshot.data() as UserPrivateCacheDoc | undefined
-}
 
-async function deleteUserSubcollections(userRef: DocumentReference) {
-  const collections = await userRef.listCollections()
+async function deleteUserDocument(userId: string) {
+  const { db } = await useAdmin()
+  try {
+    await db.collection('users').doc(userId).delete()
+  } catch (err) {
+    console.error('Error deleting public user document for user', userId)
+    console.error(err)
+  }
+}
+async function deleteUserSubcollections(userId: string) {
+  const { db } = await useAdmin()
+  const collections = await db.collection('users').doc(userId).listCollections()
   try {
     await Promise.all(collections.map(async (collection) => {
       const docs = await collection.listDocuments()
@@ -62,16 +60,7 @@ async function deleteUserSubcollections(userRef: DocumentReference) {
       })
     }))
   } catch (err) {
-    console.error('Error deleting subcollections of user document for user', userRef.id)
-    console.error(err)
-  }
-}
-
-async function deleteUserDocument(userRef: DocumentReference) {
-  try {
-    await userRef.delete()
-  } catch (err) {
-    console.error('Error deleting public user document for user', userRef.id)
+    console.error('Error deleting subcollections of user document for user', userId)
     console.error(err)
   }
 }
@@ -124,8 +113,8 @@ async function deleteModerationDocument(userId: string) {
 async function discardAllReports(reporterUsername: string, cache: UserPrivateCacheDoc | undefined) {
   // If user has not reported anything, cache can be undefined
   if (!cache) return
-  const reportedUsers = cache.reportedUsers.split(' ').filter(r => r.length > 0)
-  const reportedVariants = cache.reportedVariants.split(' ').filter(r => r.length > 0)
+  const reportedUsers = cache.reportedUsers.split(' ').filter((r) => r.length > 0)
+  const reportedVariants = cache.reportedVariants.split(' ').filter((r) => r.length > 0)
   
   await Promise.all([
     discardReports('user', reportedUsers, reporterUsername),
@@ -141,7 +130,7 @@ async function discardAllReports(reporterUsername: string, cache: UserPrivateCac
       try {
         await discardReportsFn([reporterUsername], moderationDocRef)
       } catch (err) {
-        // Allow 404 errors. This entry can be a block instead of a report. Also, 
+        // Allow 404 errors. This entry can be a block instead of a report. Also,
         // the report may have been deleted by a moderator.
         if (err instanceof HttpsError && err.code === 'not-found') return
         console.error(`Cannot remove the report of ${type} ${id} by @${reporterUsername}`)
