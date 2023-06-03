@@ -1,7 +1,8 @@
 
 import { BannedUserDataDoc, UserDoc } from 'db/schema'
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
-import { batchedUpdate, useAdmin } from '../helpers'
+import { useAdmin } from '../helpers'
+import { stopOngoingGames } from '../game/helpers/stop-ongoing-games'
 import { fetchUser } from '../user/helpers/fetch-user'
 import { updateName } from '../user/rename-user'
 import assertModerator from './helpers/assert-moderator'
@@ -76,34 +77,6 @@ async function banUser(userId: string): Promise<void> {
   }
   // The user's session token will expire in 1 hour, at which point they will be logged out.
   // Until then, they can still use the app normally (but are unable to update their profile).
-}
-
-async function stopOngoingGames(userId: string): Promise<void> {
-  const { db } = await useAdmin()
-  
-  const ongoingGamesWhite = await db.collection('games')
-    .where('IMMUTABLE.whiteId', '==', userId)
-    .where('winner', '==', null)
-    .get()
-  await batchedUpdate(ongoingGamesWhite, (batch, ref) => {
-    batch.update(ref, {
-      'playerToMove': 'game-over',
-      'winner': 'black',
-      'IMMUTABLE.calledFinishGame': true,
-    })
-  })
-  
-  const ongoingGamesBlack = await db.collection('games')
-    .where('IMMUTABLE.blackId', '==', userId)
-    .where('winner', '==', null)
-    .get()
-  await batchedUpdate(ongoingGamesBlack, (batch, ref) => {
-    batch.update(ref, {
-      'playerToMove': 'game-over',
-      'winner': 'white',
-      'IMMUTABLE.calledFinishGame': true,
-    })
-  })
 }
 
 async function backupUserData(userId: string): Promise<void> {

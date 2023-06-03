@@ -6,6 +6,7 @@ import type { UserDoc, UserPrivateCacheDoc } from 'db/schema'
 import type { UserRecord } from 'firebase-admin/auth'
 import type { DocumentReference } from 'firebase-admin/firestore'
 import { HttpsError } from 'firebase-functions/v1/https'
+import { stopOngoingGames } from '../game/helpers/stop-ongoing-games'
 
 /**
  * Called when a user Auth record is deleted. Deletes the user document
@@ -26,6 +27,8 @@ export default async function(user: UserRecord): Promise<void> {
     console.error('User document for user', userId, 'does not exist')
     return
   }
+  
+  await stopOngoingGames(userId)
   
   await Promise.all([
     deleteUserSubcollections(userRef),

@@ -4,6 +4,7 @@ import { insertUser, insertUpvote, insertUserReport, insertVariantReport } from 
 import { makeFirestoreContext } from '../make-context'
 import { insertVariant } from '../variant/variant-mock'
 import { insertModerationDoc } from '../moderator/moderator-mock'
+import { insertGame } from '../game/games-mock'
 
 const { app, testEnv } = initialize('delete-user-test')
 const db = app.firestore()
@@ -153,11 +154,108 @@ test('variant reports are deleted', async () => {
 })
 
 test('user name is deleted from created variants', async () => {
-  // TODO
+  const user = await auth.createUser({
+    uid: USER_ID,
+    displayName: 'The Deleted User',
+    photoURL: 'https://example.com/user.png',
+  })
+  await insertUser(db, user)
+  const myVariant = await insertVariant(db, 'my_variant', 'white', USER_ID)
+  const notMyVariant = await insertVariant(db, 'not_my_variant', 'black', 'someone_else')
+  
+  expect(myVariant.creatorId).toBe(USER_ID)
+  expect(notMyVariant.creatorId).toBe('someone_else')
+  
+  const done = expectNoErrorLog()
+  await auth.deleteUser(user.uid)
+  await deleteUser(user)
+  done()
+  
+  const myVariantAfter = await db.collection('variants').doc('my_variant').get()
+  expect(myVariantAfter.data()).toEqual({
+    ...myVariant,
+    creatorId: null,
+    creatorDisplayName: '[deleted]',
+  })
+  const notMyVariantAfter = await db.collection('variants').doc('not_my_variant').get()
+  expect(notMyVariantAfter.data()).toEqual(notMyVariant)
 })
 
 test('user name is deleted from played games', async () => {
-  // TODO
+  const user = await auth.createUser({
+    uid: USER_ID,
+    displayName: 'The Deleted User',
+    photoURL: 'https://example.com/user.png',
+  })
+  await insertUser(db, user)
+  const ongoingGame1 = await insertGame(db, 'game_1', 'some_variant')
+  await db.collection('games').doc('game_1').update({
+    'IMMUTABLE.whiteId': USER_ID,
+    'IMMUTABLE.whiteDisplayName': 'The Deleted User',
+  })
+  const ongoingGame2 = await insertGame(db, 'game_2', 'some_variant')
+  await db.collection('games').doc('game_2').update({
+    'IMMUTABLE.blackId': USER_ID,
+    'IMMUTABLE.blackDisplayName': 'The Deleted User',
+  })
+  const finishedGame1 = await insertGame(db, 'game_3', 'some_variant', 'draw')
+  await db.collection('games').doc('game_3').update({
+    'IMMUTABLE.whiteId': USER_ID,
+    'IMMUTABLE.whiteDisplayName': 'The Deleted User',
+  })
+  const finishedGame2 = await insertGame(db, 'game_4', 'some_variant', 'white')
+  await db.collection('games').doc('game_4').update({
+    'IMMUTABLE.blackId': USER_ID,
+    'IMMUTABLE.blackDisplayName': 'The Deleted User',
+  })
+  
+  const done = expectNoErrorLog()
+  await auth.deleteUser(user.uid)
+  await deleteUser(user)
+  done()
+  
+  const ongoingGame1After = await db.collection('games').doc('game_1').get()
+  expect(ongoingGame1After.data()).toEqual({
+    ...ongoingGame1,
+    playerToMove: 'game-over',
+    winner: 'black',
+    IMMUTABLE: {
+      ...ongoingGame1.IMMUTABLE,
+      whiteId: null,
+      whiteDisplayName: '[deleted]',
+      calledFinishGame: true,
+    },
+  })
+  const ongoingGame2After = await db.collection('games').doc('game_2').get()
+  expect(ongoingGame2After.data()).toEqual({
+    ...ongoingGame2,
+    playerToMove: 'game-over',
+    winner: 'white',
+    IMMUTABLE: {
+      ...ongoingGame2.IMMUTABLE,
+      blackId: null,
+      blackDisplayName: '[deleted]',
+      calledFinishGame: true,
+    },
+  })
+  const finishedGame1After = await db.collection('games').doc('game_3').get()
+  expect(finishedGame1After.data()).toEqual({
+    ...finishedGame1,
+    IMMUTABLE: {
+      ...finishedGame1.IMMUTABLE,
+      whiteId: null,
+      whiteDisplayName: '[deleted]',
+    },
+  })
+  const finishedGame2After = await db.collection('games').doc('game_4').get()
+  expect(finishedGame2After.data()).toEqual({
+    ...finishedGame2,
+    IMMUTABLE: {
+      ...finishedGame2.IMMUTABLE,
+      blackId: null,
+      blackDisplayName: '[deleted]',
+    },
+  })
 })
 
 test('user profile picture is deleted', async () => {
@@ -226,7 +324,6 @@ test('deleting subcollection with more than 500 documents', async () => {
   })
   await insertUser(db, user)
   
-  // Insert 1350 documents into upvotedVariants
   const batch1 = db.batch()
   const batch2 = db.batch()
   const batch3 = db.batch()
