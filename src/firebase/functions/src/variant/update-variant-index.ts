@@ -6,7 +6,7 @@ import type { VariantDoc, VariantIndexDoc } from 'db/schema'
 /**
  * 1 MiB - 89 bytes.
  * @see https://firebase.google.com/docs/firestore/quotas#collections_documents_and_fields
- */ 
+ */
 const MAX_INDEX_SIZE = 1_048_487
 
 /**

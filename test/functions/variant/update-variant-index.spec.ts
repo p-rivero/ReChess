@@ -125,8 +125,36 @@ test('overflow to next index page, many pages', async () => {
   await updateVariantIndex(snap)
   done()
   
-  const indexPage1 = await db.collection('variantIndex').doc('3').get()
-  expect(indexPage1.data()).toEqual({
+  const indexPage3 = await db.collection('variantIndex').doc('3').get()
+  expect(indexPage3.data()).toEqual({
     index: getExpectedLine(variantDoc),
   })
+})
+
+test('entry fills the first free page', async () => {
+  const variantDoc = await insertVariant(db, VARIANT_ID)
+  const snap = testEnv.firestore.makeDocumentSnapshot(variantDoc, `variants/${VARIANT_ID}`)
+  const expectedLine = getExpectedLine(variantDoc)
+  const remainingBytes = getRemainingSpace(expectedLine)
+  
+  await db.collection('variantIndex').doc('0').set({
+    index: makePadding(remainingBytes + 1),
+  })
+  await db.collection('variantIndex').doc('1').set({
+    index: makePadding(500),
+  })
+  await db.collection('variantIndex').doc('2').set({
+    index: makePadding(remainingBytes + 1),
+  })
+  
+  const done = expectNoErrorLog()
+  await updateVariantIndex(snap)
+  done()
+  
+  const indexPage1 = await db.collection('variantIndex').doc('1').get()
+  expect(indexPage1.data()).toEqual({
+    index: makePadding(500) + '\n' + getExpectedLine(variantDoc),
+  })
+  const indexPage3 = await db.collection('variantIndex').doc('3').get()
+  expect(indexPage3.exists).toBe(false)
 })
