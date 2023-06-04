@@ -31,6 +31,23 @@ export async function updatePrivateCache(mode: UpdateCacheMode, userId: string, 
   await storeCache(userId, userCacheDoc)
 }
 
+/**
+ * Removes a variant from the `upvotedVariants` list of a user's private cache.
+ * @param {string} userId UID of the user whose cache to update
+ * @param {string} variantId UID of the variant to remove
+ * @return {Promise<void>} A promise that resolves when the function is done
+ */
+export async function removeUpvotedVariant(userId: string, variantId: string) {
+  const userCacheDoc = await loadCache(userId)
+  const newUpvotes = userCacheDoc.upvotedVariants.split(' ').filter((id) => id && id !== variantId).join(' ')
+  
+  if (newUpvotes.length === userCacheDoc.upvotedVariants.length) {
+    await handleUpvotedVariantNotFound(userId, variantId, userCacheDoc)
+    return
+  }
+  await updateCacheUpvotes(userId, newUpvotes)
+}
+
 async function loadCache(userId: string): Promise<UserPrivateCacheDoc> {
   const userCacheDoc = await fetchUserCache(userId)
   if (userCacheDoc) return userCacheDoc
@@ -40,7 +57,6 @@ async function loadCache(userId: string): Promise<UserPrivateCacheDoc> {
     reportedUsers: '',
   }
 }
-
 
 /**
  * Stores the private cache of a user without performing any changes.
@@ -57,33 +73,23 @@ export async function storeCache(userId: string, userCacheDoc: UserPrivateCacheD
   }
 }
 
-
-/**
- * Removes a variant from the `upvotedVariants` list of a user's private cache.
- * @param {string} userId UID of the user whose cache to update
- * @param {string} variantId UID of the variant to remove
- * @param {UserPrivateCacheDoc} userCacheDoc The current cache document.
- * If not provided, the cache will be fetched from the database.
- * @return {Promise<void>} A promise that resolves when the function is done
- */
-export async function removeUpvotedVariant(userId: string, variantId: string, userCacheDoc?: UserPrivateCacheDoc) {
-  if (!userCacheDoc) userCacheDoc = await loadCache(userId)
-  const newUpvotes = userCacheDoc.upvotedVariants.split(' ').filter((id) => id && id !== variantId).join(' ')
-  
-  if (newUpvotes.length === userCacheDoc.upvotedVariants.length) {
-    // This could happen if the user upvotes and then immediately un-upvotes a variant.
-    // Give the other function some time to write the user's private cache, then write our version.
-    console.error('Overriding cache!', userId, variantId)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-  }
-  
+async function updateCacheUpvotes(userId: string, newUpvotes: string) {
   const { db } = await useAdmin()
   try {
     await db.collection('users').doc(userId).collection('privateCache').doc('doc').update({
       upvotedVariants: newUpvotes,
     })
   } catch (err) {
-    console.error(`Error while removing updated variant for user ${userId}:`)
+    console.error(`Error while removing upvoted variant for user ${userId}:`)
     console.error(err)
   }
+}
+
+async function handleUpvotedVariantNotFound(userId: string, variantId: string, ourCache: UserPrivateCacheDoc) {
+  // This could happen if the user upvotes and then immediately un-upvotes a variant.
+  // If the upvote function is slower, the read cache will not exist or will not have the variant.
+  // Give the other function some time to write the user's private cache, then write our version.
+  console.warn('Overriding cache!', userId, variantId)
+  await new Promise((resolve) => setTimeout(resolve, 1000))
+  await storeCache(userId, ourCache)
 }

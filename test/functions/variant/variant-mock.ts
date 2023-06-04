@@ -23,7 +23,7 @@ export async function insertVariant(
   
   const doc: VariantDoc = {
     name: 'Variant Name',
-    description: 'Standard chess rules',
+    description: 'This is the description for the variant',
     creationTime: admin.firestore.Timestamp.now() as Timestamp,
     creatorDisplayName: 'The Creator Name',
     creatorId,

@@ -1,4 +1,3 @@
-
 import { updatePrivateCache } from '../user/helpers/update-private-cache'
 import { updateVariantUpvotes } from './helpers/update-variant-metrics'
 

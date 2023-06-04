@@ -38,7 +38,7 @@ test('user can report another user', async () => {
   expect(reportDoc.data()).toEqual({
     reason: 'Some reason',
     onlyBlock: false,
-    time: expect.anything(),
+    time: snap.data()?.time,
   })
   
   const modDoc = await db.doc(`userModeration/${REPORTED_ID}`).get()
@@ -80,7 +80,7 @@ test('user can block another user', async () => {
   expect(reportDoc.data()).toEqual({
     reason: '',
     onlyBlock: true,
-    time: expect.anything(),
+    time: snap.data()?.time,
   })
   
   // Report is not created
@@ -166,13 +166,13 @@ test('user can report 2 users', async () => {
   expect(reportDoc1.data()).toEqual({
     reason: 'Some reason',
     onlyBlock: false,
-    time: expect.anything(),
+    time: snap1.data()?.time,
   })
   const reportDoc2 = await db.doc(`users/${REPORTER_ID}/reportedUsers/another_reported`).get()
   expect(reportDoc2.data()).toEqual({
     reason: 'Some reason',
     onlyBlock: false,
-    time: expect.anything(),
+    time: snap2.data()?.time,
   })
   
   const reporterCache = await db.collection('users').doc(REPORTER_ID).collection('privateCache').doc('doc').get()

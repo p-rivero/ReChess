@@ -35,7 +35,7 @@ test('user can report a variant', async () => {
   expect(reportDoc.data()).toEqual({
     reason: 'Some reason',
     onlyBlock: false,
-    time: expect.anything(),
+    time: snap.data()?.time,
   })
   
   const modDoc = await db.doc(`variantModeration/${REPORTED_VARIANT}`).get()
@@ -111,13 +111,13 @@ test('user can report 2 variants', async () => {
   expect(reportDoc.data()).toEqual({
     reason: 'Some reason',
     onlyBlock: false,
-    time: expect.anything(),
+    time: snap1.data()?.time,
   })
   const reportDoc2 = await db.doc(`users/${REPORTER_ID}/reportedVariants/another_reported`).get()
   expect(reportDoc2.data()).toEqual({
     reason: 'Some reason',
     onlyBlock: false,
-    time: expect.anything(),
+    time: snap2.data()?.time,
   })
   
   const reporterCache = await db.collection('users').doc(REPORTER_ID).collection('privateCache').doc('doc').get()

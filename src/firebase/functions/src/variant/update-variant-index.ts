@@ -3,7 +3,11 @@ import { useAdmin } from '../helpers'
 import type { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 import type { VariantDoc, VariantIndexDoc } from 'db/schema'
 
-const MAX_INDEX_SIZE = 1_040_000 // 1 MiB - 8576 bytes (plenty of space for metadata and the new line)
+/**
+ * 1 MiB - 89 bytes.
+ * @see https://firebase.google.com/docs/firestore/quotas#collections_documents_and_fields
+ */ 
+const MAX_INDEX_SIZE = 1_048_487
 
 /**
  * Called when a variant document is inserted. Appends the variant to the index.
@@ -47,22 +51,18 @@ async function appendToIndex(line: string, index: number): Promise<boolean> {
   const indexRef = db.collection('variantIndex').doc(index.toString())
   const indexDoc = await indexRef.get()
   
-  if (indexDoc.exists) {
-    // Append the new line to the existing index
-    const indexData = indexDoc.data() as VariantIndexDoc
-    const oldIndex = indexData.index
-    if (oldIndex.length > MAX_INDEX_SIZE) {
-      // The index is full, try the next one
-      return false
-    }
-    await indexRef.set({
-      index: oldIndex + '\n' + line,
-    })
-  } else {
+  if (!indexDoc.exists) {
     // Create the index with the new line
-    await indexRef.set({
-      index: line,
-    })
+    await indexRef.set({ index: line })
+    return true
   }
+  const indexData = indexDoc.data() as VariantIndexDoc
+  const oldIndex = indexData.index
+  if (oldIndex.length + 1 + line.length > MAX_INDEX_SIZE) { // +1 for '\n'
+    // The index is full, try the next one
+    return false
+  }
+  // Append the new line to the existing index
+  await indexRef.set({ index: oldIndex + '\n' + line })
   return true
 }
