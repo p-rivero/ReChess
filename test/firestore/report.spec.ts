@@ -80,6 +80,23 @@ test('can report (but not unreport) a user', async () => {
   )
 })
 
+test('can block (but not unblock) a user', async () => {
+  await createUser()
+  await createUser('bad_person', 'bad_person_id')
+  
+  const reportDoc: ReportDoc = {
+    time: now(),
+    onlyBlock: true,
+    reason: '',
+  }
+  await assertSucceeds(
+    set('verified', reportDoc, 'users', MY_ID, 'reportedUsers', 'bad_person_id')
+  )
+  await assertFails(
+    remove('verified', 'users', MY_ID, 'reportedUsers', 'bad_person_id')
+  )
+})
+
 test('can report a variant without reason', async () => {
   await createUser()
   await createVariant(VARIANT_ID)
@@ -207,6 +224,28 @@ test('cannot report a user twice', async () => {
   }
   await assertSucceeds(
     set('verified', reportDoc, 'users', MY_ID, 'reportedUsers', 'bad_person_id')
+  )
+  await assertFails(
+    set('verified', reportDoc, 'users', MY_ID, 'reportedUsers', 'bad_person_id')
+  )
+})
+
+test('cannot report a user after blocking them', async () => {
+  await createUser()
+  await createUser('bad_person', 'bad_person_id')
+  
+  const blockDoc: ReportDoc = {
+    time: now(),
+    onlyBlock: true,
+    reason: '',
+  }
+  const reportDoc: ReportDoc = {
+    time: now(),
+    onlyBlock: false,
+    reason: 'Some reason',
+  }
+  await assertSucceeds(
+    set('verified', blockDoc, 'users', MY_ID, 'reportedUsers', 'bad_person_id')
   )
   await assertFails(
     set('verified', reportDoc, 'users', MY_ID, 'reportedUsers', 'bad_person_id')
