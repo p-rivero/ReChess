@@ -13,7 +13,7 @@ export type ReportType = 'variant' | 'user'
  * @param {ReportType} mode Whether to report a variant or a user
  * @param {string} docId UID of the variant or user that was reported
  * @param {string} reporterId UID of the user who reported the variant or user
- * @param {string} reportReason User-provided reason for the report. Can be empty.
+ * @param {ReportDoc} report The report to add to the summary
  * @return {Promise<void>} A promise that resolves when the function is done
  */
 export async function incrementReports(mode: ReportType, docId: string, reporterId: string, report: ReportDoc) {

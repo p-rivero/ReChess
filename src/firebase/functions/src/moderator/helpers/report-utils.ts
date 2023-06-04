@@ -5,7 +5,7 @@ import type { BannedUserDataDoc, ReportDoc } from 'db/schema'
 /**
  * Returns a line to add to the reports summary of a variant or user.
  * @param {string} userId UID of the user who reported the variant or user
- * @param {string} reportReason Reason for the report
+ * @param {ReportDoc} report The report to add to the summary
  * @return {string} The text to append to the reports summary.
  */
 export async function makeSummaryLine(userId: string, report: ReportDoc): Promise<string> {

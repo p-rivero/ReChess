@@ -6,8 +6,7 @@ import { insertVariant } from '../variant/variant-mock'
 import { insertGame } from '../game/games-mock'
 import { Change } from 'firebase-functions'
 import admin from 'firebase-admin'
-import type { UserRenameTriggerDoc } from '@/firebase/db/schema'
-import type { UserDoc } from '@/firebase/db/schema'
+import type { UserRenameTriggerDoc, UserDoc } from '@/firebase/db/schema'
 
 const { app, testEnv } = initialize('rename-user-test')
 const db = app.firestore()

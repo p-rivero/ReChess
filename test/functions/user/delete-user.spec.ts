@@ -64,6 +64,8 @@ test('upvotes are deleted' , async () => {
     photoURL: 'https://example.com/user.png',
   })
   await insertUser(db, user)
+  await insertVariant(db, 'variant_id_1')
+  await insertVariant(db, 'variant_id_2')
   const snap1 = await insertUpvote(db, testEnv, USER_ID, 'variant_id_1')
   const snap2 = await insertUpvote(db, testEnv, USER_ID, 'variant_id_2')
   await incrementVariantUpvotes(snap1, variantContext('variant_id_1'))
