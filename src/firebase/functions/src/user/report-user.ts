@@ -2,6 +2,7 @@
 import { ReportDoc } from 'db/schema'
 import { incrementReports } from './helpers/increment-reports'
 import { updatePrivateCache } from './helpers/update-private-cache'
+import type { QueryDocumentSnapshot } from 'firebase-functions/v1/firestore'
 
 /**
  * Called when a user reports or blocks another user. Updates the private cache of the
@@ -12,12 +13,12 @@ import { updatePrivateCache } from './helpers/update-private-cache'
  * @param {QueryDocumentSnapshot} snap Snapshot of the document that was created by the reporter
  * @return {Promise<void>} A promise that resolves when the function is done
  */
-export default async function(reportedId: string, reporterId: string, snap: FirebaseFirestore.QueryDocumentSnapshot) {
+export default async function(reportedId: string, reporterId: string, snap: QueryDocumentSnapshot): Promise<void> {
   const report = snap.data() as ReportDoc
   if (report.onlyBlock) {
     await updatePrivateCache('reportUser', reporterId, reportedId)
   } else {
     // This increments the report count of the reported user and then calls updatePrivateCache
-    await incrementReports('user', reportedId, reporterId, report.reason)
+    await incrementReports('user', reportedId, reporterId, report)
   }
 }

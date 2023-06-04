@@ -36,7 +36,7 @@ function makeContext() {
 
 
 test('when a slot is created, variant popularity is incremented', async () => {
-  const variantBefore = await insertVariant(db, VARIANT_ID, 'white')
+  const variantBefore = await insertVariant(db, VARIANT_ID)
   const snap = makeSnap()
   const context = makeContext()
   
@@ -52,7 +52,7 @@ test('when a slot is created, variant popularity is incremented', async () => {
 })
 
 test('when a slot is deleted, variant popularity is decremented', async () => {
-  const variantBefore = await insertVariant(db, VARIANT_ID, 'white')
+  const variantBefore = await insertVariant(db, VARIANT_ID)
   const snap = makeSnap()
   const context = makeContext()
   
@@ -68,7 +68,7 @@ test('when a slot is deleted, variant popularity is decremented', async () => {
 })
 
 test('creating and deleting has no effect', async () => {
-  const variantBefore = await insertVariant(db, VARIANT_ID, 'white')
+  const variantBefore = await insertVariant(db, VARIANT_ID)
   const snap = makeSnap()
   const context = makeContext()
   

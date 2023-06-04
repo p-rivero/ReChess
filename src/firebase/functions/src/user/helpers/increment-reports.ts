@@ -3,7 +3,7 @@ import { makeSummaryLine } from '../../moderator/helpers/report-utils'
 import { updatePrivateCache } from './update-private-cache'
 import { useAdmin } from '../../helpers'
 import type { DocumentReference } from 'firebase-admin/firestore'
-import type { ModerationDoc } from 'db/schema'
+import type { ModerationDoc, ReportDoc } from 'db/schema'
 
 export type ReportType = 'variant' | 'user'
 
@@ -16,7 +16,7 @@ export type ReportType = 'variant' | 'user'
  * @param {string} reportReason User-provided reason for the report. Can be empty.
  * @return {Promise<void>} A promise that resolves when the function is done
  */
-export async function incrementReports(mode: ReportType, docId: string, reporterId: string, reportReason: string) {
+export async function incrementReports(mode: ReportType, docId: string, reporterId: string, report: ReportDoc) {
   const { db } = await useAdmin()
   const collection = mode === 'user' ? 'userModeration' : 'variantModeration'
   const moderationRef = db.collection(collection).doc(docId)
@@ -24,14 +24,14 @@ export async function incrementReports(mode: ReportType, docId: string, reporter
   const cacheOperation = mode === 'user' ? 'reportUser' : 'reportVariant'
   
   await Promise.all([
-    appendReport(moderationRef, reporterId, reportReason),
+    appendReport(moderationRef, reporterId, report),
     updatePrivateCache(cacheOperation, reporterId, docId),
   ])
 }
 
-async function appendReport(moderationRef: DocumentReference, reporterId: string, reportReason: string) {
+async function appendReport(moderationRef: DocumentReference, reporterId: string, report: ReportDoc) {
   const { db } = await useAdmin()
-  const newSummaryLine = await makeSummaryLine(reporterId, reportReason)
+  const newSummaryLine = await makeSummaryLine(reporterId, report)
   
   try {
     await db.runTransaction(async (transaction) => {

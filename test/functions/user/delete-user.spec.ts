@@ -124,8 +124,8 @@ test('variant reports are deleted', async () => {
     photoURL: 'https://example.com/user.png',
   })
   await insertUser(db, user)
-  await insertVariant(db, 'variant_id_1', 'white')
-  await insertVariant(db, 'variant_id_2', 'white')
+  await insertVariant(db, 'variant_id_1')
+  await insertVariant(db, 'variant_id_2')
   const snap1 = await insertVariantReport(db, testEnv, USER_ID, 'reported_variant_1')
   const snap2 = await insertVariantReport(db, testEnv, USER_ID, 'reported_variant_2')
   await reportVariant(snap1, variantContext('reported_variant_1'))

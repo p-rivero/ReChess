@@ -7,7 +7,7 @@ type DB = admin.firestore.Firestore
 export async function insertVariant(
   db: DB,
   variantId: string,
-  firstPlayerToMove: 'white' | 'black' | 'invalid-variant',
+  firstPlayerToMove: 'white' | 'black' | 'invalid-variant' = 'white',
   creatorId = 'creator_id',
 ): Promise<VariantDoc> {
   let initialState: string

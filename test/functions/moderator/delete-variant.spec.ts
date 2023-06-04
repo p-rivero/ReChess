@@ -24,8 +24,8 @@ async function gameOverTriggerExists(gameId: string): Promise<boolean> {
 test('moderator can delete a variant', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
-  await insertVariant(db, VARIANT_ID, 'white')
-  await insertVariant(db, 'another_variant', 'white')
+  await insertVariant(db, VARIANT_ID)
+  await insertVariant(db, 'another_variant')
   await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
   const done = expectNoErrorLog()
@@ -41,8 +41,8 @@ test('moderator can delete a variant', async () => {
 test('moderator can delete a variant with games', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
-  await insertVariant(db, VARIANT_ID, 'white')
-  await insertVariant(db, 'another_variant', 'white')
+  await insertVariant(db, VARIANT_ID)
+  await insertVariant(db, 'another_variant')
   await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
   await insertGame(db, 'game_1', VARIANT_ID, 'draw', true)
@@ -76,8 +76,8 @@ test('moderator can delete a variant with games', async () => {
 test('moderation document is deleted', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
-  await insertVariant(db, VARIANT_ID, 'white')
-  await insertVariant(db, 'another_variant', 'white')
+  await insertVariant(db, VARIANT_ID)
+  await insertVariant(db, 'another_variant')
   await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
   await insertModerationDoc(db, 'variant', VARIANT_ID, 10)
@@ -97,7 +97,7 @@ test('moderation document is deleted', async () => {
 test('variant index is updated', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
-  await insertVariant(db, VARIANT_ID, 'white')
+  await insertVariant(db, VARIANT_ID)
   
   const index1 = await insertIndex(db, [
     { id: 'aaa', name: 'Variant A', description: 'abc', tags: [] },
@@ -133,7 +133,7 @@ test('variant index is updated', async () => {
 test('lobby slots are deleted', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
-  await insertVariant(db, VARIANT_ID, 'white')
+  await insertVariant(db, VARIANT_ID)
   await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
   await insertLobbySlot(db, VARIANT_ID, 'creator_1', 'challenger_id', 'random', true)
@@ -155,7 +155,7 @@ test('lobby slots are deleted', async () => {
 test('deleting a variant when index does not exist', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
-  await insertVariant(db, VARIANT_ID, 'white')
+  await insertVariant(db, VARIANT_ID)
   const index = await insertIndex(db, [
     { id: 'another', name: 'Another variant' },
     { id: 'not_this_id', name: 'Variant name' },
@@ -172,7 +172,7 @@ test('deleting a variant when index does not exist', async () => {
 test('deleting a variant that does not exist does nothing', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
-  await insertVariant(db, 'another_variant', 'white')
+  await insertVariant(db, 'another_variant')
   await insertGame(db, 'game_1', 'another_variant', 'draw')
   
   const done = expectLog('error', 'Could not find index entry for ' + VARIANT_ID)
@@ -189,8 +189,8 @@ test('deleting a variant that does not exist does nothing', async () => {
 test('deleting a variant twice does nothing', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
-  await insertVariant(db, VARIANT_ID, 'white')
-  await insertVariant(db, 'another_variant', 'white')
+  await insertVariant(db, VARIANT_ID)
+  await insertVariant(db, 'another_variant')
   await insertGame(db, 'game_1', VARIANT_ID, 'draw')
   await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
@@ -214,7 +214,7 @@ test('delete a variant with more than 500 games', async () => {
   const NUM_GAMES = 501
   const context = makeModeratorContext(MODERATOR_ID)
   const args = makeArgs(VARIANT_ID)
-  await insertVariant(db, VARIANT_ID, 'white')
+  await insertVariant(db, VARIANT_ID)
   await insertIndex(db, [{ id: VARIANT_ID, name: 'deleted variant' }])
   
   await Promise.all(Array.from({ length: NUM_GAMES }, async (_, i) => {

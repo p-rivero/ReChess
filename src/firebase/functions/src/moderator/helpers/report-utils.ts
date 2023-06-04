@@ -1,6 +1,6 @@
 import { fetchUserDoc } from '../../user/helpers/fetch-user'
 import { useAdmin } from '../../helpers'
-import type { BannedUserDataDoc } from 'db/schema'
+import type { BannedUserDataDoc, ReportDoc } from 'db/schema'
 
 /**
  * Returns a line to add to the reports summary of a variant or user.
@@ -8,8 +8,8 @@ import type { BannedUserDataDoc } from 'db/schema'
  * @param {string} reportReason Reason for the report
  * @return {string} The text to append to the reports summary.
  */
-export async function makeSummaryLine(userId: string, reportReason: string): Promise<string> {
-  reportReason = reportReason.trim()
+export async function makeSummaryLine(userId: string, report: ReportDoc): Promise<string> {
+  let reportReason = report.reason.trim()
   // Ignore reports that contain \n or \t
   if (/[\n\t]/.exec(reportReason)) {
     console.warn('Ignoring report invalid characters:', reportReason, userId)
@@ -23,8 +23,8 @@ export async function makeSummaryLine(userId: string, reportReason: string): Pro
     throw new Error(`Attempting to add a report for a user that does not exist: ${userId}`)
   }
   const username = userDoc.IMMUTABLE.username
-  const currentTimestamp = Date.now()
-  return `${username}\t${reportReason}\t${currentTimestamp}\n`
+  const timestamp = report.time.toMillis()
+  return `${username}\t${reportReason}\t${timestamp}\n`
 }
 
 /**
