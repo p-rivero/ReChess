@@ -6,47 +6,47 @@
   font-size: 0.9rem;
 }
 
-.tippy-box[data-placement^=top] .tippy-arrow:before {
-  border-top-color: $tooltip-bg
+.tippy-box[data-placement^=top] .tippy-arrow::before {
+  border-top-color: $tooltip-bg;
 }
 
-.tippy-box[data-placement^=bottom] .tippy-arrow:before {
-  border-bottom-color: $tooltip-bg
+.tippy-box[data-placement^=bottom] .tippy-arrow::before {
+  border-bottom-color: $tooltip-bg;
 }
 
-.tippy-box[data-placement^=left] .tippy-arrow:before {
-  border-left-color: $tooltip-bg
+.tippy-box[data-placement^=left] .tippy-arrow::before {
+  border-left-color: $tooltip-bg;
 }
 
-.tippy-box[data-placement^=right] .tippy-arrow:before {
-  border-right-color: $tooltip-bg
+.tippy-box[data-placement^=right] .tippy-arrow::before {
+  border-right-color: $tooltip-bg;
 }
 
 .tippy-box .tippy-backdrop {
-  background-color: $tooltip-bg
+  background-color: $tooltip-bg;
 }
 
 .tippy-box .tippy-svg-arrow {
-  fill: $tooltip-bg
+  fill: $tooltip-bg;
 }
 
 
 .tippy-box[data-state=hidden] {
-  opacity:0
+  opacity: 0;
 }
 
 .tippy-box[data-state=hidden][data-placement^=top] {
-  transform:translateY(4px)
+  transform: translateY(4px);
 }
 
 .tippy-box[data-state=hidden][data-placement^=bottom] {
-  transform:translateY(-4px)
+  transform: translateY(-4px);
 }
 
 .tippy-box[data-state=hidden][data-placement^=left] {
-  transform:translateX(4px)
+  transform: translateX(4px);
 }
 
 .tippy-box[data-state=hidden][data-placement^=right] {
-  transform:translateX(-4px)
+  transform: translateX(-4px);
 }

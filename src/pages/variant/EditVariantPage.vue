@@ -245,7 +245,7 @@
           @changed="value => draftStore.state.globalRules.repetitionsDraw = value"
         />
         <InfoTooltip
-          class="ml-2"
+          class="ml-4"
           :text="'In standard chess, when the same position is reached 3 times,\n' +
             'the game is a draw. Set this number to 0 to disable this rule.'"
         />

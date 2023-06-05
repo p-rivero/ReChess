@@ -1,18 +1,18 @@
 @import 'variables';
 
 html[data-theme="dark"] {
-    background-color: $black-ter;
+  background-color: $black-ter;
 }
 
 html[data-theme="light"] {
-    background-color: $white;
+  background-color: $white;
 }
 
 html {
-    scroll-behavior: smooth;
-    scroll-padding-top: $navbar-height + 1rem;
+  scroll-behavior: smooth;
+  scroll-padding-top: $navbar-height + 1rem;
 }
 
 mark {
-    background-color: transparent;
+  background-color: transparent;
 }
