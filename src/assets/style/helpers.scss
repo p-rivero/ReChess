@@ -76,12 +76,6 @@ img.is-rounded {
     object-fit: cover;
 }
 
-[data-tooltip]:hover:before {
-    font-size: 0.9rem;
-    font-family: $family-serif;
-    border-radius: 0.25rem;
-}
-
 a.no-color {
     color: inherit;
 }

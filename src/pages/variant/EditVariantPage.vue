@@ -200,12 +200,14 @@
             text="Capturing is forced"
             class="rules-field"
             :start-value="draftStore.state.globalRules.capturingIsForced"
+            :tooltip="'If you have the option to capture a piece, you must do so.'"
             @changed="value => draftStore.state.globalRules.capturingIsForced = value"
           />
           <SmartCheckbox
             text="Check is forbidden"
             class="rules-field"
             :start-value="draftStore.state.globalRules.checkIsForbidden"
+            :tooltip="'If a move puts the opponent in check, that move is illegal.'"
             @changed="value => {
               draftStore.state.globalRules.checkIsForbidden = value
               draftStore.state.globalRules.checksToLose = 0
@@ -217,12 +219,14 @@
           <SmartCheckbox
             text="Stalemated player loses"
             class="rules-field"
+            :tooltip="'When a player doesn\'t have any legal moves, the game\nis not a draw. Instead, that player loses.'"
             :start-value="draftStore.state.globalRules.stalematedPlayerLoses"
             @changed="value => draftStore.state.globalRules.stalematedPlayerLoses = value"
           />
           <SmartCheckbox
             text="Invert ALL win conditions"
             class="rules-field"
+            :tooltip="'When the game is over, the winner\nbecomes the loser and vice versa.'"
             :start-value="draftStore.state.globalRules.invertWinConditions"
             @changed="value => draftStore.state.globalRules.invertWinConditions = value"
           />
@@ -240,6 +244,11 @@
           :start-value="draftStore.state.globalRules.repetitionsDraw"
           @changed="value => draftStore.state.globalRules.repetitionsDraw = value"
         />
+        <InfoTooltip
+          class="ml-2"
+          :text="'In standard chess, when the same position is reached 3 times,\n' +
+            'the game is a draw. Set this number to 0 to disable this rule.'"
+        />
       </div>
       <div class="is-flex is-align-items-center mb-6">
         <div class="field-label">
@@ -255,10 +264,14 @@
           :disabled="draftStore.state.globalRules.checkIsForbidden"
           @changed="value => draftStore.state.globalRules.checksToLose = value"
         />
-        
         <div class="field-label-right">
           <label>times</label>
         </div>
+        <InfoTooltip
+          class="ml-2"
+          :text="'In some variants like 3-check, if a player is put in check 3 times,\n' +
+            'they lose. Set this number to 0 to disable this rule.'"
+        />
       </div>
       <label class="label">Pieces:</label>
       <PiecesSummary
@@ -293,6 +306,7 @@
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import EditableMarkdown from '@/components/basic-wrappers/EditableMarkdown.vue'
   import FileDropArea from '@/components/FileDropArea.vue'
+  import InfoTooltip from '@/components/InfoTooltip.vue'
   import PiecePlacementButtons from '@/components/variant/edit/PiecePlacementButtons.vue'
   import PiecesSummary from '@/components/variant/PiecesSummary.vue'
   import PillList from '@/components/PillList.vue'

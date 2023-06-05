@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container is-align-items-center">
     <label class="b-checkbox checkbox">
       <input
         ref="checkboxInput"
@@ -13,17 +13,24 @@
         class="control-label adjust-text"
       >{{ text }}</span>
     </label>
+    <InfoTooltip
+      v-if="tooltip"
+      class="tooltip-icon"
+      :text="tooltip"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
+  import InfoTooltip from '@/components/InfoTooltip.vue'
   
   const checkboxInput = ref<HTMLInputElement>()
   
   const props = defineProps<{
     text?: string
     startValue?: boolean
+    tooltip?: string
   }>()
   
   const emit = defineEmits<{
@@ -48,3 +55,22 @@
     emit('changed', checked)
   }
 </script>
+
+<style scoped lang="scss">
+  .tooltip-icon {
+    margin-left: 0.5rem;
+  }
+  .container {
+    display: flex;
+  }
+  
+  @media screen and (max-width: 600px) {
+    .tooltip-icon {
+      margin-top: 0.5rem;
+      margin-left: calc(2em - 2px);
+    }
+    .container {
+      display: block;
+    }
+  }
+</style>

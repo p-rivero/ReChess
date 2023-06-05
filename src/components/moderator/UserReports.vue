@@ -34,7 +34,7 @@
       <p class="is-size-4 mr-3">
         {{ user.numWinPoints }} / {{ user.numGamesPlayed }}
       </p>
-      <TooltipInfo text="Win points / Played games" />
+      <InfoTooltip text="Win points / Played games" />
     </div>
   </GenericUserReports>
 </template>
@@ -44,7 +44,7 @@
   import { type UserReports, useModeratorStore } from '@/stores/moderator'
   import { computed } from 'vue'
   import GenericUserReports from './GenericReports.vue'
-  import TooltipInfo from '@/components/TooltipInfo.vue'
+  import InfoTooltip from '@/components/InfoTooltip.vue'
   
   const moderatorStore = useModeratorStore()
   

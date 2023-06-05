@@ -20,7 +20,6 @@
     "postinstall": "chmod +x ./src/assets/icons/generate-icons.sh; patch-package"
   },
   "dependencies": {
-    "@creativebulma/bulma-tooltip": "^1.2.0",
     "bulma": "^0.9.4",
     "bulma-checkbox": "^1.2.1",
     "chessgroundx": "./chessgroundx",
@@ -35,6 +34,7 @@
     "sass": "^1.62.1",
     "sortablejs": "^1.15.0",
     "sortablejs-vue3": "^1.2.9",
+    "tippy.js": "^6.3.7",
     "vue": "^3.3.4",
     "vue-highlight-words": "^3.0.1",
     "vue-input-autowidth": "^2.2.0",
