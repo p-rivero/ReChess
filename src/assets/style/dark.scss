@@ -39,10 +39,7 @@ $card-header-shadow: $shadow;
 
 $tooltip-bg: $grey-darkest;
 
-@import 'dependencies';
-
-@import 'icons';
-@import 'helpers';
+@import 'dependencies/index';
 
 // Browser's spinner arrows cannot be styled, hide them
 input[type="number"]::-webkit-outer-spin-button,
