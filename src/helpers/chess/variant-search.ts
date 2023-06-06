@@ -89,13 +89,13 @@ class VariantSearchIndex {
         name,
         searchScore,
         sortScore: NaN, // Set by SearchCard when the variant is loaded
-        matches: this.getMatchRanges(matches),
+        matches: VariantSearchIndex.getMatchRanges(matches),
       }
       return typedRet
     })
   }
   
-  private getMatchRanges(matches: readonly Fuse.FuseResultMatch[] | undefined): Match[] {
+  private static getMatchRanges(matches: readonly Fuse.FuseResultMatch[] | undefined): Match[] {
     if (!matches) return []
     const result: Match[] = []
     for (const match of matches) {

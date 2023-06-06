@@ -146,7 +146,7 @@ export const useLobbyStore = defineStore('lobby', () => {
   function onOngoingLoaded(callback: (lobby: OngoingGameSlot[]) => void) {
     ongoingLoadedCallback = callback
   }
-  function onLobbyCreated(callback: (color:RequestedColor)=>void) {
+  function onLobbyCreated(callback: (color: RequestedColor)=>void) {
     lobbyCreatedCallback = callback
   }
   function onLobbyDeleted(callback: ()=>void) {
