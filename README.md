@@ -154,3 +154,4 @@ All files in this repository (submodules not included) are licensed under the [M
 This means that the project as a whole is licensed under the GPLv3, but some parts (namely, the code in this repository) are licensed under the MIT License, which is [GPL-compatible](https://www.gnu.org/licenses/license-list.en.html#Expat). See [this document](https://softwarefreedom.org/resources/2007/gpl-non-gpl-collaboration.html) for more information.
 
 You are free to use the files in this repository under the terms of the MIT License, but if you also clone and use the `protochess-engine` submodule or the `chessgroundx` submodule, you must comply with the terms of the GPLv3.
+
