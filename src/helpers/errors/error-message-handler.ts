@@ -23,18 +23,18 @@ export class ErrorMessageHandler {
 
   
   // Add the error message component
-  registerText(errorMessageRef: ErrorHandlerText) {
+  public registerText(errorMessageRef: ErrorHandlerText) {
     this.messageText.push(errorMessageRef)
   }
   
   // Add a new user of the error message
-  register(user: ErrorHandlerUser) {
+  public register(user: ErrorHandlerUser) {
     this.messageUsers.push(user)
     // We could return an id or interface here, but for now we don't need it
   }
 
   // Show an error message
-  show(message: string, priority: number) {
+  public show(message: string, priority: number) {
     if (this.currentPriority > priority) return
     this.hasErrorRef.value = true
     this.currentPriority = priority
@@ -44,7 +44,7 @@ export class ErrorMessageHandler {
   }
   
   // Show an exception
-  showException(exception: unknown, priority = 0) {
+  public showException(exception: unknown, priority = 0) {
     if (exception instanceof RechessError) {
       this.show(exception.localizedMessage, priority)
     } else if (exception instanceof Error) {
@@ -56,7 +56,7 @@ export class ErrorMessageHandler {
   }
   
   // Clear the error message, poll all users for a new error message
-  clear() {
+  public clear() {
     this.currentPriority = NaN
     for (const user of this.messageUsers) {
       const refreshResult = user.refresh()

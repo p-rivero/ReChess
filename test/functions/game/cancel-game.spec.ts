@@ -143,7 +143,7 @@ test('cannot cancel a game that does not exist', async () => {
   const arg = makeArgs('nonexistent_game_id')
   await insertGame(db, GAME_ID, VARIANT_ID)
   
-  let e = await expectHttpsError(cancelGame(arg, context))
+  const e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The game does not exist.')
   expect(e.code).toBe('not-found')
 })
@@ -153,7 +153,7 @@ test('caller must be one of the players', async () => {
   const arg = makeArgs()
   await insertGame(db, GAME_ID, VARIANT_ID)
   
-  let e = await expectHttpsError(cancelGame(arg, context))
+  const e = await expectHttpsError(cancelGame(arg, context))
   expect(e.message).toMatch('The function must be called by either the white or black player.')
   expect(e.code).toBe('permission-denied')
   

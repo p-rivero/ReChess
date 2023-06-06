@@ -4,7 +4,7 @@
 import Cropme from 'cropme'
 
 export class CircleCropme {
-  cropme: Cropme
+  private cropme: Cropme
   
   constructor(element: HTMLElement, componentHeight: number, viewportDiameter: number) {
     this.cropme = new Cropme(element, {
@@ -38,13 +38,13 @@ export class CircleCropme {
     })
   }
   
-  bind(image: Blob) {
+  public bind(image: Blob) {
     this.cropme.bind({
       url: URL.createObjectURL(image),
     })
   }
   
-  cropImage(width: number) {
+  public cropImage(width: number) {
     return this.cropme.crop({
       type: 'blob',
       mimetype: 'image/webp',
@@ -52,7 +52,7 @@ export class CircleCropme {
     })
   }
   
-  destroy() {
+  public destroy() {
     this.cropme.destroy()
   }
 }

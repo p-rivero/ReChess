@@ -50,6 +50,26 @@ class VariantSearchIndex {
     })
   }
   
+  private static getMatchRanges(matches: readonly Fuse.FuseResultMatch[] | undefined): Match[] {
+    if (!matches) return []
+    const result: Match[] = []
+    for (const match of matches) {
+      if (match.key !== 'name') continue
+      if (!match.value) continue
+      for (const range of match.indices) {
+        // Add 1 to the end index to make it exclusive
+        result.push({ start: range[0], end: range[1] + 1 })
+      }
+    }
+    // If there are any matches of 4 characters or more, only return those
+    const longMatches4 = result.filter(({ start, end }) => end - start >= 4)
+    if (longMatches4.length > 0) return longMatches4
+    // If there are any matches of 2 characters or more, only return those
+    const longMatches2 = result.filter(({ start, end }) => end - start >= 2)
+    if (longMatches2.length > 0) return longMatches2
+    return result
+  }
+  
   updateIndex(tags: string[]) {
     const tagsHash = tags.join(',')
     if (tagsHash === this.lastTagsHash) return
@@ -93,26 +113,6 @@ class VariantSearchIndex {
       }
       return typedRet
     })
-  }
-  
-  private static getMatchRanges(matches: readonly Fuse.FuseResultMatch[] | undefined): Match[] {
-    if (!matches) return []
-    const result: Match[] = []
-    for (const match of matches) {
-      if (match.key !== 'name') continue
-      if (!match.value) continue
-      for (const range of match.indices) {
-        // Add 1 to the end index to make it exclusive
-        result.push({ start: range[0], end: range[1] + 1 })
-      }
-    }
-    // If there are any matches of 4 characters or more, only return those
-    const longMatches4 = result.filter(({ start, end }) => end - start >= 4)
-    if (longMatches4.length > 0) return longMatches4
-    // If there are any matches of 2 characters or more, only return those
-    const longMatches2 = result.filter(({ start, end }) => end - start >= 2)
-    if (longMatches2.length > 0) return longMatches2
-    return result
   }
 }
 
