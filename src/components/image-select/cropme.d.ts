@@ -65,12 +65,12 @@ declare module 'cropme' {
   
   declare class Cropme {
     constructor(element: HTMLElement, options?: CropmeOptions)
-    bind(bindOptions: CropmeBindOptions): Promise<void>
-    rotate(absoluteAngleDegrees: Integer)
-    crop(cropOptions: CropmeCropOptions | CropmeOutputType): Promise<string>
-    position(): CropmePosition
-    reload(CropmeOptions)
-    destroy()
+    public bind(bindOptions: CropmeBindOptions): Promise<void>
+    public rotate(absoluteAngleDegrees: Integer)
+    public crop(cropOptions: CropmeCropOptions | CropmeOutputType): Promise<string>
+    public position(): CropmePosition
+    public reload(CropmeOptions)
+    public destroy()
   }
   export = Cropme
 }

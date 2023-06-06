@@ -203,7 +203,6 @@ export interface GlobalRules {
 // Interface for the WASM module
 
 export interface IWasmModule {
-  init(): Promise<void>,
   supportsThreads: Promise<boolean>,
   wasmObject: {
     toString(): Promise<unknown>,
@@ -223,6 +222,7 @@ export interface IWasmModule {
     getMaxThreads(): Promise<unknown>,
     setNumThreads(threads: number): Promise<unknown>,
   }
+  init(): Promise<void>,
 }
 
 export interface IWasmModuleConstructor {

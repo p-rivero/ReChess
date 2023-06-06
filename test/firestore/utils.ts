@@ -46,22 +46,22 @@ export type TestUtilsSignature = {
 }
 
 export class Batch {
-  batch: WriteBatch
-  db: firebase.firestore.Firestore
+  private batch: WriteBatch
+  private db: firebase.firestore.Firestore
   constructor(batch: WriteBatch, db: firebase.firestore.Firestore) {
     this.batch = batch
     this.db = db
   }
-  set(data: DocumentData, path: string, ...pathSegments: string[]) {
+  public set(data: DocumentData, path: string, ...pathSegments: string[]) {
     this.batch.set(doc(this.db, path, ...pathSegments), data)
   }
-  update(data: UpdateData, path: string, ...pathSegments: string[]) {
+  public update(data: UpdateData, path: string, ...pathSegments: string[]) {
     this.batch.update(doc(this.db, path, ...pathSegments), data)
   }
-  remove(path: string, ...pathSegments: string[]) {
+  public remove(path: string, ...pathSegments: string[]) {
     this.batch.delete(doc(this.db, path, ...pathSegments))
   }
-  async commit() {
+  public async commit() {
     return this.batch.commit()
   }
 }

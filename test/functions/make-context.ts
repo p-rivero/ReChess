@@ -7,7 +7,7 @@ import type { https, EventContext } from 'firebase-functions'
  * @param {boolean} appCheck True if the caller has an App Check token.
  * @param {boolean} emailVerified True if the caller's email is verified.
  */
-export function makeCallableContext(userId: string|null, appCheck = true, emailVerified = true, customClaims?: Object): https.CallableContext {
+export function makeCallableContext(userId: string|null, appCheck = true, emailVerified = true, customClaims?: object): https.CallableContext {
   const token = {
     aud: 'test',
     auth_time: 123,

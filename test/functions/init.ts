@@ -5,12 +5,12 @@ import { injectApp } from '@/firebase/functions/src/helpers'
 import type { FeaturesList } from 'firebase-functions-test/lib/features'
 import type { AppOptions } from 'firebase-admin'
 
+export * as functions from '../../src/firebase/functions/src/index'
+
 export interface TestUtils {
   app: admin.app.App,
   testEnv: FeaturesList,
 }
-
-export const functions = require('../../src/firebase/functions/src/index') as typeof import('../../src/firebase/functions/src/index')
 
 process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080"
 process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099"

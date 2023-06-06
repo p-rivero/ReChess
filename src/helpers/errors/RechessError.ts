@@ -1,7 +1,7 @@
 
 export class RechessError extends Error {
+  private static locale: ErrorLocale = 'en'
   public readonly code: ErrorToken
-  static locale: ErrorLocale = 'en'
   private params: Record<string, string> = {}
   
   constructor(code: ErrorToken, params?: Record<string, string>) {
@@ -10,11 +10,11 @@ export class RechessError extends Error {
     if (params) this.params = params
   }
   
-  static setLocale(locale: ErrorLocale) {
+  public static setLocale(locale: ErrorLocale) {
     this.locale = locale
   }
   
-  get localizedMessage() {
+  public get localizedMessage() {
     let text = LOCALES[RechessError.locale][this.code]
     // Format the text with the params
     for (const [key, value] of Object.entries(this.params)) {

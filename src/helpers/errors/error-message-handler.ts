@@ -10,10 +10,10 @@ export interface ErrorHandlerUser {
 }
 
 export class ErrorMessageHandler {
-  messageUsers: ErrorHandlerUser[] = []
-  messageText: ErrorHandlerText[] = []
-  hasErrorRef: Ref<boolean>
-  currentPriority = NaN
+  private messageUsers: ErrorHandlerUser[] = []
+  private messageText: ErrorHandlerText[] = []
+  private hasErrorRef: Ref<boolean>
+  private currentPriority = NaN
   
   // The passed ref will be set to true when there is an error
   // This allows disabling buttons and other UI elements

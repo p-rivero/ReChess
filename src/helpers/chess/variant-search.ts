@@ -70,7 +70,7 @@ class VariantSearchIndex {
     return result
   }
   
-  updateIndex(tags: string[]) {
+  public updateIndex(tags: string[]) {
     const tagsHash = tags.join(',')
     if (tagsHash === this.lastTagsHash) return
     this.lastTagsHash = tagsHash
@@ -93,7 +93,7 @@ class VariantSearchIndex {
     this.index.setCollection(variants)
   }
   
-  search(query: string, limit: number, tags: string[]): VariantIndexResult[] {
+  public search(query: string, limit: number, tags: string[]): VariantIndexResult[] {
     this.updateIndex(tags)
     
     return this.index.search(query, { limit }).map(result => {
