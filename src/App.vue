@@ -31,7 +31,7 @@
 </script>
 
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
   .page-container {
     // Subtract the height of the navbar from the height of the page
     min-height: calc(100vh - 4rem);

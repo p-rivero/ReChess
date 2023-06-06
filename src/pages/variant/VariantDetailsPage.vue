@@ -38,7 +38,7 @@
         <h4>Rules:</h4>
         <ul>
           <li
-            v-for="rule in rules"
+            v-for="rule of rules"
             :key="rule"
           >
             {{ rule }}

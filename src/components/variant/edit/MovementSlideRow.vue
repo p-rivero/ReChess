@@ -5,7 +5,7 @@
     </div>
     <div class="field is-grouped is-grouped-multiline">
       <div
-        v-for="(selected, index) in selectedDirections"
+        v-for="(selected, index) of selectedDirections"
         :key="index"
         class="control"
       >
@@ -110,7 +110,7 @@
 </script>
   
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
   .arrow-button {
     width: 2.5rem;
     height: 2.5rem;

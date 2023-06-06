@@ -6,7 +6,7 @@
       @change="onDropdownChange"
     >
       <option
-        v-for="[key, value] in AVAILABLE_OPTIONS"
+        v-for="[key, value] of AVAILABLE_OPTIONS"
         :key="key"
         :value="value"
       >

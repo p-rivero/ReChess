@@ -130,7 +130,7 @@
   }
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
   [data-theme="light"] .navbar {
     box-shadow: 0 0.2em 0.3em rgba(0, 0, 0, 0.2);
   }

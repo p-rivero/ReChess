@@ -531,7 +531,7 @@
 </script>
 
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
   @media screen and (max-width: 1023px) {
     .reverse-columns {
       display: flex;

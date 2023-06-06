@@ -1,7 +1,6 @@
-import { serverTimestamp } from 'firebase/firestore'
+import { type Timestamp, serverTimestamp } from 'firebase/firestore'
 import type { GameDoc, LobbySlotDoc, RequestedColor, UserDoc, VariantDoc } from '@/firebase/db/schema'
 import type { TestUtilsSignature } from '../utils'
-import type { Timestamp } from 'firebase/firestore'
 
 export const MY_ID = 'my_id'
 export const ALICE_ID = 'alice_id'

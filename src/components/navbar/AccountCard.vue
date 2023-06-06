@@ -41,8 +41,7 @@
 </script>
 
 
-<style lang="scss" scoped>
-
+<style scoped lang="scss">
   .card-header-title {
     overflow: clip;
     max-height: 3rem;

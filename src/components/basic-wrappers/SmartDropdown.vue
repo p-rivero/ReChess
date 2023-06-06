@@ -5,7 +5,7 @@
       @change="selectChanged($event.target)"
     >
       <option
-        v-for="item in props.items"
+        v-for="item of props.items"
         :key="item"
         :value="item"
       >

@@ -1,6 +1,7 @@
 // UTILITIES FOR WRITING SHORTER TESTS
 
 import { DocumentReference, DocumentSnapshot, QuerySnapshot, Timestamp, WriteBatch, serverTimestamp, updateDoc, writeBatch } from '@firebase/firestore'
+import { type RulesTestContext, type RulesTestEnvironment, assertSucceeds as originalAssertSucceeds } from '@firebase/rules-unit-testing'
 import {
   addDoc,
   collection,
@@ -11,7 +12,7 @@ import {
   setDoc,
 } from 'firebase/firestore'
 import type { CollectionReference, DocumentData, Query, UpdateData } from '@firebase/firestore-types'
-import type { RulesTestContext, RulesTestEnvironment } from '@firebase/rules-unit-testing'
+
 import type firebase from 'firebase/compat'
 
 /**
@@ -177,7 +178,6 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
 
 
 // Redefine assertSucceeds to throw a new error. This improves linting when using the Jest VSCode extension
-import { assertSucceeds as originalAssertSucceeds } from '@firebase/rules-unit-testing'
 export async function assertSucceeds<T>(pr: Promise<T>): Promise<T> {
   try {
     return await originalAssertSucceeds(pr)

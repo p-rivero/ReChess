@@ -12,7 +12,7 @@ const UPLOADER_ID = 'some_user_id'
 test('accepts images with correct hash', async () => {
   const FILE_PATH = 'piece-images/' + IMAGE_SHA256
   
-  let [_file, metadata] = await bucket.upload(IMAGE_PATH, {
+  const [_file, metadata] = await bucket.upload(IMAGE_PATH, {
     destination: FILE_PATH,
     metadata: {
       contentType: `image/png`,
@@ -31,7 +31,7 @@ test('accepts images with correct hash', async () => {
 test('rejects images with an incorrect name', async () => {
   const FILE_PATH = 'piece-images/some-name'
   
-  let [_file, metadata] = await bucket.upload(IMAGE_PATH, {
+  const [_file, metadata] = await bucket.upload(IMAGE_PATH, {
     destination: FILE_PATH,
     metadata: {
       contentType: `image/png`,
@@ -51,7 +51,7 @@ test('rejects images with an incorrect name', async () => {
 test('rejects images without uploader ID', async () => {
   const FILE_PATH = 'piece-images/' + IMAGE_SHA256
   
-  let [_file, metadata] = await bucket.upload(IMAGE_PATH, {
+  const [_file, metadata] = await bucket.upload(IMAGE_PATH, {
     destination: FILE_PATH,
     metadata: {
       contentType: `image/png`,
@@ -71,7 +71,7 @@ test('rejects images without uploader ID', async () => {
 test('ignores images in other directories', async () => {
   const FILE_PATH = 'another-directory/some-name'
   
-  let [_file, metadata] = await bucket.upload(IMAGE_PATH, {
+  const [_file, metadata] = await bucket.upload(IMAGE_PATH, {
     destination: FILE_PATH,
     metadata: {
       contentType: `image/png`,

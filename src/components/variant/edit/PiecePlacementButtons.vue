@@ -2,7 +2,7 @@
   <div>
     <div class="field is-grouped is-grouped-multiline">
       <button
-        v-for="piece in pieceList"
+        v-for="piece of pieceList"
         :key="'' + piece.id + piece.definition.imageUrls"
         class="control button sz-3 px-1 py-1"
         :class="{'is-primary': selectedId === piece.id}"

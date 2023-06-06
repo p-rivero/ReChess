@@ -176,7 +176,7 @@
   
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
   .box {
     padding: 0;
     max-width: 1000px;
