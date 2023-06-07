@@ -231,7 +231,7 @@ test('cannot create a game if slot has no challenger', async () => {
   await insertVariant(db, VARIANT_ID)
   await insertLobbySlot(db, VARIANT_ID, USER_ID, null, 'white')
   
-  let e = await expectHttpsError(createGame(arg, context))
+  const e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The lobby slot has no challenger.')
   expect(e.code).toBe('failed-precondition')
 })

@@ -58,7 +58,7 @@
     moderatorStore.refreshVariantReports()
   })
   
-  function checkUserIsMod() {
+  function checkUserIsModerator() {
     if (!authStore.loggedUser) {
       returnHome(401, 'If you are a moderator, please log in to access this page.')
       return
@@ -67,7 +67,7 @@
       returnHome(403, 'You need to be a moderator to access this page.')
     }
   }
-  watch(authStore, checkUserIsMod)
-  onMounted(checkUserIsMod)
   
+  watch(authStore, checkUserIsModerator)
+  onMounted(checkUserIsModerator)
 </script>

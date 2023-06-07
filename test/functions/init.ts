@@ -3,7 +3,6 @@ import initFunctions from 'firebase-functions-test'
 import { assertEmulatorsRunning } from '../test-common'
 import { injectApp } from '@/firebase/functions/src/helpers'
 import type { FeaturesList } from 'firebase-functions-test/lib/features'
-import type { AppOptions } from 'firebase-admin'
 
 export * as functions from '../../src/firebase/functions/src/index'
 
@@ -19,7 +18,7 @@ process.env.FIREBASE_STORAGE_EMULATOR_HOST = "localhost:9199"
 let currentUtils: TestUtils | null = null
 export function initialize(projectId: string): TestUtils {
   const testEnv = initFunctions({ projectId })
-  const config: AppOptions = {
+  const config: admin.AppOptions = {
     projectId,
     storageBucket: `${projectId}.appspot.com`,
     credential: admin.credential.applicationDefault(),
