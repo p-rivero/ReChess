@@ -1,23 +1,25 @@
 <template>
-  <div class="container is-align-items-center">
-    <label class="b-checkbox checkbox">
-      <input
-        ref="checkboxInput"
-        type="checkbox"
-        value="false"
-        @change="checkboxChanged($event.target)"
-      >
-      <span class="check" />
-      <span
-        v-if="text"
-        class="control-label adjust-text"
-      >{{ text }}</span>
-    </label>
-    <InfoTooltip
-      v-if="tooltip"
-      class="tooltip-icon"
-      :text="tooltip"
-    />
+  <div>
+    <div class="container is-align-items-center">
+      <label class="b-checkbox checkbox">
+        <input
+          ref="checkboxInput"
+          type="checkbox"
+          value="false"
+          @change="checkboxChanged($event.target)"
+        >
+        <span class="check" />
+        <span
+          v-if="text"
+          class="control-label adjust-text"
+        >{{ text }}</span>
+      </label>
+      <InfoTooltip
+        v-if="tooltip"
+        class="tooltip-icon"
+        :text="tooltip"
+      />
+    </div>
   </div>
 </template>
 
