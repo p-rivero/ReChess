@@ -17,16 +17,16 @@ const MAX_INDEX_SIZE = 1_048_487
 export default async function(snap: QueryDocumentSnapshot): Promise<void> {
   let { name, description, tags } = snap.data() as VariantDoc
   
-  // Enforce the 35 character limit on tags
+  // Enforce the 35 character limit on tags and remove invalid characters
   if (tags.some((tag) => tag.length > 35)) {
     snap.ref.delete().catch((e) => console.error('Cannot delete invalid variant', e))
     return
   }
+  tags = tags.map((tag) => tag.replace(/[\t\n# ,]/g, '').toLowerCase())
   
   // Replace tabs and newlines with spaces
   name = name.replace(/[\t\n]/g, ' ').toLowerCase()
   description = description.replace(/[\t\n]/g, ' ').toLowerCase()
-  tags = tags.map((tag) => tag.replace(/[\t\n# ,]/g, '').toLowerCase())
   
   const line = `${snap.id}\t${name}\t${description.slice(0, 100)}\t${tags.join(',')}`
   
