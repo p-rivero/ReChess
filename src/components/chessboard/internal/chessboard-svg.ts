@@ -1,8 +1,8 @@
 // Generate a chess board, with the given number of rows and columns
 
 export function chessboardSvg(width: number, height: number, light_color: string, dark_color: string): string {
-  light_color = light_color.replace('#', '%23')
-  dark_color = dark_color.replace('#', '%23')
+  light_color = light_color.replace(/#/g, '%23')
+  dark_color = dark_color.replace(/#/g, '%23')
   const svg = []
   svg.push(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' shape-rendering='crispEdges'>`)
   for (let row = 0; row < height; row++) {
