@@ -242,7 +242,7 @@ test('cannot create a game for a slot that already has a game', async () => {
   await insertVariant(db, VARIANT_ID)
   await insertLobbySlot(db, VARIANT_ID, USER_ID, 'a_challenger', 'white', true)
   
-  let e = await expectHttpsError(createGame(arg, context))
+  const e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The lobby slot already has a game.')
   expect(e.code).toBe('failed-precondition')
 })
@@ -253,7 +253,7 @@ test('cannot create a game for a variant that does not exist', async () => {
   const context = makeContext(USER_ID)
   await insertLobbySlot(db, VARIANT_ID, USER_ID, 'a_challenger', 'white')
   
-  let e = await expectHttpsError(createGame(arg, context))
+  const e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The variant does not exist.')
   expect(e.code).toBe('not-found')
 })
@@ -264,7 +264,7 @@ test('challenger cannot create the game', async () => {
   const context = makeContext('challenger_id')
   await insertLobbySlot(db, VARIANT_ID, 'creator_id', 'challenger_id', 'white')
   
-  let e = await expectHttpsError(createGame(arg, context))
+  const e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The function must be called by the user that created the lobby slot.')
   expect(e.code).toBe('permission-denied')
 })
@@ -275,7 +275,7 @@ test('variant must have a valid starting player', async () => {
   await insertVariant(db, VARIANT_ID, 'invalid-variant')
   await insertLobbySlot(db, VARIANT_ID, USER_ID, 'a_challenger', 'white')
   
-  let e = await expectHttpsError(createGame(arg, context))
+  const e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The variant has an invalid initial state.')
   expect(e.code).toBe('internal')
 })
@@ -287,7 +287,7 @@ test('cannot create a game twice', async () => {
   await insertLobbySlot(db, VARIANT_ID, USER_ID, 'a_challenger', 'white')
   
   await expectSuccess(createGame(arg, context))
-  let e = await expectHttpsError(createGame(arg, context))
+  const e = await expectHttpsError(createGame(arg, context))
   expect(e.message).toMatch('The lobby slot already has a game.')
   expect(e.code).toBe('failed-precondition')
 })

@@ -63,6 +63,7 @@
       returnHome(401, 'If you are a moderator, please log in to access this page.')
       return
     }
+    
     if (!authStore.loggedUser.moderator) {
       returnHome(403, 'You need to be a moderator to access this page.')
     }
