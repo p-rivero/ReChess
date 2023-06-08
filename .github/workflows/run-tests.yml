@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: 16
       
-      - run: npm install
+      - run: npm ci
         
       - name: Test with Firebase emulators
         uses: w9jds/firebase-action@master

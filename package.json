@@ -37,7 +37,7 @@
     "tippy.js": "^6.3.7",
     "vue": "^3.3.4",
     "vue-highlight-words": "^3.0.1",
-    "vue-input-autowidth": "^2.2.0",
+    "vue-input-autowidth": "^2.2.1",
     "vue-markdown-render": "^2.0.1",
     "vue-router": "^4.2.1",
     "wasm-feature-detect": "^1.5.1"

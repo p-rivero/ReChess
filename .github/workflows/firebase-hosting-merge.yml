@@ -50,7 +50,7 @@ jobs:
             **/node_modules
           key: ${{ runner.os }}-node-${{ steps.node.outputs.version }}-${{ hashFiles('**/package-lock.json') }}
           
-      - run: npm install
+      - run: npm ci
       
       - name: Build
         run: npm run build
