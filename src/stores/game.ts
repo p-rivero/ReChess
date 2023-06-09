@@ -8,7 +8,7 @@ import { useAuthStore } from './auth-user'
 import type { GameDoc, GameSummary } from '@/firebase/db/schema'
 import type { MoveInfo, Player, PublishedVariant } from '@/protochess/types'
 
-export type Game = {
+export interface Game {
   id: string
   variant: PublishedVariant
   moveHistory: MoveInfo[]

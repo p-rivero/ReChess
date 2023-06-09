@@ -5,7 +5,7 @@ import { defineStore } from 'pinia'
 import { useAuthStore } from './auth-user'
 import type { GameDoc, LobbySlotDoc, RequestedColor } from '@/firebase/db/schema'
 
-export type LobbySlot = {
+export interface LobbySlot {
   currentUserIsCreator: boolean
   currentUserIsChallenger: boolean
   
@@ -20,7 +20,7 @@ export type LobbySlot = {
   gameDocId?: string
 }
 
-export type OngoingGameSlot = {
+export interface OngoingGameSlot {
   currentUserIsPlayer: boolean
   
   gameId: string
@@ -32,7 +32,7 @@ export type OngoingGameSlot = {
   blackDisplayName: string
 }
 
-export type ChallengerInfo = {
+export interface ChallengerInfo {
   name: string
   image?: string
   gameCreated: boolean

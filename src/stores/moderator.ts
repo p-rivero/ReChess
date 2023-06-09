@@ -14,16 +14,16 @@ import { useVariantStore } from './variant'
 import type { ModerationDoc } from '@/firebase/db/schema'
 import type { PublishedVariant } from '@/protochess/types'
 
-export type Report = {
+export interface Report {
   reporterUsername: string
   reasonText: string
   time: Date
 }
-export type UserReports = {
+export interface UserReports {
   reportedUser: User
   reports: Report[]
 }
-export type VariantReports = {
+export interface VariantReports {
   reportedVariant: PublishedVariant
   reports: Report[]
 }

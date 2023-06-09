@@ -19,7 +19,7 @@ export function returnHome(error: ErrorCode, reason: string) {
   router.replace({ name: 'home' })
 }
 
-export type UserStore = {
+export interface UserStore {
   getUserById: (id: string) => Promise<User | undefined>
 }
 export async function goToProfile(userStore: UserStore, userId: string, newTab = false) {

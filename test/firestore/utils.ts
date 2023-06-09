@@ -25,7 +25,7 @@ import type firebase from 'firebase/compat'
 export type AuthType = 'verified' | 'unverified' | 'not logged' | 'moderator' | 'admin'
 
 
-export type TestUtilsSignature = {
+export interface TestUtilsSignature {
   // Get a single document
   get: (authType: AuthType, path: string, ...pathSegments: string[]) => Promise<DocumentSnapshot>
   // Perform a query on a collection

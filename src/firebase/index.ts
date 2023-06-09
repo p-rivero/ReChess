@@ -58,26 +58,26 @@ initializeAppCheck(app, {
 
 
 // Export references to the callable functions
-type CreateGameParams = { variantId: string, lobbySlotCreatorId: string }
+interface CreateGameParams { variantId: string, lobbySlotCreatorId: string }
 export const createGame = httpsCallable<CreateGameParams, { gameId: string }>(functions, 'createGame')
 
-type CancelGameParams = { gameId: string, reason: string }
-export const cancelGame = httpsCallable<CancelGameParams, void>(functions, 'cancelGame')
+interface CancelGameParams { gameId: string, reason: string }
+export const cancelGame = httpsCallable<CancelGameParams>(functions, 'cancelGame')
 
-type BanUserParams = { userId: string, doNotBackup?: boolean }
-export const banUser = httpsCallable<BanUserParams, void>(functions, 'banUser')
+interface BanUserParams { userId: string, doNotBackup?: boolean }
+export const banUser = httpsCallable<BanUserParams>(functions, 'banUser')
 
-type UnbanUserParams = { userId: string }
-export const unbanUser = httpsCallable<UnbanUserParams, void>(functions, 'unbanUser')
+interface UnbanUserParams { userId: string }
+export const unbanUser = httpsCallable<UnbanUserParams>(functions, 'unbanUser')
 
-type DeleteVariantParams = { variantId: string }
-export const deleteVariant = httpsCallable<DeleteVariantParams, void>(functions, 'deleteVariant')
+interface DeleteVariantParams { variantId: string }
+export const deleteVariant = httpsCallable<DeleteVariantParams>(functions, 'deleteVariant')
 
-type DiscardUserReportsParams = { userId: string, reporters: string[] }
-export const discardUserReports = httpsCallable<DiscardUserReportsParams, void>(functions, 'discardUserReports')
+interface DiscardUserReportsParams { userId: string, reporters: string[] }
+export const discardUserReports = httpsCallable<DiscardUserReportsParams>(functions, 'discardUserReports')
 
-type DiscardVariantReportsParams = { variantId: string, reporters: string[] }
-export const discardVariantReports = httpsCallable<DiscardVariantReportsParams, void>(functions, 'discardVariantReports')
+interface DiscardVariantReportsParams { variantId: string, reporters: string[] }
+export const discardVariantReports = httpsCallable<DiscardVariantReportsParams>(functions, 'discardVariantReports')
 
-type WipeUserParams = { userId: string }
-export const wipeUser = httpsCallable<WipeUserParams, void>(functions, 'wipeUser')
+interface WipeUserParams { userId: string }
+export const wipeUser = httpsCallable<WipeUserParams>(functions, 'wipeUser')

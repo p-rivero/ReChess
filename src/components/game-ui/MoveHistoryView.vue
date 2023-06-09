@@ -76,20 +76,20 @@
   type FormattedList = FormattedListEntry[]
   type FormattedListEntry = ListRow | BranchSentinel
   
-  type ListRow = {
+  interface ListRow {
     moveNum: number,
     leftMove: DisplayedMove,
     rightMove: DisplayedMove,
     isSentinel?: false
   }
-  type DisplayedMove = {
+  interface DisplayedMove {
     move: string
     highlighted?: boolean
     node?: MoveTreeNode
     isSentinel?: false,
   }
   
-  type BranchSentinel = {
+  interface BranchSentinel {
     isSentinel: true
     node: MoveTreeNode
     startAtLeft: boolean

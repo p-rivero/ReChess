@@ -86,7 +86,7 @@
     },
   })
   
-  type Piece = {
+  interface Piece {
     id: string | null | undefined
     definition: FullPieceDef
     color: Player

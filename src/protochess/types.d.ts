@@ -225,9 +225,7 @@ export interface IWasmModule {
   init(): Promise<void>,
 }
 
-export interface IWasmModuleConstructor {
-  new(): Promise<IWasmModule>,
-}
+export type IWasmModuleConstructor = new() => Promise<IWasmModule>
 
 /** @see {isGetBestMoveResult} ts-auto-guard:type-guard */
 export interface GetBestMoveResult {

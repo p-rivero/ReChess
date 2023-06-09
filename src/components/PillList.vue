@@ -63,7 +63,7 @@
 
 <script lang="ts">
 // Internal type for representing a pill
-  type Pill = {
+  interface Pill {
     text: string
     editing: boolean
     error: boolean

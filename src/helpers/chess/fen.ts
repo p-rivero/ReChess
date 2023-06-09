@@ -1,4 +1,4 @@
-type PiecePlacement = {
+interface PiecePlacement {
   pieceId: string
   x: number
   y: number

@@ -30,7 +30,7 @@
   
   // Map from piece id to the URL of the image to use
   export type PlayerPieceImages = [string, string][]
-  export type PieceImages = {white: PlayerPieceImages, black: PlayerPieceImages}
+  export interface PieceImages {white: PlayerPieceImages, black: PlayerPieceImages}
   
   const props = defineProps<{
     width: number

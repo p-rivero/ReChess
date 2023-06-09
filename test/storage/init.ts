@@ -36,7 +36,7 @@ export function setupJest(projectId: string, onInit: (testEnv: RulesTestEnvironm
 }
 
 
-type StorageInterface = {
+interface StorageInterface {
   verified: firebase.storage.Storage,
   unverified: firebase.storage.Storage,
   notLogged: firebase.storage.Storage,

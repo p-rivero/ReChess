@@ -46,7 +46,7 @@
     engineLevel?: 1 | 2 | 3 | 4 | 5
   }>()
   
-  type GameResult = {flag: MakeMoveFlag, winner: MakeMoveWinner}
+  interface GameResult {flag: MakeMoveFlag, winner: MakeMoveWinner}
   const emit = defineEmits<{
     (event: 'new-move', from: [number, number], to: [number, number], promotion?: string, result?: GameResult): void
     (event: 'on-scroll', result?: GameResult): void

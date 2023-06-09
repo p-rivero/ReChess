@@ -16,8 +16,8 @@ export type SearchOrder = 'search-relevance' | VariantListOrder
 // Default order when not searching
 export const DEFAULT_ORDER = 'popular'
 
-export type Match = {start: number, end: number} // end is exclusive
-export type VariantIndexResult = {
+export interface Match {start: number, end: number} // end is exclusive
+export interface VariantIndexResult {
   id: string
   name: string
   searchScore: number // The search relevance of this result (between 0 and 1)

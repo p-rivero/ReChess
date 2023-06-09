@@ -156,7 +156,7 @@ function getSquareBBox(ctx: CanvasRenderingContext2D, alphaThreshold: number, cr
   }
 }
 
-type Bounds = {
+interface Bounds {
   top: number
   left: number
   right: number

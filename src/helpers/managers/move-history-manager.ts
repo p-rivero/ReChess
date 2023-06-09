@@ -3,11 +3,11 @@ import { clone, objectEquals } from '@/helpers/ts-utils'
 import { moveToString } from '@/helpers/chess/chess-coords'
 import type { GameState, InitialState, MakeMoveFlag, MakeMoveWinner, MoveInfo } from '@/protochess/types'
 
-export type MoveResult = { flag: MakeMoveFlag, winner: MakeMoveWinner }
+export interface MoveResult { flag: MakeMoveFlag, winner: MakeMoveWinner }
 
 export type MoveHistoryQueryResult = Readonly<{ state: GameState, lastMove?: MoveInfo }>
 
-export type MoveTreeNode = {
+export interface MoveTreeNode {
   move: MoveInfo | 'root'
   notation: string
   children: MoveTreeNode[]
