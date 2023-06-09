@@ -27,7 +27,7 @@ export default async function(image: ObjectMetadata): Promise<void> {
   const hash = await computeImageHash(fileRef)
   const fileName = image.name.split('/').pop()
   if (fileName !== hash) {
-    const uploader = image.metadata?.userId
+    const uploader = image.metadata.userId
     console.warn('Deleting', image.name, 'because the hash does not match the filename. Uploader:', uploader)
     await fileRef.delete()
   }

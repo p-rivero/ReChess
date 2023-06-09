@@ -60,9 +60,6 @@ service cloud.firestore {
     function fetchUser(userId) {
       return get(/databases/$(database)/documents/users/$(userId)).data;
     }
-    function fetchGame(gameId) {
-      return get(/databases/$(database)/documents/games/$(gameId)).data;
-    }
     function usernameIsTaken(username) {
       return exists(/databases/$(database)/documents/usernames/$(username));
     }

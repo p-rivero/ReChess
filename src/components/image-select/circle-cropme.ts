@@ -44,7 +44,7 @@ export class CircleCropme {
     })
   }
   
-  public cropImage(width: number) {
+  public async cropImage(width: number): Promise<string> {
     return this.cropme.crop({
       type: 'blob',
       mimetype: 'image/webp',

@@ -59,13 +59,13 @@ export const useVariantStore = defineStore('variant', () => {
     variantListTag = tag
   }
   
-  watch(authStore, async () => {
+  watch(authStore, () => {
     // If the user has changed, we need to fetch the upvotes again
-    variantList.value.forEach(variant => {
+    for (const variant of variantList.value) {
       variant.loggedUserUpvoted = authStore.loggedUser ?
         authStore.loggedUser.upvotedVariants.includes(variant.uid) :
         false
-    })
+    }
   })
   
   // Gets a variant from the database, or returns undefined if it doesn't exist

@@ -107,7 +107,7 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
       throw new Error('admin is not allowed for read operations')
     }
     const document = doc(getAuth(authType), path, ...pathSegments)
-    return await getDoc(document)
+    return getDoc(document)
   }
   
   async function query(authType: AuthType, path: string, getQuery?: (col: CollectionReference)=>Query): Promise<QuerySnapshot> {
@@ -117,7 +117,7 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
     // If no query is provided, return all documents
     if (!getQuery) getQuery = (col) => col
     const col = getAuth(authType).collection(path)
-    return await getDocs(getQuery(col))
+    return getDocs(getQuery(col))
   }
   
   async function set(authType: AuthType|RulesTestContext, data: DocumentData, path: string, ...pathSegments: string[]): Promise<void> {
@@ -148,7 +148,7 @@ export function setupTestUtils(testEnv: RulesTestEnvironment, myId: string, myEm
       return result
     }
     const col = collection(getAuth(authType), path, ...pathSegments)
-    return await addDoc(col, data)
+    return addDoc(col, data)
   }
   
   async function remove(authType: AuthType|RulesTestContext, path: string, ...pathSegments: string[]): Promise<void> {

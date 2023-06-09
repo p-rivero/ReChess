@@ -77,7 +77,7 @@
   }>()
   
   
-  onMounted(async () => {
+  onMounted(() => {
     const DUMMY_VARIANT: Variant = {
       boardWidth: 8,
       boardHeight: 8,

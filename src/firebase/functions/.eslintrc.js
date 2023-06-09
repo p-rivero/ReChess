@@ -11,10 +11,11 @@ module.exports = {
     'plugin:import/typescript',
     'google',
     'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/strict',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: ['tsconfig.json', 'tsconfig.dev.json'],
+    project: ['./tsconfig.json', 'tsconfig.dev.json'],
     sourceType: 'module',
   },
   ignorePatterns: [
@@ -47,5 +48,10 @@ module.exports = {
     }],
     'sort-imports-es6-autofix/sort-imports-es6': ['warn'],
     'require-jsdoc': 'off',
+    'no-return-await': ['warn'],
+    'no-prototype-builtins': ['warn'],
+    '@typescript-eslint/await-thenable': ['error'],
+    '@typescript-eslint/no-unnecessary-condition': 'off',
+    '@typescript-eslint/prefer-nullish-coalescing': 'off',
   },
 }

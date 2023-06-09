@@ -121,7 +121,7 @@ async function createGame(variant: [string, VariantDoc], slot: [string, LobbySlo
 }
 
 function getFirstPlayerToMove(variant: VariantDoc): 'white' | 'black' {
-  const variantInitialState = JSON.parse(variant.initialState) as {playerToMove: 0 | 1}
+  const variantInitialState = JSON.parse(variant.initialState) as {playerToMove: number}
   if (variantInitialState.playerToMove !== 0 && variantInitialState.playerToMove !== 1) {
     throw new HttpsError('internal', 'The variant has an invalid initial state.')
   }

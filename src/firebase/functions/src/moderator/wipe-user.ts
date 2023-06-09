@@ -62,12 +62,12 @@ async function getUserVariants(userId: string): Promise<string[]> {
   ])
   const createdVariants = variants.docs.map((doc) => doc.id)
   const backupDoc = userDataBackup.data() as BannedUserDataDoc | undefined
-  const backupVariants = backupDoc?.publishedVariants?.split(' ') ?? []
+  const backupVariants = backupDoc?.publishedVariants.split(' ') ?? []
   return [...createdVariants, ...backupVariants]
 }
 
 async function removeVariants(variantIds: string[], context: CallableContext): Promise<void> {
-  await Promise.all(variantIds.map(async (id) => await deleteVariant({ variantId: id }, context)))
+  await Promise.all(variantIds.map((id) => deleteVariant({ variantId: id }, context)))
 }
 
 async function removeUserReports(userId: string, context: CallableContext): Promise<void> {
@@ -94,6 +94,6 @@ async function removeStoredFile(fileName: string): Promise<void> {
   } catch (untypedErr) {
     const e = untypedErr as { code: number }
     // Ignore the error if the file doesn't exist
-    if (e.code !== 404) throw e
+    if (e.code !== 404) throw untypedErr
   }
 }

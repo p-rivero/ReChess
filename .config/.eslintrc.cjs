@@ -40,6 +40,8 @@ module.exports = {
       exports: 'always-multiline',
     }],
     'sort-imports-es6-autofix/sort-imports-es6': ['warn'],
+    'no-return-await': ['warn'],
+    'no-prototype-builtins': ['warn'],
   },
   overrides: [{
     files: ['**/*.mts'],

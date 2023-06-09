@@ -15,7 +15,7 @@ export async function assertEmulatorRunning(name: string, port: number, mustRun:
   if (!running && mustRun) throw new Error(`Please START the ${name} emulator before running the tests.`)
 }
 
-async function isPortTaken(port: number): Promise<boolean> {
+function isPortTaken(port: number): Promise<boolean> {
   let numTries = 0
   return new Promise((resolve, reject) => {
     const tester = net.createServer()

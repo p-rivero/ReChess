@@ -149,7 +149,7 @@
   }
   watch(orderBy, async order => {
     sessionStorage.setItem('search-order', order)
-    refreshVariantList()
+    await refreshVariantList()
   })
   const refreshVariantListDebounced = debounce(refreshVariantList, 300)
   watch(tags, () => refreshVariantListDebounced())

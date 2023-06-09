@@ -24,7 +24,7 @@ app.mount('#app')
 // Temporary code until threads work as expected
 protochessSupportsThreads().then(async supportsThreads => {
   if (supportsThreads) {
-    getProtochess('ui').then(async p => await p.setNumThreads(1))
-    getProtochess('search').then(async p => await p.setNumThreads(4))
+    await getProtochess('ui').then(p => p.setNumThreads(1))
+    await getProtochess('search').then(p => p.setNumThreads(4))
   }
 })

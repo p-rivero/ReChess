@@ -110,7 +110,7 @@
     (event: 'tag-clicked', tag: string): void
   }>()
   
-  onMounted(async () => {
+  onMounted(() => {
     board.value?.setState(props.variant)
   })
   

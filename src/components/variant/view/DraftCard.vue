@@ -80,7 +80,7 @@
   const draftStore = useVariantDraftStore()
   const userPrefsStore = useUserPrefsStore()
   
-  onMounted(async () => {
+  onMounted(() => {
     if (!draftStore.hasDraft()) {
       return
     }

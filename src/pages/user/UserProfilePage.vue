@@ -402,7 +402,7 @@
     }
   }
   
-  async function imageClicked() {
+  function imageClicked() {
     if (!user.value || !myProfile(user.value)) {
       return
     }
@@ -617,7 +617,7 @@
     sendingResetPasswordEmail.value = false
   }
   
-  async function signOut() {
+  function signOut() {
     showPopup('Sign out', 'Do you want to log out of your account?', 'yes-no', async () => {
       await authStore.signOut()
       router.push({ name: 'home' })

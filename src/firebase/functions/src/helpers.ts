@@ -7,7 +7,7 @@ import type { DocumentReference, QuerySnapshot, WriteBatch } from 'firebase-admi
 let appInstance: App | null = null
 
 
-export type UseAdminReturn = {
+export interface UseAdminReturn {
   db: admin.firestore.Firestore,
   storage: admin.storage.Storage,
   auth: admin.auth.Auth
@@ -81,7 +81,7 @@ export async function batchedUpdate(input: BatchUpdateInput, operation: BatchCal
   for (let nBatch = 0; nBatch < numBatches; nBatch++) {
     const batch = db.batch()
     for (let i = 0; i < MAX_BATCH_SIZE; i++) {
-      const ref = input[nBatch * MAX_BATCH_SIZE + i]
+      const ref = input.at(nBatch * MAX_BATCH_SIZE + i)
       if (!ref) break
       operation(batch, ref)
     }

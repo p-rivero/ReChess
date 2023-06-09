@@ -1,5 +1,5 @@
 
-import { Timestamp, type QueryDocumentSnapshot } from 'firebase-admin/firestore'
+import { type QueryDocumentSnapshot, Timestamp } from 'firebase-admin/firestore'
 import type { Change } from 'firebase-functions'
 
 import { batchedUpdate, useAdmin } from '../helpers'

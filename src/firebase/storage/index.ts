@@ -89,17 +89,6 @@ export async function getUrl(bucket: Bucket, filePath: string): Promise<string |
   }
 }
 
-/**
- * Gets the file path of a file in cloud storage.
- * @param {string} url The download URL of the file
- * @return {Promise<string>} A promise that resolves to the file path
- */
-export async function getFilePath(bucket: Bucket, url: string): Promise<string> {
-  const storage = getStorageRef(bucket)
-  const fileRef = ref(storage, url)
-  return fileRef.fullPath
-}
-
 
 function getStorageRef(bucket: Bucket): FirebaseStorage {
   switch (bucket) {

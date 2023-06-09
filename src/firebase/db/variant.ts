@@ -119,8 +119,8 @@ export async function getUpvotedVariants(userId: string): Promise<[VariantDoc, s
   const querySnapshot = await getDocs(q)
   const variantIds = querySnapshot.docs.map(doc => doc.id)
   // For each variant, get the variant document
-  const variantDocs = await Promise.all(variantIds.map(id => {
-    const variant = getVariantById(id)
+  const variantDocs = await Promise.all(variantIds.map(async id => {
+    const variant = await getVariantById(id)
     if (!variant) throw new Error(`Upvoted variant ${id} does not exist`)
     return variant
   }))

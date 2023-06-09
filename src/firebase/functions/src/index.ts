@@ -21,7 +21,7 @@ region(FUNCTIONS_REGION)
   .storage
   .bucket('rechess-web-piece-images')
   .object()
-  .onFinalize(async (object) => {
+  .onFinalize((object) => {
     return callFunction(import('./file-upload/check-piece-hash'), object)
   })
 

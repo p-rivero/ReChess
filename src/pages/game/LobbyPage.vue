@@ -201,7 +201,7 @@
   })
   
   
-  async function createGameClicked() {
+  function createGameClicked() {
     if (!authStore.loggedUser) {
       requestSignIn()
       return
