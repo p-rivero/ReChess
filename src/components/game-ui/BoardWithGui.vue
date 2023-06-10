@@ -185,6 +185,7 @@
       }
       return winner
     },
+    gameOver,
     playerToMove,
   })
   
@@ -238,6 +239,7 @@
     // Even if the popup was not shown initially, prevent it from being shown again
     gameOverPopupShown.value = true
     updateTitle('Game over')
+    board.value.disableMovement()
     emit('game-over', flag, winner, playerToMove)
   }
   
@@ -246,7 +248,7 @@
       winner === 'white' ? 'White wins!' :
       winner === 'black' ? 'Black wins!' :
       'It\'s a Draw!'
-    const message = gameOverMessage(flag, playerToMove)
+    const message = gameOverMessage(flag, winner, playerToMove)
     
     // Wait some time before showing the popup, so that the user can see the
     // final position of the game.

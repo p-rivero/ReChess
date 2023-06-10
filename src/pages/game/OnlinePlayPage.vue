@@ -114,12 +114,7 @@
   }
   
   function opponentResigned() {
-    showPopup(
-      'The opponent has resigned',
-      'You won the game by resignation.',
-      'ok'
-    )
-    // TODO: Disable movement
+    board.value?.gameOver('Resignation', isWhite.value ? 'white' : 'black')
   }
   
   async function illegalPosition() {

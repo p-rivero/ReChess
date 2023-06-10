@@ -145,7 +145,14 @@ export const useGameStore = defineStore('game', () => {
   
   async function cancelGame(reason: string) {
     if (!currentGameId) throw new Error('No game is being listened to')
-    await fnCancelGame({ gameId: currentGameId, reason })
+    try {
+      await fnCancelGame({ gameId: currentGameId, reason })
+    } catch (e) {
+      console.error(e)
+      // This could happen if the game was already cancelled or if the user has been banned
+      // there is not much we can do about it, and throwing an error would just cause navigation issues
+      // Return and pretend that the game was cancelled
+    }
   }
   
   

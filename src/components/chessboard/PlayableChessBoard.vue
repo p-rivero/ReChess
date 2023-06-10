@@ -92,7 +92,7 @@
       return handleResult(result)
     },
     
-    // Returns which player is to move
+    // Returns which player can move
     async playerToMove(): Promise<Player> {
       const protochess = await getProtochess('ui')
       return protochess.playerToMove()
@@ -122,6 +122,11 @@
     async jumpToHistoryNode(node: MoveTreeNode) {
       const entry = moveHistory.goTo(node)
       await jumpToMove(entry)
+    },
+    
+    // Disable movement
+    disableMovement() {
+      board.value?.setMovable(false, false, [])
     },
     
     // Expose the history tree for the UI to display

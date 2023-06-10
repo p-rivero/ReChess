@@ -89,7 +89,7 @@
         blackBarHeight.value = '50%'
       }
       depthText.value = 'Game over'
-      explainText.value = gameOverMessage(flag, playerToMove)
+      explainText.value = gameOverMessage(flag, winner, playerToMove)
     },
     
     evalText,

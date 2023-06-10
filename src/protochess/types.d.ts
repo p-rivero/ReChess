@@ -61,7 +61,8 @@ export type MakeMoveFlag =
   'PieceInWinSquare' |
   'CheckLimit' |
   'Stalemate' |
-  'Repetition'
+  'Repetition' |
+  'Resignation'
   
 export type MakeMoveWinner = Player | 'none'
 

@@ -18,7 +18,8 @@ export function isMakeMoveResult(obj: unknown): obj is MakeMoveResult {
             typedObj["flag"] === "PieceInWinSquare" ||
             typedObj["flag"] === "CheckLimit" ||
             typedObj["flag"] === "Stalemate" ||
-            typedObj["flag"] === "Repetition") &&
+            typedObj["flag"] === "Repetition" ||
+            typedObj["flag"] === "Resignation") &&
         (typedObj["winner"] === "white" ||
             typedObj["winner"] === "black" ||
             typedObj["winner"] === "none") &&
