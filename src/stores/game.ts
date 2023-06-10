@@ -1,5 +1,6 @@
 import { GameDB } from '@/firebase/db'
 import { defineStore } from 'pinia'
+import { cancelGame as fnCancelGame } from '@/firebase'
 import { moveToString, parseMove } from '@/helpers/chess/chess-coords'
 import { objectEquals } from '@/helpers/ts-utils'
 import { onSnapshot } from '@firebase/firestore'
@@ -142,6 +143,12 @@ export const useGameStore = defineStore('game', () => {
     })
   }
   
+  async function cancelGame(reason: string) {
+    if (!currentGameId) throw new Error('No game is being listened to')
+    await fnCancelGame({ gameId: currentGameId, reason })
+  }
+  
+  
   function readDocument(id: string, doc: GameDoc, variant: PublishedVariant): Game {
     const moveHistory: MoveInfo[] = []
     for (const move of doc.moveHistory.split(' ')) {
@@ -175,5 +182,6 @@ export const useGameStore = defineStore('game', () => {
     
     movePiece,
     getUserGames,
+    cancelGame,
   }
 })

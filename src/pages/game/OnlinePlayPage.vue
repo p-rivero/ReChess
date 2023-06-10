@@ -3,24 +3,25 @@
     ref="board"
     :white="isWhite ? 'human' : 'none'"
     :black="isBlack ? 'human' : 'none'"
-    :update-title="isWhite || isBlack"
-    :show-game-over-popup="isWhite || isBlack"
+    :update-title="isPlaying"
+    :show-game-over-popup="isPlaying"
     :opponent-name="opponentName"
     
-    @new-move="newMove"
+    @new-move="sendNewMove"
     @invalid-variant="illegalPosition"
   />
 </template>
 
 <script setup lang="ts">
-  import { onUnmounted, ref, watchEffect } from 'vue'
+  import { computed, onUnmounted, ref, watchEffect } from 'vue'
   import { returnHome } from '@/helpers/managers/navigation-manager'
   import { showPopup } from '@/helpers/managers/popup-manager'
   import { updateTitle } from '@/helpers/web-utils'
   import { useGameStore } from '@/stores/game'
   import { useRoute } from 'vue-router'
   import BoardWithGui from '@/components/game-ui/BoardWithGui.vue'
-  import type { Player } from '@/protochess/types'
+  import type { Game } from '@/stores/game'
+  import type { MakeMoveWinner, Player } from '@/protochess/types'
   
   const route = useRoute()
   const gameStore = useGameStore()
@@ -29,6 +30,7 @@
   // For the remote player, use 'none' and set the state manually
   const isWhite = ref(false)
   const isBlack = ref(false)
+  const isPlaying = computed(() => isWhite.value || isBlack.value)
   const opponentName = ref('')
   
   // When the route changes, update the game
@@ -40,14 +42,17 @@
       return
     }
     
-    gameStore.onGameChanged(game => {
-      board.value?.setState(game.variant, game.moveHistory)
-      isWhite.value = game.loggedUserIsWhite
-      isBlack.value = game.loggedUserIsBlack
-      if (!isWhite.value && !isBlack.value) {
-        updateTitle(`${game.whiteName} vs ${game.blackName}`)
-      } else {
-        opponentName.value = isWhite.value ? game.blackName : game.whiteName
+    gameStore.onGameChanged(async game => {
+      if (!board.value) {
+        throw new Error('Board not initialized')
+      }
+      updateUi(game)
+      const realWinner = await board.value.setState(game.variant, game.moveHistory)
+      const declaredWinner = getWinner(game)
+      const declaredWinnerIsMe = declaredWinner === 'white' && isWhite.value || declaredWinner === 'black' && isBlack.value
+      if (declaredWinner !== realWinner) {
+        if (declaredWinnerIsMe) opponentResigned()
+        else illegalPosition()
       }
     })
     
@@ -57,7 +62,7 @@
     
     gameStore.onInvalidVariant(() => {
       returnHome(503, 'This variant seems to be invalid. It may have been uploaded \
-          using an incompatible version of the site or by a malicious user. \
+          using an incompatible version of the site. \
           \n\nPlease report this by [opening an issue on GitHub](https://github.com/p-rivero/ReChess/issues).')
     })
     
@@ -74,7 +79,7 @@
   })
   
   
-  async function newMove(from: [number, number], to: [number, number], promotion?: string, winner?: Player|'none') {
+  async function sendNewMove(from: [number, number], to: [number, number], promotion?: string, winner?: Player|'none') {
     // Error checking
     if (!board.value) throw new Error('Board is not defined')
     // Convert winner from Player|'none'|undefined to Player|'draw'|null
@@ -94,8 +99,45 @@
     }
   }
   
-  function illegalPosition() {
-    console.log('Illegal position detected!')
+  function updateUi(game: Game) {
+    isWhite.value = game.loggedUserIsWhite
+    isBlack.value = game.loggedUserIsBlack
+    if (!isWhite.value && !isBlack.value) {
+      updateTitle(`${game.whiteName} vs ${game.blackName}`)
+    } else {
+      opponentName.value = isWhite.value ? game.blackName : game.whiteName
+    }
+  }
+  
+  function getWinner(game: Game): MakeMoveWinner | undefined {
+    return game.winner === 'draw' ? 'none' : game.winner
+  }
+  
+  function opponentResigned() {
+    showPopup(
+      'The opponent has resigned',
+      'You won the game by resignation.',
+      'ok'
+    )
+    // TODO: Disable movement
+  }
+  
+  async function illegalPosition() {
+    if (isPlaying.value) {
+      showPopup(
+        'This game seems to be invalid',
+        'Please wait while we cancel the game...',
+        'ok'
+      )
+      await gameStore.cancelGame('An illegal position was detected')
+      returnHome(503, 'The game you were playing is invalid, your opponent seems to have made \
+          an illegal move. The game has been cancelled. \
+          \n\nIf the problem persists, please [open an issue on GitHub](https://github.com/p-rivero/ReChess/issues).')
+    } else {
+      returnHome(503, 'The game you were spectating seems to be invalid. \
+          \n\nPlease try again later, and if the problem persists, \
+          [open an issue on GitHub](https://github.com/p-rivero/ReChess/issues).')
+    }
   }
   
 </script>

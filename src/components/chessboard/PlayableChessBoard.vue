@@ -122,7 +122,6 @@
     async jumpToHistoryNode(node: MoveTreeNode) {
       const entry = moveHistory.goTo(node)
       await jumpToMove(entry)
-      
     },
     
     // Expose the history tree for the UI to display

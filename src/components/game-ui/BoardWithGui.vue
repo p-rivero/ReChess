@@ -153,15 +153,19 @@
   }>()
   
   defineExpose({
-    async setState(variant: Variant, history: MoveInfo[] = [], fen?: string) {
-      // Set the board state and make sure it's valid
-      // Since the page has just loaded, the move history is empty
+    async setState(variant: Variant, history: MoveInfo[] = [], fen?: string): Promise<MakeMoveWinner|undefined> {
+      if (!board.value) {
+        throw new Error('Board not initialized')
+      }
+      let winner: MakeMoveWinner | undefined
       try {
+        // Set the board state and make sure it's valid
         const state = { initialState: variant, moveHistory: history, initialFen: fen }
-        const result = await board.value?.setState(state)
+        const result = await board.value.setState(state)
         if (result) {
           // Game over, show the popup
           await updateResult(result)
+          winner = result.winner
         } else {
           // If in the middle of a game, check that the position is valid
           // validPosition() is fast, use the UI instance
@@ -172,13 +176,14 @@
       } catch (e) {
         console.error(e)
         emit('invalid-variant')
-        return
+        return undefined
       }
       // Initialize evaluation gauge
       // This can take a while, don't await it
       if (props.hasGauge) {
         updateEvaluation()
       }
+      return winner
     },
     playerToMove,
   })

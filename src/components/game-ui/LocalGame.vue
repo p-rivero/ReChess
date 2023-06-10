@@ -56,7 +56,7 @@
   
   function invalidVariant() {
     returnHome(503, 'This variant seems to be invalid. It may have been uploaded \
-        using an incompatible version of the site or by a malicious user. \
+        using an incompatible version of the site. \
         \n\nPlease report this by [opening an issue on GitHub](https://github.com/p-rivero/ReChess/issues).')
   }
   
