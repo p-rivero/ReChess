@@ -19,7 +19,7 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
   
   // Enforce the 35 character limit on tags and remove invalid characters
   if (tags.some((tag) => tag.length > 35)) {
-    snap.ref.delete().catch((e) => console.error('Cannot delete invalid variant', e))
+    await deleteVariant(snap)
     return
   }
   tags = tags.map((tag) => tag.replace(/[\t\n# ,]/g, '').toLowerCase())
@@ -34,21 +34,15 @@ export default async function(snap: QueryDocumentSnapshot): Promise<void> {
   let index = 0
   let success = false
   while (!success) {
-    success = await appendToIndex(line, index)
+    success = await appendLineToIndex(line, index)
     index++
   }
 }
 
 
-/**
- * Appends a line to the a given index document.
- * @param {string} line Text to append to the index
- * @param {number} index Number of the index document to append to, incremented until a free index is found
- * @return {Promise<boolean>} True if the line was appended, false if the index is full
- */
-async function appendToIndex(line: string, index: number): Promise<boolean> {
+async function appendLineToIndex(line: string, indexNum: number): Promise<boolean> {
   const { db } = await useAdmin()
-  const indexRef = db.collection('variantIndex').doc(index.toString())
+  const indexRef = db.collection('variantIndex').doc(indexNum.toString())
   const indexDoc = await indexRef.get()
   
   if (!indexDoc.exists) {
@@ -65,4 +59,14 @@ async function appendToIndex(line: string, index: number): Promise<boolean> {
   // Append the new line to the existing index
   await indexRef.set({ index: oldIndex + '\n' + line })
   return true
+}
+
+async function deleteVariant(variantSnap: QueryDocumentSnapshot) {
+  const { creatorId } = variantSnap.data() as VariantDoc
+  console.warn(`Deleting variant with invalid tags. creatorId: ${creatorId}`)
+  try {
+    await variantSnap.ref.delete()
+  } catch (err) {
+    console.error('Cannot delete invalid variant', err)
+  }
 }

@@ -1,6 +1,6 @@
 import { VariantDoc, VariantIndexDoc } from '@/firebase/db/schema'
 import { functions, initialize } from '../init'
-import { expectNoErrorLog } from '../utils'
+import { expectLog, expectNoErrorLog } from '../utils'
 import { insertVariant, insertIndex } from './variant-mock'
 
 const { app, testEnv } = initialize('update-variant-index-test')
@@ -11,10 +11,12 @@ const updateVariantIndex = testEnv.wrap(functions.updateVariantIndex)
 const MAX_INDEX_SIZE = 1_048_487
 const VARIANT_ID = 'new_variant_id'
 
-function getExpectedLine(variant: VariantDoc) {
+function getExpectedLine(variant: VariantDoc, overrideTags?: string[]) {
   const name = variant.name.toLowerCase()
   const description = variant.description.toLowerCase()
-  const tags = variant.tags.join(',').toLowerCase()
+  const tags = overrideTags ?
+    overrideTags.join(',') :
+    variant.tags.join(',').toLowerCase()
   return `${VARIANT_ID}\t${name}\t${description}\t${tags}`
 }
 
@@ -157,4 +159,79 @@ test('entry fills the first free page', async () => {
   })
   const indexPage3 = await db.collection('variantIndex').doc('3').get()
   expect(indexPage3.exists).toBe(false)
+})
+
+
+
+test('maximum tag length is 35 chars, success', async () => {
+  const variantDoc = await insertVariant(db, VARIANT_ID)
+  variantDoc.tags = ['some_tag', 'a'.repeat(35), 'another_tag']
+  const snap = testEnv.firestore.makeDocumentSnapshot(variantDoc, `variants/${VARIANT_ID}`)
+  
+  const done = expectNoErrorLog()
+  await updateVariantIndex(snap)
+  done()
+  
+  const variantAfter = await db.collection('variants').doc(VARIANT_ID).get()
+  expect(variantAfter.exists).toBe(true)
+})
+
+test('maximum tag length is 35 chars, failure', async () => {
+  const variantDoc = await insertVariant(db, VARIANT_ID, 'white', 'some_creator_id')
+  variantDoc.tags = ['some_tag', 'a'.repeat(36), 'another_tag']
+  const snap = testEnv.firestore.makeDocumentSnapshot(variantDoc, `variants/${VARIANT_ID}`)
+  
+  const done = expectLog('warn', `Deleting variant with invalid tags. creatorId: some_creator_id`)
+  await updateVariantIndex(snap)
+  done()
+  
+  const variantAfter = await db.collection('variants').doc(VARIANT_ID).get()
+  expect(variantAfter.exists).toBe(false)
+})
+
+test('tags are converted to lowercase and illegal chars are deleted', async () => {
+  const variantDoc = await insertVariant(db, VARIANT_ID, 'white', 'some_creator_id')
+  variantDoc.tags = ['some#_##ta,,g', 'aNOTHEr\n\t_tag', 'THIRD TAG']
+  const snap = testEnv.firestore.makeDocumentSnapshot(variantDoc, `variants/${VARIANT_ID}`)
+  
+  const done = expectNoErrorLog()
+  await updateVariantIndex(snap)
+  done()
+  
+  const indexDoc = await db.collection('variantIndex').doc('0').get()
+  expect(indexDoc.data()).toEqual({
+    index: getExpectedLine(variantDoc, ['some_tag', 'another_tag', 'thirdtag']),
+  })
+})
+
+test('tabs and newlines are deleted from name and description', async () => {
+  const variantDoc = await insertVariant(db, VARIANT_ID, 'white', 'some_creator_id')
+  variantDoc.name = 'some\nname\t\twith\ttabs'
+  variantDoc.description = 'some\n\tdescription'
+  const snap = testEnv.firestore.makeDocumentSnapshot(variantDoc, `variants/${VARIANT_ID}`)
+  
+  const done = expectNoErrorLog()
+  await updateVariantIndex(snap)
+  done()
+  
+  const indexDoc = await db.collection('variantIndex').doc('0').get()
+  expect(indexDoc.data()).toEqual({
+    index: `${VARIANT_ID}\tsome name  with tabs\tsome  description\t`,
+  })
+})
+
+test('name and description are cropped and converted to lowercase', async () => {
+  const variantDoc = await insertVariant(db, VARIANT_ID, 'white', 'some_creator_id')
+  variantDoc.name = 'Some NAME'
+  variantDoc.description = 'AbCd'.repeat(100) // 400 chars
+  const snap = testEnv.firestore.makeDocumentSnapshot(variantDoc, `variants/${VARIANT_ID}`)
+  
+  const done = expectNoErrorLog()
+  await updateVariantIndex(snap)
+  done()
+  
+  const indexDoc = await db.collection('variantIndex').doc('0').get()
+  expect(indexDoc.data()).toEqual({
+    index: `${VARIANT_ID}\tsome name\t${'abcd'.repeat(25)}\t`,
+  })
 })
