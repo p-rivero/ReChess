@@ -8,7 +8,8 @@ const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
 let testEnv: RulesTestEnvironment | null = null
-setupJest('test-storage-profile-images', 'default', env => testEnv = env)
+const DEPEND_ON = 'test-storage-piece-images'
+setupJest('test-storage-profile-images', 'default', env => testEnv = env, DEPEND_ON)
 
 
 test('can see profile picture of other users', async () => {

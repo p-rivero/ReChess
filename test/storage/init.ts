@@ -12,12 +12,21 @@ const RULES_PATH: Record<StorageRules, string> = {
   'piece-images': 'src/firebase/storage/piece-images.rules',
 }
 
-export function setupJest(projectId: string, rules: StorageRules, onInit: (testEnv: RulesTestEnvironment) => void) {
+export function setupJest(projectId: string, rules: StorageRules, onInit: (testEnv: RulesTestEnvironment) => void, dependOn?: string) {
   let testEnv: RulesTestEnvironment | null = null
   
   beforeAll(async () => {
     // Make sure the emulator is running (Use: firebase emulators:start --only firestore,storage,auth)
     await assertEmulatorsRunning()
+    globalThis.process.env['RUNNING_TEST_' + projectId] = 'true'
+    
+    if (dependOn) {
+      // Give some time for the other test to start, and then wait for it to finish
+      await new Promise(resolve => setTimeout(resolve, 4000))
+      while (globalThis.process.env['RUNNING_TEST_' + dependOn]) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
+    }
     
     try {
       testEnv = await initializeTestEnvironment({
@@ -34,9 +43,10 @@ export function setupJest(projectId: string, rules: StorageRules, onInit: (testE
       process.exit(1)
     }
     onInit(testEnv)
-  })
+  }, 100000)
   
   afterAll(async () => {
+    globalThis.process.env['RUNNING_TEST_' + projectId] = undefined
     await testEnv?.cleanup()
   })
   
