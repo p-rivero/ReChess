@@ -1,6 +1,6 @@
 import { type RulesTestEnvironment, initializeTestEnvironment } from '@firebase/rules-unit-testing'
+import { type UploadMetadata, uploadString } from 'firebase/storage'
 import { assertEmulatorsRunning } from '../test-common'
-import { uploadString } from 'firebase/storage'
 import fs from 'fs'
 import type firebase from 'firebase/compat/app'
 
@@ -57,7 +57,7 @@ interface StorageInterface {
   unverified: firebase.storage.Storage,
   notLogged: firebase.storage.Storage,
   moderator: firebase.storage.Storage,
-  setupData(path: string, data: string): Promise<void>,
+  setupData(path: string, data: string, metadata?: UploadMetadata): Promise<void>,
 }
 export function setupTestUtils(testEnv: RulesTestEnvironment|null, myId: string, myEmail: string): StorageInterface {
   if (!testEnv) throw new Error('testEnv is not initialized')
@@ -67,12 +67,12 @@ export function setupTestUtils(testEnv: RulesTestEnvironment|null, myId: string,
   const verified = testEnv.authenticatedContext(myId, { email: myEmail, email_verified: true }).storage()
   const moderator = testEnv.authenticatedContext(myId, { email: myEmail, email_verified: true, moderator: true }).storage()
   
-  async function setupData(path: string, data: string) {
+  async function setupData(path: string, data: string, metadata?: UploadMetadata) {
     if (!testEnv) throw new Error('testEnv is not initialized')
     await testEnv.withSecurityRulesDisabled(async context => {
       const storage = context.storage()
       const testRef = storage.ref(path)
-      await uploadString(testRef, data)
+      await uploadString(testRef, data, 'raw', metadata)
     })
   }
   

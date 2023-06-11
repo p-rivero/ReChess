@@ -5,13 +5,12 @@ export function decodeData(buffer: ArrayBuffer) {
   return new TextDecoder().decode(buffer)
 }
 
-export async function uploadFile(ref: StorageReference, filePath: string, uploaderId: string) {
+export async function uploadFile(ref: StorageReference, filePath: string, uploaderId: string, contentType?: string) {
   const buffer = fs.readFileSync(filePath)
   // Get MIME type from file extension. There are more robust ways to do this, but this is good enough for testing.
   const extension = filePath.split('.').pop()
-  const contentType = `image/${extension}`
   const metadata: UploadMetadata = {
-    contentType,
+    contentType: contentType || `image/${extension}`,
     customMetadata: {
       userId: uploaderId,
     },
