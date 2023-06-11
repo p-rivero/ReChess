@@ -87,7 +87,7 @@
   import { nextTick, ref } from 'vue'
   import FileDropArea from '@/components/FileDropArea.vue'
   import ImageCrop from './ImageCrop.vue'
-  import type { Bucket, CacheHeader } from '@/firebase/storage'
+  import type { BucketName, CacheHeader } from '@/firebase/storage'
   
   const popup = ref<HTMLElement>()
   const buttonUpload = ref<HTMLButtonElement>()
@@ -96,7 +96,7 @@
   const hasImage = ref(false)
   const loading = ref(false)
   let uploadBlobName = ''
-  let uploadBucket: Bucket = 'default'
+  let uploadBucket: BucketName = 'default'
   
   const props = defineProps<{
     showDeleteButton: () => boolean
@@ -105,7 +105,7 @@
   }>()
   
   defineExpose({
-    show(bucket: Bucket, uploadName: string) {
+    show(bucket: BucketName, uploadName: string) {
       uploadBucket = bucket
       uploadBlobName = uploadName
       popup.value?.classList.add('is-active')

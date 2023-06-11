@@ -8,7 +8,7 @@ export type CacheHeader = `${'public' | 'private'}, max-age=${number}${', immuta
 
 const DEFAULT_CACHE: CacheHeader = 'public, max-age=31536000, immutable'
 
-export type Bucket = 'default' | 'piece-images'
+export type BucketName = 'default' | 'piece-images'
 
 /**
  * Uploads a blob to cloud storage, at a given path. The user must be logged in,
@@ -23,7 +23,7 @@ export type Bucket = 'default' | 'piece-images'
  * as soon as the file changes.
  * @throws {Error} If the user is not logged in or if the upload fails
  */
-export async function uploadBlob(file: Blob, bucket: Bucket, filePath: string, cache = DEFAULT_CACHE): Promise<UploadResult> {
+export async function uploadBlob(file: Blob, bucket: BucketName, filePath: string, cache = DEFAULT_CACHE): Promise<UploadResult> {
   const authStore = useAuthStore()
   const storage = getStorageRef(bucket)
   const user = authStore.loggedUser
@@ -45,7 +45,7 @@ export async function uploadBlob(file: Blob, bucket: Bucket, filePath: string, c
  * @return {Promise<Blob | undefined>} A promise that resolves to the blob, or undefined if the file does not exist
  * @throws {Error} If the user does not have permission to download the file
  */
-export async function downloadBlob(bucket: Bucket, filePath: string): Promise<Blob | undefined> {
+export async function downloadBlob(bucket: BucketName, filePath: string): Promise<Blob | undefined> {
   const url = await getUrl(bucket, filePath)
   if (!url) return undefined
   
@@ -62,7 +62,7 @@ export async function downloadBlob(bucket: Bucket, filePath: string): Promise<Bl
  * @return {Promise<void>} A promise that resolves when the file is deleted
  * @throws {Error} If the user is not logged in or does not have permission to delete the file
  */
-export async function deleteFile(bucket: Bucket, filePath: string): Promise<void> {
+export async function deleteFile(bucket: BucketName, filePath: string): Promise<void> {
   const storage = getStorageRef(bucket)
   const fileRef = ref(storage, filePath)
   await deleteObject(fileRef)
@@ -75,7 +75,7 @@ export async function deleteFile(bucket: Bucket, filePath: string): Promise<void
  * @return {Promise<string | undefined>} A promise that resolves to the download URL,
  * or undefined if the file does not exist
  */
-export async function getUrl(bucket: Bucket, filePath: string): Promise<string | undefined> {
+export async function getUrl(bucket: BucketName, filePath: string): Promise<string | undefined> {
   const storage = getStorageRef(bucket)
   const fileRef = ref(storage, filePath)
   try {
@@ -90,7 +90,7 @@ export async function getUrl(bucket: Bucket, filePath: string): Promise<string |
 }
 
 
-function getStorageRef(bucket: Bucket): FirebaseStorage {
+function getStorageRef(bucket: BucketName): FirebaseStorage {
   switch (bucket) {
   case 'default': return defaultStorage
   case 'piece-images': return pieceStorage
