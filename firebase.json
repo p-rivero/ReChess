@@ -29,12 +29,9 @@
     "rules": "src/firebase/db/firestore.rules",
     "indexes": "src/firebase/db/firestore.indexes.json"
   },
-  "storage": [
-    {
-      "target": "storage-target",
-      "rules": "src/firebase/storage/storage.rules"
-    }
-  ],
+  "storage": {
+    "rules": "src/firebase/storage/storage.rules"
+  },
   "functions": [
     {
       "source": "src/firebase/functions",
