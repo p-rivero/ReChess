@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "rechess-web"
-  }
+  },
+  "targets": {
+    "rechess-web": {
+      "storage": {
+        "default": [ "rechess-web.appspot.com" ],
+        "piece-images": [ "rechess-web-piece-images" ]
+      }
+    }
+  },
+  "etags": {}
 }

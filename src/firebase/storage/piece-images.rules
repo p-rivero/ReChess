@@ -4,9 +4,8 @@ function authMetadata() {
   return request.auth.uid != null && request.auth.uid == request.resource.metadata.userId
 }
 
-function sizeKb(maxSizeKilobytes) {
-  // Use KiB instead of KB, since it's more permissive and we don't care about the exact size.
-  return request.resource.size < maxSizeKilobytes * 1024;
+function sizeKib(maxSizeKibibytes) {
+  return request.resource.size < maxSizeKibibytes * 1024;
 }
 
 function isImage() {
@@ -14,6 +13,7 @@ function isImage() {
 }
 
 service firebase.storage {
+  // When deployed, bucket == "rechess-web-piece-images". This is not true in unit tests.
   match /b/{bucket}/o {
     match /piece-images/{imageName} {
       // Anyone can see the images
@@ -26,30 +26,13 @@ service firebase.storage {
       // Store the piece images in a separate bucket, so that we can run the 
       // cloud function only when needed.
       allow create: if
-        bucket == "rechess-web-piece-images" &&
         authMetadata() &&
-        sizeKb(200) &&
+        sizeKib(200) &&
         isImage() &&
         resource == null;
         
       // Cannot edit the metadata of an image or delete it, since other variants may reference it.
       allow update, delete: if false;
-    }
-    
-    
-    match /profile-images/{userId} {
-      // Anyone can see the images
-      allow read;
-      
-      // Only allow uploading images of 200kB or less, and only for the user's own profile.
-      allow create, update: if
-        authMetadata() &&
-        sizeKb(200) &&
-        isImage() &&
-        request.auth.uid == userId;
-        
-      // Only allow deleting the user's own profile image.
-      allow delete: if request.auth.uid == userId;
     }
   }
 }

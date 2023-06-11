@@ -29,9 +29,16 @@
     "rules": "src/firebase/db/firestore.rules",
     "indexes": "src/firebase/db/firestore.indexes.json"
   },
-  "storage": {
-    "rules": "src/firebase/storage/storage.rules"
-  },
+  "storage": [
+    {
+      "target": "default",
+      "rules": "src/firebase/storage/default.rules"
+    },
+    {
+      "target": "piece-images",
+      "rules": "src/firebase/storage/piece-images.rules"
+    }
+  ],
   "functions": [
     {
       "source": "src/firebase/functions",

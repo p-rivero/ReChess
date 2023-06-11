@@ -6,11 +6,11 @@ const MY_ID = 'my_id'
 const MY_EMAIL = 'my@email.com'
 
 let testEnv: RulesTestEnvironment | null = null
-setupJest('test-storage-profile-images', env => testEnv = env)
+setupJest('test-storage-profile-images', 'default', env => testEnv = env)
 
 
 
-test.skip('can see profile picture of other users', async () => {
+test('can see profile picture of other users', async () => {
   setupTestUtils(testEnv, MY_ID, MY_EMAIL)
   
 })

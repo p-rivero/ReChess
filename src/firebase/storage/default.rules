@@ -1,0 +1,33 @@
+rules_version = '2';
+
+function authMetadata() {
+  return request.auth.uid != null && request.auth.uid == request.resource.metadata.userId
+}
+
+function sizeKib(maxSizeKibibytes) {
+  return request.resource.size < maxSizeKibibytes * 1024;
+}
+
+function isImage() {
+  return request.resource.contentType.matches('image/.*');
+}
+
+service firebase.storage {
+  // When deployed, bucket == "rechess-web.appspot.com". This is not true in unit tests.
+  match /b/{bucket}/o {
+    match /profile-images/{userId} {
+      // Anyone can see the images
+      allow read;
+      
+      // Only allow uploading images of 200kB or less, and only for the user's own profile.
+      allow create, update: if
+        authMetadata() &&
+        sizeKib(200) &&
+        isImage() &&
+        request.auth.uid == userId;
+        
+      // Only allow deleting the user's own profile image.
+      allow delete: if request.auth.uid == userId;
+    }
+  }
+}

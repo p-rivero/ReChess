@@ -1,9 +1,18 @@
 import { type RulesTestEnvironment, initializeTestEnvironment } from '@firebase/rules-unit-testing'
 import { assertEmulatorsRunning } from '../test-common'
 import { uploadString } from 'firebase/storage'
+import fs from 'fs'
 import type firebase from 'firebase/compat/app'
 
-export function setupJest(projectId: string, onInit: (testEnv: RulesTestEnvironment) => void) {
+/** Choose which storage rules file to load */
+export type StorageRules = 'default' | 'piece-images'
+
+const RULES_PATH: Record<StorageRules, string> = {
+  'default': 'src/firebase/storage/default.rules',
+  'piece-images': 'src/firebase/storage/piece-images.rules',
+}
+
+export function setupJest(projectId: string, rules: StorageRules, onInit: (testEnv: RulesTestEnvironment) => void) {
   let testEnv: RulesTestEnvironment | null = null
   
   beforeAll(async () => {
@@ -16,10 +25,12 @@ export function setupJest(projectId: string, onInit: (testEnv: RulesTestEnvironm
         storage: {
           host: 'localhost',
           port: 9199,
+          rules: fs.readFileSync(RULES_PATH[rules], 'utf8'),
         },
       })
     } catch (e) {
       // Cannot connect to emulator
+      console.error(e)
       process.exit(1)
     }
     onInit(testEnv)
