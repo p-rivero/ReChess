@@ -1,7 +1,10 @@
 rules_version = '2';
 
+function loggedAs(id) {
+  return request.auth.uid != null && request.auth.uid == id && request.auth.token.email_verified;
+}
 function authMetadata() {
-  return request.auth.uid != null && request.auth.uid == request.resource.metadata.userId
+  return loggedAs(request.resource.metadata.userId);
 }
 
 function sizeKib(maxSizeKibibytes) {

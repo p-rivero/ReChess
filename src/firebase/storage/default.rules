@@ -1,7 +1,10 @@
 rules_version = '2';
 
+function loggedAs(id) {
+  return request.auth.uid != null && request.auth.uid == id && request.auth.token.email_verified;
+}
 function authMetadata() {
-  return request.auth.uid != null && request.auth.uid == request.resource.metadata.userId
+  return loggedAs(request.resource.metadata.userId);
 }
 
 function sizeKib(maxSizeKibibytes) {
@@ -24,10 +27,10 @@ service firebase.storage {
         authMetadata() &&
         sizeKib(200) &&
         isImage() &&
-        request.auth.uid == userId;
+        loggedAs(userId);
         
       // Only allow deleting the user's own profile image.
-      allow delete: if request.auth.uid == userId;
+      allow delete: if loggedAs(userId);
     }
   }
 }

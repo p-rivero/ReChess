@@ -42,7 +42,12 @@ export function setupJest(projectId: string, rules: StorageRules, onInit: (testE
   
   // Clear data between tests
   afterEach(async () => {
-    await testEnv?.clearStorage()
+    async function clearData(ref: firebase.storage.Reference): Promise<void> {
+      const list = await ref.listAll()
+      await Promise.all(list.items.map(i => i.delete())) // Delete files
+      await Promise.all(list.prefixes.map(p => clearData(p))) // Call recursively on subdirectories
+    }
+    await testEnv?.withSecurityRulesDisabled(context => clearData(context.storage().ref()))
   })
 }
 
@@ -70,5 +75,6 @@ export function setupTestUtils(testEnv: RulesTestEnvironment|null, myId: string,
       await uploadString(testRef, data)
     })
   }
+  
   return { verified, unverified, notLogged, moderator, setupData }
 }

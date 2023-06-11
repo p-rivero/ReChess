@@ -19,7 +19,7 @@ function loggedAs(id) {
 }
 // Same as loggedAs, but does not require the email to be verified
 function loggedAsUnverified(id) {
-  return request.auth != null && request.auth.uid != null && request.auth.uid == id;
+  return request.auth.uid != null && request.auth.uid == id;
 }
 function isModerator() {
   return request.auth != null && request.auth.token.moderator;
