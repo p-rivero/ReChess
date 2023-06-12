@@ -3,7 +3,7 @@
     class="pl-3 pr-2 py-2 is-clickable"
     @click="emit('click')"
   >
-    <div class="sz-icon icon-external-link color-primary-dark" />
+    <div class="sz-icon icon-external-link color-primary-strong" />
   </div>
 </template>
 

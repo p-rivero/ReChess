@@ -33,7 +33,7 @@
               :class="{
                 'icon-edit': editable,
                 'icon-info': !editable,
-                'color-primary-dark': hovered === pieceIndex,
+                'color-primary-strong': hovered === pieceIndex,
                 'color-theme': hovered !== pieceIndex,
               }"
             />
@@ -58,7 +58,7 @@
               v-if="piece.isLeader"
               class="is-flex is-align-items-center py-2"
             >
-              <div class="star-icon-container icon-star-fill color-primary-dark mb-1 mr-1 is-flex-shrink-0" />
+              <div class="star-icon-container icon-star-fill color-primary-strong mb-1 mr-1 is-flex-shrink-0" />
               <strong class="has-text-primary-dark mr-4">Leader</strong>
             </div>
           </div>

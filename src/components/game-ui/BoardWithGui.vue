@@ -79,7 +79,7 @@
             class="ml-3 is-clickable"
             @click="showPopup('Why is the game over?', gauge?.explainText ?? '', 'ok')"
           >
-            <div class="icon-help color-primary-dark sz-2" />
+            <div class="icon-help color-primary-strong sz-2" />
           </div>
           <div
             v-else-if="hasGauge"
