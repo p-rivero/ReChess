@@ -2,12 +2,11 @@
   <div class="w-100 h-100">
     <PieceViewer
       ref="board"
-      :key="`${width}-${height}-${position}`"
       class="mb-4"
       :piece="piece"
-      :width="width"
-      :height="height"
-      :position="position"
+      :width="currentSize"
+      :height="currentSize"
+      :position="currentPosition"
       :get-click-mode="getClickMode"
       :cursor-pointer="cursorPointer"
       @clicked="(delta, mode) => emit('clicked', delta, mode)"
@@ -45,13 +44,13 @@
       >
         <button
           class="button view-button px-1 py-1"
-          :class="{'is-active': width === button.width && height === button.height && position === button.position}"
-          @click="width = button.width; height = button.height; position = button.position"
+          :class="{'is-active': targetSize === button.size && targetPosition === button.position}"
+          @click="targetSize = button.size; targetPosition = button.position; animate()"
         >
           <span
             :class="[
               button.icon,
-              (width === button.width && height === button.height && position === button.position) ? 'color-primary' : 'color-theme',
+              (targetSize === button.size && targetPosition === button.position) ? 'color-primary' : 'color-theme',
             ]"
           />
         </button>
@@ -62,6 +61,7 @@
 
 
 <script setup lang="ts">
+  import { objectEquals } from '@/helpers/ts-utils'
   import { ref, toRefs } from 'vue'
   import PieceViewer from './PieceViewer.vue'
   import type { FullPieceDef } from '@/protochess/types'
@@ -79,23 +79,51 @@
     (event: 'clicked', delta: [number, number], mode?: 'add'|'remove'): void
   }>()
   
-  const width = ref<number>(7)
-  const height = ref<number>(7)
-  type Position = 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
-  const position = ref<Position>('center')
+  const targetSize = ref<number>(7)
+  const currentSize = ref<number>(7)
+  const targetPosition = ref<[number, number]>([3,3])
+  const currentPosition = ref<[number, number]>([3,3])
   
-  const ZOOM_BUTTONS: {width: number, height: number, position: Position, icon: string}[][] = [
+  const ZOOM_BUTTONS: {size: number, position: [number, number], icon: string}[][] = [
     [
-      { width: 7, height: 7, position: 'center', icon: 'icon-zoom1' },
-      { width: 15, height: 15, position: 'center', icon: 'icon-zoom2' },
+      { size: 7, position: [3,3], icon: 'icon-zoom1' },
+      { size: 15, position: [7,7], icon: 'icon-zoom2' },
     ],
     [
-      { width: 15, height: 15, position: 'top-left', icon: 'icon-zoom3' },
-      { width: 15, height: 15, position: 'top-right', icon: 'icon-zoom4' },
-      { width: 15, height: 15, position: 'bottom-left', icon: 'icon-zoom5' },
-      { width: 15, height: 15, position: 'bottom-right', icon: 'icon-zoom6' },
+      { size: 15, position: [0,14], icon: 'icon-zoom3' },
+      { size: 15, position: [14,14], icon: 'icon-zoom4' },
+      { size: 15, position: [0,0], icon: 'icon-zoom5' },
+      { size: 15, position: [14,0], icon: 'icon-zoom6' },
     ],
   ]
+  
+  function animate() {
+    const startX = currentPosition.value[0] / currentSize.value
+    const startY = currentPosition.value[1] / currentSize.value
+    const targetX = targetPosition.value[0] / targetSize.value
+    const targetY = targetPosition.value[1] / targetSize.value
+    const changeX = Math.abs(startX - targetX) > 0.2
+    const changeY = Math.abs(startY - targetY) > 0.2
+    const timer = setInterval(async () => {
+      if (targetSize.value === currentSize.value && objectEquals(targetPosition.value, currentPosition.value)) {
+        clearInterval(timer)
+        return
+      }
+      const deltaSize = targetSize.value - currentSize.value
+      const deltaPosition = [targetPosition.value[0] - currentPosition.value[0], targetPosition.value[1] - currentPosition.value[1]]
+      
+      const sizeSpeed = 2
+      const positionSpeedX = changeX && (deltaSize > 0 && deltaPosition[0] > 2 || deltaSize < 0 && deltaPosition[0] < -2) ? 3 : 1
+      const positionSpeedY = changeY && (deltaSize > 0 && deltaPosition[1] > 2 || deltaSize < 0 && deltaPosition[1] < -2) ? 3 : 1
+      
+      const stepSize = Math.sign(deltaSize) * sizeSpeed
+      const stepPosition = [Math.sign(deltaPosition[0]) * positionSpeedX, Math.sign(deltaPosition[1]) * positionSpeedY]
+      
+      currentSize.value += stepSize
+      currentPosition.value[0] += stepPosition[0]
+      currentPosition.value[1] += stepPosition[1]
+    }, 25)
+  }
   
 </script>
 

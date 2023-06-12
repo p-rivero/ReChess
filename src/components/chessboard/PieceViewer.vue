@@ -1,6 +1,7 @@
 <template>
   <ChessgroundAdapter
     ref="board"
+    :key="boardUpdatekey"
     :width="width"
     :height="height"
     :white-pov="true"
@@ -16,7 +17,7 @@
 
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, nextTick, onMounted, ref, watch } from 'vue'
   import { keyToPosition, positionToKey } from '@/helpers/chess/chess-coords'
   import ChessgroundAdapter from './internal/ChessgroundAdapter.vue'
   import type { Config } from 'chessgroundx/config'
@@ -28,7 +29,7 @@
     piece: FullPieceDef
     width: number
     height: number
-    position: 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+    position: [number, number]
     cursorPointer?: boolean
     getClickMode?: (position: [number, number]) => 'add'|'remove'
   }>()
@@ -39,40 +40,30 @@
   
   const image = computed(() => props.piece.imageUrls[0] || props.piece.imageUrls[1] || '')
   const board = ref<InstanceType<typeof ChessgroundAdapter>>()
+  const boardUpdatekey = ref('')
     
   const getClickModeProxy = computed(() => {
     const fn = props.getClickMode
     if (!fn) return undefined
     return (key: Key) => {
       const coords = keyToPosition(key)
-      const delta: [number, number] = [coords[0] - piece_coords[0], coords[1] - piece_coords[1]]
+      const delta: [number, number] = [coords[0] - props.position[0], coords[1] - props.position[1]]
       return fn(delta)
     }
   })
     
-  watch(props.piece, () => board.value?.setShapes(getShapes()))
-  onMounted(() => board.value?.setShapes(getShapes()))
-  
-  let piece_coords: [number, number]
-  if (props.position === 'center') {
-    piece_coords = [Math.floor(props.width/2), Math.floor(props.height/2)]
-  } else if (props.position === 'top-left') {
-    piece_coords = [0, props.height-1]
-  } else if (props.position === 'top-right') {
-    piece_coords = [props.width-1, props.height-1]
-  } else if (props.position === 'bottom-left') {
-    piece_coords = [0, 0]
-  } else if (props.position === 'bottom-right') {
-    piece_coords = [props.width-1, 0]
-  }
-  
-  
-  const boardConfig: Config = {
+  watch(props, () => {
+    boardUpdatekey.value = `${props.width}-${props.height}-${props.position}`
+    nextTick(() => board.value?.setShapes(getShapes(props.position)))
+  })
+  onMounted(() => board.value?.setShapes(getShapes(props.position)))
+    
+  const boardConfig = computed<Config>(() => ({
     mapping: {
       whitePieces: ['P'],
       blackPieces: [],
     },
-    fen: getFen(),
+    fen: getFen(props.position),
     viewOnly: true,
     disableContextMenu: true,
     blockTouchScroll: true,
@@ -104,34 +95,34 @@
       },
     },
     allyPieceSize: 1,
-  }
+  }))
   
   
   function clicked(key: Key, mode?: 'add'|'remove') {
     const coords = keyToPosition(key)
-    const delta: [number, number] = [coords[0] - piece_coords[0], coords[1] - piece_coords[1]]
+    const delta: [number, number] = [coords[0] - props.position[0], coords[1] - props.position[1]]
     emit('clicked', delta, mode)
   }
   
   
-  function getFen(): string {
+  function getFen(position: [number, number]): string {
     let fen = ''
-    fen += piece_coords[0]
+    fen += position[0]
     fen += 'P'
-    fen += '/'.repeat(piece_coords[1])
+    fen += '/'.repeat(position[1])
     return fen
   }
   
-  function getShapes(): DrawShape[] {
+  function getShapes(position: [number, number]): DrawShape[] {
     // Jump deltas
     
     let keysMove: Key[] = []
     for (const [x, y] of props.piece.translateJumpDeltas) {
-      keysMove.push(positionToKey([x + piece_coords[0], y + piece_coords[1]]))
+      keysMove.push(positionToKey([x + position[0], y + position[1]]))
     }
     let keysCapture: Key[] = []
     for (const [x, y] of props.piece.attackJumpDeltas) {
-      keysCapture.push(positionToKey([x + piece_coords[0], y + piece_coords[1]]))
+      keysCapture.push(positionToKey([x + position[0], y + position[1]]))
     }
     // Intersection of keysMove and keysCapture
     let keysBoth: Key[] = []
@@ -147,9 +138,9 @@
     }
     let keysExplosion: Key[] = []
     if (props.piece.explodeOnCapture) {
-      keysExplosion.push(positionToKey(piece_coords))
+      keysExplosion.push(positionToKey(position))
       for (const [x, y] of props.piece.explosionDeltas) {
-        keysExplosion.push(positionToKey([x + piece_coords[0], y + piece_coords[1]]))
+        keysExplosion.push(positionToKey([x + position[0], y + position[1]]))
       }
     }
     
@@ -169,76 +160,76 @@
     
     // Slides
     
-    if (piece_coords[0] < props.width-1) {
+    if (position[0] < props.width-1) {
       if (props.piece.translateEast && props.piece.attackEast) {
-        shapes.push(arrowShape('right', 'purple'))
+        shapes.push(arrowShape(position, 'right', 'purple'))
       } else if (props.piece.translateEast) {
-        shapes.push(arrowShape('right', 'green'))
+        shapes.push(arrowShape(position, 'right', 'green'))
       } else if (props.piece.attackEast) {
-        shapes.push(arrowShape('right', 'red'))
+        shapes.push(arrowShape(position, 'right', 'red'))
       }
     }
-    if (piece_coords[0] > 0) {
+    if (position[0] > 0) {
       if (props.piece.translateWest && props.piece.attackWest) {
-        shapes.push(arrowShape('left', 'purple'))
+        shapes.push(arrowShape(position, 'left', 'purple'))
       } else if (props.piece.translateWest) {
-        shapes.push(arrowShape('left', 'green'))
+        shapes.push(arrowShape(position, 'left', 'green'))
       } else if (props.piece.attackWest) {
-        shapes.push(arrowShape('left', 'red'))
+        shapes.push(arrowShape(position, 'left', 'red'))
       }
     }
-    if (piece_coords[1] < props.height-1) {
+    if (position[1] < props.height-1) {
       if (props.piece.translateNorth && props.piece.attackNorth) {
-        shapes.push(arrowShape('up', 'purple'))
+        shapes.push(arrowShape(position, 'up', 'purple'))
       } else if (props.piece.translateNorth) {
-        shapes.push(arrowShape('up', 'green'))
+        shapes.push(arrowShape(position, 'up', 'green'))
       } else if (props.piece.attackNorth) {
-        shapes.push(arrowShape('up', 'red'))
+        shapes.push(arrowShape(position, 'up', 'red'))
       }
     }
-    if (piece_coords[1] > 0) {
+    if (position[1] > 0) {
       if (props.piece.translateSouth && props.piece.attackSouth) {
-        shapes.push(arrowShape('down', 'purple'))
+        shapes.push(arrowShape(position, 'down', 'purple'))
       } else if (props.piece.translateSouth) {
-        shapes.push(arrowShape('down', 'green'))
+        shapes.push(arrowShape(position, 'down', 'green'))
       } else if (props.piece.attackSouth) {
-        shapes.push(arrowShape('down', 'red'))
+        shapes.push(arrowShape(position, 'down', 'red'))
       }
     }
-    if (piece_coords[0] < props.width-1 && piece_coords[1] < props.height-1) {
+    if (position[0] < props.width-1 && position[1] < props.height-1) {
       if (props.piece.translateNortheast && props.piece.attackNortheast) {
-        shapes.push(arrowShape('upright', 'purple'))
+        shapes.push(arrowShape(position, 'upright', 'purple'))
       } else if (props.piece.translateNortheast) {
-        shapes.push(arrowShape('upright', 'green'))
+        shapes.push(arrowShape(position, 'upright', 'green'))
       } else if (props.piece.attackNortheast) {
-        shapes.push(arrowShape('upright', 'red'))
+        shapes.push(arrowShape(position, 'upright', 'red'))
       }
     }
-    if (piece_coords[0] > 0 && piece_coords[1] < props.height-1) {
+    if (position[0] > 0 && position[1] < props.height-1) {
       if (props.piece.translateNorthwest && props.piece.attackNorthwest) {
-        shapes.push(arrowShape('upleft', 'purple'))
+        shapes.push(arrowShape(position, 'upleft', 'purple'))
       } else if (props.piece.translateNorthwest) {
-        shapes.push(arrowShape('upleft', 'green'))
+        shapes.push(arrowShape(position, 'upleft', 'green'))
       } else if (props.piece.attackNorthwest) {
-        shapes.push(arrowShape('upleft', 'red'))
+        shapes.push(arrowShape(position, 'upleft', 'red'))
       }
     }
-    if (piece_coords[0] < props.width-1 && piece_coords[1] > 0) {
+    if (position[0] < props.width-1 && position[1] > 0) {
       if (props.piece.translateSoutheast && props.piece.attackSoutheast) {
-        shapes.push(arrowShape('downright', 'purple'))
+        shapes.push(arrowShape(position, 'downright', 'purple'))
       } else if (props.piece.translateSoutheast) {
-        shapes.push(arrowShape('downright', 'green'))
+        shapes.push(arrowShape(position, 'downright', 'green'))
       } else if (props.piece.attackSoutheast) {
-        shapes.push(arrowShape('downright', 'red'))
+        shapes.push(arrowShape(position, 'downright', 'red'))
       }
     }
-    if (piece_coords[0] > 0 && piece_coords[1] > 0) {
+    if (position[0] > 0 && position[1] > 0) {
       if (props.piece.translateSouthwest && props.piece.attackSouthwest) {
-        shapes.push(arrowShape('downleft', 'purple'))
+        shapes.push(arrowShape(position, 'downleft', 'purple'))
       } else if (props.piece.translateSouthwest) {
-        shapes.push(arrowShape('downleft', 'green'))
+        shapes.push(arrowShape(position, 'downleft', 'green'))
       } else if (props.piece.attackSouthwest) {
-        shapes.push(arrowShape('downleft', 'red'))
+        shapes.push(arrowShape(position, 'downleft', 'red'))
       }
     }
     
@@ -252,23 +243,24 @@
     return `<line x1="10%" y1="10%" x2="90%" y2="90%" stroke="${color}" stroke-width="10" />` +
       `<line x1="10%" y1="90%" x2="90%" y2="10%" stroke="${color}" stroke-width="10" />`
   }
-  function arrowShape(dir: 'left' | 'right' | 'up' | 'down' | 'upleft' | 'upright' | 'downleft' | 'downright', brush: string): DrawShape {
+  type Direction = 'left' | 'right' | 'up' | 'down' | 'upleft' | 'upright' | 'downleft' | 'downright'
+  function arrowShape(position: [number, number], dir: Direction, brush: string): DrawShape {
     if (dir === 'left') {
-      return { orig: positionToKey(piece_coords), dest:positionToKey([0, piece_coords[1]]), brush }
+      return { orig: positionToKey(position), dest:positionToKey([0, position[1]]), brush }
     } else if (dir === 'right') {
-      return { orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, piece_coords[1]]), brush }
+      return { orig: positionToKey(position), dest:positionToKey([props.width-1, position[1]]), brush }
     } else if (dir === 'up') {
-      return { orig: positionToKey(piece_coords), dest:positionToKey([piece_coords[0], props.height-1]), brush }
+      return { orig: positionToKey(position), dest:positionToKey([position[0], props.height-1]), brush }
     } else if (dir === 'down') {
-      return { orig: positionToKey(piece_coords), dest:positionToKey([piece_coords[0], 0]), brush }
+      return { orig: positionToKey(position), dest:positionToKey([position[0], 0]), brush }
     } else if (dir === 'upleft') {
-      return { orig: positionToKey(piece_coords), dest:positionToKey([0, props.height-1]), brush }
+      return { orig: positionToKey(position), dest:positionToKey([0, props.height-1]), brush }
     } else if (dir === 'upright') {
-      return { orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, props.height-1]), brush }
+      return { orig: positionToKey(position), dest:positionToKey([props.width-1, props.height-1]), brush }
     } else if (dir === 'downleft') {
-      return { orig: positionToKey(piece_coords), dest:positionToKey([0, 0]), brush }
+      return { orig: positionToKey(position), dest:positionToKey([0, 0]), brush }
     } else if (dir === 'downright') {
-      return { orig: positionToKey(piece_coords), dest:positionToKey([props.width-1, 0]), brush }
+      return { orig: positionToKey(position), dest:positionToKey([props.width-1, 0]), brush }
     } else {
       throw new Error('Invalid direction')
     }
