@@ -23,7 +23,7 @@
           v-if="showLevelSelect"
           class="mb-5"
         >
-          <p class="w-100 has-text-centered mb-1">
+          <p class="w-100 has-text-centered mb-2">
             Engine strength:
           </p>
           <div class="is-flex is-justify-content-center">

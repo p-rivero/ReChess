@@ -50,3 +50,7 @@
 .tippy-box[data-state=hidden][data-placement^=right] {
   transform: translateX(-4px);
 }
+
+.tippy-content {
+  white-space: pre-line;
+}

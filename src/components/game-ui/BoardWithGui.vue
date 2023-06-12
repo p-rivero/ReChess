@@ -74,13 +74,13 @@
           <p class="is-size-5">
             {{ gauge?.depthText }}
           </p>
-          <a
+          <div
             v-if="gauge?.explainText"
-            class="ml-3 is-size-5"
+            class="ml-3 is-clickable"
             @click="showPopup('Why is the game over?', gauge?.explainText ?? '', 'ok')"
           >
-            Why?
-          </a>
+            <div class="icon-help color-primary-dark sz-2" />
+          </div>
           <div
             v-else-if="hasGauge"
             class="is-flex-grow-1 is-flex is-align-items-center is-justify-content-flex-end"

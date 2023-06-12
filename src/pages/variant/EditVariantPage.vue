@@ -1,8 +1,3 @@
-<!--
-  This page is used to edit the variant that is currently stored in LocalStorage (through the use of the draftVariantStore)
-  
--->
-
 <template>
   <div class="columns is-desktop reverse-columns">
     <div class="column is-narrow left-column">
@@ -60,7 +55,7 @@
         />
       </div>
       
-      <div class="is-flex is-align-items-center mb-4">
+      <div class="is-flex is-align-items-center mb-5">
         <div class="field-label">
           <label>First player to move:</label>
         </div>
@@ -74,7 +69,12 @@
       </div>
       
       <div class="field mb-6">
-        <label class="label">Place or remove pieces:</label>
+        <div class="is-flex mb-2">
+          <label class="label mr-4">Add or remove pieces:</label>
+          <InfoTooltip
+            text="Tap a piece below to select it, and then tap the board to add or remove it."
+          />
+        </div>
         <PiecePlacementButtons
           ref="pieceSelector"
           :z-index="11"
@@ -185,7 +185,7 @@
       <EditableMarkdown
         class="mb-5"
         :text="draftStore.state.description"
-        :placeholder="'Describe the rules of the variant and how fun it is to play!\nYou can use **Markdown** to format your text.'"
+        :placeholder="'Describe the rules of the variant and how fun it is to play! You can use **Markdown** to format your text.'"
         :editable="true"
         :error-handler="errorMsgHandler"
         :char-limit="1000"
@@ -219,14 +219,14 @@
           <SmartCheckbox
             text="Stalemated player loses"
             class="rules-field"
-            :tooltip="'When a player doesn\'t have any legal moves, the game\nis not a draw. Instead, that player loses.'"
+            :tooltip="'When a player doesn\'t have any legal moves, the game is not a draw. Instead, that player loses.'"
             :start-value="draftStore.state.globalRules.stalematedPlayerLoses"
             @changed="value => draftStore.state.globalRules.stalematedPlayerLoses = value"
           />
           <SmartCheckbox
             text="Invert ALL win conditions"
             class="rules-field"
-            :tooltip="'When the game is over, the winner\nbecomes the loser and vice versa.'"
+            :tooltip="'When the game is over, the winner becomes the loser and vice versa.'"
             :start-value="draftStore.state.globalRules.invertWinConditions"
             @changed="value => draftStore.state.globalRules.invertWinConditions = value"
           />
@@ -246,8 +246,8 @@
         />
         <InfoTooltip
           class="ml-4"
-          :text="'In standard chess, when the same position is reached 3 times,\n' +
-            'the game is a draw. Set this number to 0 to disable this rule.'"
+          text="In standard chess, when the same position is reached 3 times, the game is a draw.
+          Set this number to 0 to disable this rule."
         />
       </div>
       <div class="is-flex is-align-items-center mb-6">
@@ -269,8 +269,8 @@
         </div>
         <InfoTooltip
           class="ml-2"
-          :text="'In some variants like 3-check, if a player is put in check 3 times,\n' +
-            'they lose. Set this number to 0 to disable this rule.'"
+          text="In some variants like 3-check, if a player is put in check 3 times, they lose.
+          Set this number to 0 to disable this rule."
         />
       </div>
       <label class="label">Pieces:</label>

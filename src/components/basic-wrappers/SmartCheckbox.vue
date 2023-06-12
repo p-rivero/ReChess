@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container is-align-items-center">
+    <div class="is-flex">
       <label class="b-checkbox checkbox">
         <input
           ref="checkboxInput"
@@ -9,16 +9,18 @@
           @change="checkboxChanged($event.target)"
         >
         <span class="check" />
-        <span
-          v-if="text"
-          class="control-label adjust-text"
-        >{{ text }}</span>
+        <div class="is-flex is-flex-wrap-wrap">
+          <span
+            v-if="text"
+            class="control-label adjust-text is-align-self-center"
+          >{{ text }}</span>
+          <InfoTooltip
+            v-if="tooltip"
+            class="my-1 ml-2"
+            :text="tooltip"
+          />
+        </div>
       </label>
-      <InfoTooltip
-        v-if="tooltip"
-        class="tooltip-icon"
-        :text="tooltip"
-      />
     </div>
   </div>
 </template>
@@ -57,22 +59,3 @@
     emit('changed', checked)
   }
 </script>
-
-<style scoped lang="scss">
-  .tooltip-icon {
-    margin-left: 0.5rem;
-  }
-  .container {
-    display: flex;
-  }
-  
-  @media screen and (max-width: 600px) {
-    .tooltip-icon {
-      margin-top: 0.5rem;
-      margin-left: calc(2em - 2px);
-    }
-    .container {
-      display: block;
-    }
-  }
-</style>

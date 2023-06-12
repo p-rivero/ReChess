@@ -1,9 +1,3 @@
-
-<!--
-  This page is used to edit one of the pieces of the Variant that is currently stored in LocalStorage.
-  The index of the piece to edit is passed in as a parameter.
--->
-
 <template>
   <div class="columns is-desktop reverse-columns">
     <div class="column is-5">
@@ -59,7 +53,9 @@
         <div class="column is-flex is-align-items-center pb-1">
           <SmartCheckbox
             text="White"
-            class="mr-4"
+            class="mr-1"
+            tooltip="Allow the white player to use this piece.
+            You will need to provide an image and a unique FEN symbol (1 letter or emoji) to identify this white piece."
             :start-value="!whiteInvisible"
             @changed="enabled => enabledCheckboxChanged(enabled, 'white')"
           />
@@ -85,7 +81,9 @@
         <div class="column is-flex is-align-items-center pb-1">
           <SmartCheckbox
             text="Black"
-            class="mr-4"
+            class="mr-1"
+            tooltip="Allow the black player to use this piece.
+            You will need to provide an image and a unique FEN symbol (1 letter or emoji) to identify this black piece."
             :start-value="!blackInvisible"
             @changed="enabled => enabledCheckboxChanged(enabled, 'black')"
           />
@@ -118,6 +116,10 @@
               else piece!.notationPrefix = [undefined, undefined]
             }"
           />
+          <InfoTooltip
+            text="This allows you to change the prefix shown in the move notation. For example, in 'Nc4' the prefix is 'N'.
+            If you disable this option, the FEN symbol will be used instead (not recommended)."
+          />
         </div>
         <div
           v-show="piece?.notationPrefix[0] != null"
@@ -127,7 +129,7 @@
           <span class="mr-2"> White: </span>
           <SmartTextInput
             ref="whiteNotationInput"
-            placeholder="(none)"
+            placeholder="(no prefix)"
             :start-text="piece?.notationPrefix[0] ?? ''"
             @changed="text => piece!.notationPrefix[0] = text"
           />
@@ -140,7 +142,7 @@
           <span class="mr-2"> Black: </span>
           <SmartTextInput
             ref="blackNotationInput"
-            placeholder="(none)"
+            placeholder="(no prefix)"
             :start-text="piece?.notationPrefix[1] ?? ''"
             @changed="text => piece!.notationPrefix[1] = text"
           />
@@ -202,7 +204,13 @@
         </div>
       </div>
       
-      <label>Win instantly when standing on:</label>
+      <div class="is-flex">
+        <label class="mr-2">Win squares:</label>
+        <InfoTooltip
+          text="If you manage to move this piece to a win square, you win the game instantly.
+          Enter a list of squares (e.g. 'a1', 'b2', 'c3')."
+        />
+      </div>
       <CoordPillList
         :editable="true"
         class="mb-6"
@@ -224,7 +232,14 @@
           type="move"
         />
       </div>
-      <label>Double jump when standing on:</label>
+      <div class="is-flex">
+        <label class="mr-2">Double jump when standing on:</label>
+        <InfoTooltip
+          text="If the piece is standing on one of these squares, it can jump twice in a row (the second jump cannot capture a piece).
+          Your opponent can capture your piece as if it had only moved once (en passant).
+          Enter a list of squares (e.g. 'a1', 'b2', 'c3')."
+        />
+      </div>
       <CoordPillList
         :editable="true"
         class="mb-6"
@@ -249,7 +264,13 @@
       </div>
       
       <label class="label">Promotion:</label>
-      <label>Promote when landing on:</label>
+      <div class="is-flex">
+        <label class="mr-2">Promote when landing on:</label>
+        <InfoTooltip
+          text="Squares where the piece will be promoted.
+          Enter a list of squares (e.g. 'a1', 'b2', 'c3')."
+        />
+      </div>
       <CoordPillList
         class="mb-5"
         :editable="true"
@@ -262,7 +283,14 @@
           v-if="!whiteInvisible"
           class="column"
         >
-          <label>(White) Promote to:</label>
+          <div class="is-flex">
+            <label class="mr-2">(White) Promote to:</label>
+            <InfoTooltip
+              text="List of promotion options for the white player.
+              Enter a list of FEN symbols (e.g. 'Q', 'R', 'B', 'N').
+              If you want promotion to be optional, add the white symbol of this piece to the list."
+            />
+          </div>
           <CharPillList
             :editable="true"
             :starting-pills="piece?.promoVals[0]"
@@ -274,7 +302,14 @@
           v-if="!blackInvisible"
           class="column"
         >
-          <label>(Black) Promote to:</label>
+          <div class="is-flex">
+            <label class="mr-2">(Black) Promote to:</label>
+            <InfoTooltip
+              text="List of promotion options for the black player.
+              Enter a list of FEN symbols (e.g. 'q', 'r', 'b', 'n').
+              If you want promotion to be optional, add the black symbol of this piece to the list."
+            />
+          </div>
           <CharPillList
             :editable="true"
             :starting-pills="piece?.promoVals[1]"
@@ -289,6 +324,8 @@
           <SmartCheckbox
             text="Explode when capturing"
             class="rules-field"
+            tooltip="The piece will explode when it captures another piece.
+            You can change the shape and radius of the explosion by adding affected squares below."
             :start-value="piece?.explodeOnCapture"
             @changed="value => piece!.explodeOnCapture = value"
           />
@@ -297,16 +334,18 @@
           <SmartCheckbox
             text="Immune to other explosions"
             class="rules-field"
+            tooltip="The piece will not be affected when another piece explodes next to it.
+            This does not apply to the piece's own explosion when it captures another piece."
             :start-value="piece?.immuneToExplosion"
             @changed="value => piece!.immuneToExplosion = value"
           />
         </div>
       </div>
       <AddRemoveButtons
-        v-show="piece?.explodeOnCapture"
         text="Explosion squares:"
-        :z-index="11"
         type="explosion"
+        :class="{ 'invisible': !piece?.explodeOnCapture }"
+        :z-index="11"
         :selected-type="selectedDelta"
         @set-type="setSelectedDelta"
         @clear="clearDelta('explosion')"
@@ -335,6 +374,7 @@
   import AddRemoveButtons from '@/components/variant/edit/AddRemoveButtons.vue'
   import CharPillList from '@/components/variant/edit/CharPillList.vue'
   import CoordPillList from '@/components/variant/edit/CoordPillList.vue'
+  import InfoTooltip from '@/components/InfoTooltip.vue'
   import MovementSlideRow from '@/components/variant/edit/MovementSlideRow.vue'
   import PieceImageEdit from '@/components/variant/edit/PieceImageEdit.vue'
   import PieceViewerWithZoom from '@/components/chessboard/PieceViewerWithZoom.vue'
