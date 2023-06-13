@@ -49,10 +49,14 @@
     const variant = props.variant
     // Update the UI optimistically. If this is an upvote, animate the heart
     variant.loggedUserUpvoted = !variant.loggedUserUpvoted
-    variant.numUpvotes += variant.loggedUserUpvoted ? 1 : -1
     if (variant.loggedUserUpvoted) {
+      variant.numUpvotes++
+      authStore.loggedUser.upvotedVariants.push(variant.uid)
       animateHeart.value = true
       setTimeout(() => animateHeart.value = false, 500)
+    } else {
+      variant.numUpvotes--
+      authStore.loggedUser.upvotedVariants = authStore.loggedUser.upvotedVariants.filter(v => v !== variant.uid)
     }
     // Update the server
     try {

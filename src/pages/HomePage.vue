@@ -58,6 +58,10 @@
       :variant="variant"
       @tag-clicked="tagClicked"
     />
+    <button
+      v-if="!variantStore.variantListFetched"
+      class="mt-6 button is-loading borderless is-size-2"
+    />
   </div>
 </template>
 
