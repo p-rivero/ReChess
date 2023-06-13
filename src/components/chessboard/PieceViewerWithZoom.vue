@@ -4,8 +4,7 @@
       ref="board"
       class="mb-4"
       :piece="piece"
-      :width="currentSize"
-      :height="currentSize"
+      :board-size="currentSize"
       :position="currentPosition"
       :get-click-mode="getClickMode"
       :cursor-pointer="cursorPointer"
@@ -122,7 +121,7 @@
       currentSize.value += stepSize
       currentPosition.value[0] += stepPosition[0]
       currentPosition.value[1] += stepPosition[1]
-    }, 25)
+    }, 30)
   }
   
 </script>

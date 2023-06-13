@@ -2,8 +2,8 @@
   <ChessgroundAdapter
     ref="board"
     :key="boardUpdatekey"
-    :width="width"
-    :height="height"
+    :width="boardSize"
+    :height="boardSize"
     :white-pov="true"
     :view-only="true"
     :initial-config="boardConfig"
@@ -20,6 +20,7 @@
   import { computed, nextTick, onMounted, ref, watch } from 'vue'
   import { keyToPosition, positionToKey } from '@/helpers/chess/chess-coords'
   import ChessgroundAdapter from './internal/ChessgroundAdapter.vue'
+  import arrowShape from '@/helpers/chess/slide-arrow-shape'
   import type { Config } from 'chessgroundx/config'
   import type { DrawShape } from 'chessgroundx/draw'
   import type { FullPieceDef } from '@/protochess/types'
@@ -27,8 +28,7 @@
   
   const props = defineProps<{
     piece: FullPieceDef
-    width: number
-    height: number
+    boardSize: number
     position: [number, number]
     cursorPointer?: boolean
     getClickMode?: (position: [number, number]) => 'add'|'remove'
@@ -53,10 +53,10 @@
   })
     
   watch(props, () => {
-    boardUpdatekey.value = `${props.width}-${props.height}-${props.position}`
-    nextTick(() => board.value?.setShapes(getShapes(props.position)))
+    boardUpdatekey.value = `${props.boardSize}-${props.position}`
+    nextTick(() => board.value?.setShapes(getShapes(props.position, props.boardSize)))
   })
-  onMounted(() => board.value?.setShapes(getShapes(props.position)))
+  onMounted(() => board.value?.setShapes(getShapes(props.position, props.boardSize)))
     
   const boardConfig = computed<Config>(() => ({
     mapping: {
@@ -69,8 +69,8 @@
     blockTouchScroll: true,
     coordinates: false,
     dimensions: {
-      width: props.width,
-      height: props.height,
+      width: props.boardSize,
+      height: props.boardSize,
     },
     drawable: {
       brushes: {
@@ -113,7 +113,7 @@
     return fen
   }
   
-  function getShapes(position: [number, number]): DrawShape[] {
+  function getShapes(position: [number, number], boardSize: number): DrawShape[] {
     // Jump deltas
     
     let keysMove: Key[] = []
@@ -160,76 +160,77 @@
     
     // Slides
     
-    if (position[0] < props.width-1) {
+    const topRight = props.boardSize - 1
+    if (position[0] < topRight) {
       if (props.piece.translateEast && props.piece.attackEast) {
-        shapes.push(arrowShape(position, 'right', 'purple'))
+        shapes.push(arrowShape(position, boardSize, 'right', 'purple'))
       } else if (props.piece.translateEast) {
-        shapes.push(arrowShape(position, 'right', 'green'))
+        shapes.push(arrowShape(position, boardSize, 'right', 'green'))
       } else if (props.piece.attackEast) {
-        shapes.push(arrowShape(position, 'right', 'red'))
+        shapes.push(arrowShape(position, boardSize, 'right', 'red'))
       }
     }
     if (position[0] > 0) {
       if (props.piece.translateWest && props.piece.attackWest) {
-        shapes.push(arrowShape(position, 'left', 'purple'))
+        shapes.push(arrowShape(position, boardSize, 'left', 'purple'))
       } else if (props.piece.translateWest) {
-        shapes.push(arrowShape(position, 'left', 'green'))
+        shapes.push(arrowShape(position, boardSize, 'left', 'green'))
       } else if (props.piece.attackWest) {
-        shapes.push(arrowShape(position, 'left', 'red'))
+        shapes.push(arrowShape(position, boardSize, 'left', 'red'))
       }
     }
-    if (position[1] < props.height-1) {
+    if (position[1] < topRight) {
       if (props.piece.translateNorth && props.piece.attackNorth) {
-        shapes.push(arrowShape(position, 'up', 'purple'))
+        shapes.push(arrowShape(position, boardSize, 'up', 'purple'))
       } else if (props.piece.translateNorth) {
-        shapes.push(arrowShape(position, 'up', 'green'))
+        shapes.push(arrowShape(position, boardSize, 'up', 'green'))
       } else if (props.piece.attackNorth) {
-        shapes.push(arrowShape(position, 'up', 'red'))
+        shapes.push(arrowShape(position, boardSize, 'up', 'red'))
       }
     }
     if (position[1] > 0) {
       if (props.piece.translateSouth && props.piece.attackSouth) {
-        shapes.push(arrowShape(position, 'down', 'purple'))
+        shapes.push(arrowShape(position, boardSize, 'down', 'purple'))
       } else if (props.piece.translateSouth) {
-        shapes.push(arrowShape(position, 'down', 'green'))
+        shapes.push(arrowShape(position, boardSize, 'down', 'green'))
       } else if (props.piece.attackSouth) {
-        shapes.push(arrowShape(position, 'down', 'red'))
+        shapes.push(arrowShape(position, boardSize, 'down', 'red'))
       }
     }
-    if (position[0] < props.width-1 && position[1] < props.height-1) {
+    if (position[0] < topRight && position[1] < topRight) {
       if (props.piece.translateNortheast && props.piece.attackNortheast) {
-        shapes.push(arrowShape(position, 'upright', 'purple'))
+        shapes.push(arrowShape(position, boardSize, 'upright', 'purple'))
       } else if (props.piece.translateNortheast) {
-        shapes.push(arrowShape(position, 'upright', 'green'))
+        shapes.push(arrowShape(position, boardSize, 'upright', 'green'))
       } else if (props.piece.attackNortheast) {
-        shapes.push(arrowShape(position, 'upright', 'red'))
+        shapes.push(arrowShape(position, boardSize, 'upright', 'red'))
       }
     }
-    if (position[0] > 0 && position[1] < props.height-1) {
+    if (position[0] > 0 && position[1] < topRight) {
       if (props.piece.translateNorthwest && props.piece.attackNorthwest) {
-        shapes.push(arrowShape(position, 'upleft', 'purple'))
+        shapes.push(arrowShape(position, boardSize, 'upleft', 'purple'))
       } else if (props.piece.translateNorthwest) {
-        shapes.push(arrowShape(position, 'upleft', 'green'))
+        shapes.push(arrowShape(position, boardSize, 'upleft', 'green'))
       } else if (props.piece.attackNorthwest) {
-        shapes.push(arrowShape(position, 'upleft', 'red'))
+        shapes.push(arrowShape(position, boardSize, 'upleft', 'red'))
       }
     }
-    if (position[0] < props.width-1 && position[1] > 0) {
+    if (position[0] < topRight && position[1] > 0) {
       if (props.piece.translateSoutheast && props.piece.attackSoutheast) {
-        shapes.push(arrowShape(position, 'downright', 'purple'))
+        shapes.push(arrowShape(position, boardSize, 'downright', 'purple'))
       } else if (props.piece.translateSoutheast) {
-        shapes.push(arrowShape(position, 'downright', 'green'))
+        shapes.push(arrowShape(position, boardSize, 'downright', 'green'))
       } else if (props.piece.attackSoutheast) {
-        shapes.push(arrowShape(position, 'downright', 'red'))
+        shapes.push(arrowShape(position, boardSize, 'downright', 'red'))
       }
     }
     if (position[0] > 0 && position[1] > 0) {
       if (props.piece.translateSouthwest && props.piece.attackSouthwest) {
-        shapes.push(arrowShape(position, 'downleft', 'purple'))
+        shapes.push(arrowShape(position, boardSize, 'downleft', 'purple'))
       } else if (props.piece.translateSouthwest) {
-        shapes.push(arrowShape(position, 'downleft', 'green'))
+        shapes.push(arrowShape(position, boardSize, 'downleft', 'green'))
       } else if (props.piece.attackSouthwest) {
-        shapes.push(arrowShape(position, 'downleft', 'red'))
+        shapes.push(arrowShape(position, boardSize, 'downleft', 'red'))
       }
     }
     
@@ -242,28 +243,6 @@
   function generateCrossSvg(color: string): string {
     return `<line x1="10%" y1="10%" x2="90%" y2="90%" stroke="${color}" stroke-width="10" />` +
       `<line x1="10%" y1="90%" x2="90%" y2="10%" stroke="${color}" stroke-width="10" />`
-  }
-  type Direction = 'left' | 'right' | 'up' | 'down' | 'upleft' | 'upright' | 'downleft' | 'downright'
-  function arrowShape(position: [number, number], dir: Direction, brush: string): DrawShape {
-    if (dir === 'left') {
-      return { orig: positionToKey(position), dest:positionToKey([0, position[1]]), brush }
-    } else if (dir === 'right') {
-      return { orig: positionToKey(position), dest:positionToKey([props.width-1, position[1]]), brush }
-    } else if (dir === 'up') {
-      return { orig: positionToKey(position), dest:positionToKey([position[0], props.height-1]), brush }
-    } else if (dir === 'down') {
-      return { orig: positionToKey(position), dest:positionToKey([position[0], 0]), brush }
-    } else if (dir === 'upleft') {
-      return { orig: positionToKey(position), dest:positionToKey([0, props.height-1]), brush }
-    } else if (dir === 'upright') {
-      return { orig: positionToKey(position), dest:positionToKey([props.width-1, props.height-1]), brush }
-    } else if (dir === 'downleft') {
-      return { orig: positionToKey(position), dest:positionToKey([0, 0]), brush }
-    } else if (dir === 'downright') {
-      return { orig: positionToKey(position), dest:positionToKey([props.width-1, 0]), brush }
-    } else {
-      throw new Error('Invalid direction')
-    }
   }
 </script>
 
