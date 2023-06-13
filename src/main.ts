@@ -28,3 +28,7 @@ protochessSupportsThreads().then(async supportsThreads => {
     await getProtochess('search').then(p => p.setNumThreads(4))
   }
 })
+
+
+// Preload heart-fill.svg to avoid broken animation on first click
+import('@/assets/icons/heart-fill.svg').then(url => new Image().src = url.default)
