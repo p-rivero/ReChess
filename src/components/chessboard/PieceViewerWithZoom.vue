@@ -97,31 +97,36 @@
   ]
   
   function animate() {
-    const startX = currentPosition.value[0] / currentSize.value
-    const startY = currentPosition.value[1] / currentSize.value
-    const targetX = targetPosition.value[0] / targetSize.value
-    const targetY = targetPosition.value[1] / targetSize.value
-    const changeX = Math.abs(startX - targetX) > 0.2
-    const changeY = Math.abs(startY - targetY) > 0.2
+    function getSizeIncrement() {
+      const deltaSize = targetSize.value - currentSize.value
+      return Math.sign(deltaSize) * 2
+    }
+    const startPercent = [currentPosition.value[0] / currentSize.value, currentPosition.value[1] / currentSize.value]
+    const deltaSize = targetSize.value - currentSize.value
+    function getPositionIncrement(i: 0 | 1) {
+      const deltaPosition = targetPosition.value[i] - currentPosition.value[i]
+      const targetPercent = targetPosition.value[i] / targetSize.value
+      const relativePositionChanging = Math.abs(targetPercent - startPercent[i]) > 0.1
+      let speed = 1
+      if (relativePositionChanging) {
+        if ((deltaSize > 0 && deltaPosition > 2) || (deltaSize < 0 && deltaPosition < -2)) {
+          speed = 3
+        } else if ((deltaSize > 0 && deltaPosition > 1) || (deltaSize < 0 && deltaPosition < 1)) {
+          speed = 2
+        }
+      }
+      return Math.sign(deltaPosition) * speed
+    }
+    
     const timer = setInterval(async () => {
       if (targetSize.value === currentSize.value && objectEquals(targetPosition.value, currentPosition.value)) {
         clearInterval(timer)
         return
       }
-      const deltaSize = targetSize.value - currentSize.value
-      const deltaPosition = [targetPosition.value[0] - currentPosition.value[0], targetPosition.value[1] - currentPosition.value[1]]
-      
-      const sizeSpeed = 2
-      const positionSpeedX = changeX && (deltaSize > 0 && deltaPosition[0] > 2 || deltaSize < 0 && deltaPosition[0] < -2) ? 3 : 1
-      const positionSpeedY = changeY && (deltaSize > 0 && deltaPosition[1] > 2 || deltaSize < 0 && deltaPosition[1] < -2) ? 3 : 1
-      
-      const stepSize = Math.sign(deltaSize) * sizeSpeed
-      const stepPosition = [Math.sign(deltaPosition[0]) * positionSpeedX, Math.sign(deltaPosition[1]) * positionSpeedY]
-      
-      currentSize.value += stepSize
-      currentPosition.value[0] += stepPosition[0]
-      currentPosition.value[1] += stepPosition[1]
-    }, 30)
+      currentSize.value += getSizeIncrement()
+      currentPosition.value[0] += getPositionIncrement(0)
+      currentPosition.value[1] += getPositionIncrement(1)
+    }, 40)
   }
   
 </script>
