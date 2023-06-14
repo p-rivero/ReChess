@@ -137,7 +137,7 @@
   .eval-gauge {
     position: relative;
     display: block;
-    width: 20px;
+    width: 1.25rem;
     background-color: #ccc;
     border-radius: 0.25rem;
     &::after {
