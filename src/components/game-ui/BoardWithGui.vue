@@ -32,67 +32,78 @@
             emit('browse-history', result?.winner)
           }"
           @player-changed="p => playerToMove = p"
+          @fen-changed="fen => fenTextbox?.setText(fen)"
         />
       </div>
       
       
-      <div class="gui-column is-flex">
-        <EvaluationGauge
-          v-if="hasGauge"
-          v-show="gaugeEnabled"
-          ref="gauge"
-          class="mr-2"
-          :white-pov="true"
-        />
-        <div class="card history-card">
-          <div class="history-header px-2 py-1 is-flex is-align-items-center">
-            <p class="is-size-4 has-text-weight-semibold mr-3">
-              {{ gauge?.evalText }}
-            </p>
-            <p
-              v-if="!gaugeEnabled && gameOverPopupShown"
-              class="is-size-5"
-            >
-              Game Over
-            </p>
-            <p
-              v-else-if="opponentName"
-              class="is-size-5 opponent-name-text"
-            >
-              vs. {{ opponentName }}
-            </p>
-            <p class="is-size-5">
-              {{ gauge?.depthText }}
-            </p>
-            <div
-              v-if="gauge?.explainText"
-              class="ml-3 is-clickable"
-              @click="showPopup('Why is the game over?', gauge?.explainText ?? '', 'ok')"
-            >
-              <div class="icon-help color-primary-strong sz-2" />
-            </div>
-            <div
-              v-else-if="hasGauge"
-              class="is-flex-grow-1 is-flex is-align-items-center is-justify-content-flex-end"
-            >
-              <SmartCheckbox
-                class="mt-1"
-                text="Eval"
-                :start-value="true"
-                @changed="setGaugeEnabled"
-              />
-            </div>
-          </div>
-  
-          <MoveHistoryWrap
-            v-if="board?.historyRootRef"
-            ref="moveHistory"
-            class="history"
-            :root="board?.historyRootRef"
-            :current-selection="board?.historyCurrentNodeRef"
-            @node-clicked="node => board?.jumpToHistoryNode(node)"
+      <div class="gui-column">
+        <div class="history-card-and-gauge is-flex mb-4">
+          <EvaluationGauge
+            v-if="hasGauge"
+            v-show="gaugeEnabled"
+            ref="gauge"
+            class="mr-2"
+            :white-pov="true"
           />
+          <div class="card history-card">
+            <div class="history-header px-2 py-1 is-flex is-align-items-center">
+              <p class="is-size-4 has-text-weight-semibold mr-3">
+                {{ gauge?.evalText }}
+              </p>
+              <p
+                v-if="!gaugeEnabled && gameOverPopupShown"
+                class="is-size-5"
+              >
+                Game Over
+              </p>
+              <p
+                v-else-if="opponentName"
+                class="is-size-5 opponent-name-text"
+              >
+                vs. {{ opponentName }}
+              </p>
+              <p class="is-size-5">
+                {{ gauge?.depthText }}
+              </p>
+              <div
+                v-if="gauge?.explainText"
+                class="ml-3 is-clickable"
+                @click="showPopup('Why is the game over?', gauge?.explainText ?? '', 'ok')"
+              >
+                <div class="icon-help color-primary-strong sz-2" />
+              </div>
+              <div
+                v-else-if="hasGauge"
+                class="is-flex-grow-1 is-flex is-align-items-center is-justify-content-flex-end"
+              >
+                <SmartCheckbox
+                  class="mt-1"
+                  text="Eval"
+                  :start-value="true"
+                  @changed="setGaugeEnabled"
+                />
+              </div>
+            </div>
+    
+            <MoveHistoryWrap
+              v-if="board?.historyRootRef"
+              ref="moveHistory"
+              class="history"
+              :root="board?.historyRootRef"
+              :current-selection="board?.historyCurrentNodeRef"
+              @node-clicked="node => board?.jumpToHistoryNode(node)"
+            />
+          </div>
         </div>
+        <strong>FEN:</strong>
+        <SmartTextInput
+          ref="fenTextbox"
+          placeholder="Set FEN string"
+          :max-length="500"
+          :select-all-on-focus="true"
+          @enter-pressed="fen => { board?.setFen(fen); updateEvaluation() }"
+        />
       </div>
     </div>
   </div>
@@ -109,11 +120,13 @@
   import MoveHistoryWrap from '@/components/game-ui/MoveHistoryWrap.vue'
   import PlayableChessBoard from '@/components/chessboard/PlayableChessBoard.vue'
   import SmartCheckbox from '@/components/basic-wrappers/SmartCheckbox.vue'
+  import SmartTextInput from '../basic-wrappers/SmartTextInput.vue'
   import type { MakeMoveFlag, MakeMoveWinner, MoveInfo, Player, Variant } from '@/protochess/types'
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
   const moveHistory = ref<InstanceType<typeof MoveHistoryWrap>>()
+  const fenTextbox = ref<InstanceType<typeof SmartTextInput>>()
   const playerToMove = ref<Player>()
   // Only show the game over popup once
   const gameOverPopupShown = ref(false)
@@ -297,9 +310,11 @@
     margin-left: 1rem;
   }
   
-  .history-card {
+  .history-card-and-gauge {
     height: 100%;
-    max-height: calc(100vh - 6rem);
+    max-height: calc(100% - 20rem);
+  }
+  .history-card {
     .history-header {
       height: 3rem;
       border-bottom: 1px solid $grey-darkest;

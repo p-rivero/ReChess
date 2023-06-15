@@ -8,7 +8,8 @@
     :placeholder="props.placeholder"
     :maxlength="props.maxLength"
     @input="inputChanged"
-    @keydown.enter="emit('enter-pressed')"
+    @keydown.enter="emit('enter-pressed', textInput?.value ?? '')"
+    @focus="selectAllOnFocus && textInput?.select()"
   >
   <textarea
     v-else
@@ -19,6 +20,8 @@
     :placeholder="props.placeholder"
     :maxlength="props.maxLength"
     @input="inputChanged"
+    @keydown.enter="emit('enter-pressed', textInput?.value ?? '')"
+    @focus="selectAllOnFocus && textInput?.select()"
   />
 </template>
 
@@ -40,11 +43,12 @@
     errorPriority?: number
     emitChangedWhenError?: boolean
     maxLength?: number
+    selectAllOnFocus?: boolean
   }>()
   
   const emit = defineEmits<{
     (event: 'changed', text: string): void
-    (event: 'enter-pressed'): void
+    (event: 'enter-pressed', text: string): void
   }>()
   
   

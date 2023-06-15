@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
   import { MoveHistoryManager, type MoveHistoryQueryResult, type MoveTreeNode } from '@/helpers/managers/move-history-manager'
+  import { clone } from '@/helpers/ts-utils'
   import { computed, nextTick, ref } from 'vue'
   import { getProtochess } from '@/protochess'
   import PromotionPopup from '@/components/game-ui/PromotionPopup.vue'
@@ -51,6 +52,7 @@
     (event: 'new-move', from: [number, number], to: [number, number], promotion?: string, result?: GameResult): void
     (event: 'on-scroll', result?: GameResult): void
     (event: 'player-changed', playerToMove: Player): void
+    (event: 'fen-changed', fen: string): void
   }>()
   
   
@@ -66,9 +68,11 @@
   
   const moveHistory = new MoveHistoryManager(props.allowBranching)
   
+  let currentVariant: VariantGameState|undefined = undefined
   defineExpose({
     // Set the state of the board
     async setState(state: VariantGameState): Promise<GameResult|undefined> {
+      currentVariant = clone(state)
       const protochess = await getProtochess('ui')
       const result = await protochess.setState(state)
       const stateDiff = await protochess.getStateDiff()
@@ -87,9 +91,17 @@
       moveHistory.initialize(state, historyNotation)
       historyRootRef.value = moveHistory.getRoot()
       historyCurrentNodeRef.value = moveHistory.getCurrentNode()
+      emit('fen-changed', stateDiff.fen)
       emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
       
       return handleResult(result)
+    },
+    async setFen(fen: string) {
+      if (!currentVariant) throw new Error('Cannot set fen before setting state')
+      currentVariant.initialFen = fen
+      currentVariant.moveHistory = []
+      board.value?.clearLastMove()
+      await this.setState(currentVariant)
     },
     
     // Returns which player can move
@@ -216,6 +228,7 @@
     // Important: update the player before emitting new-move (otherwise, the player sent to the server will be wrong)
     emit('player-changed', stateDiff.playerToMove === 0 ? 'white' : 'black')
     emit('new-move', mv.from, mv.to, mv.promotion, gameResult)
+    emit('fen-changed', stateDiff.fen)
     
     updateMovableSquares(stateDiff, !!gameResult)
   }
@@ -275,6 +288,7 @@
     const canMove = !gameResult && moveHistory.canMakeMove()
     updateMovableSquares(stateDiff, !canMove)
     emit('on-scroll', gameResult)
+    emit('fen-changed', stateDiff.fen)
   }
 </script>
 
