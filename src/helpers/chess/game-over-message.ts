@@ -6,33 +6,34 @@ import type { MakeMoveFlag, MakeMoveWinner, Player } from '@/protochess/types'
  * @param {Player} playerToMove The player that was to move when the game ended
  */
 export function gameOverMessage(flag: MakeMoveFlag, winner: MakeMoveWinner, playerToMove: Player): string {
-  const toMoveUpper = playerToMove === 'white' ? 'White' : 'Black'
-  const loserUpper = winner === 'white' ? 'Black' : 'White'
+  const nameToMove = playerToMove === 'white' ? 'White' : 'Black'
+  const nameJustMoved = playerToMove === 'white' ? 'Black' : 'White'
+  const nameLoser = winner === 'white' ? 'Black' : 'White'
   if (flag === 'Checkmate') {
-    return `**Checkmate:** ${toMoveUpper} has no legal moves and is in check.`
+    return `**Checkmate:** ${nameToMove} has no legal moves and is in check.`
   }
   if (flag === 'Stalemate') {
-    return `**Stalemate:** ${toMoveUpper} has no legal moves, but is not in check.`
+    return `**Stalemate:** ${nameToMove} has no legal moves, but is not in check.`
   }
   if (flag === 'LeaderCaptured') {
-    return `The **${toMoveUpper}** leader has been **captured** or has exploded. 
-    \n\nIt's ${toMoveUpper}'s turn, but their designated leader piece is not on the board.`
+    return `The **${nameToMove}** leader has been **captured** or has exploded. 
+    \n\nIt's ${nameToMove}'s turn, but their designated leader piece is not on the board.`
   }
   if (flag === 'AllPiecesCaptured') {
-    return `All of **${toMoveUpper}**'s pieces have been **captured**.
-    \n\nIt's ${toMoveUpper}'s turn, but they have no pieces on the board.`
+    return `All of **${nameToMove}**'s pieces have been **captured**.
+    \n\nIt's ${nameToMove}'s turn, but they have no pieces on the board.`
   }
   if (flag === 'PieceInWinSquare') {
-    return `One of **${toMoveUpper}**'s pieces has reached a **winning square**.`
+    return `One of **${nameJustMoved}**'s pieces has reached a **winning square**.`
   }
   if (flag === 'CheckLimit') {
-    return `**${toMoveUpper}** has been in check too many times.`
+    return `**${nameToMove}** has been in check too many times.`
   }
   if (flag === 'Repetition') {
     return 'The same position has been **repeated** too many times.'
   }
   if (flag === 'Resignation') {
-    return `${loserUpper} has **resigned**.`
+    return `${nameLoser} has **resigned**.`
   }
   return ''
 }
