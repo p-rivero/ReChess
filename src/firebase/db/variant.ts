@@ -17,7 +17,7 @@ export async function createVariant(userId: string, displayName: string, variant
     creatorId: userId,
     numUpvotes: 0,
     popularity: 0,
-    tags: variant.tags,
+    tags: variant.tags.map(tag => tag.toLowerCase()),
     initialState: JSON.stringify(variant),
   }
   const docRef = await addDoc(collection(db, 'variants'), document)

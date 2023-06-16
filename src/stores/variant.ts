@@ -30,7 +30,7 @@ export const useVariantStore = defineStore('variant', () => {
     // Filter the list of variants
     let result = fullVariantList
     for (const tag of clientTags) {
-      result = result.filter(variant => variant.tags.some(t => t.startsWith(tag)))
+      result = result.filter(variant => variant.tags.some(t => t.toLowerCase().startsWith(tag)))
     }
     
     variantList.value = result
