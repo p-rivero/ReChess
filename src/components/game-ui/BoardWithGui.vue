@@ -102,7 +102,7 @@
           placeholder="Set FEN string"
           :max-length="500"
           :select-all-on-focus="true"
-          @enter-pressed="fen => { board?.setFen(fen); updateEvaluation() }"
+          @enter-pressed="updateFen"
         />
       </div>
     </div>
@@ -291,6 +291,15 @@
     gauge.value?.resetText(enabled)
     gaugeEnabled.value = enabled
     updateEvaluation()
+  }
+  
+  async function updateFen(fen: string) {
+    try {
+      await board.value?.setFen(fen)
+      updateEvaluation()
+    } catch (e) {
+      console.warn('Invalid FEN:', e)
+    }
   }
 </script>
 
