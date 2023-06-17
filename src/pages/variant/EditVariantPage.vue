@@ -31,11 +31,11 @@
           :min="1"
           :max="16"
           :default="8"
-          :start-value="draftStore.state.boardHeight"
-          @changed="h => {
-            // Split the fen rows and get the last h rows
-            draftStore.state.fen = board?.getFen().split('/').slice(-h).join('/') ?? ''
-            draftStore.state.boardHeight = h
+          :start-value="draftStore.state.boardWidth"
+          @changed="w => {
+            board?.getPositionsWhere(p => p[0] >= w).forEach(p => board?.removePiece(p))
+            refreshFen()
+            draftStore.state.boardWidth = w
           }"
         />
         <div class="field-label-both">
@@ -46,11 +46,11 @@
           :min="1"
           :max="16"
           :default="8"
-          :start-value="draftStore.state.boardWidth"
-          @changed="w => {
-            board?.getPositionsWhere(p => p[0] >= w).forEach(p => board?.removePiece(p))
-            refreshFen()
-            draftStore.state.boardWidth = w
+          :start-value="draftStore.state.boardHeight"
+          @changed="h => {
+            // Split the fen rows and get the last h rows
+            draftStore.state.fen = board?.getFen().split('/').slice(-h).join('/') ?? ''
+            draftStore.state.boardHeight = h
           }"
         />
       </div>
