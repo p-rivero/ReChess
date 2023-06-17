@@ -1,15 +1,44 @@
 <template>
-  <MoveHistoryView
-    :key="updateKey"
-    ref="listElement"
-    class="py-3 history-bg scrollable"
-    :root="root"
-    :start-at-left="true"
-    :root-move-number="1"
-    :indent-depth="0"
-    :current-selection="currentSelection"
-    @node-clicked="node => emit('node-clicked', node)"
-  />
+  <div>
+    <MoveHistoryView
+      :key="updateKey"
+      ref="listElement"
+      class="py-3 history-bg scrollable"
+      :root="root"
+      :start-at-left="true"
+      :root-move-number="1"
+      :indent-depth="0"
+      :current-selection="currentSelection"
+      @node-clicked="node => emit('node-clicked', node)"
+    />
+    
+    <div class="is-flex">
+      <button
+        class="button is-small is-fullwidth mx-1 borderless"
+        @click="emit('node-clicked', root)"
+      >
+        <div class="sz-icon icon-chevron-left-2 color-theme" />
+      </button>
+      <button
+        class="button is-small is-fullwidth mx-1 borderless"
+        @click="emit('scroll', true)"
+      >
+        <div class="sz-icon icon-chevron-left color-theme" />
+      </button>
+      <button
+        class="button is-small is-fullwidth mx-1 borderless"
+        @click="emit('scroll', false)"
+      >
+        <div class="sz-icon icon-chevron-right color-theme" />
+      </button>
+      <button
+        class="button is-small is-fullwidth mx-1 borderless"
+        @click="emit('node-clicked', findLastMainNode(root))"
+      >
+        <div class="sz-icon icon-chevron-right-2 color-theme" />
+      </button>
+    </div>
+  </div>
 </template>
 
 
@@ -29,6 +58,7 @@
   
   const emit = defineEmits<{
     (event: 'node-clicked', node: MoveTreeNode): void
+    (event: 'scroll', up: boolean): void
   }>()
   
   watch(props, updateHistory)
@@ -50,6 +80,13 @@
       highlightedMove?.scrollIntoView({ behavior: 'smooth', block: verticalStrategy })
     })
   }
+  
+  function findLastMainNode(node: MoveTreeNode): MoveTreeNode {
+    while (node.children.length > 0) {
+      node = node.children[0]
+    }
+    return node
+  }
 </script>
 
 
@@ -63,6 +100,6 @@
   }
   .history-bg {
     border-radius: 0.25rem;
-    min-height: 10rem;
+    height: calc(100% - 2rem);
   }
 </style>

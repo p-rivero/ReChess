@@ -141,6 +141,38 @@
 }
 
 
+/* chevron-left-2.svg */
+.icon-chevron-left-2 {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/icons/chevron-left-2.svg");
+  mask-image: url("@/assets/icons/chevron-left-2.svg");
+}
+
+
+/* chevron-left.svg */
+.icon-chevron-left {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/icons/chevron-left.svg");
+  mask-image: url("@/assets/icons/chevron-left.svg");
+}
+
+
+/* chevron-right-2.svg */
+.icon-chevron-right-2 {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/icons/chevron-right-2.svg");
+  mask-image: url("@/assets/icons/chevron-right-2.svg");
+}
+
+
+/* chevron-right.svg */
+.icon-chevron-right {
+  @extend .icon-common;
+  -webkit-mask-image: url("@/assets/icons/chevron-right.svg");
+  mask-image: url("@/assets/icons/chevron-right.svg");
+}
+
+
 /* chevron-up.svg */
 .icon-chevron-up {
   @extend .icon-common;

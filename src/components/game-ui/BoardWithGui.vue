@@ -93,17 +93,20 @@
               :root="board?.historyRootRef"
               :current-selection="board?.historyCurrentNodeRef"
               @node-clicked="node => board?.jumpToHistoryNode(node)"
+              @scroll="board?.scrollMoveHistory"
             />
           </div>
         </div>
-        <strong>FEN:</strong>
-        <SmartTextInput
-          ref="fenTextbox"
-          placeholder="Set FEN string"
-          :max-length="500"
-          :select-all-on-focus="true"
-          @enter-pressed="updateFen"
-        />
+        <div v-if="hasGauge">
+          <strong>FEN:</strong>
+          <SmartTextInput
+            ref="fenTextbox"
+            placeholder="Set FEN string"
+            :max-length="500"
+            :select-all-on-focus="true"
+            @enter-pressed="updateFen"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -205,6 +208,7 @@
     }
   })
   
+  const moveListMarginRem = props.hasGauge ? 11 : 6
   const forceVertical = computed(() => (board.value?.aspectRatio ?? 1) >= 3)
   const screenInvRatio = ref(window.innerHeight / window.innerWidth)
   const showHistoryHint = computed(() => {
@@ -321,7 +325,7 @@
   
   .history-card-and-gauge {
     height: 100%;
-    max-height: calc(100vh - 12rem);
+    max-height: v-bind("`calc(100vh - ${moveListMarginRem}rem)`");
   }
   .history-card {
     .history-header {
@@ -329,7 +333,7 @@
       border-bottom: 1px solid $grey-darkest;
     }
     .history {
-      height: calc(100% - 3rem);
+      height: calc(100% - 3rem - 2px);
     }
   }
   
@@ -360,6 +364,9 @@
       }
     }
     
+    .history-card-and-gauge {
+      max-height: 30rem;
+    }
     
     .history-card {
       width: 100%;

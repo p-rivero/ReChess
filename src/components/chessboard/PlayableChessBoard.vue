@@ -20,7 +20,7 @@
         :invert-enemy-direction="invertEnemyDirection"
         :cursor-pointer="cursorPointer"
         @user-moved="userMovedCallback"
-        @wheel="onWheel"
+        @wheel="scrollMoveHistory"
       />
       <PromotionPopup ref="promotionPopup" />
     </div>
@@ -141,6 +141,9 @@
       board.value?.setMovable(false, false, [])
     },
     
+    // Scroll up or down the move history
+    scrollMoveHistory,
+    
     // Expose the history tree for the UI to display
     historyRootRef,
     historyCurrentNodeRef,
@@ -259,7 +262,7 @@
   }
   
   
-  async function onWheel(up: boolean) {
+  async function scrollMoveHistory(up: boolean) {
     // Attempt to get the history entry
     const entry = up ? moveHistory.undo() : moveHistory.redo()
     if (!entry) return
