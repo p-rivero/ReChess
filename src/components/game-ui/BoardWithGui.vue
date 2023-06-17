@@ -321,7 +321,7 @@
   
   .history-card-and-gauge {
     height: 100%;
-    max-height: calc(100% - 20rem);
+    max-height: calc(100vh - 12rem);
   }
   .history-card {
     .history-header {

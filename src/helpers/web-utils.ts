@@ -32,6 +32,10 @@ export function isScrolledIntoView(el: HTMLElement): boolean {
   return isVisible
 }
 
+export function pageIsScrollable() {
+  return document.body.scrollHeight > window.innerHeight
+}
+
 
 
 

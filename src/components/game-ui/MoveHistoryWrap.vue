@@ -14,8 +14,8 @@
 
 
 <script setup lang="ts">
-  import { isScrolledIntoView } from '@/helpers/web-utils'
-  import { ref, watch } from 'vue'
+  import { isScrolledIntoView, pageIsScrollable } from '@/helpers/web-utils'
+  import { onMounted, ref, watch } from 'vue'
   import MoveHistoryView from './MoveHistoryView.vue'
   import type { MoveTreeNode } from '@/helpers/managers/move-history-manager'
   
@@ -31,7 +31,9 @@
     (event: 'node-clicked', node: MoveTreeNode): void
   }>()
   
-  watch(props, () => {
+  watch(props, updateHistory)
+  onMounted(updateHistory)
+  function updateHistory() {
     if (!listElement.value) return
     const elem = listElement.value.$el as HTMLElement
     const scrollPos = elem.scrollTop
@@ -44,9 +46,10 @@
       if (!isScrolledIntoView(elem)) return
       // Make sure the move with class 'highlight-move' is visible
       const highlightedMove = elem.querySelector('.highlight-move')
-      highlightedMove?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      const verticalStrategy = pageIsScrollable() ? 'nearest' : 'center'
+      highlightedMove?.scrollIntoView({ behavior: 'smooth', block: verticalStrategy })
     })
-  })
+  }
 </script>
 
 
