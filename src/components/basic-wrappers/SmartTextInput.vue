@@ -20,7 +20,6 @@
     :placeholder="props.placeholder"
     :maxlength="props.maxLength"
     @input="inputChanged"
-    @keydown.enter="emit('enter-pressed', textInput?.value ?? '')"
     @focus="selectAllOnFocus && textInput?.select()"
   />
 </template>
