@@ -228,7 +228,6 @@
       previousState = 'playing'
     }
     if (!result && props.hasGauge) {
-      // This can take a while, don't await it
       updateEvalDebounced()
     }
   }

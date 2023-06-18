@@ -78,7 +78,7 @@
     usernameStatus.value = 'unknown'
     if (name === '') return
     // Limit the number of requests to the server
-    await checkUsernameDebounced(name)
+    checkUsernameDebounced(name)
   }
   const checkUsernameDebounced = debounce(async (name: string) => {
     const available = await authStore.usernameAvailable(name)

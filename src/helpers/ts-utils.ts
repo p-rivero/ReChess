@@ -12,7 +12,7 @@ export function clone<T>(obj: T): T {
  * @param wait Time to wait before calling the callback
  * @see https://gist.github.com/ca0v/73a31f57b397606c9813472f7493a940
  */
-export function debounce<T extends (...args: Parameters<T>)=>void>(cb: T, wait = 20): (...args: Parameters<T>)=>void {
+export function debounce<T extends (...args: Parameters<T>)=>ReturnType<T>>(cb: T, wait = 20): (...args: Parameters<T>) => void {
   let h: NodeJS.Timeout | undefined = undefined
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const callable = (...args: Parameters<T>) => {
@@ -27,14 +27,15 @@ export function debounce<T extends (...args: Parameters<T>)=>void>(cb: T, wait =
  * @param cb Callback (function to throttle)
  * @param wait Time to wait before calling the callback again
  */
-export function throttle<T extends (...args: Parameters<T>)=>void>(cb: T, wait = 20): (...args: Parameters<T>)=>void {
+export function throttle<T extends (...args: Parameters<T>)=>ReturnType<T>>(cb: T, wait = 20): (...args: Parameters<T>) => ReturnType<T>|undefined {
   let inThrottle = false
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const callable = (...args: Parameters<T>) => {
     if (!inThrottle) {
-      cb(...args)
+      const ret = cb(...args)
       inThrottle = true
       setTimeout(() => inThrottle = false, wait)
+      return ret
     }
   }
   return callable
