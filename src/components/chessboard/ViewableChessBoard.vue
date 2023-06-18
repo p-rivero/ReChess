@@ -34,7 +34,7 @@
   import ChessgroundAdapter, { type PieceImages } from './internal/ChessgroundAdapter.vue'
   import type * as cg from 'chessgroundx/types'
   import type { Config } from 'chessgroundx/config'
-  import type { InitialState, MoveInfo, MoveList, StateDiff, Variant } from '@/protochess/types'
+  import type { InitialState, MoveInfo, MoveList, PieceId, StateDiff, Variant } from '@/protochess/types'
 
   const props = defineProps<{
     whitePov: boolean
@@ -155,13 +155,13 @@
     },
     
     // Returns the piece at the given position
-    getPieceAt(position: [number, number]): string | undefined {
+    getPieceAt(position: [number, number]): PieceId | undefined {
       const key = positionToKey(position)
       return board.value?.getPieceAtKey(key)
     },
     
     // Returns the list of positions that meet a given condition
-    getPositionsWhere(condition: (pos: [number, number], id: string) => boolean): [number, number][] {
+    getPositionsWhere(condition: (pos: [number, number], id: PieceId) => boolean): [number, number][] {
       const conditionKey = (key: cg.Key, piece: cg.Piece) => {
         return condition(keyToPosition(key), mappingReverse(piece))
       }
@@ -197,7 +197,7 @@
     },
     
     // Move a piece from one position to another, and optionally promote it
-    makeMove(from: [number, number], to: [number, number], promotion?: string) {
+    makeMove(from: [number, number], to: [number, number], promotion?: PieceId) {
       const fromKey = positionToKey(from)
       const toKey = positionToKey(to)
       board.value?.movePiece(fromKey, toKey)
@@ -207,7 +207,7 @@
     },
     
     // Add a new piece to the board, at a given position
-    addPiece(position: [number, number], pieceId: string) {
+    addPiece(position: [number, number], pieceId: PieceId) {
       const key = positionToKey(position)
       const piecesDiff: cg.PiecesDiff = new Map()
       piecesDiff.set(key, mappingLookup(pieceId))
@@ -248,7 +248,7 @@
     },
     
     // Draw an arrow between two positions
-    drawArrow(from: [number, number], to: [number, number], brush: string, pieceId?: string) {
+    drawArrow(from: [number, number], to: [number, number], brush: string, pieceId?: PieceId) {
       const fromKey = positionToKey(from)
       const toKey = positionToKey(to)
       const shapes = board.value?.getShapes() || []
@@ -294,8 +294,8 @@
     return images
   }
   
-  function getLeaderIds(state: InitialState): string[] {
-    const roles: string[] = []
+  function getLeaderIds(state: InitialState): PieceId[] {
+    const roles: PieceId[] = []
     for (const pieceDef of state.pieceTypes) {
       if (pieceDef.isLeader) {
         if (pieceDef.ids[0]) roles.push(pieceDef.ids[0])
@@ -312,7 +312,7 @@
   }
   
   // Convert a custom ID to a chessgroundx piece
-  function mappingLookup(id: string): cg.Piece {
+  function mappingLookup(id: PieceId): cg.Piece {
     // Wall
     if (id === '*') return { role: '_-piece', color: 'none' }
     
@@ -330,7 +330,7 @@
     throw new Error(`Unknown piece id: ${id}`)
   }
   // Convert a chessgroundx piece to a custom ID
-  function mappingReverse(piece: cg.Piece): string {
+  function mappingReverse(piece: cg.Piece): PieceId {
     // Wall
     if (piece.role === '_-piece') return '*'
     

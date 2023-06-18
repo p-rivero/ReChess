@@ -21,7 +21,7 @@
   import { useRoute } from 'vue-router'
   import BoardWithGui from '@/components/game-ui/BoardWithGui.vue'
   import type { Game } from '@/stores/game'
-  import type { MakeMoveWinner, Player } from '@/protochess/types'
+  import type { MakeMoveWinner, PieceId, Player } from '@/protochess/types'
   
   const route = useRoute()
   const gameStore = useGameStore()
@@ -79,7 +79,7 @@
   })
   
   
-  async function sendNewMove(from: [number, number], to: [number, number], promotion?: string, winner?: Player|'none') {
+  async function sendNewMove(from: [number, number], to: [number, number], promotion?: PieceId, winner?: Player|'none') {
     // Error checking
     if (!board.value) throw new Error('Board is not defined')
     // Convert winner from Player|'none'|undefined to Player|'draw'|null

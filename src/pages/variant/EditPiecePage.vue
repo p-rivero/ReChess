@@ -383,7 +383,7 @@
   import SmartDropdown from '@/components/basic-wrappers/SmartDropdown.vue'
   import SmartErrorMessage from '@/components/basic-wrappers/SmartErrorMessage.vue'
   import SmartTextInput from '@/components/basic-wrappers/SmartTextInput.vue'
-  import type { FullPieceDef, Player } from '@/protochess/types'
+  import type { FullPieceDef, PieceId, Player } from '@/protochess/types'
   
   const route = useRoute()
   const draftStore = useVariantDraftStore()
@@ -533,7 +533,7 @@
     )
   }
   
-  function updatePieceId(newId: string, color: Player) {
+  function updatePieceId(newId: PieceId, color: Player) {
     if (!piece) throw new Error('Piece is null')
     // Remove all existing placements of this piece
     const oldId = color === 'white' ? piece.ids[0] : piece.ids[1]

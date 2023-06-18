@@ -27,9 +27,10 @@
   import type { Api } from 'chessgroundx/api'
   import type { Config } from 'chessgroundx/config'
   import type { DrawShape } from 'chessgroundx/draw'
+  import type { PieceId } from '@/protochess/types'
   
   // Map from piece id to the URL of the image to use
-  export type PlayerPieceImages = [string, string][]
+  export type PlayerPieceImages = [PieceId, string][]
   export interface PieceImages {white: PlayerPieceImages, black: PlayerPieceImages}
   
   const props = defineProps<{

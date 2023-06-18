@@ -3,6 +3,9 @@
 
 export type Player = 'white' | 'black'
 
+/** 1-char string */
+export type PieceId = string
+
 // Only the placement of the pieces, in the FEN format
 type FenPlacements = string
 
@@ -44,7 +47,7 @@ export interface Protochess {
   /** Get all possible moves for the current player (for each origin square, what are the possible destinations) */
   legalMoves(): Promise<MoveList[]>,
   /** For a given move (from, to), returns the IDs of the pieces that can be promoted to */
-  possiblePromotions(from: [number, number], to: [number, number]): Promise<string[]>,
+  possiblePromotions(from: [number, number], to: [number, number]): Promise<PieceId[]>,
   
   // Multi-threading control
   /** Returns the maximum number of threads that can be used in `setNumThreads()` */
@@ -81,7 +84,7 @@ export interface MoveInfo {
   // promotion is a piece id (string of 1 character)
   from: [number, number],
   to: [number, number],
-  promotion?: string,
+  promotion?: PieceId,
 }
 export interface MoveInfoWithEval extends MoveInfo {
   evaluation: number | `#${number}`,
@@ -149,7 +152,7 @@ export interface VariantGameState extends GameState {
 // Piece properties that affect the game logic
 /** @see {isPieceDefinition} ts-auto-guard:type-guard */
 export interface PieceDefinition {
-  ids: [Option<string>, Option<string>],
+  ids: [Option<PieceId>, Option<PieceId>],
   notationPrefix: [Option<string>, Option<string>],
   isLeader: boolean,
   castleFiles?: [number, number],
@@ -158,7 +161,7 @@ export interface PieceDefinition {
   explosionDeltas: [number, number][],
   immuneToExplosion: boolean,
   promotionSquares: [number, number][],
-  promoVals: [string[], string[]],
+  promoVals: [PieceId[], PieceId[]],
   doubleJumpSquares: [number, number][],
   attackSlidingDeltas: [number, number][][],
   attackJumpDeltas: [number, number][],

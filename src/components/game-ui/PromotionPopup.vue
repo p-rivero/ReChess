@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import type { Variant } from '@/protochess/types'
+  import type { PieceId, Variant } from '@/protochess/types'
 
   let variant: Variant | null = null
   
@@ -43,7 +43,7 @@
     },
     // Show the promotion popup and return the index of the selected promotion
     // Set flip to true if the board is seen from black's perspective
-    async pickPromotion(coord: [number, number], flip: boolean, possiblePromotions: string[]): Promise<number | undefined> {
+    async pickPromotion(coord: [number, number], flip: boolean, possiblePromotions: PieceId[]): Promise<number | undefined> {
       if (!variant) {
         throw new Error('PromotionPopup: setState() must be called before pickPromotion()')
       }

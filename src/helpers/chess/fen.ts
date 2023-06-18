@@ -1,3 +1,5 @@
+import type { PieceId } from '@/protochess/types'
+
 interface PiecePlacement {
   pieceId: string
   x: number
@@ -81,7 +83,7 @@ export function placementsToFen(placements: PiecePlacement[]): string {
  * @param id The id of the piece to remove
  * @returns The new FEN string
  */
-export function removePiecesById(fen: string, id: string): string {
+export function removePiecesById(fen: string, id: PieceId): string {
   const placements = fenToPlacements(fen)
   return placementsToFen(placements.filter((p) => p.pieceId !== id))
 }

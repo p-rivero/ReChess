@@ -34,7 +34,7 @@
   import { getProtochess } from '@/protochess'
   import PromotionPopup from '@/components/game-ui/PromotionPopup.vue'
   import ViewableChessBoard from './ViewableChessBoard.vue'
-  import type { MakeMoveFlag, MakeMoveResult, MakeMoveWinner, MoveInfo, Player, StateDiff, VariantGameState } from '@/protochess/types'
+  import type { MakeMoveFlag, MakeMoveResult, MakeMoveWinner, MoveInfo, PieceId, Player, StateDiff, VariantGameState } from '@/protochess/types'
   
   // If the user navigates the history while the engine is thinking, the found move is stored here until it can be played
   let engineStoredMove: MoveInfo|undefined = undefined
@@ -49,7 +49,7 @@
   
   interface GameResult {flag: MakeMoveFlag, winner: MakeMoveWinner}
   const emit = defineEmits<{
-    (event: 'new-move', from: [number, number], to: [number, number], promotion?: string, result?: GameResult): void
+    (event: 'new-move', from: [number, number], to: [number, number], promotion?: PieceId, result?: GameResult): void
     (event: 'on-scroll', result?: GameResult): void
     (event: 'player-changed', playerToMove: Player): void
     (event: 'fen-changed', fen: string): void
@@ -121,7 +121,7 @@
     },
     
     // Draw an arrow between the given positions
-    drawArrow(from: [number, number], to: [number, number], brush: string, pieceId?: string) {
+    drawArrow(from: [number, number], to: [number, number], brush: string, pieceId?: PieceId) {
       board.value?.drawArrow(from, to, brush, pieceId)
     },
     
@@ -157,7 +157,7 @@
   async function userMovedCallback(from: [number, number], to: [number, number]) {
     const protochess = await getProtochess('ui')
     const possiblePromotions = await protochess.possiblePromotions(from, to)
-    let promotion: string|undefined = undefined
+    let promotion: PieceId|undefined = undefined
     if (possiblePromotions.length > 0) {
       // Choose promotion
       if (!promotionPopup.value) throw new Error('Promotion popup not initialized')

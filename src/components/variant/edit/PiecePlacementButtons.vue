@@ -63,9 +63,9 @@
   import { ref , watch } from 'vue'
   import { showPopup } from '@/helpers/managers/popup-manager'
   import PieceImageView from '@/components/variant/PieceImageView.vue'
-  import type { FullPieceDef, Player, Variant } from '@/protochess/types'
+  import type { FullPieceDef, PieceId, Player, Variant } from '@/protochess/types'
   
-  const selectedId = ref<string|'wall'|'delete'|'none'>('none')
+  const selectedId = ref<PieceId|'wall'|'delete'|'none'>('none')
     
   const props = defineProps<{
     variant: Variant
@@ -73,7 +73,7 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'piece-selected', piece: string | 'wall' | 'delete'): void
+    (event: 'piece-selected', piece: PieceId | 'wall' | 'delete'): void
     (event: 'piece-deselected'): void
     (event: 'delete-click'): void
     (event: 'clear-all-click'): void
@@ -87,7 +87,7 @@
   })
   
   interface Piece {
-    id: string | null | undefined
+    id: PieceId | null | undefined
     definition: FullPieceDef
     color: Player
   }
@@ -119,7 +119,7 @@
   }, { immediate: true })
   
   function onPieceClick(piece: Piece | 'wall' | 'delete') {
-    let id: string
+    let id: PieceId | 'wall' | 'delete'
     
     if (typeof piece === 'string') {
       // Wall or delete

@@ -70,7 +70,7 @@
               (White) Promote to:
             </p>
             <img
-              v-for="(sym, i) of piece.promoVals[0].filter((sym: string) => symbolImg(0, sym))"
+              v-for="(sym, i) of piece.promoVals[0].filter((sym: PieceId) => symbolImg(0, sym))"
               :key="sym + i"
               :src="symbolImg(0, sym)"
               :alt="`${sym}`"
@@ -86,7 +86,7 @@
               (Black) Promote to:
             </p>
             <img
-              v-for="(sym, i) of piece.promoVals[1].filter((sym: string) => symbolImg(1, sym))"
+              v-for="(sym, i) of piece.promoVals[1].filter((sym: PieceId) => symbolImg(1, sym))"
               :key="sym + i"
               :src="symbolImg(1, sym)"
               :alt="`piece ${sym}`"
@@ -112,7 +112,7 @@
   import { Sortable } from 'sortablejs-vue3'
   import { ref } from 'vue'
   import PieceImageView from '@/components/variant/PieceImageView.vue'
-  import type { Variant } from '@/protochess/types'
+  import type { PieceId, Variant } from '@/protochess/types'
   
   const hovered = ref(-1)
   const props = defineProps<{
@@ -134,7 +134,7 @@
     (event: 'reorder', oldIndex: number, newIndex: number): void
   }>()
   
-  function symbolImg(player: 0|1, symbol: string): string {
+  function symbolImg(player: 0|1, symbol: PieceId): string {
     for (const piece of props.state.pieceTypes) {
       if (piece.ids[player] === symbol) {
         return piece.imageUrls[player] ?? ''

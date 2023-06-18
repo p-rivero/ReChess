@@ -7,7 +7,7 @@ import { onSnapshot } from '@firebase/firestore'
 import { readVariantDoc } from './variant'
 import { useAuthStore } from './auth-user'
 import type { GameDoc, GameSummary } from '@/firebase/db/schema'
-import type { MoveInfo, Player, PublishedVariant } from '@/protochess/types'
+import type { MoveInfo, PieceId, Player, PublishedVariant } from '@/protochess/types'
 
 export interface Game {
   id: string
@@ -108,7 +108,7 @@ export const useGameStore = defineStore('game', () => {
   async function movePiece(
     from: [number, number],
     to: [number, number],
-    promotion: string | undefined,
+    promotion: PieceId | undefined,
     playerToMove: Player,
     winner: 'white' | 'black' | 'draw' | undefined
   ) {

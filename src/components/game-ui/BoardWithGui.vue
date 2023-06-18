@@ -124,7 +124,7 @@
   import PlayableChessBoard from '@/components/chessboard/PlayableChessBoard.vue'
   import SmartCheckbox from '@/components/basic-wrappers/SmartCheckbox.vue'
   import SmartTextInput from '../basic-wrappers/SmartTextInput.vue'
-  import type { MakeMoveFlag, MakeMoveWinner, MoveInfo, Player, Variant } from '@/protochess/types'
+  import type { MakeMoveFlag, MakeMoveWinner, MoveInfo, PieceId, Player, Variant } from '@/protochess/types'
   
   const board = ref<InstanceType<typeof PlayableChessBoard>>()
   const gauge = ref<InstanceType<typeof EvaluationGauge>>()
@@ -154,7 +154,7 @@
   
   const emit = defineEmits<{
     (event: 'invalid-variant'): void
-    (event: 'new-move', from: [number, number], to: [number, number], promotion?: string, winner?: Player|'none'): void
+    (event: 'new-move', from: [number, number], to: [number, number], promotion?: PieceId, winner?: Player|'none'): void
     (event: 'browse-history', winner?: Player|'none'): void
     (event: 'game-over', flag: MakeMoveFlag, winner: MakeMoveWinner, playerToMove: Player): void
   }>()

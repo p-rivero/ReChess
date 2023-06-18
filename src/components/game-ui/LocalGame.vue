@@ -23,7 +23,7 @@
   import { useVariantDraftStore } from '@/stores/variant-draft'
   import { useVariantStore } from '@/stores/variant'
   import BoardWithGui from './BoardWithGui.vue'
-  import type { Player, Variant } from '@/protochess/types'
+  import type { PieceId, Player, Variant } from '@/protochess/types'
   
   const route = useRoute()
   
@@ -42,7 +42,7 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'new-move', from: [number, number], to: [number, number], promotion?: string, winner?: Player|'none'): void
+    (event: 'new-move', from: [number, number], to: [number, number], promotion?: PieceId, winner?: Player|'none'): void
   }>()
   
   onMounted(async () => {

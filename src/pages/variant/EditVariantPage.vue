@@ -318,6 +318,7 @@
   import SmartNumberInput from '@/components/basic-wrappers/SmartNumberInput.vue'
   import SmartTextInput from '@/components/basic-wrappers/SmartTextInput.vue'
   import ViewableChessBoard from '@/components/chessboard/ViewableChessBoard.vue'
+  import type { PieceId } from '@/protochess/types'
   
   const draftStore = useVariantDraftStore()
   const authStore = useAuthStore()
@@ -330,7 +331,7 @@
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
   const pieceSelector = ref<InstanceType<typeof PiecePlacementButtons>>()
-  const selectedPieceId = ref<string|'wall'|'delete'|'none'>('none')
+  const selectedPieceId = ref<PieceId|'wall'|'delete'|'none'>('none')
   
   // This page is only accessible when logged in
   if (!authStore.loggedUser) {
