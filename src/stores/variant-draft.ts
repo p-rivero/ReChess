@@ -63,7 +63,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
   // Attempts to publish the variant to the server. If successful, returns the id of the variant.
   async function publish(): Promise<string | undefined> {
     const authStore = useAuthStore()
-    if (!authStore.loggedUser) return undefined
+    if (!authStore.loggedUser) return
     try {
       const id = await VariantDB.createVariant(authStore.loggedUser.uid, authStore.loggedUser.displayName, state.value)
       // Draft published successfully, remove it
@@ -71,7 +71,7 @@ export const useVariantDraftStore = defineStore('variant-draft', () => {
       return id
     } catch (e) {
       console.error('Error while trying to create variant', e)
-      return undefined
+      return
     }
   }
   

@@ -7,8 +7,8 @@
       :error-handler="errorHandler"
       :refresh-handler-on-input="true"
       :validator="text => {
-        if (disableChecking) return undefined
-        if (text === '' && !strictMode) return undefined
+        if (disableChecking) return
+        if (text === '' && !strictMode) return
         if (text === '') return 'Please enter a username'
         if (text.length < 3) return 'Username must be at least 3 characters long'
         if (text.length > 25) return 'Username must be at most 25 characters long'

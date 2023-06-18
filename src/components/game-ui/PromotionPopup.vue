@@ -74,7 +74,7 @@
         await new Promise(resolve => setTimeout(resolve, 100))
       }
       if (selectedIndex.value === -1) {
-        return undefined
+        return
       }
       return selectedIndex.value
     },

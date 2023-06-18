@@ -29,7 +29,7 @@
         :error-handler="errorHandler"
         :refresh-handler-on-input="true"
         :validator="text => {
-          if (text === '' && !isStrict) return undefined
+          if (text === '' && !isStrict) return
           if (text === '') return 'An email is required'
           if (!(/^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$/).test(text))
             return 'The email has an invalid format'
@@ -61,7 +61,7 @@
           :error-handler="errorHandler"
           :refresh-handler-on-input="true"
           :validator="text => {
-            if (text === '' && !isStrict) return undefined
+            if (text === '' && !isStrict) return
             if (text === '') return 'The password is required'
             if (text.length < 6 && isRegister) return 'Password must be at least 6 characters long'
           }"
@@ -99,8 +99,8 @@
           :error-handler="errorHandler"
           :refresh-handler-on-input="true"
           :validator="text => {
-            if (!isRegister) return undefined
-            if (text === '' && !isStrict) return undefined
+            if (!isRegister) return
+            if (text === '' && !isStrict) return
             if (text.length < 6 || text !== password) return 'Passwords must match and be at least 6 characters long'
           }"
           :emit-changed-when-error="true"

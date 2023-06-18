@@ -96,7 +96,6 @@
       hasError.value = error !== undefined
       return error
     }
-    return undefined
   }
   
   function toggleEdit(setEditing: boolean) {

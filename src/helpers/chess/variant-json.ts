@@ -11,7 +11,6 @@ export function parseVariantJson(json: string): Variant | undefined {
   } catch (e) {
     // ignore error and return undefined
   }
-  return undefined
 }
 
 

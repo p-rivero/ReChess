@@ -183,7 +183,7 @@
       } catch (e) {
         console.error(e)
         emit('invalid-variant')
-        return undefined
+        return
       }
       // Initialize evaluation gauge
       // This can take a while, don't await it

@@ -39,13 +39,13 @@
     (event: 'clicked', delta: [number, number], mode?: 'add'|'remove'): void
   }>()
   
-  const image = computed(() => props.piece.imageUrls[0] || props.piece.imageUrls[1] || '')
+  const image = computed(() => props.piece.imageUrls[0] ?? props.piece.imageUrls[1] ?? '')
   const board = ref<InstanceType<typeof ChessgroundAdapter>>()
   const boardUpdatekey = ref('')
     
   const getClickModeProxy = computed(() => {
     const fn = props.getClickMode
-    if (!fn) return undefined
+    if (!fn) return
     return (key: Key) => {
       const coords = keyToPosition(key)
       const delta: [number, number] = [coords[0] - props.position[0], coords[1] - props.position[1]]

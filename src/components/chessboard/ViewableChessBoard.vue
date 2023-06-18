@@ -58,7 +58,7 @@
   
   const getClickModeProxy = computed(() => {
     const fn = props.getClickMode
-    if (!fn) return undefined
+    if (!fn) return
     return (key: cg.Key) => fn(keyToPosition(key))
   })
   
@@ -188,7 +188,7 @@
       }
       const newConfig: Config = {
         movable: {
-          color: white && black ? 'both' : white ? 'white' : black ? 'black' : 'none' as cg.Color,
+          color: white && black ? 'both' : white ? 'white' : black ? 'black' : 'none',
           free: false,
           dests,
         },

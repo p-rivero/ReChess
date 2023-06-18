@@ -83,7 +83,7 @@ export async function getUrl(bucket: BucketName, filePath: string): Promise<stri
     return url
   } catch (error) {
     if (error instanceof FirebaseError && error.code === 'storage/object-not-found') {
-      return undefined
+      return
     }
     throw error
   }

@@ -3,7 +3,11 @@ import type { ErrorMessageHandler } from '@/helpers/errors/error-message-handler
 import type { FullPieceDef, InitialState, Variant } from '@/protochess/types'
 
 export async function checkState(variant: Variant, errorMsgHandler: ErrorMessageHandler): Promise<void> {
-  if (!checkPieces(variant, errorMsgHandler)) return
+  const piecesError = checkPieces(variant)
+  if (piecesError) {
+    errorMsgHandler.show(piecesError, -1)
+    return
+  }
   try {
     await checkProtochess(variant)
     // Clear the error message and enable the publish button
@@ -15,73 +19,70 @@ export async function checkState(variant: Variant, errorMsgHandler: ErrorMessage
 }
 
 
-function checkPieces(state: Variant, errorMsgHandler: ErrorMessageHandler): boolean {
+function checkPieces(state: Variant): string | undefined {
   for (let i = 0; i < state.pieceTypes.length; i++) {
-    const piece = state.pieceTypes[i]
-    if (!piece.displayName) {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} doesn't have a name`, -1)
-      return false
-    }
-    if (piece.ids[0] === '') {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} is missing a symbol for White`, -1)
-      return false
-    }
-    if (piece.ids[1] === '') {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} is missing a symbol for Black`, -1)
-      return false
-    }
-    if (checkDuplicateSymbol(i, 0, state, errorMsgHandler)) return false
-    if (checkDuplicateSymbol(i, 1, state, errorMsgHandler)) return false
-    if (!piece.ids[0] && !piece.ids[1]) {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} must be available for at least 1 player`, -1)
-      return false
-    }
-    if (piece.ids[0] && !piece.imageUrls[0]) {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} is missing an image for White`, -1)
-      return false
-    }
-    if (piece.ids[1] && !piece.imageUrls[1]) {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} is missing an image for Black`, -1)
-      return false
-    }
-    for (const square of piece.doubleJumpSquares) {
-      if (square[0] >= state.boardWidth || square[1] >= state.boardHeight) {
-        errorMsgHandler.show(`Piece ${pieceName(i, piece)} can double jump at ${squareName(square)}, which is outside the board`, -1)
-        return false
-      }
-    }
-    for (const square of piece.promotionSquares) {
-      if (square[0] >= state.boardWidth || square[1] >= state.boardHeight) {
-        errorMsgHandler.show(`Piece ${pieceName(i, piece)} promotes at ${squareName(square)}, which is outside the board`, -1)
-        return false
-      }
-    }
-    if (piece.ids[0] && piece.promoVals[0].length === 0 && piece.promotionSquares.length !== 0) {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} (White) promotes at some squares, but has no pieces to promote to`, -1)
-      return false
-    }
-    if (piece.ids[0] && piece.promoVals[0].length !== 0 && piece.promotionSquares.length === 0) {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} (White) can promote to ${piece.promoVals[0]}, but has no promotion squares`, -1)
-      return false
-    }
-    if (piece.ids[1] && piece.promoVals[1].length === 0 && piece.promotionSquares.length !== 0) {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} (Black) promotes at some squares, but has no pieces to promote to`, -1)
-      return false
-    }
-    if (piece.ids[1] && piece.promoVals[1].length !== 0 && piece.promotionSquares.length === 0) {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} (Black) can promote to ${piece.promoVals[1]}, but has no promotion squares`, -1)
-      return false
-    }
-    if (piece.castleFiles && state.pieceTypes.every(p => !p.isCastleRook)) {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} castles as King, so it needs 1 or more pieces that castle as Rook`, -1)
-      return false
-    }
-    if (piece.isCastleRook && state.pieceTypes.every(p => !p.castleFiles)) {
-      errorMsgHandler.show(`Piece ${pieceName(i, piece)} castles as Rook, so it needs 1 or more pieces that castle as King`, -1)
-      return false
+    const error = pieceError(i, state)
+    if (error) return error
+  }
+}
+
+function pieceError(i: number, state: Variant): string | undefined {
+  const piece = state.pieceTypes[i]
+  if (!piece.displayName) {
+    return `Piece ${pieceName(i, piece)} doesn't have a name`
+  }
+  if (piece.ids[0] === '') {
+    return `Piece ${pieceName(i, piece)} is missing a symbol for White`
+  }
+  if (piece.ids[1] === '') {
+    return `Piece ${pieceName(i, piece)} is missing a symbol for Black`
+  }
+  const duplicateWhiteError = checkDuplicateSymbol(i, 0, state)
+  if (duplicateWhiteError) {
+    return duplicateWhiteError
+  }
+  const duplicateBlackError = checkDuplicateSymbol(i, 1, state)
+  if (duplicateBlackError) {
+    return duplicateBlackError
+  }
+  
+  if (!piece.ids[0] && !piece.ids[1]) {
+    return `Piece ${pieceName(i, piece)} must be available for at least 1 player`
+  }
+  if (piece.ids[0] && !piece.imageUrls[0]) {
+    return `Piece ${pieceName(i, piece)} is missing an image for White`
+  }
+  if (piece.ids[1] && !piece.imageUrls[1]) {
+    return `Piece ${pieceName(i, piece)} is missing an image for Black`
+  }
+  for (const square of piece.doubleJumpSquares) {
+    if (square[0] >= state.boardWidth || square[1] >= state.boardHeight) {
+      return `Piece ${pieceName(i, piece)} can double jump at ${squareName(square)}, which is outside the board`
     }
   }
-  return true
+  for (const square of piece.promotionSquares) {
+    if (square[0] >= state.boardWidth || square[1] >= state.boardHeight) {
+      return `Piece ${pieceName(i, piece)} promotes at ${squareName(square)}, which is outside the board`
+    }
+  }
+  if (piece.ids[0] && piece.promoVals[0].length === 0 && piece.promotionSquares.length !== 0) {
+    return `Piece ${pieceName(i, piece)} (White) promotes at some squares, but has no pieces to promote to`
+  }
+  if (piece.ids[0] && piece.promoVals[0].length !== 0 && piece.promotionSquares.length === 0) {
+    return `Piece ${pieceName(i, piece)} (White) can promote to ${piece.promoVals[0]}, but has no promotion squares`
+  }
+  if (piece.ids[1] && piece.promoVals[1].length === 0 && piece.promotionSquares.length !== 0) {
+    return `Piece ${pieceName(i, piece)} (Black) promotes at some squares, but has no pieces to promote to`
+  }
+  if (piece.ids[1] && piece.promoVals[1].length !== 0 && piece.promotionSquares.length === 0) {
+    return `Piece ${pieceName(i, piece)} (Black) can promote to ${piece.promoVals[1]}, but has no promotion squares`
+  }
+  if (piece.castleFiles && state.pieceTypes.every(p => !p.isCastleRook)) {
+    return `Piece ${pieceName(i, piece)} castles as King, so it needs 1 or more pieces that castle as Rook`
+  }
+  if (piece.isCastleRook && state.pieceTypes.every(p => !p.castleFiles)) {
+    return `Piece ${pieceName(i, piece)} castles as Rook, so it needs 1 or more pieces that castle as King`
+  }
 }
 
 
@@ -112,22 +113,19 @@ function squareName(square: [number, number]): string {
   return `${String.fromCharCode(square[0] + 97)}${square[1] + 1}`
 }
 
-function checkDuplicateSymbol(i: number, player: number, state: Variant, errorMsgHandler: ErrorMessageHandler): boolean {
+function checkDuplicateSymbol(i: number, player: number, state: Variant): string | undefined {
   const piece = state.pieceTypes[i]
   const playerSym = piece.ids[player]
-  if (!playerSym) return false
+  if (!playerSym) return
   if (piece.ids[1 - player] === playerSym) {
-    errorMsgHandler.show(`Piece ${pieceName(i, piece)} cannot have the same symbol '${playerSym}' for both White and Black`, -1)
-    return true
+    return `Piece ${pieceName(i, piece)} cannot have the same symbol '${playerSym}' for both White and Black`
   }
   for (let j = 0; j < i; j++) {
     const otherPiece = state.pieceTypes[j]
     if (playerSym === otherPiece.ids[0] || playerSym === otherPiece.ids[1]) {
       const piece1 = pieceName(i, piece)
       const piece2 = pieceName(j, otherPiece)
-      errorMsgHandler.show(`There are 2 pieces with the symbol '${playerSym}' (${piece1} and ${piece2})`, -1)
-      return true
+      return `There are 2 pieces with the symbol '${playerSym}' (${piece1} and ${piece2})`
     }
   }
-  return false
 }

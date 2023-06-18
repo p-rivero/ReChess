@@ -99,16 +99,18 @@
   const moveList = ref<FormattedList>([])
   
   onMounted(() => {
-    // Convert the tree to a flat list of moves, with sentinel values for recursive components
-    
+    const flatList = convertTreeToFlatList(props.root, props.startAtLeft, props.currentSelection)
+    moveList.value = formatList(flatList, props.rootMoveNumber)
+  })
+  
+  function convertTreeToFlatList(root: MoveTreeNode, startLeft: boolean, selectedNode?: MoveTreeNode): FlatList {
     const flatList: FlatList = []
-    if (!props.startAtLeft) {
+    if (!startLeft) {
       flatList.push({ move: '...' })
     }
     
-    let currentlyAtLeft = props.startAtLeft
     // Initialize the current node to the root, create pseudo-root if necessary
-    let currentNode = props.root.move === 'root' ? props.root : { move: 'root', children: [props.root] }
+    let currentNode = root.move === 'root' ? root : { move: 'root', children: [root] }
     
     // Keep going down the mainline until we reach a leaf
     while (currentNode) {
@@ -121,7 +123,7 @@
       // Add the next move (this skips the root, which is not a real move)
       flatList.push({
         move: currentNode.children[0].notation,
-        highlighted: currentNode.children[0] === props.currentSelection,
+        highlighted: currentNode.children[0] === selectedNode,
         node: currentNode.children[0],
       })
 
@@ -129,7 +131,7 @@
       if (currentNode.children.length > 1) {
         // Make sure DisplayedMoves always come in pairs. When white branches,
         // we need to add padding before and after
-        if (currentlyAtLeft) {
+        if (startLeft) {
           flatList.push({ move: '...' })
         }
         for (let i = 1; i < currentNode.children.length; i++) {
@@ -137,19 +139,19 @@
           const sentinel: BranchSentinel = {
             isSentinel: true,
             node: child,
-            startAtLeft: currentlyAtLeft,
+            startAtLeft: startLeft,
           }
           flatList.push(sentinel)
           flatList.push({ move: '' })
         }
-        if (currentlyAtLeft) {
+        if (startLeft) {
           flatList.push({ move: '...' })
         }
       }
       
       // Go down the mainline. This returns undefined if there are no children
       currentNode = currentNode.children[0]
-      currentlyAtLeft = !currentlyAtLeft
+      startLeft = !startLeft
     }
     // Make sure DisplayedMoves always come in pairs. When reaching the end,
     // add a padding if black still has to move
@@ -158,12 +160,12 @@
       if (!last.isSentinel && last.move === '...') flatList.pop()
       else flatList.push({ move: '' })
     }
-    
-    
-    
-    // Convert the flat list to a list of rows, with sentinel values for recursive components
+    return flatList
+  }
+  
+  // Convert the flat list to a list of rows, with sentinel values for recursive components
+  function formatList(flatList: FlatList, moveNumber: number): FormattedList {
     const formattedList: FormattedList = []
-    let currentMoveNumber = props.rootMoveNumber
     let decremented = false
     for (let i = 0; i < flatList.length; i += 2) {
       const leftMove = flatList[i]
@@ -175,30 +177,29 @@
           throw new Error('Incorrect sentinel padding in MoveHistoryView')
         }
         // If there are many branches, decrement the move number only once
-        if (!decremented) currentMoveNumber--
+        if (!decremented) moveNumber--
         decremented = true
-        leftMove.moveNumber = currentMoveNumber
+        leftMove.moveNumber = moveNumber
         formattedList.push(leftMove)
         continue
       }
-      if (decremented && leftMove.move !== '...') currentMoveNumber++
+      if (decremented && leftMove.move !== '...') moveNumber++
       
       // Normal row
       if (rightMove.isSentinel) {
         throw new Error('Unexpected sentinel value in MoveHistoryView')
       }
       const row: ListRow = {
-        moveNum: currentMoveNumber,
+        moveNum: moveNumber,
         leftMove,
         rightMove,
       }
       formattedList.push(row)
-      currentMoveNumber++
+      moveNumber++
       decremented = false
     }
-    
-    moveList.value = formattedList
-  })
+    return formattedList
+  }
   
 </script>
 

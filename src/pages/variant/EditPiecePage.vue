@@ -417,8 +417,8 @@
   const whiteInvisible = computed(() => piece?.ids[0] == null || piece?.ids[0] === undefined)
   const blackInvisible = computed(() => piece?.ids[1] == null || piece?.ids[1] === undefined)
   // Reference to the current (number) value of the castling file text inputs
-  const castleFileQueenside = ref(piece?.castleFiles?.[0] || 2)
-  const castleFileKingside = ref(piece?.castleFiles?.[1] || 6)
+  const castleFileQueenside = ref(piece?.castleFiles?.[0] ?? 2)
+  const castleFileKingside = ref(piece?.castleFiles?.[1] ?? 6)
   
   function castlingDropdownChanged(item: string) {
     if (!piece) throw new Error('Piece is null')
