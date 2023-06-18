@@ -115,7 +115,9 @@ function isPlainObject(o: unknown) {
  */
 export function intersection<T>(a: T[], b: T[]): T[] {
   const intersection = a.filter(x => b.includes(x))
-  a = a.filter(x => !intersection.includes(x))
-  b = b.filter(x => !intersection.includes(x))
+  for (const x of intersection) {
+    a.splice(a.indexOf(x), 1)
+    b.splice(b.indexOf(x), 1)
+  }
   return intersection
 }
