@@ -89,15 +89,16 @@ async function toggleModeratorStatus(user: admin.auth.UserRecord) {
 
 // Terminal UI
 
-function onKeyPress(expectedKey: string, keyCallback: ()=>void, cancelCallback: ()=>void) {
+type KeyCallback = () => Promise<void> | void
+function onKeyPress(expectedKey: string, keyCallback: KeyCallback, cancelCallback: KeyCallback) {
   process.stdin.setRawMode(true)
   process.stdin.resume()
   process.stdin.setEncoding('utf8')
-  process.stdin.once('data', (key) => {
+  process.stdin.once('data', async (key) => {
     if (key.toString() === expectedKey) {
-      keyCallback()
+      await keyCallback()
     } else {
-      cancelCallback()
+      await cancelCallback()
     }
   })
 }

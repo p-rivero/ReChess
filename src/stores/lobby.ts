@@ -38,6 +38,9 @@ export interface ChallengerInfo {
   gameCreated: boolean
 }
 
+type CallbackRet = void | Promise<void>
+type Callback = () => CallbackRet
+type CallbackOf<T> = (arg: T) => CallbackRet
 const EMPTY_FN = () => { /* do nothing */ }
 
 export const useLobbyStore = defineStore('lobby', () => {
@@ -47,15 +50,15 @@ export const useLobbyStore = defineStore('lobby', () => {
   
   // Callbacks
   let unsubscribe = EMPTY_FN
-  let lobbyLoadedCallback: (lobby: LobbySlot[]) => void = EMPTY_FN
-  let ongoingLoadedCallback: (lobby: OngoingGameSlot[]) => void = EMPTY_FN
-  let lobbyCreatedCallback: (a: RequestedColor) => void = EMPTY_FN
-  let lobbyDeletedCallback = EMPTY_FN
-  let challengerJoinedCallback: (info: ChallengerInfo) => void = EMPTY_FN
-  let challengerLeftCallback = EMPTY_FN
-  let joinSlotCallback: (id: string, name: string) => void = EMPTY_FN
-  let kickedFromSlotCallback = EMPTY_FN
-  let gameCreatedCallback: (gameId: string, creatorId: string) => void = EMPTY_FN
+  let lobbyLoadedCallback: CallbackOf<LobbySlot[]> = EMPTY_FN
+  let ongoingLoadedCallback: CallbackOf<OngoingGameSlot[]> = EMPTY_FN
+  let lobbyCreatedCallback: CallbackOf<RequestedColor> = EMPTY_FN
+  let lobbyDeletedCallback: Callback = EMPTY_FN
+  let challengerJoinedCallback: CallbackOf<ChallengerInfo> = EMPTY_FN
+  let challengerLeftCallback: Callback = EMPTY_FN
+  let joinSlotCallback: (id: string, name: string) => CallbackRet = EMPTY_FN
+  let kickedFromSlotCallback: Callback = EMPTY_FN
+  let gameCreatedCallback: (gameId: string, creatorId: string) => CallbackRet = EMPTY_FN
   
   // Get real time updates for the slots in a lobby
   // Call this function after setting the callbacks
@@ -65,7 +68,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     // If subscribed to a different lobby, unsubscribe first
     unsubscribe()
     
-    const unsubscribeLobby = onSnapshot(LobbyDB.getLobbySlots(variantId), snap => {
+    const unsubscribeLobby = onSnapshot(LobbyDB.getLobbySlots(variantId), async snap => {
       const slots: LobbySlot[] = []
       // Update the list of slots
       snap.forEach(docSnap => {
@@ -77,12 +80,12 @@ export const useLobbyStore = defineStore('lobby', () => {
         const doc = docSnap.data() as LobbySlotDoc
         slots.push(readLobbyDocument(creatorId, doc))
       })
-      lobbyLoadedCallback(slots)
+      await lobbyLoadedCallback(slots)
       
       // If one of the slots is from the current user, show the waiting popup
       const mySlot = slots.find(s => s.currentUserIsCreator)
       if (mySlot) {
-        lobbyCreatedCallback(mySlot.requestedColor)
+        await lobbyCreatedCallback(mySlot.requestedColor)
         // If my slot has a challenger, show their info
         if (mySlot.challengerId) {
           // If challenger is reported, kick them automatically
@@ -90,35 +93,35 @@ export const useLobbyStore = defineStore('lobby', () => {
             rejectChallenger()
             return
           }
-          challengerJoinedCallback({
+          await challengerJoinedCallback({
             name: mySlot.challengerDisplayName ?? '[error]',
             image: mySlot.challengerImage,
             gameCreated: mySlot.gameDocId !== undefined,
           })
         } else {
-          challengerLeftCallback()
+          await challengerLeftCallback()
         }
       } else {
-        lobbyDeletedCallback()
+        await lobbyDeletedCallback()
       }
       
       // If the current user is joining a lobby, show the waiting popup
       // and redirect to the game when it's created
       const joinedSlot = slots.find(s => s.currentUserIsChallenger)
       if (joinedSlot) {
-        joinSlotCallback(joinedSlot.creatorId, joinedSlot.creatorDisplayName)
+        await joinSlotCallback(joinedSlot.creatorId, joinedSlot.creatorDisplayName)
         showKickedPopup = true
         if (joinedSlot.gameDocId) {
-          gameCreatedCallback(joinedSlot.gameDocId, joinedSlot.creatorId)
+          await gameCreatedCallback(joinedSlot.gameDocId, joinedSlot.creatorId)
           // Don't show popup if the creator accepts the challenge
           showKickedPopup = false
         }
       } else if (showKickedPopup) {
-        kickedFromSlotCallback()
+        await kickedFromSlotCallback()
         showKickedPopup = false
       }
     })
-    const unsubscribeOngoing = onSnapshot(LobbyDB.getOngoingGames(variantId), snap => {
+    const unsubscribeOngoing = onSnapshot(LobbyDB.getOngoingGames(variantId), async snap => {
       let slots: OngoingGameSlot[] = []
       snap.forEach(docSnap => {
         const docId = docSnap.id
@@ -130,7 +133,7 @@ export const useLobbyStore = defineStore('lobby', () => {
       const myGames = slots.filter(s => s.whiteId === myId || s.blackId === myId)
       const otherGames = slots.filter(s => s.whiteId !== myId && s.blackId !== myId)
       slots = myGames.concat(otherGames)
-      ongoingLoadedCallback(slots)
+      await ongoingLoadedCallback(slots)
     })
     
     unsubscribe = () => {
@@ -176,11 +179,12 @@ export const useLobbyStore = defineStore('lobby', () => {
     lobbyLoadedCallback = EMPTY_FN
     ongoingLoadedCallback = EMPTY_FN
     lobbyCreatedCallback = EMPTY_FN
+    lobbyDeletedCallback = EMPTY_FN
     challengerJoinedCallback = EMPTY_FN
     challengerLeftCallback = EMPTY_FN
     joinSlotCallback = EMPTY_FN
     kickedFromSlotCallback = EMPTY_FN
-    lobbyDeletedCallback = EMPTY_FN
+    gameCreatedCallback = EMPTY_FN
   }
   
   function readLobbyDocument(docId: string, doc: LobbySlotDoc): LobbySlot {

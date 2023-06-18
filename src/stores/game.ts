@@ -26,6 +26,8 @@ export interface Game {
   loggedUserIsBlack: boolean
 }
 
+type Callback = () => void | Promise<void>
+type CallbackOf<T> = (arg: T) => void | Promise<void>
 const EMPTY_FN = () => { /* do nothing */ }
 
 export const useGameStore = defineStore('game', () => {
@@ -36,9 +38,9 @@ export const useGameStore = defineStore('game', () => {
   
   // Callbacks
   let unsubscribe = EMPTY_FN
-  let gameChangedCallback: (game: Game) => void = EMPTY_FN
-  let gameNotExistsCallback = EMPTY_FN
-  let invalidVariantCallback = EMPTY_FN
+  let gameChangedCallback: CallbackOf<Game> = EMPTY_FN
+  let gameNotExistsCallback: Callback = EMPTY_FN
+  let invalidVariantCallback: Callback = EMPTY_FN
   
   // Get real time updates for the moves in a game
   // Call this function after setting the callbacks
@@ -50,9 +52,9 @@ export const useGameStore = defineStore('game', () => {
     
     const gameRef = GameDB.getGameRef(gameId)
     
-    unsubscribe = onSnapshot(gameRef, snap => {
+    unsubscribe = onSnapshot(gameRef, async snap => {
       if (!snap.exists()) {
-        gameNotExistsCallback()
+        await gameNotExistsCallback()
         return
       }
       const gameDoc = snap.data() as GameDoc
@@ -62,7 +64,7 @@ export const useGameStore = defineStore('game', () => {
       if (currentVariant == null) {
         const variant = readVariantDoc(gameDoc.IMMUTABLE.variant, gameDoc.IMMUTABLE.variantId)
         if (!variant) {
-          invalidVariantCallback()
+          await invalidVariantCallback()
           return
         }
         currentVariant = variant
@@ -71,20 +73,20 @@ export const useGameStore = defineStore('game', () => {
       // If the same user has 2 tabs open, we need to check which ones are outdated
       // and call the callback only when needed
       if (!objectEquals(newGame, currentGame)) {
-        gameChangedCallback(newGame)
+        await gameChangedCallback(newGame)
         currentGame = newGame
       }
     })
     currentGameId = gameId
   }
   
-  function onGameChanged(callback: (game: Game) => void) {
+  function onGameChanged(callback: CallbackOf<Game>) {
     gameChangedCallback = callback
   }
-  function onGameNotExists(callback: () => void) {
+  function onGameNotExists(callback: Callback) {
     gameNotExistsCallback = callback
   }
-  function onInvalidVariant(callback: () => void) {
+  function onInvalidVariant(callback: Callback) {
     invalidVariantCallback = callback
   }
 
