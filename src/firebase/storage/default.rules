@@ -4,7 +4,7 @@ function loggedAs(id) {
   return request.auth.uid != null && request.auth.uid == id && request.auth.token.email_verified;
 }
 function authMetadata() {
-  return loggedAs(request.resource.metadata.userId);
+  return userId in request.resource.metadata && loggedAs(request.resource.metadata.userId);
 }
 
 function sizeKib(maxSizeKibibytes) {
