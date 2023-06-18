@@ -33,6 +33,7 @@
       return route.query.startAs
     }
     if (route.query.startAs === 'random') {
+      // Using Math.random() is safe here, since this is a local game
       return Math.random() < 0.5 ? 'white' : 'black'
     }
     // Invalid value

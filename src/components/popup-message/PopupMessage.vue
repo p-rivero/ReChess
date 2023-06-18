@@ -56,8 +56,11 @@
   const primaryButtonText = ref('')
   const secondaryButtonText = ref<string|null>(null)
   
-  let acceptCallback: () => void
-  let cancelCallback: () => void
+  export type PopupCallback = () => Promise<void> | void
+  export type PopupButtons = 'ok' | 'ok-cancel' | 'yes-no'
+  
+  let acceptCallback: PopupCallback
+  let cancelCallback: PopupCallback
   let isImportant = false
   
   defineExpose({
@@ -65,33 +68,42 @@
       important: boolean,
       title: string,
       message: string,
-      buttons: 'ok' | 'ok-cancel' | 'yes-no',
-      accept?: () => void,
-      cancel?: () => void
+      buttons: PopupButtons,
+      accept: PopupCallback = (() => { /* Do nothing */ }),
+      cancel: PopupCallback = (() => { /* Do nothing */ })
     ) {
       titleText.value = title
       messageText.value = message
       isImportant = important
-      acceptCallback = accept ?? (() => { /* No callback set, do nothing */ })
-      cancelCallback = cancel ?? (() => { /* No callback set, do nothing */ })
-      if (buttons === 'ok-cancel') {
-        primaryButtonText.value = 'OK'
-        secondaryButtonText.value = 'Cancel'
-      } else if (buttons === 'yes-no') {
-        primaryButtonText.value = 'Yes'
-        secondaryButtonText.value = 'No'
-      } else if (buttons === 'ok') {
-        primaryButtonText.value = 'OK'
-        secondaryButtonText.value = null
-      } else {
-        throw new Error('Invalid button type')
-      }
+      acceptCallback = accept
+      cancelCallback = cancel
+      initializeButtonText(buttons)
+      
       popup.value?.classList.add('is-active')
       document.documentElement.classList.add('is-clipped')
       primaryButton.value?.focus()
     },
     hide: closePopup,
   })
+  
+  function initializeButtonText(buttons: PopupButtons) {
+    switch (buttons) {
+    case 'ok-cancel':
+      primaryButtonText.value = 'OK'
+      secondaryButtonText.value = 'Cancel'
+      break
+    case 'yes-no':
+      primaryButtonText.value = 'Yes'
+      secondaryButtonText.value = 'No'
+      break
+    case 'ok':
+      primaryButtonText.value = 'OK'
+      secondaryButtonText.value = null
+      break
+    default:
+      throw new Error('Invalid button type')
+    }
+  }
   
   function accept() {
     acceptCallback()
