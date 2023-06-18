@@ -25,7 +25,8 @@ jobs:
       - run: npm ci
         
       - name: Test with Firebase emulators
-        uses: w9jds/firebase-action@master
+        # When https://github.com/firebase/firebase-tools/issues/5904 is fixed, use @master
+        uses: w9jds/firebase-action@v11.30.0
         with:
           args: emulators:exec --only firestore,storage,auth 'npm test -- --detectOpenHandles'
         env:

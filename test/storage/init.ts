@@ -40,7 +40,7 @@ export function setupJest(projectId: string, rules: StorageRules, onInit: (testE
     } catch (e) {
       // Cannot connect to emulator
       console.error(e)
-      process.exit(0)
+      process.exit(1)
     }
     onInit(testEnv)
   }, 100000)
