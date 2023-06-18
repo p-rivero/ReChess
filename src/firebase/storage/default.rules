@@ -12,7 +12,8 @@ function sizeKib(maxSizeKibibytes) {
 }
 
 function isImage() {
-  return request.resource.contentType.matches('image/.*');
+  let contentType = request.resource.contentType;
+  return contentType != null && contentType.matches('image/.*');
 }
 
 service firebase.storage {
