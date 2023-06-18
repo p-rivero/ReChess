@@ -1,7 +1,7 @@
 import { positionToKey } from '@/helpers/chess/chess-coords'
 import type { DrawShape } from 'chessgroundx/draw'
 
-type Direction = 'left' | 'right' | 'up' | 'down' | 'upleft' | 'upright' | 'downleft' | 'downright'
+export type Direction = 'left' | 'right' | 'up' | 'down' | 'upleft' | 'upright' | 'downleft' | 'downright'
 
 /**
  * Returns a shape that draws an arrow from the given starting position to the edge of the board
@@ -12,7 +12,7 @@ type Direction = 'left' | 'right' | 'up' | 'down' | 'upleft' | 'upright' | 'down
  * @param brush The brush to use for the arrow
  * @returns A shape that draws an arrow from the given starting position to the edge of the board
  */
-export default function(start: [number, number], boardSize: number, arrowDir: Direction, brush: string): DrawShape {
+export function arrowShape(start: [number, number], boardSize: number, arrowDir: Direction, brush: string): DrawShape {
   return {
     orig: positionToKey(start),
     dest: positionToKey(getArrowEnd(start, boardSize, arrowDir)),

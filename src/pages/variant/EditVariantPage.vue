@@ -423,7 +423,7 @@
       'This will remove **all** pieces and walls from the board. Do you want to continue?',
       'yes-no',
       // Set the position to '/' instead of '', the engine wants a non-empty fen
-      () => draftStore.state.fen = '/'
+      () => { draftStore.state.fen = '/' }
     )
   }
   

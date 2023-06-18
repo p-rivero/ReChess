@@ -17,10 +17,11 @@
 
 
 <script setup lang="ts">
+  import { type Direction, arrowShape } from '@/helpers/chess/slide-arrow-shape'
   import { computed, nextTick, onMounted, ref, watch } from 'vue'
+  import { intersection } from '@/helpers/ts-utils'
   import { keyToPosition, positionToKey } from '@/helpers/chess/chess-coords'
   import ChessgroundAdapter from './internal/ChessgroundAdapter.vue'
-  import arrowShape from '@/helpers/chess/slide-arrow-shape'
   import type { Config } from 'chessgroundx/config'
   import type { DrawShape } from 'chessgroundx/draw'
   import type { FullPieceDef } from '@/protochess/types'
@@ -114,127 +115,86 @@
   }
   
   function getShapes(position: [number, number], boardSize: number): DrawShape[] {
-    // Jump deltas
+    return [
+      ...getJumpDeltasShapes(position),
+      ...getSlidesShapes(position, boardSize),
+    ]
+  }
+  
+  function getJumpDeltasShapes(position: [number, number]): DrawShape[] {
+    const keysMove: Key[] = []
+    for (const [dx, dy] of props.piece.translateJumpDeltas) {
+      keysMove.push(positionToKey([dx + position[0], dy + position[1]]))
+    }
+    const keysCapture: Key[] = []
+    for (const [dx, dy] of props.piece.attackJumpDeltas) {
+      keysCapture.push(positionToKey([dx + position[0], dy + position[1]]))
+    }
+    const keysBoth = intersection(keysMove, keysCapture)
     
-    let keysMove: Key[] = []
-    for (const [x, y] of props.piece.translateJumpDeltas) {
-      keysMove.push(positionToKey([x + position[0], y + position[1]]))
-    }
-    let keysCapture: Key[] = []
-    for (const [x, y] of props.piece.attackJumpDeltas) {
-      keysCapture.push(positionToKey([x + position[0], y + position[1]]))
-    }
-    // Intersection of keysMove and keysCapture
-    let keysBoth: Key[] = []
-    for (const key of keysMove) {
-      if (keysCapture.includes(key)) {
-        keysBoth.push(key)
-      }
-    }
-    // Slso remove the keys from keysMove and keysCapture
-    for (const key of keysBoth) {
-      keysMove.splice(keysMove.indexOf(key), 1)
-      keysCapture.splice(keysCapture.indexOf(key), 1)
-    }
-    let keysExplosion: Key[] = []
+    const keysExplosion: Key[] = []
     if (props.piece.explodeOnCapture) {
       keysExplosion.push(positionToKey(position))
-      for (const [x, y] of props.piece.explosionDeltas) {
-        keysExplosion.push(positionToKey([x + position[0], y + position[1]]))
+      for (const [dx, dy] of props.piece.explosionDeltas) {
+        keysExplosion.push(positionToKey([position[0] + dx, position[1] + dy]))
       }
     }
     
+    return [
+      ...keysToShapes(keysMove, generateCircleSvg('green')),
+      ...keysToShapes(keysCapture, generateCircleSvg('red')),
+      ...keysToShapes(keysBoth, generateCircleSvg('purple')),
+      ...keysToShapes(keysExplosion, generateCrossSvg('orange')),
+    ]
+  }
+  
+  function getSlidesShapes(position: [number, number], boardSize: number): DrawShape[] {
     const shapes: DrawShape[] = []
-    for (const key of keysMove) {
-      shapes.push({ orig: key, customSvg: generateCircleSvg('green') })
-    }
-    for (const key of keysCapture) {
-      shapes.push({ orig: key, customSvg: generateCircleSvg('red') })
-    }
-    for (const key of keysBoth) {
-      shapes.push({ orig: key, customSvg: generateCircleSvg('purple') })
-    }
-    for (const key of keysExplosion) {
-      shapes.push({ orig: key, customSvg: generateCrossSvg('orange') })
-    }
+    const piece = props.piece
     
-    // Slides
-    
-    const topRight = props.boardSize - 1
-    if (position[0] < topRight) {
-      if (props.piece.translateEast && props.piece.attackEast) {
-        shapes.push(arrowShape(position, boardSize, 'right', 'purple'))
-      } else if (props.piece.translateEast) {
-        shapes.push(arrowShape(position, boardSize, 'right', 'green'))
-      } else if (props.piece.attackEast) {
-        shapes.push(arrowShape(position, boardSize, 'right', 'red'))
-      }
+    const boardEdge = boardSize - 1
+    if (position[0] < boardEdge) {
+      shapes.push(...slideArrow(position, boardSize, 'right', piece.translateEast, piece.attackEast))
     }
     if (position[0] > 0) {
-      if (props.piece.translateWest && props.piece.attackWest) {
-        shapes.push(arrowShape(position, boardSize, 'left', 'purple'))
-      } else if (props.piece.translateWest) {
-        shapes.push(arrowShape(position, boardSize, 'left', 'green'))
-      } else if (props.piece.attackWest) {
-        shapes.push(arrowShape(position, boardSize, 'left', 'red'))
-      }
+      shapes.push(...slideArrow(position, boardSize, 'left', piece.translateWest, piece.attackWest))
     }
-    if (position[1] < topRight) {
-      if (props.piece.translateNorth && props.piece.attackNorth) {
-        shapes.push(arrowShape(position, boardSize, 'up', 'purple'))
-      } else if (props.piece.translateNorth) {
-        shapes.push(arrowShape(position, boardSize, 'up', 'green'))
-      } else if (props.piece.attackNorth) {
-        shapes.push(arrowShape(position, boardSize, 'up', 'red'))
-      }
+    if (position[1] < boardEdge) {
+      shapes.push(...slideArrow(position, boardSize, 'up', piece.translateNorth, piece.attackNorth))
     }
     if (position[1] > 0) {
-      if (props.piece.translateSouth && props.piece.attackSouth) {
-        shapes.push(arrowShape(position, boardSize, 'down', 'purple'))
-      } else if (props.piece.translateSouth) {
-        shapes.push(arrowShape(position, boardSize, 'down', 'green'))
-      } else if (props.piece.attackSouth) {
-        shapes.push(arrowShape(position, boardSize, 'down', 'red'))
-      }
+      shapes.push(...slideArrow(position, boardSize, 'down', piece.translateSouth, piece.attackSouth))
     }
-    if (position[0] < topRight && position[1] < topRight) {
-      if (props.piece.translateNortheast && props.piece.attackNortheast) {
-        shapes.push(arrowShape(position, boardSize, 'upright', 'purple'))
-      } else if (props.piece.translateNortheast) {
-        shapes.push(arrowShape(position, boardSize, 'upright', 'green'))
-      } else if (props.piece.attackNortheast) {
-        shapes.push(arrowShape(position, boardSize, 'upright', 'red'))
-      }
+    if (position[0] < boardEdge && position[1] < boardEdge) {
+      shapes.push(...slideArrow(position, boardSize, 'upright', piece.translateNortheast, piece.attackNortheast))
     }
-    if (position[0] > 0 && position[1] < topRight) {
-      if (props.piece.translateNorthwest && props.piece.attackNorthwest) {
-        shapes.push(arrowShape(position, boardSize, 'upleft', 'purple'))
-      } else if (props.piece.translateNorthwest) {
-        shapes.push(arrowShape(position, boardSize, 'upleft', 'green'))
-      } else if (props.piece.attackNorthwest) {
-        shapes.push(arrowShape(position, boardSize, 'upleft', 'red'))
-      }
+    if (position[0] > 0 && position[1] < boardEdge) {
+      shapes.push(...slideArrow(position, boardSize, 'upleft', piece.translateNorthwest, piece.attackNorthwest))
     }
-    if (position[0] < topRight && position[1] > 0) {
-      if (props.piece.translateSoutheast && props.piece.attackSoutheast) {
-        shapes.push(arrowShape(position, boardSize, 'downright', 'purple'))
-      } else if (props.piece.translateSoutheast) {
-        shapes.push(arrowShape(position, boardSize, 'downright', 'green'))
-      } else if (props.piece.attackSoutheast) {
-        shapes.push(arrowShape(position, boardSize, 'downright', 'red'))
-      }
+    if (position[0] < boardEdge && position[1] > 0) {
+      shapes.push(...slideArrow(position, boardSize, 'downright', piece.translateSoutheast, piece.attackSoutheast))
     }
     if (position[0] > 0 && position[1] > 0) {
-      if (props.piece.translateSouthwest && props.piece.attackSouthwest) {
-        shapes.push(arrowShape(position, boardSize, 'downleft', 'purple'))
-      } else if (props.piece.translateSouthwest) {
-        shapes.push(arrowShape(position, boardSize, 'downleft', 'green'))
-      } else if (props.piece.attackSouthwest) {
-        shapes.push(arrowShape(position, boardSize, 'downleft', 'red'))
-      }
+      shapes.push(...slideArrow(position, boardSize, 'downleft', piece.translateSouthwest, piece.attackSouthwest))
     }
-    
     return shapes
+  }
+  
+  function slideArrow(position: [number,number], boardSize: number, arrowDir: Direction, move: boolean, capture: boolean): DrawShape[] {
+    if (move && capture) {
+      return [arrowShape(position, boardSize, arrowDir, 'purple')]
+    }
+    if (move) {
+      return [arrowShape(position, boardSize, arrowDir, 'green')]
+    }
+    if (capture) {
+      return [arrowShape(position, boardSize, arrowDir, 'red')]
+    }
+    return []
+  }
+  
+  function keysToShapes(keys: Key[], svg: string): DrawShape[] {
+    return keys.map(key => ({ orig: key, customSvg: svg }))
   }
   
   function generateCircleSvg(color: string): string {

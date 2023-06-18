@@ -102,7 +102,7 @@
       'You can always create a new variant from scratch by clicking the **Create** button in the top navigation bar. \
       \n\nYou can also use any existing variant as a template to create your own.',
       'ok-cancel',
-      () => userPrefsStore.seeCreateHint = false
+      () => { userPrefsStore.seeCreateHint = false }
     )
   }
   

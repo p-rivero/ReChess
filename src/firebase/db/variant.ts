@@ -125,5 +125,5 @@ export async function getUpvotedVariants(userId: string): Promise<[VariantDoc, s
     return variant
   }))
   // Return the variant document and the variant ID
-  return variantDocs.map((doc, i) => [doc as VariantDoc, variantIds[i]])
+  return variantDocs.map((doc, i) => [doc, variantIds[i]])
 }
