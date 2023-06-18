@@ -65,8 +65,8 @@ export function moveToString(move: MoveInfo): string {
 }
 
 export function parseMove(move: string): MoveInfo {
-  const moveRegex = /^([a-p])([0-9]{1,2})([a-p])([0-9]{1,2})(=..?)?$/
-  const match = move.match(moveRegex)
+  const moveRegex = /^([a-p])(\d{1,2})([a-p])(\d{1,2})(=..?)?$/
+  const match = moveRegex.exec(move)
   if (!match) {
     throw new Error(`Invalid move string: "${move}"`)
   }

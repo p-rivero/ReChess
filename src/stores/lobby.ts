@@ -74,7 +74,7 @@ export const useLobbyStore = defineStore('lobby', () => {
       snap.forEach(docSnap => {
         const creatorId = docSnap.id
         // Skip slots created by reported users
-        if (authStore.loggedUser && authStore.loggedUser.reportedUsers.includes(creatorId)) {
+        if (authStore.loggedUser?.reportedUsers.includes(creatorId)) {
           return
         }
         const doc = docSnap.data() as LobbySlotDoc
@@ -89,7 +89,7 @@ export const useLobbyStore = defineStore('lobby', () => {
         // If my slot has a challenger, show their info
         if (mySlot.challengerId) {
           // If challenger is reported, kick them automatically
-          if (authStore.loggedUser && authStore.loggedUser.reportedUsers.includes(mySlot.challengerId)) {
+          if (authStore.loggedUser?.reportedUsers.includes(mySlot.challengerId)) {
             rejectChallenger()
             return
           }
