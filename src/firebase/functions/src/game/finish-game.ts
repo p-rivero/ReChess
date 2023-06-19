@@ -98,13 +98,20 @@ async function appendGameSummary(user: [string, UserDoc], newGame: GameSummary) 
   if (lengthAfterAddingGame > MAX_CACHED_GAMES) {
     last5Games.pop()
   }
+  const opponentIds = removeNullsAndDuplicates(last5Games.map(game => game.opponentId))
+  const variantIds = removeNullsAndDuplicates(last5Games.map(game => game.variantId))
   
+  // It would be safer to use a transaction here to read and update the profile, but
+  // it would make the code less readable and it's not a big deal, since the same user
+  // is unlikely to finish 2 games at the same time.
   try {
     const earnedPoints = WIN_POINTS[newGame.result]
     await db.collection('users').doc(userId).update({
       'IMMUTABLE.numGamesPlayed': FieldValue.increment(1),
       'IMMUTABLE.numWinPoints': FieldValue.increment(earnedPoints),
       'IMMUTABLE.last5Games': JSON.stringify(last5Games),
+      'IMMUTABLE.lastGamesOpponentIds': opponentIds,
+      'IMMUTABLE.lastGamesVariantIds': variantIds,
     })
   } catch (e) {
     console.error('Cannot update profile', userId, e)
@@ -115,4 +122,8 @@ function playerResult(side: 'white'|'black', winner: 'white'|'black'|'draw'|null
   if (!winner) throw new Error('Game is not finished')
   if (winner === 'draw') return 'draw'
   return winner === side ? 'win' : 'loss'
+}
+
+function removeNullsAndDuplicates(array: (string|null)[]): string[] {
+  return [...new Set(array.filter(s => s))] as string[]
 }

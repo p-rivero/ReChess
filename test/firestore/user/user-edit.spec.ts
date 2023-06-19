@@ -30,6 +30,8 @@ async function setupUser(name: string|null = null) {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {

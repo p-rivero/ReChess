@@ -24,13 +24,15 @@ export interface UserDoc {
     numGamesPlayed: number
     numWinPoints: number
     last5Games: string // JSON of GameSummary[], updated by cloud function
+    lastGamesOpponentIds: string[] // Index of last 5 games
+    lastGamesVariantIds: string[] // Index of last 5 games
   }
   // Hidden flag (disallowed by security rules)
   banned?: true
 }
 export interface GameSummary {
   gameId: string
-  variantId: string
+  variantId: string // TODO: Cascade delete
   variantName: string
   timeCreatedMs: number
   playedSide: 'white' | 'black'

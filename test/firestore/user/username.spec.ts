@@ -28,6 +28,8 @@ async function setupUser(id: string, username = 'new_username') {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   await set('admin', user, 'users', id)

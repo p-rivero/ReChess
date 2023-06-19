@@ -1,4 +1,5 @@
 import admin from 'firebase-admin'
+import { Change } from 'firebase-functions'
 import type { UserDoc, GameSummary, UsernameDoc, UserPrivateDoc, TimestampDoc, ReportDoc, UserRenameTriggerDoc } from '@/firebase/db/schema'
 import type { UserRecord } from 'firebase-functions/v1/auth'
 import type { Timestamp } from 'firebase/firestore'
@@ -11,25 +12,30 @@ function randomId(): string {
   return a
 }
 
-function makeGameSummaries(numGames: number): string {
-  const summaries = []
-  for (let i = 0; i < numGames; i++) {
+function makeGameSummaries(opponentIds: string[], variantIds: string[]): string {
+  function randomVariantId() {
+    return variantIds[Math.floor(Math.random() * variantIds.length)]
+  }
+  const summaries = opponentIds.map((opponentId, i) => {
     const doc: GameSummary = {
       gameId: randomId(),
-      variantId: randomId(),
+      variantId: randomVariantId(),
       variantName: 'Variant Name',
       timeCreatedMs: Date.now() - 1000 * i,
       playedSide: 'white',
       result: 'win',
-      opponentId: randomId(),
+      opponentId,
       opponentName: 'Opponent Name',
     }
-    summaries.push(doc)
-  }
+    return doc
+  })
   return JSON.stringify(summaries)
 }
 
 export async function insertUserWithGames(db: DB, userId: string, gamesPlayed: number): Promise<UserDoc> {
+  gamesPlayed = Math.min(gamesPlayed, 5)
+  const opponentIds = Array.from({ length: gamesPlayed }, () => randomId())
+  const variantIds = Array.from({ length: 3 }, () => randomId())
   const doc: UserDoc = {
     name: 'User Name',
     about: 'About me',
@@ -39,7 +45,9 @@ export async function insertUserWithGames(db: DB, userId: string, gamesPlayed: n
       renameAllowedAt: null,
       numGamesPlayed: gamesPlayed,
       numWinPoints: 0,
-      last5Games: makeGameSummaries(Math.min(gamesPlayed, 5)),
+      last5Games: makeGameSummaries(opponentIds, variantIds),
+      lastGamesOpponentIds: opponentIds,
+      lastGamesVariantIds: variantIds,
     },
   }
   await db.collection('users').doc(userId).set(doc)
@@ -57,6 +65,8 @@ export async function insertUser(db: DB, user: UserRecord, insertAllDocs = false
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   await db.collection('users').doc(user.uid).set(doc)
@@ -95,4 +105,22 @@ export async function insertVariantReport(db: DB, testEnv: FeaturesList, userId:
   }
   await db.collection('users').doc(userId).collection('reportedVariants').doc(reportedVariantId).set(doc)
   return testEnv.firestore.makeDocumentSnapshot(doc, `users/${userId}/reportedVariants/${reportedVariantId}`)
+}
+
+export async function changeUserName(db: DB, testEnv: FeaturesList, userId: string, newName: string | null) {
+  const userDoc = (await db.collection('users').doc(userId).get()).data() as UserDoc
+  const username = userDoc.IMMUTABLE.username
+  const oldDoc: UserRenameTriggerDoc = {
+    name: userDoc.name ?? `@${username}`,
+    username,
+  }
+  const oldSnapshot = testEnv.firestore.makeDocumentSnapshot(oldDoc, `users/${userId}/renameTrigger/doc`)
+  const newDoc: UserRenameTriggerDoc = {
+    name: newName ?? `@${username}`,
+    username,
+  }
+  const newSnapshot = testEnv.firestore.makeDocumentSnapshot(newDoc, `users/${userId}/renameTrigger/doc`)
+  await db.collection('users').doc(userId).update({ name: newName })
+  await db.collection('users').doc(userId).collection('renameTrigger').doc('doc').set(newDoc)
+  return new Change(oldSnapshot, newSnapshot)
 }

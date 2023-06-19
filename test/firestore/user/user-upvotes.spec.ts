@@ -26,6 +26,8 @@ async function createUserAndVariant(creatorId = 'some_id') {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const variant: VariantDoc = {

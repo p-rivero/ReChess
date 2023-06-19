@@ -59,7 +59,7 @@ export async function callFunction< F extends(...args: any[]) => Promise<any> >
 }
 
 type BatchUpdateInput = QuerySnapshot | DocumentReference[]
-type BatchCallback = (batch: WriteBatch, ref: DocumentReference) => void
+type BatchCallback = (batch: WriteBatch, ref: DocumentReference, index: number) => void
 
 /**
  * Generic function to perform a batched update of possibly more than 500 documents.
@@ -81,9 +81,10 @@ export async function batchedUpdate(input: BatchUpdateInput, operation: BatchCal
   for (let nBatch = 0; nBatch < numBatches; nBatch++) {
     const batch = db.batch()
     for (let i = 0; i < MAX_BATCH_SIZE; i++) {
-      const ref = input.at(nBatch * MAX_BATCH_SIZE + i)
+      const index = nBatch * MAX_BATCH_SIZE + i
+      const ref = input.at(index)
       if (!ref) break
-      operation(batch, ref)
+      operation(batch, ref, index)
     }
     await batch.commit()
   }

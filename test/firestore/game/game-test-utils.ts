@@ -45,6 +45,8 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const bob: UserDoc = {
@@ -57,6 +59,8 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const my_user: UserDoc = {
@@ -69,6 +73,8 @@ export async function setupUsersAndVariant(set: TestUtilsSignature['set']) {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   await Promise.all([

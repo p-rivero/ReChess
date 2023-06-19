@@ -1,12 +1,10 @@
 import { functions, initialize } from '../init'
 import { expectNoErrorLog } from '../utils'
-import { insertUser } from './user-mock' 
+import { insertUser, changeUserName } from './user-mock' 
 import { makeFirestoreContext } from '../make-context'
 import { insertVariant } from '../variant/variant-mock'
 import { insertGame } from '../game/games-mock'
-import { Change } from 'firebase-functions'
 import admin from 'firebase-admin'
-import type { UserRenameTriggerDoc, UserDoc } from '@/firebase/db/schema'
 
 const { app, testEnv } = initialize('rename-user-test')
 const db = app.firestore()
@@ -15,21 +13,8 @@ const renameUser = testEnv.wrap(functions.renameUser)
 
 const USER_ID = 'renamed_user_id'
 
-async function changeName(userDoc: UserDoc, newName: string | null) {
-  const username = userDoc.IMMUTABLE.username
-  const oldDoc: UserRenameTriggerDoc = {
-    name: userDoc.name ?? `@${username}`,
-    username,
-  }
-  const oldSnapshot = testEnv.firestore.makeDocumentSnapshot(oldDoc, `users/${USER_ID}/renameTrigger/doc`)
-  const newDoc: UserRenameTriggerDoc = {
-    name: newName ?? `@${username}`,
-    username,
-  }
-  const newSnapshot = testEnv.firestore.makeDocumentSnapshot(newDoc, `users/${USER_ID}/renameTrigger/doc`)
-  await db.collection('users').doc(USER_ID).update({ name: newName })
-  await db.collection('users').doc(USER_ID).collection('renameTrigger').doc('doc').set(newDoc)
-  return new Change(oldSnapshot, newSnapshot)
+async function changeName(newName: string | null) {
+  return changeUserName(db, testEnv, USER_ID, newName)
 }
 async function setRenameTimeout(timeout: Date) {
   const timeoutTimestamp = admin.firestore.Timestamp.fromDate(timeout)
@@ -47,7 +32,7 @@ test('user can change display name', async () => {
     displayName: 'My Old Name',
   })
   const userDoc = await insertUser(db, user, true)
-  const change = await changeName(userDoc, 'A New Name')
+  const change = await changeName('A New Name')
   
   const startTimestamp = Date.now()
   const done = expectNoErrorLog()
@@ -77,7 +62,7 @@ test('user can delete display name' , async () => {
   })
   const userDoc = await insertUser(db, user, true)
   await setRenameTimeout(new Date(Date.now())) // Existing timeout that should be overwriten
-  const change = await changeName(userDoc, null)
+  const change = await changeName(null)
   
   const startTimestamp = Date.now()
   const done = expectNoErrorLog()
@@ -105,10 +90,10 @@ test('user name is updated in created variants', async () => {
     uid: USER_ID,
     displayName: 'My Old Name',
   })
-  const userDoc = await insertUser(db, user, true)
+  await insertUser(db, user, true)
   const myVariant = await insertVariant(db, 'my_variant', 'white', USER_ID)
   const notMyVariant = await insertVariant(db, 'not_my_variant', 'black', 'someone_else')
-  const change = await changeName(userDoc, 'A New Name')
+  const change = await changeName('A New Name')
   
   expect(myVariant.creatorId).toBe(USER_ID)
   expect(notMyVariant.creatorId).toBe('someone_else')
@@ -135,7 +120,7 @@ test('removed user name is updated in created variants', async () => {
   const username = userDoc.IMMUTABLE.username
   const myVariant = await insertVariant(db, 'my_variant', 'white', USER_ID)
   const notMyVariant = await insertVariant(db, 'not_my_variant', 'black', 'someone_else')
-  const change = await changeName(userDoc, null)
+  const change = await changeName(null)
   
   expect(myVariant.creatorId).toBe(USER_ID)
   expect(notMyVariant.creatorId).toBe('someone_else')
@@ -158,7 +143,7 @@ test('user name is updated in played games', async () => {
     uid: USER_ID,
     displayName: 'My Old Name',
   })
-  const userDoc = await insertUser(db, user, true)
+  await insertUser(db, user, true)
   const ongoingGame1 = await insertGame(db, 'game_1', 'some_variant')
   await db.collection('games').doc('game_1').update({
     'IMMUTABLE.whiteId': USER_ID,
@@ -179,7 +164,7 @@ test('user name is updated in played games', async () => {
     'IMMUTABLE.blackId': USER_ID,
     'IMMUTABLE.blackDisplayName': 'My Old Name',
   })
-  const change = await changeName(userDoc, 'A New Name')
+  const change = await changeName('A New Name')
   
   const done = expectNoErrorLog()
   await renameUser(change, makeContext())
@@ -240,7 +225,7 @@ test('removed user name is updated in played games', async () => {
     'IMMUTABLE.blackId': USER_ID,
     'IMMUTABLE.blackDisplayName': 'My Old Name',
   })
-  const change = await changeName(userDoc, null)
+  const change = await changeName(null)
   
   const done = expectNoErrorLog()
   await renameUser(change, makeContext())

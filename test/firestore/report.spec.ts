@@ -27,6 +27,8 @@ async function createUser(username = 'my_username', id = MY_ID) {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   await set('admin', user, 'users', id)

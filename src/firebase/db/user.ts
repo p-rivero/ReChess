@@ -16,6 +16,8 @@ export async function createUser(user: User, username: string): Promise<UserDoc>
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   if (!user.email) throw new Error('User must have an email')

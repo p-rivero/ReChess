@@ -29,6 +29,8 @@ test('anyone can read created users', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   await set('admin', user, 'users', '1234')
@@ -58,6 +60,8 @@ test('can create a user if authenticated', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -85,6 +89,8 @@ test('cannot create a user if username is already taken', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -114,6 +120,8 @@ test('cannot create a user if not authenticated', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -140,6 +148,8 @@ test('cannot create a user with more than 0 wins', async () => {
       numGamesPlayed: 0,
       numWinPoints: 1,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -166,6 +176,8 @@ test('cannot create a user with more than 0 played games', async () => {
       numGamesPlayed: 1,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -192,6 +204,64 @@ test('last5Games must be an empty array', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[{}]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
+    },
+  }
+  const userPrivate: UserPrivateDoc = {
+    IMMUTABLE: {
+      email: MY_EMAIL,
+    },
+  }
+  const batch = startBatch('unverified')
+  batch.set(username, 'usernames', 'my_username')
+  batch.set(user, 'users', MY_ID)
+  batch.set(userPrivate, 'users', MY_ID, 'private', 'doc')
+  await assertFails(batch.commit())
+})
+
+test('lastGamesOpponentIds must be an empty array', async () => {
+  const username: UsernameDoc = { userId: MY_ID }
+  const user: UserDoc = {
+    name: 'my new user',
+    about: '',
+    profileImg: 'example.com/img.png',
+    IMMUTABLE: {
+      username: 'my_username',
+      renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
+      lastGamesOpponentIds: ['some_id'],
+      lastGamesVariantIds: [],
+    },
+  }
+  const userPrivate: UserPrivateDoc = {
+    IMMUTABLE: {
+      email: MY_EMAIL,
+    },
+  }
+  const batch = startBatch('unverified')
+  batch.set(username, 'usernames', 'my_username')
+  batch.set(user, 'users', MY_ID)
+  batch.set(userPrivate, 'users', MY_ID, 'private', 'doc')
+  await assertFails(batch.commit())
+})
+
+test('lastGamesVariantIds must be an empty array', async () => {
+  const username: UsernameDoc = { userId: MY_ID }
+  const user: UserDoc = {
+    name: 'my new user',
+    about: '',
+    profileImg: 'example.com/img.png',
+    IMMUTABLE: {
+      username: 'my_username',
+      renameAllowedAt: null,
+      numGamesPlayed: 0,
+      numWinPoints: 0,
+      last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: ['some_id'],
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -218,6 +288,8 @@ test('can create a user without name or profileImg', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -243,6 +315,8 @@ test('cannot create a user without also creating username', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -268,6 +342,8 @@ test('cannot create a user without also creating private doc', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const batch = startBatch('unverified')
@@ -288,6 +364,8 @@ test('cannot create more than one private doc', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -315,6 +393,8 @@ test('email must match auth token', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {
@@ -341,6 +421,8 @@ test('renameAllowedAt must be null', async () => {
       numGamesPlayed: 0,
       numWinPoints: 0,
       last5Games: '[]',
+      lastGamesOpponentIds: [],
+      lastGamesVariantIds: [],
     },
   }
   const userPrivate: UserPrivateDoc = {

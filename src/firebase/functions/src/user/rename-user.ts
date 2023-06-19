@@ -3,7 +3,7 @@ import { type QueryDocumentSnapshot, Timestamp } from 'firebase-admin/firestore'
 import type { Change } from 'firebase-functions'
 
 import { batchedUpdate, useAdmin } from '../helpers'
-import type { UserRenameTriggerDoc } from 'db/schema'
+import type { GameSummary, UserDoc, UserRenameTriggerDoc } from 'db/schema'
 
 
 /**
@@ -59,12 +59,11 @@ export async function updateName(userId: string, newName: string | null): Promis
     updateNameOfVariantCreator(userId, newName, removeId),
     updateNameOfWhitePlayer(userId, newName, removeId),
     updateNameOfBlackPlayer(userId, newName, removeId),
+    updateOpponentGameSummaries(userId, newName, removeId),
   ])
   
   // Do not update the name in the lobby entries, because they are short-lived and
   // it's not a problem to have the old name there for a while
-  
-  // TODO: User caches
 }
 
 async function updateNameOfVariantCreator(creatorId: string, newName: string, removeId: boolean) {
@@ -111,6 +110,36 @@ async function updateNameOfBlackPlayer(playerId: string, newName: string, remove
     })
   } catch (err) {
     console.error(`Error while updating games (black) for user ${playerId}:`)
+    console.error(err)
+  }
+}
+
+async function updateOpponentGameSummaries(userId: string, newName: string, removeId: boolean) {
+  const { db } = await useAdmin()
+  const updatedUsers = await db.collection('users').where('IMMUTABLE.lastGamesOpponentIds', 'array-contains', userId).get()
+  
+  const newSummaries = updatedUsers.docs.map(doc => {
+    const user = doc.data() as UserDoc
+    const summaries = JSON.parse(user.IMMUTABLE.last5Games) as GameSummary[]
+    for (const summary of summaries) {
+      if (summary.opponentId === userId) {
+        summary.opponentName = newName
+        if (removeId) {
+          summary.opponentId = null
+        }
+      }
+    }
+    return JSON.stringify(summaries)
+  })
+  
+  try {
+    await batchedUpdate(updatedUsers, (batch, ref, i) => {
+      batch.update(ref, {
+        'IMMUTABLE.last5Games': newSummaries[i],
+      })
+    })
+  } catch (err) {
+    console.error(`Error while updating last5Games for user ${userId}:`)
     console.error(err)
   }
 }

@@ -107,7 +107,8 @@ service cloud.firestore {
       function isUserDoc(doc) {
         return
           hasFields(doc, ['about', 'IMMUTABLE'], ['name', 'profileImg']) &&
-          hasFields(doc.IMMUTABLE, ['username', 'numGamesPlayed', 'numWinPoints', 'last5Games'], ['renameAllowedAt']) &&
+          hasFields(doc.IMMUTABLE, ['username', 'numGamesPlayed', 'numWinPoints', 'last5Games',
+              'lastGamesOpponentIds', 'lastGamesVariantIds'], ['renameAllowedAt']) &&
           doc.about is string &&
           doc.about.size() <= 1000 &&
           (doc.name == null || (
@@ -126,7 +127,11 @@ service cloud.firestore {
           )) &&
           doc.IMMUTABLE.numGamesPlayed is int &&
           doc.IMMUTABLE.numWinPoints is number && // 0.5 points for draw, not an int
-          doc.IMMUTABLE.last5Games is string;
+          doc.IMMUTABLE.last5Games is string &&
+          doc.IMMUTABLE.lastGamesOpponentIds is list &&
+          doc.IMMUTABLE.lastGamesOpponentIds.size() <= 5 &&
+          doc.IMMUTABLE.lastGamesVariantIds is list &&
+          doc.IMMUTABLE.lastGamesVariantIds.size() <= 5;
       }
       function allowCreateUser() {
         let doc = request.resource.data;
@@ -140,6 +145,8 @@ service cloud.firestore {
           doc.IMMUTABLE.numGamesPlayed == 0 &&
           doc.IMMUTABLE.numWinPoints == 0 &&
           doc.IMMUTABLE.last5Games == '[]' &&
+          doc.IMMUTABLE.lastGamesOpponentIds.size() == 0 &&
+          doc.IMMUTABLE.lastGamesVariantIds.size() == 0 &&
           // User must be created in a batch with a username document
           getAfter(/databases/$(database)/documents/usernames/$(doc.IMMUTABLE.username)).data.userId == userId &&
           // User must be created in a batch with a private document
@@ -432,7 +439,8 @@ service cloud.firestore {
         let HISTORY_REGEX = '^([a-p][0-9]{1,2}[a-p][0-9]{1,2}(=..?)? )*$';
         return
           hasFields(doc, ['moveHistory', 'playerToMove', 'IMMUTABLE'], ['winner']) &&
-          hasFields(doc.IMMUTABLE, ['timeCreated', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName', 'requestedColor', 'players', 'calledFinishGame'], ['whiteId', 'blackId']) &&
+          hasFields(doc.IMMUTABLE, ['timeCreated', 'variantId', 'variant', 'whiteDisplayName', 'blackDisplayName',
+              'requestedColor', 'players', 'calledFinishGame'], ['whiteId', 'blackId']) &&
           doc.moveHistory is string &&
           doc.moveHistory.size() <= 10000 &&
           doc.moveHistory.matches(HISTORY_REGEX) &&

@@ -3,7 +3,7 @@ import { makeFirestoreContext } from '../make-context'
 import { insertGame } from './games-mock'
 import { insertUserWithGames } from '../user/user-mock'
 import admin from 'firebase-admin'
-import type { GameOverTriggerDoc, VariantDoc, UserDoc, GameDoc } from '@/firebase/db/schema'
+import type { GameOverTriggerDoc, VariantDoc, UserDoc, GameDoc, GameSummary } from '@/firebase/db/schema'
 import type { Timestamp } from 'firebase/firestore'
 import { expectLog, expectNoErrorLog } from '../utils'
 
@@ -20,6 +20,11 @@ function makeSnap() {
 }
 function makeContext() {
   return makeFirestoreContext({ gameId: GAME_ID })
+}
+
+function expectedVariantIds(game: GameSummary[]) {
+  return game.map(g => g.variantId)
+    .reduce((acc, id) => acc.includes(id) ? acc : [...acc, id], [] as string[])
 }
 
 
@@ -47,6 +52,8 @@ test('game finishes and white player wins game', async () => {
       numGamesPlayed: whiteUserBefore.IMMUTABLE.numGamesPlayed + 1,
       numWinPoints: whiteUserBefore.IMMUTABLE.numWinPoints + 1,
       last5Games: expect.any(String),
+      lastGamesOpponentIds: ['black_id'],
+      lastGamesVariantIds: [VARIANT_ID],
     },
   })
   const whiteLast5GamesBefore = JSON.parse(whiteUserBefore.IMMUTABLE.last5Games)
@@ -65,12 +72,15 @@ test('game finishes and white player wins game', async () => {
   })
   
   // Black profile was updated
+  const expectedOpponentIds = ['white_id', ...blackUserBefore.IMMUTABLE.lastGamesOpponentIds.slice(0, 4)]
   expect(blackUserAfter).toEqual({
     ...blackUserBefore,
     IMMUTABLE: {
       ...blackUserBefore.IMMUTABLE,
       numGamesPlayed: blackUserBefore.IMMUTABLE.numGamesPlayed + 1,
       last5Games: expect.any(String),
+      lastGamesOpponentIds: expectedOpponentIds,
+      lastGamesVariantIds: expect.arrayContaining([VARIANT_ID]),
     },
   })
   const blackLast5GamesBefore = JSON.parse(blackUserBefore.IMMUTABLE.last5Games)
@@ -87,6 +97,8 @@ test('game finishes and white player wins game', async () => {
     opponentId: 'white_id',
     opponentName: 'White Name',
   })
+  expect(blackLast5Games[1]).toEqual(blackLast5GamesBefore[0])
+  expect(blackUserAfter.IMMUTABLE.lastGamesVariantIds).toEqual(expectedVariantIds(blackLast5Games))
   
   // Game was marked as finished
   expect(gameAfter).toEqual({
@@ -129,6 +141,8 @@ test('game finishes and black player wins game', async () => {
       ...whiteUserBefore.IMMUTABLE,
       numGamesPlayed: whiteUserBefore.IMMUTABLE.numGamesPlayed + 1,
       last5Games: expect.any(String),
+      lastGamesOpponentIds: ['black_id'],
+      lastGamesVariantIds: [VARIANT_ID],
     },
   })
   const whiteLast5Games = JSON.parse(whiteUserAfter.IMMUTABLE.last5Games)
@@ -152,6 +166,8 @@ test('game finishes and black player wins game', async () => {
       numGamesPlayed: blackUserBefore.IMMUTABLE.numGamesPlayed + 1,
       numWinPoints: blackUserBefore.IMMUTABLE.numWinPoints + 1,
       last5Games: expect.any(String),
+      lastGamesOpponentIds: ['white_id', ...blackUserBefore.IMMUTABLE.lastGamesOpponentIds.slice(0, 4)],
+      lastGamesVariantIds: expect.arrayContaining([VARIANT_ID]),
     },
   })
   const blackLast5Games = JSON.parse(blackUserAfter.IMMUTABLE.last5Games)
@@ -166,6 +182,7 @@ test('game finishes and black player wins game', async () => {
     opponentId: 'white_id',
     opponentName: 'White Name',
   })
+  expect(blackUserAfter.IMMUTABLE.lastGamesVariantIds).toEqual(expectedVariantIds(blackLast5Games))
   
   expect(gameAfter.IMMUTABLE.calledFinishGame).toEqual(true)
   expect(variantAfter.popularity).toEqual(variantBefore.popularity - 1)
@@ -195,6 +212,8 @@ test('game finishes and there is a draw', async () => {
       numGamesPlayed: whiteUserBefore.IMMUTABLE.numGamesPlayed + 1,
       numWinPoints: whiteUserBefore.IMMUTABLE.numWinPoints + 0.5,
       last5Games: expect.any(String),
+      lastGamesOpponentIds: ['black_id'],
+      lastGamesVariantIds: [VARIANT_ID],
     },
   })
   const whiteLast5Games = JSON.parse(whiteUserAfter.IMMUTABLE.last5Games)
@@ -218,6 +237,8 @@ test('game finishes and there is a draw', async () => {
       numGamesPlayed: blackUserBefore.IMMUTABLE.numGamesPlayed + 1,
       numWinPoints: blackUserBefore.IMMUTABLE.numWinPoints + 0.5,
       last5Games: expect.any(String),
+      lastGamesOpponentIds: expect.arrayContaining(['white_id']),
+      lastGamesVariantIds: expect.arrayContaining([VARIANT_ID]),
     },
   })
   const blackLast5Games = JSON.parse(blackUserAfter.IMMUTABLE.last5Games)
