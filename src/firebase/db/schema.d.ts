@@ -32,7 +32,7 @@ export interface UserDoc {
 }
 export interface GameSummary {
   gameId: string
-  variantId: string // TODO: Cascade delete
+  variantId: string
   variantName: string
   timeCreatedMs: number
   playedSide: 'white' | 'black'

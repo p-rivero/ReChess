@@ -166,8 +166,8 @@ test('deleted users are removed from other caches', async () => {
 
 
 test('deleted users are removed from other caches', async () => {
-  const whitePlayer = await insertUserWithGames(db, 'white_id', 5)
-  const blackPlayer = await insertUserWithGames(db, 'black_id', 5)
+  await insertUserWithGames(db, 'white_id', 5)
+  await insertUserWithGames(db, 'black_id', 5)
   const variant = await insertVariant(db, VARIANT_ID)
   
   await insertGame(db, 'not_deleted_2', 'another_variant', 'white', true)
