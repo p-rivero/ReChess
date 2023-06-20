@@ -4,6 +4,7 @@ import { fetchUserDoc } from '../user/helpers/fetch-user'
 import { updateVariantPopularity } from '../variant/helpers/update-variant-metrics'
 import { useAdmin } from '../helpers'
 import type { GameDoc, GameSummary, UserDoc } from 'db/schema'
+import { createGameSummary, extractIds } from './helpers/game-summary'
 
 /**
  * Triggered when a game finishes successfully. Updates the denormalized
@@ -66,28 +67,6 @@ async function updateProfile(game: [string, GameDoc], userId: string): Promise<v
   await appendGameSummary([userId, userDoc], newGame)
 }
 
-function createGameSummary(game: [string, GameDoc], playerId: string): GameSummary {
-  const [gameId, gameDoc] = game
-  const playedSide = gameDoc.IMMUTABLE.whiteId === playerId ? 'white' : 'black'
-  
-  const result = playerResult(playedSide, gameDoc.winner)
-  
-  const [opponentId, opponentName] = playedSide === 'white' ?
-    [gameDoc.IMMUTABLE.blackId, gameDoc.IMMUTABLE.blackDisplayName] :
-    [gameDoc.IMMUTABLE.whiteId, gameDoc.IMMUTABLE.whiteDisplayName]
-  
-  return {
-    gameId,
-    variantId: gameDoc.IMMUTABLE.variantId,
-    variantName: gameDoc.IMMUTABLE.variant.name,
-    timeCreatedMs: gameDoc.IMMUTABLE.timeCreated.toMillis(),
-    playedSide,
-    result,
-    opponentId,
-    opponentName,
-  }
-}
-
 async function appendGameSummary(user: [string, UserDoc], newGame: GameSummary) {
   const MAX_CACHED_GAMES = 5
   const { db } = await useAdmin()
@@ -98,8 +77,7 @@ async function appendGameSummary(user: [string, UserDoc], newGame: GameSummary) 
   if (lengthAfterAddingGame > MAX_CACHED_GAMES) {
     last5Games.pop()
   }
-  const opponentIds = removeNullsAndDuplicates(last5Games.map(game => game.opponentId))
-  const variantIds = removeNullsAndDuplicates(last5Games.map(game => game.variantId))
+  const { opponentIds, variantIds } = extractIds(last5Games)
   
   // It would be safer to use a transaction here to read and update the profile, but
   // it would make the code less readable and it's not a big deal, since the same user
@@ -116,14 +94,4 @@ async function appendGameSummary(user: [string, UserDoc], newGame: GameSummary) 
   } catch (e) {
     console.error('Cannot update profile', userId, e)
   }
-}
-
-function playerResult(side: 'white'|'black', winner: 'white'|'black'|'draw'|null): 'win'|'loss'|'draw' {
-  if (!winner) throw new Error('Game is not finished')
-  if (winner === 'draw') return 'draw'
-  return winner === side ? 'win' : 'loss'
-}
-
-function removeNullsAndDuplicates(array: (string|null)[]): string[] {
-  return [...new Set(array.filter(s => s))] as string[]
 }

@@ -2,6 +2,7 @@
 import { type CallableContext, HttpsError } from 'firebase-functions/v1/https'
 import { VariantIndexDoc } from 'db/schema'
 import { batchedUpdate, useAdmin } from '../helpers'
+import { refreshUserLastGames } from '../user/helpers/update-games-cache'
 import assertModerator from './helpers/assert-moderator'
 
 /**
@@ -28,7 +29,29 @@ export default async function(data: unknown, context: CallableContext): Promise<
     throw new HttpsError('invalid-argument', 'The variantId must be a string.')
   }
   
-  // Delete games played on the variant
+  await deleteVariantLobby(variantId)
+  await deleteVariantGames(variantId)
+  await deleteVariant(variantId)
+  await removeVariantFromSearchIndex(variantId)
+}
+
+
+async function deleteVariant(variantId: string) {
+  const { db } = await useAdmin()
+  await db.collection('variants').doc(variantId).delete()
+  await db.collection('variantModeration').doc(variantId).delete()
+}
+
+async function deleteVariantLobby(variantId: string) {
+  const { db } = await useAdmin()
+  const lobbyDocs = await db.collection('variants').doc(variantId).collection('lobby').get()
+  await batchedUpdate(lobbyDocs, (batch, ref) => {
+    batch.delete(ref)
+  })
+}
+
+
+async function deleteVariantGames(variantId: string) {
   const { db } = await useAdmin()
   const games = await db.collection('games').where('IMMUTABLE.variantId', '==', variantId).get()
   await batchedUpdate(games, (batch, ref) => {
@@ -38,24 +61,12 @@ export default async function(data: unknown, context: CallableContext): Promise<
     batch.delete(ref.collection('gameOverTrigger').doc('doc'))
   })
   
-  // Delete the variant, reports and lobby slots
-  await db.collection('variants').doc(variantId).delete()
-  await db.collection('variantModeration').doc(variantId).delete()
-  const lobbyDocs = await db.collection('variants').doc(variantId).collection('lobby').get()
-  await batchedUpdate(lobbyDocs, (batch, ref) => {
-    batch.delete(ref)
-  })
-  
-  await updateIndex(variantId)
+  const affectedUsers = await db.collection('users').where('IMMUTABLE.lastGamesVariantIds', 'array-contains', variantId).select().get()
+  const affectedUserIds = affectedUsers.docs.map((doc) => doc.id)
+  await Promise.all(affectedUserIds.map((userId) => refreshUserLastGames(userId)))
 }
 
-
-/**
- * Removes the variant from the variant index.
- * @param {string} removedId UID of the variant that is being removed
- * @return {Promise<void>} A promise that resolves when the function is complete
- */
-async function updateIndex(removedId: string) {
+async function removeVariantFromSearchIndex(removedVariantId: string) {
   const { db } = await useAdmin()
   const indexes = await db.collection('variantIndex').get()
   let found = false
@@ -63,7 +74,7 @@ async function updateIndex(removedId: string) {
   for (const doc of indexes.docs) {
     const data = doc.data() as VariantIndexDoc
     const indexRows = data.index.split('\n')
-    const rowsFiltered = indexRows.filter((row) => !row.startsWith(removedId + '\t'))
+    const rowsFiltered = indexRows.filter((row) => !row.startsWith(removedVariantId + '\t'))
     const indexFiltered = rowsFiltered.join('\n')
     if (indexFiltered === data.index) continue
     await db.collection('variantIndex').doc(doc.id).update({ index: indexFiltered })
@@ -71,6 +82,6 @@ async function updateIndex(removedId: string) {
   }
   
   if (!found) {
-    console.error(`Could not find index entry for ${removedId}`)
+    console.error(`Could not find index entry for ${removedVariantId}`)
   }
 }

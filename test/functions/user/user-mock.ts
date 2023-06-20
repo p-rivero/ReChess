@@ -34,8 +34,8 @@ function makeGameSummaries(opponentIds: string[], variantIds: string[]): string 
 
 export async function insertUserWithGames(db: DB, userId: string, gamesPlayed: number): Promise<UserDoc> {
   gamesPlayed = Math.min(gamesPlayed, 5)
-  const opponentIds = Array.from({ length: gamesPlayed }, () => randomId())
-  const variantIds = Array.from({ length: 3 }, () => randomId())
+  const opponentIds = Array.from({ length: gamesPlayed }, randomId)
+  const variantIds = Array.from({ length: 3 }, randomId)
   const doc: UserDoc = {
     name: 'User Name',
     about: 'About me',
