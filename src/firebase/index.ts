@@ -12,7 +12,7 @@ import { initializeApp } from 'firebase/app'
 
 declare global {
   // eslint-disable-next-line no-var
-  var FIREBASE_APPCHECK_DEBUG_TOKEN: boolean | string | undefined
+  var FIREBASE_APPCHECK_DEBUG_TOKEN: boolean | string | undefined //NOSONAR
 }
 
 // Initialize Firebase

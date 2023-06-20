@@ -65,7 +65,7 @@
   import PieceImageView from '@/components/variant/PieceImageView.vue'
   import type { FullPieceDef, PieceId, Player, Variant } from '@/protochess/types'
   
-  const selectedId = ref<PieceId|'wall'|'delete'|'none'>('none')
+  const selectedId = ref<PieceId|'wall'|'delete'|'none'>('none') //NOSONAR PieceId = string
     
   const props = defineProps<{
     variant: Variant
@@ -73,7 +73,7 @@
   }>()
   
   const emit = defineEmits<{
-    (event: 'piece-selected', piece: PieceId | 'wall' | 'delete'): void
+    (event: 'piece-selected', piece: PieceId | 'wall' | 'delete'): void //NOSONAR PieceId = string
     (event: 'piece-deselected'): void
     (event: 'delete-click'): void
     (event: 'clear-all-click'): void
@@ -119,7 +119,7 @@
   }, { immediate: true })
   
   function onPieceClick(piece: Piece | 'wall' | 'delete') {
-    let id: PieceId | 'wall' | 'delete'
+    let id: PieceId | 'wall' | 'delete' //NOSONAR PieceId = string
     
     if (typeof piece === 'string') {
       // Wall or delete

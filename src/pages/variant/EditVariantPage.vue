@@ -331,7 +331,7 @@
   const errorMsgHandler = new ErrorMessageHandler(hasError)
   
   const pieceSelector = ref<InstanceType<typeof PiecePlacementButtons>>()
-  const selectedPieceId = ref<PieceId|'wall'|'delete'|'none'>('none')
+  const selectedPieceId = ref<PieceId|'wall'|'delete'|'none'>('none') //NOSONAR PieceId = string
   
   // This page is only accessible when logged in
   if (!authStore.loggedUser) {
