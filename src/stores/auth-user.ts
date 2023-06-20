@@ -41,6 +41,8 @@ export class AuthUser extends User {
         numGamesPlayed: 0,
         numWinPoints: 0,
         last5Games: '[]',
+        lastGamesOpponentIds: [],
+        lastGamesVariantIds: [],
       },
     }
     super(authUser.uid, dbUser ?? DEFAULT_DOC)
