@@ -13,6 +13,7 @@ const db = app.firestore()
 const auth = app.auth()
 const storage = app.storage()
 const wipeUser = testEnv.wrap(functions.wipeUser)
+const discardUserReports = testEnv.wrap(functions.discardUserReports)
 
 const MODERATOR_ID = 'moderator_user_id'
 const WIPED_ID = 'wiped_user_id'
@@ -256,6 +257,35 @@ test('user profile picture is deleted', async () => {
   expect(exists).toBe(false)
 })
 
+test('wipe user after discarding a report', async () => {
+  const context = makeModeratorContext(MODERATOR_ID)
+  const user = await auth.createUser({ uid: WIPED_ID })
+  await insertUser(db, user)
+  await insertReport(db, WIPED_ID, 'user', 'reported_user_1')
+  await insertReport(db, WIPED_ID, 'user', 'reported_user_2')
+  
+  const wipedUserCacheBefore = await db.collection('users').doc(WIPED_ID).collection('reportedUsers').doc('reported_user_1').get()
+  expect(wipedUserCacheBefore.data()).toEqual({
+    time: expect.anything(),
+    reason: `The user ${WIPED_ID} reported the user reported_user_1`,
+    onlyBlock: false,
+  })
+  
+  await expectSuccess(discardUserReports({ userId: 'reported_user_1', reporters: [WIPED_ID, 'other_reporter'] }, context))
+  
+  const report1 = await db.collection('userModeration').doc('reported_user_1').get()
+  expect(report1.exists).toEqual(false)
+  const report2 = await db.collection('userModeration').doc('reported_user_2').get()
+  expect(report2.exists).toEqual(true)
+  
+  const args = makeArgs(WIPED_ID)
+  await expectSuccess(wipeUser(args, context))
+  
+  const report1After = await db.collection('userModeration').doc('reported_user_1').get()
+  expect(report1After.exists).toEqual(false)
+  const report2After = await db.collection('userModeration').doc('reported_user_2').get()
+  expect(report2After.exists).toEqual(false)
+})
 
 
 test('arguments must be correct', async () => {

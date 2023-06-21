@@ -4,6 +4,9 @@ $primary: $brown;
 $primary-dark: $dark-brown;
 $primary-light: $light-brown;
 
+// Default green is too light for white background
+$success: $darker-green;
+
 $link: $primary;
 $link-visited: $primary;
 $link-hover: $grey-darker;

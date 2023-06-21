@@ -23,7 +23,8 @@ export async function discardReports(reporters: unknown, docRef: FirebaseFiresto
     // Get the moderation document
     const modSnap = await transaction.get(docRef)
     if (!modSnap.exists) {
-      throw new HttpsError('not-found', 'This moderation document does not exist.')
+      // The variant or user has 0 reports, do nothing
+      return
     }
     const modDoc = modSnap.data() as ModerationDoc
     

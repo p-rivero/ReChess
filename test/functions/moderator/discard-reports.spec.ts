@@ -340,18 +340,19 @@ test('caller must be authenticated as a moderator', async () => {
   await test(async context => await discardVariantReports(variantArg, context))
 })
 
-test('cannot remove reports for a moderationDoc that does not exist', async () => {
+test('removing reports for non-existent moderationDoc does nothing', async () => {
   const context = makeModeratorContext(MODERATOR_ID)
   const userArg = userArgs(REPORTED_ID, ['a', 'b', 'c'])
   const variantArg = variantArgs(VARIANT_ID, ['a', 'b', 'c'])
   
-  let e = await expectHttpsError(discardUserReports(userArg, context))
-  expect(e.message).toMatch('This moderation document does not exist.')
-  expect(e.code).toBe('not-found')
+  // Don't throw an error if the moderationDoc doesn't exist, since we want the function to be idempotent.
+  await expectSuccess(discardUserReports(userArg, context))
+  const userModerationDoc = await db.collection('userModeration').doc(REPORTED_ID).get()
+  expect(userModerationDoc.exists).toBe(false)
   
-  e = await expectHttpsError(discardVariantReports(variantArg, context))
-  expect(e.message).toMatch('This moderation document does not exist.')
-  expect(e.code).toBe('not-found')
+  await expectSuccess(discardVariantReports(variantArg, context))
+  const variantModerationDoc = await db.collection('variantModeration').doc(VARIANT_ID).get()
+  expect(variantModerationDoc.exists).toBe(false)
 })
 
 
