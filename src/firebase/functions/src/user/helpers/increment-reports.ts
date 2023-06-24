@@ -39,6 +39,9 @@ async function appendReport(moderationRef: DocumentReference, reporterId: string
       let newDoc: ModerationDoc
       if (moderationSnap.exists) {
         const oldDoc = moderationSnap.data() as ModerationDoc
+        if (missingNewline(oldDoc.reportsSummary)) {
+          oldDoc.reportsSummary += '\n'
+        }
         newDoc = {
           numReports: oldDoc.numReports + 1,
           reportsSummary: oldDoc.reportsSummary + newSummaryLine,
@@ -52,4 +55,8 @@ async function appendReport(moderationRef: DocumentReference, reporterId: string
     console.error(`Error while appending report to ${moderationRef.path}`)
     console.error(err)
   }
+}
+
+function missingNewline(text: string) {
+  return text.length > 0 && text[text.length - 1] !== '\n'
 }

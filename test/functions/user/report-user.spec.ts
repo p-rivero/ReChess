@@ -184,6 +184,35 @@ test('user can report 2 users', async () => {
   })
 })
 
+test('can recover from missing newline', async () => {
+  const reporter = await auth.createUser({
+    uid: 'another_reporter',
+    displayName: 'Another Reporter',
+  })
+  const reporterDoc = await insertUser(db, reporter)
+  const reported = await auth.createUser({
+    uid: REPORTED_ID,
+    displayName: 'Reported User',
+  })
+  await insertUser(db, reported)
+  
+  await db.collection('userModeration').doc(REPORTED_ID).set({
+    numReports: 1,
+    reportsSummary: `some_name\tSome reason\t1234`, // missing newline
+  })
+  const snap = await insertUserReport(db, testEnv, 'another_reporter', REPORTED_ID)
+  const done = expectNoErrorLog()
+  await reportUser(snap, makeContext('another_reporter'))
+  done()
+  
+  const modDoc = await db.doc(`userModeration/${REPORTED_ID}`).get()
+  expect(modDoc.data()).toEqual({
+    numReports: 2,
+    reportsSummary: `some_name\tSome reason\t1234\n` + // newline added
+      `${reporterDoc.IMMUTABLE.username}\tSome reason\t${snap.data().time.toMillis()}\n`,
+  })
+})
+
 // The database rules already check that:
 // - users cannot report themselves
 // - users cannot report the same user twice

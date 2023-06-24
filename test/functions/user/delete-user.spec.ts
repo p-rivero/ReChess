@@ -87,6 +87,30 @@ test('upvotes are deleted' , async () => {
   expect(await collectionSize('upvotedVariants')).toBe(0)
 })
 
+test('empty private cache is also deleted' , async () => {
+  const user = await auth.createUser({
+    uid: USER_ID,
+    displayName: 'The Deleted User',
+    photoURL: 'https://example.com/user.png',
+  })
+  await insertUser(db, user)
+  
+  await db.collection('users').doc(USER_ID).collection('privateCache').doc('doc').set({
+    reportedUsers: '',
+    reportedVariants: '',
+    upvotedVariants: '',
+  })
+  
+  expect(await collectionSize('privateCache')).toBe(1)
+  
+  const done = expectNoErrorLog()
+  await auth.deleteUser(user.uid)
+  await deleteUser(user)
+  done()
+  
+  expect(await collectionSize('privateCache')).toBe(0)
+})
+
 test('user reports are deleted', async () => {
   const user = await auth.createUser({
     uid: USER_ID,
