@@ -5,6 +5,24 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "IMMUTABLE.players",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "playerToMove",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "IMMUTABLE.timeCreated",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "games",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
           "fieldPath": "IMMUTABLE.variantId",
           "order": "ASCENDING"
         },
