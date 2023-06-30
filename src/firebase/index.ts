@@ -4,7 +4,7 @@ import { CAPTCHA_V3_PUBLIC_KEY, FIREBASE_CONFIG, PIECE_IMAGES_BUCKET_URL } from 
 import { FUNCTIONS_REGION } from './functions/src/config'
 import { ReCaptchaV3Provider, initializeAppCheck } from 'firebase/app-check'
 import { browserLocalPersistence, connectAuthEmulator, getAuth } from 'firebase/auth'
-import { connectFirestoreEmulator, enableMultiTabIndexedDbPersistence, getFirestore } from 'firebase/firestore'
+import { connectFirestoreEmulator, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from 'firebase/functions'
 import { connectStorageEmulator, getStorage } from 'firebase/storage'
 import { getPerformance } from 'firebase/performance'
@@ -20,7 +20,12 @@ const app = initializeApp(
   { apiKey: import.meta.env.VITE_RECHESS_FIREBASE_API_KEY, ...FIREBASE_CONFIG },
   { automaticDataCollectionEnabled: false }
 )
-export const db = getFirestore(app)
+
+const tabManager = import.meta.env.DEV ? undefined : persistentMultipleTabManager()
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager }),
+})
+
 export const defaultStorage = getStorage(app)
 export const pieceStorage = getStorage(app, PIECE_IMAGES_BUCKET_URL)
 export const auth = getAuth(app)
@@ -37,18 +42,6 @@ if (import.meta.env.DEV) {
   connectStorageEmulator(defaultStorage, 'localhost', 9199)
   connectStorageEmulator(pieceStorage, 'localhost', 9199)
   connectFunctionsEmulator(functions, 'localhost', 5001)
-}
-
-// Enable multi-tab persistence only in production, since the emulator is cleared on every restart
-// and the cached data would be out of sync
-if (!import.meta.env.DEV) {
-  enableMultiTabIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('Persistence could not be enabled because another tab is already open')
-    } else if (err.code === 'unimplemented') {
-      console.warn('The current browser does NOT support firestore persistence.')
-    }
-  })
 }
 
 initializeAppCheck(app, {
