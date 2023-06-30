@@ -39,7 +39,7 @@ async function appendReport(moderationRef: DocumentReference, reporterId: string
       let newDoc: ModerationDoc
       if (moderationSnap.exists) {
         const oldDoc = moderationSnap.data() as ModerationDoc
-        if (missingNewline(oldDoc.reportsSummary)) {
+        if (needsNewline(oldDoc.reportsSummary)) {
           oldDoc.reportsSummary += '\n'
         }
         newDoc = {
@@ -57,6 +57,6 @@ async function appendReport(moderationRef: DocumentReference, reporterId: string
   }
 }
 
-function missingNewline(text: string) {
-  return text.length > 0 && text[text.length - 1] !== '\n'
+function needsNewline(text: string) {
+  return text.length > 0 && !text.endsWith('\n')
 }
