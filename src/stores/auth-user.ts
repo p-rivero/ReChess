@@ -93,7 +93,8 @@ export const useAuthStore = defineStore('auth-user', () => {
       UserDB.getUserPrivateCache(newUser.uid),
       newUser.getIdTokenResult(),
     ])
-    persistUser(new AuthUser(newUser, user, cache, token.claims.moderator))
+    const moderator = !!token.claims.moderator
+    persistUser(new AuthUser(newUser, user, cache, moderator))
     
     // If the user has just verified their email, the popup may already be showing.
     // If needed, hide it.
