@@ -133,19 +133,17 @@
       pill.error = false
       pill.editing = false
       callbackOnChanged()
+    } else if (!pill.error) {
+      // First attempt: show error, re-focus input
+      pill.error = true
+      focusPillInput()
     } else {
-      if (!pill.error) {
-        // First attempt: show error, re-focus input
-        pill.error = true
-        focusPillInput()
-      } else {
-        // Second attempt: revert to original text, stop editing
-        pill.text = pill.originalText
-        pill.error = false
-        pill.editing = false
-        // Pill was just created and the user entered invalid text
-        if (pill.originalText === '') removePill(pill)
-      }
+      // Second attempt: revert to original text, stop editing
+      pill.text = pill.originalText
+      pill.error = false
+      pill.editing = false
+      // Pill was just created and the user entered invalid text
+      if (pill.originalText === '') removePill(pill)
     }
   }
 

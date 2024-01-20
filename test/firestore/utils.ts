@@ -70,12 +70,12 @@ export class Batch {
 
 export function notInitialized(): TestUtilsSignature {
   return {
-    get: () => Promise.reject('Test environment not initialized'),
-    query: () => Promise.reject('Test environment not initialized'),
-    set: () => Promise.reject('Test environment not initialized'),
-    update: () => Promise.reject('Test environment not initialized'),
-    add: () => Promise.reject('Test environment not initialized'),
-    remove: () => Promise.reject('Test environment not initialized'),
+    get: () => Promise.reject(new Error('Test environment not initialized')),
+    query: () => Promise.reject(new Error('Test environment not initialized')),
+    set: () => Promise.reject(new Error('Test environment not initialized')),
+    update: () => Promise.reject(new Error('Test environment not initialized')),
+    add: () => Promise.reject(new Error('Test environment not initialized')),
+    remove: () => Promise.reject(new Error('Test environment not initialized')),
     now: () => {throw new Error('Test environment not initialized')},
     afterSeconds: () => {throw new Error('Test environment not initialized')},
     startBatch: () => {throw new Error('Test environment not initialized')},

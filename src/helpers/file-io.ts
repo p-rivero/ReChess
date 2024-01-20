@@ -23,7 +23,7 @@ export function importFile(contentType: string): Promise<Blob> {
       if (file) {
         resolve(file)
       } else {
-        reject('No file selected')
+        reject(new Error('No file selected'))
       }
     }
     input.click()
