@@ -54,6 +54,8 @@ jobs:
       
       - name: Build
         run: npm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=16384
       
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
