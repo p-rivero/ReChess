@@ -1,10 +1,11 @@
-import { type RouteRecordRaw, createRouter, createWebHistory } from 'vue-router'
 import { updateTitle } from '@/helpers/web-utils'
 import HomePage from '@/pages/HomePage.vue'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 // https://github.com/mutoe/vue3-realworld-example-app/blob/master/src/router.ts
 
 export type AppRouteNames =
   | 'home'
+  | 'home-index'
   | 'variant-details'
   | 'variant-lobby'
   | 'variant-analysis'
@@ -27,6 +28,11 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'home',
     path: '/',
+    component: HomePage,
+  },
+  {
+    name: 'home-index',
+    path: '/index.html',
     component: HomePage,
   },
   

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.polrivero.rechess" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>ReChess</name>
+    <description>Chess reinvented by you</description>
+    <author email="pol@polrivero.com" href="https://rechess.org">
+        Pol Rivero
+    </author>
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+
+    <icon src="www/android-chrome-512x512.png" />
+    <preference name="FadeSplashScreen" value="false" />
+    <platform name="android">
+        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/android-splash.png" />
+    </platform>
+</widget>

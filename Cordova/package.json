@@ -1,0 +1,20 @@
+{
+  "name": "com.polrivero.rechess",
+  "displayName": "ReChess",
+  "version": "1.0.0",
+  "description": "Chess reinvented by you.",
+  "main": "index.js",
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Pol Rivero",
+  "license": "MIT",
+  "cordova": {
+    "platforms": [
+      "android"
+    ]
+  },
+  "devDependencies": {
+    "cordova-android": "^13.0.0"
+  }
+}
