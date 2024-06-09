@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "run-p pre-compile start-emulator dev-only",
-    "build": "run-s pre-compile type-check build-only copy-dist-cordova",
-    "build-android": "cd Cordova && cordova build android --release -- --packageType=apk",
+    "build": "run-s pre-compile type-check build-only",
     "preview": "vite preview --port 4173 --config .config/vite.config.ts",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --config .config/.eslintrc.cjs",
     "test": "jest --config .config/jest.config.js",
@@ -16,10 +15,14 @@
     "build-wasm": "make all use-pathname --directory protochess-engine/protochess-engine-wasm",
     "type-check": "vue-tsc --noEmit",
     "build-only": "vite build --config .config/vite.config.ts",
-    "copy-dist-cordova": "rm -rf ./Cordova/www && cp -r ./dist ./Cordova/www",
     "dev-only": "vite --config .config/vite.config.ts",
     "start-emulator": "firebase emulators:start",
-    "postinstall": "chmod +x ./src/assets/icons/generate-icons.sh; patch-package"
+    "postinstall": "chmod +x ./src/assets/icons/generate-icons.sh; patch-package",
+    "build-android": "run-s android:copy-dist android:build android:sign",
+    "android:copy-dist": "rm -rf Cordova/www && cp -r dist Cordova/www",
+    "android:build": "cd Cordova && cordova build android --release --bundle --sign",
+    "android:sign": "jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore Cordova/android.keystore Cordova/platforms/android/app/build/outputs/bundle/release/app-release.aab com.polrivero.rechess",
+    "android:copy-result": "cp Cordova/platforms/android/app/build/outputs/bundle/release/app-release.aab Cordova/signed.aab"
   },
   "dependencies": {
     "bulma": "^0.9.4",

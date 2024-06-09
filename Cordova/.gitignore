@@ -27,3 +27,5 @@ node_modules/
 
 # Manually copy dist directory
 www/*
+
+signed.aab
